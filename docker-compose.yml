@@ -107,6 +107,9 @@ services:
   edc:
       build: 
         context: ./edc
+        args:
+          - GIT_URL=https://github.com/eclipse-edc/Connector.git
+          - TAG=v0.0.1-milestone-9
       <<: *default_restart_policy
       env_file:
         - edc/edc.env
@@ -117,6 +120,8 @@ services:
         - 8181:8181
         - 8182:8182
         - 8282:8282
+      volumes:
+        - ./edc/config.properties:/config.properties:ro
       
   api:
     build:
