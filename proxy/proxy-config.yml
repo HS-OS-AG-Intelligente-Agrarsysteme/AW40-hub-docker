@@ -1,0 +1,12 @@
+providers:
+  docker:
+    network: hubnet
+    exposedByDefault: false
+entrypoints:
+  web:
+    address: :80
+  websecure:
+    address: :443
+log:
+  level: ERROR
+api: {}

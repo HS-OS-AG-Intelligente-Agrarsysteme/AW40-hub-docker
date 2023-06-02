@@ -4,6 +4,26 @@ x-restart-policy: &default_restart_policy
   restart: ${DEFAULT_RESTART_POLICY}
 
 services:
+  proxy:
+    image: traefik:2.10
+    <<: *default_restart_policy
+    hostname: "traefik"
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=hubnet
+      - traefik.http.routers.traefik.rule=Host(`${TRAEFIK_ADDRESS}`)
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.entrypoints=web
+
+    networks:
+      - hubnet
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - ./proxy/proxy-config.yml:/etc/traefik/traefik.yml:ro
+
   mongo:
     build: 
       context: ./mongo
@@ -32,13 +52,20 @@ services:
     env_file:
       - keycloak/keycloak.env
     hostname: "keycloak"
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=hubnet
+      - traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_ADDRESS}`)
+      - traefik.http.routers.keycloak.entrypoints=web
+      - traefik.http.services.keyloak.loadbalancer.server.port=8080
+      - traefik.http.services.keyloak.loadbalancer.server.scheme=http
     networks:
       - keycloaknet
       - hubintranet
       - hubnet
+
     ports:
-      - 8080:8080
-      - 8443:8443
+      - 127.0.0.1:8080:8080
     volumes:
       - ./keycloak/werkstatthub-realm.json:/opt/keycloak/data/import/wh.json:ro
     healthcheck:
@@ -85,12 +112,18 @@ services:
         condition: service_completed_successfully
     env_file:
       - minio/minio.env
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=hubnet
+      - traefik.http.routers.minio.rule=Host(`${MINIO_ADDRESS}`)
+      - traefik.http.routers.minio.entrypoints=web
+      - traefik.http.services.minio.loadbalancer.server.port=9090
+      - traefik.http.services.minio.loadbalancer.server.scheme=http
     networks:
       - hubintranet
       - hubnet
     ports:
-      - 9000:9000
-      - 9090:9090
+      - 127.0.0.1:9000:9000
     volumes:
       - minio-data:/data
     healthcheck:
@@ -107,9 +140,10 @@ services:
               condition: service_healthy
       entrypoint: ["sh","-c","chmod +x /minio-config.sh && ./minio-config.sh"]
       environment:
-          - HOST_IP_ADDRESS=${HOST_IP_ADDRESS}
           - S3_ROOT_USER=${S3_ROOT_USER}
           - S3_ROOT_PASSWORD=${S3_ROOT_PASSWORD}
+      networks:
+        - hubintranet
       volumes:
         - ./minio/minio-config.sh:/minio-config.sh
 
@@ -124,11 +158,16 @@ services:
     env_file:
       - api/api.env
     hostname: "api"
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=hubnet
+      - traefik.http.routers.api.rule=Host(`${API_ADDRESS}`)
+      - traefik.http.routers.api.entrypoints=web
+      - traefik.http.services.api.loadbalancer.server.port=8000
+      - traefik.http.services.api.loadbalancer.server.scheme=http
     networks:
       - hubintranet
       - hubnet
-    ports:
-      - 8000:8000
     volumes:
       - ./api/api/:/home/api/api/
 
@@ -136,11 +175,19 @@ services:
     build:
       context: ./docs
     <<: *default_restart_policy
-    ports:
-      - 127.0.0.1:8001:80
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=hubnet
+      - traefik.http.routers.docs.rule=Host(`${DOCS_ADDRESS}`)
+      - traefik.http.routers.docs.entrypoints=web
+      - traefik.http.services.docs.loadbalancer.server.port=80
+      - traefik.http.services.docs.loadbalancer.server.scheme=http
+    networks:
+      - hubnet
 
 networks:
   hubnet:
+    name: hubnet
   hubintranet:
     internal: true
   keycloaknet:

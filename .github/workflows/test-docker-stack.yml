@@ -24,6 +24,10 @@ jobs:
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v2
 
+      - name: Add Hosts entries
+        run: |
+          sudo sh -c "cat hosts_dev >> /etc/hosts"
+
     # Build and tag images  
       - name: Build containers with cache
         run : |
