@@ -3,6 +3,8 @@ FROM python:3.9.5-slim-buster AS base
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+RUN apt-get update && apt-get install curl -y
+
 # create non-root user
 RUN groupadd -r api && \
     useradd -r -g api api
@@ -22,3 +24,6 @@ COPY --chown=api:api ./api/ /home/api/api/
 FROM base as prod
 
 USER api
+
+HEALTHCHECK --interval=30s --timeout=2s --retries=5 \
+  CMD curl -fs http://localhost:8000/v1/health/ping|| exit 1

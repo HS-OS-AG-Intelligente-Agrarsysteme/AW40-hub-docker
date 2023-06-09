@@ -404,7 +404,7 @@ def test_upload_picoscope_data_single_channel(
 
     # upload file and only specify component for one channel
     channel = "A"
-    component = "Motor"
+    component = "Luftmassenmesser"
     with TestClient(test_app) as client:
         response = client.post(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/upload/picoscope",
@@ -459,7 +459,7 @@ def test_upload_picoscope_data_multi_channel(
 
     # upload file and specify components for two channels
     channel_0 = "B"
-    component_0 = "Motor"
+    component_0 = "Luftmassenmesser"
     channel_1 = "C"
     component_1 = "Batterie"
     with TestClient(test_app) as client:

@@ -671,11 +671,11 @@ class TestCase:
         async with initialized_beanie_context:
             # seed case with timeseries_data and save to db
             new_case["timeseries_data"] = [
-                timeseries_data, None, timeseries_data
+                timeseries_data, timeseries_data
             ]
             case = Case(workshop_id=1, **new_case)
             await case.save()
             await case._delete_all_timeseries_signals()
 
-            # delete_signal should have been awaited for each not None entry
+            # delete_signal should have been awaited for each not entry
             assert delete_signal.await_count == 2

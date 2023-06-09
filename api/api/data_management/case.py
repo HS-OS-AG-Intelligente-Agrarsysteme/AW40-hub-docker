@@ -74,9 +74,9 @@ class Case(Document):
     workshop_id: Indexed(str, unique=False)
 
     # diagnostic data
-    timeseries_data: List[Union[TimeseriesData, None]] = []
-    obd_data: List[Union[OBDData, None]] = []
-    symptoms: List[Union[Symptom, None]] = []
+    timeseries_data: List[TimeseriesData] = []
+    obd_data: List[OBDData] = []
+    symptoms: List[Symptom] = []
 
     # keep track of diagnostic data added to set appropriate data_ids
     timeseries_data_added: NonNegativeInt = 0

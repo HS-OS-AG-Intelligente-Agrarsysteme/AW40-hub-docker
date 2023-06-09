@@ -48,7 +48,8 @@ services:
     command: start-dev --import-realm
     container_name: keycloak
     depends_on:
-      - keycloak-db
+      keycloak-db:
+        condition: service_healthy
     env_file:
       - keycloak/keycloak.env
     hostname: "keycloak"
@@ -68,18 +69,12 @@ services:
       - 127.0.0.1:8080:8080
     volumes:
       - ./keycloak/werkstatthub-realm.json:/opt/keycloak/data/import/wh.json:ro
-    healthcheck:
-      test: curl --head -fsS http://localhost:8080/health/ready || exit 1
-      interval: 2s
-      timeout: 2s
-      retries: 30
-      start_period: 30s
 
   keycloak-config:
       image: quay.io/keycloak/keycloak:20.0
       depends_on:
-          keycloak:
-              condition: service_healthy
+        keycloak:
+          condition: service_healthy
       entrypoint: ["sh","-c","chmod +x /init.sh && ./init.sh"]
       env_file:
         - keycloak/keycloak.env
@@ -90,11 +85,12 @@ services:
         - ./keycloak/keycloak-config.sh:/init.sh
 
   keycloak-db:
-    image: postgres:15-alpine
+    build:
+      context: ./keycloak-db
     <<: *default_restart_policy
     container_name: keycloak-db
     env_file:
-      - postgres/postgres.env
+      - keycloak-db/postgres.env
     hostname: "keycloak-db"
     networks:
       - keycloaknet
@@ -105,10 +101,9 @@ services:
     build:
       context: ./minio
       args:
-          - MINIO_VER=RELEASE.2023-05-27T05-56-19Z
+        - MINIO_VER=RELEASE.2023-05-27T05-56-19Z
     <<: *default_restart_policy
     command: server /data --console-address ":9090"
-    hostname: "minio"
     depends_on:
       keycloak-config:
         condition: service_completed_successfully
@@ -121,6 +116,7 @@ services:
       - traefik.http.routers.minio.entrypoints=web
       - traefik.http.services.minio.loadbalancer.server.port=9090
       - traefik.http.services.minio.loadbalancer.server.scheme=http
+    hostname: "minio"
     networks:
       - hubintranet
       - hubnet
@@ -128,18 +124,12 @@ services:
       - 127.0.0.1:9000:9000
     volumes:
       - minio-data:/data
-    healthcheck:
-      test: curl -fs http://localhost:9000/minio/health/live || exit 1
-      interval: 2s
-      timeout: 2s
-      retries: 30
-      start_period: 30s
 
   minio-config:
       image: minio/mc
       depends_on:
-          minio:
-              condition: service_healthy
+        minio:
+          condition: service_healthy
       entrypoint: ["sh","-c","chmod +x /minio-config.sh && ./minio-config.sh"]
       environment:
           - S3_ROOT_USER=${S3_ROOT_USER}
@@ -149,6 +139,20 @@ services:
       volumes:
         - ./minio/minio-config.sh:/minio-config.sh
 
+  edc:
+      build: 
+        context: ./edc
+      <<: *default_restart_policy
+      env_file:
+        - edc/edc.env
+      hostname: "edc"
+      networks:
+        - hubnet
+      ports:
+        - 8181:8181
+        - 8182:8182
+        - 8282:8282
+      
   api:
     build:
       context: ./api
@@ -156,7 +160,8 @@ services:
     # DEVELOPMENT: run with reload and mount api package code
     command: uvicorn --host 0.0.0.0 --reload api.main:app
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     env_file:
       - api/api.env
     hostname: "api"

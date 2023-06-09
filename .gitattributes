@@ -1,0 +1,4 @@
+# These are Windows script files and should use crlf
+*.bat   text eol=crlf
+# These are Linux script files and should use lf
+*.sh    text eol=lf
