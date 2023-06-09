@@ -141,12 +141,26 @@ services:
       env_file:
         - edc/edc.env
       hostname: "edc"
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=hubnet
+        - traefik.http.routers.edc_api.rule=Host(`${EDC_ADDRESS}`) && Path(`/api`)
+        - traefik.http.routers.edc_api.entrypoints=web
+        - traefik.http.routers.edc_api.service=edc_api
+        - traefik.http.services.edc_api.loadbalancer.server.port=8181
+        - traefik.http.services.edc_api.loadbalancer.server.scheme=http
+        - traefik.http.routers.edc_management.rule=Host(`${EDC_ADDRESS}`) && Path(`/management`)
+        - traefik.http.routers.edc_management.entrypoints=web
+        - traefik.http.routers.edc_management.service=edc_management
+        - traefik.http.services.edc_management.loadbalancer.server.port=8182
+        - traefik.http.services.edc_management.loadbalancer.server.scheme=http
+        - traefik.http.routers.edc_protocol.rule=Host(`${EDC_ADDRESS}`) && Path(`/protocol`)
+        - traefik.http.routers.edc_protocol.entrypoints=web
+        - traefik.http.routers.edc_protocol.service=edc_protocol
+        - traefik.http.services.edc_protocol.loadbalancer.server.port=8282
+        - traefik.http.services.edc_protocol.loadbalancer.server.scheme=http
       networks:
         - hubnet
-      ports:
-        - 8181:8181
-        - 8182:8182
-        - 8282:8282
       
   api:
     build:
