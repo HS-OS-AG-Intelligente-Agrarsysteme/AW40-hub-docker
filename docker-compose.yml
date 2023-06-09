@@ -64,9 +64,6 @@ services:
       - keycloaknet
       - hubintranet
       - hubnet
-
-    ports:
-      - 127.0.0.1:8080:8080
     volumes:
       - ./keycloak/werkstatthub-realm.json:/opt/keycloak/data/import/wh.json:ro
 
@@ -120,8 +117,6 @@ services:
     networks:
       - hubintranet
       - hubnet
-    ports:
-      - 127.0.0.1:9000:9000
     volumes:
       - minio-data:/data
 
