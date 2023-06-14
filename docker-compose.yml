@@ -11,9 +11,10 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=hubnet
+
       - traefik.http.routers.traefik.rule=Host(`${TRAEFIK_ADDRESS}`)
+      - traefik.http.routers.traefik.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
       - traefik.http.routers.traefik.service=api@internal
-      - traefik.http.routers.traefik.entrypoints=web
 
     networks:
       - hubnet
@@ -56,10 +57,12 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=hubnet
+
       - traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_ADDRESS}`)
-      - traefik.http.routers.keycloak.entrypoints=web
-      - traefik.http.services.keyloak.loadbalancer.server.port=8080
-      - traefik.http.services.keyloak.loadbalancer.server.scheme=http
+      - traefik.http.routers.keycloak.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
+      - traefik.http.routers.keycloak.service=keycloak
+      - traefik.http.services.keycloak.loadbalancer.server.port=8080
+      - traefik.http.services.keycloak.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
     networks:
       - keycloaknet
       - hubintranet
@@ -109,10 +112,12 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=hubnet
+
       - traefik.http.routers.minio.rule=Host(`${MINIO_ADDRESS}`)
-      - traefik.http.routers.minio.entrypoints=web
+      - traefik.http.routers.minio.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
+      - traefik.http.routers.minio.service=minio
       - traefik.http.services.minio.loadbalancer.server.port=9090
-      - traefik.http.services.minio.loadbalancer.server.scheme=http
+      - traefik.http.services.minio.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
     hostname: "minio"
     networks:
       - hubintranet
@@ -144,21 +149,24 @@ services:
       labels:
         - traefik.enable=true
         - traefik.docker.network=hubnet
+
         - traefik.http.routers.edc_api.rule=Host(`${EDC_ADDRESS}`) && Path(`/api`)
-        - traefik.http.routers.edc_api.entrypoints=web
+        - traefik.http.routers.edc_api.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
         - traefik.http.routers.edc_api.service=edc_api
         - traefik.http.services.edc_api.loadbalancer.server.port=8181
-        - traefik.http.services.edc_api.loadbalancer.server.scheme=http
+        - traefik.http.services.edc_api.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
+
         - traefik.http.routers.edc_management.rule=Host(`${EDC_ADDRESS}`) && Path(`/management`)
-        - traefik.http.routers.edc_management.entrypoints=web
+        - traefik.http.routers.edc_management.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
         - traefik.http.routers.edc_management.service=edc_management
         - traefik.http.services.edc_management.loadbalancer.server.port=8182
-        - traefik.http.services.edc_management.loadbalancer.server.scheme=http
+        - traefik.http.services.edc_management.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
+
         - traefik.http.routers.edc_protocol.rule=Host(`${EDC_ADDRESS}`) && Path(`/protocol`)
-        - traefik.http.routers.edc_protocol.entrypoints=web
+        - traefik.http.routers.edc_protocol.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
         - traefik.http.routers.edc_protocol.service=edc_protocol
         - traefik.http.services.edc_protocol.loadbalancer.server.port=8282
-        - traefik.http.services.edc_protocol.loadbalancer.server.scheme=http
+        - traefik.http.services.edc_protocol.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
       networks:
         - hubnet
       
@@ -177,10 +185,12 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=hubnet
+
       - traefik.http.routers.api.rule=Host(`${API_ADDRESS}`)
-      - traefik.http.routers.api.entrypoints=web
+      - traefik.http.routers.api.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
+      - traefik.http.routers.api.service=api
       - traefik.http.services.api.loadbalancer.server.port=8000
-      - traefik.http.services.api.loadbalancer.server.scheme=http
+      - traefik.http.services.api.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
     networks:
       - hubintranet
       - hubnet
@@ -194,10 +204,12 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=hubnet
+
       - traefik.http.routers.docs.rule=Host(`${DOCS_ADDRESS}`)
-      - traefik.http.routers.docs.entrypoints=web
+      - traefik.http.routers.docs.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
+      - traefik.http.routers.docs.service=docs
       - traefik.http.services.docs.loadbalancer.server.port=80
-      - traefik.http.services.docs.loadbalancer.server.scheme=http
+      - traefik.http.services.docs.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
     networks:
       - hubnet
 
