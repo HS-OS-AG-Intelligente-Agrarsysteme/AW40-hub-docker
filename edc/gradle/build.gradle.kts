@@ -37,6 +37,8 @@ dependencies {
     implementation("$groupId:data-plane-core:$edcVersion")
 
     implementation("$groupId:transfer-data-plane:$edcVersion")
+
+    implementation(project(":extensions:policy-contract-negotiation-policy-functions"))
 }
 
 application {

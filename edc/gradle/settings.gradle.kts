@@ -22,3 +22,5 @@ dependencyResolutionManagement {
         mavenLocal()
     }
 }
+
+include(":extensions:policy-contract-negotiation-policy-functions")
