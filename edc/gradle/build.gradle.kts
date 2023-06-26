@@ -18,7 +18,7 @@ dependencies {
     implementation("$groupId:runtime-metamodel:$edcVersion")
 
     implementation("$groupId:control-plane-core:$edcVersion")
-    implementation("$groupId:data-plane-selector-core:$edcVersion")
+
     implementation("$groupId:api-observability:$edcVersion")
 
     implementation("$groupId:configuration-filesystem:$edcVersion")
@@ -32,9 +32,12 @@ dependencies {
     implementation("$groupId:aws-s3-core:$edcVersion")
     implementation("$groupId:data-plane-aws-s3:$edcVersion")
 
+    implementation("$groupId:data-plane-azure-storage:$edcVersion")
+
     implementation("$groupId:data-plane-selector-spi:$edcVersion")
     implementation("$groupId:data-plane-selector-client:$edcVersion")
     implementation("$groupId:data-plane-core:$edcVersion")
+    implementation("$groupId:data-plane-selector-core:$edcVersion")
 
     implementation("$groupId:transfer-data-plane:$edcVersion")
 }
