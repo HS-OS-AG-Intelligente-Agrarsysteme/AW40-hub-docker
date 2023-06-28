@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Copy the build files
 COPY gradle/* .
+COPY gradle/extensions extensions
 
 # Setup wrapper
 RUN gradle wrapper
