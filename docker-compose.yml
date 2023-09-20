@@ -167,6 +167,18 @@ services:
         - traefik.http.routers.edc_protocol.service=edc_protocol
         - traefik.http.services.edc_protocol.loadbalancer.server.port=8282
         - traefik.http.services.edc_protocol.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
+
+        - traefik.http.routers.edc_control.rule=Host(`${EDC_ADDRESS}`) && Path(`/control`)
+        - traefik.http.routers.edc_control.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
+        - traefik.http.routers.edc_control.service=edc_control
+        - traefik.http.services.edc_control.loadbalancer.server.port=8183
+        - traefik.http.services.edc_control.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
+
+        - traefik.http.routers.edc_public.rule=Host(`${EDC_ADDRESS}`) && Path(`/public`)
+        - traefik.http.routers.edc_public.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
+        - traefik.http.routers.edc_public.service=edc_public
+        - traefik.http.services.edc_public.loadbalancer.server.port=8185
+        - traefik.http.services.edc_public.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
       networks:
         - hubnet
       depends_on:

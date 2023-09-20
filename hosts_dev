@@ -4,3 +4,4 @@
 172.17.0.1 keycloak.werkstatthub.local
 172.17.0.1 api.werkstatthub.local
 172.17.0.1 traefik.werkstatthub.local
+172.17.0.1 edc.werkstatthub.local
