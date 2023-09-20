@@ -11,32 +11,52 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
-val groupId: String by project
+val edcGroupId: String by project
 val edcVersion: String by project
+val postgresqlGroupId: String by project
+val postgresqlVersion: String by project
 
 dependencies {
-    implementation("$groupId:runtime-metamodel:$edcVersion")
+    implementation("$edcGroupId:runtime-metamodel:$edcVersion")
 
-    implementation("$groupId:control-plane-core:$edcVersion")
-    implementation("$groupId:data-plane-selector-core:$edcVersion")
-    implementation("$groupId:api-observability:$edcVersion")
+    implementation("$edcGroupId:control-plane-core:$edcVersion")
 
-    implementation("$groupId:configuration-filesystem:$edcVersion")
-    implementation("$groupId:iam-mock:$edcVersion")
+    implementation("$edcGroupId:api-observability:$edcVersion")
 
-    implementation("$groupId:auth-tokenbased:$edcVersion")
-    implementation("$groupId:management-api:$edcVersion")
+    implementation("$edcGroupId:configuration-filesystem:$edcVersion")
+    implementation("$edcGroupId:vault-filesystem:$edcVersion")
+    implementation("$edcGroupId:iam-mock:$edcVersion")
 
-    implementation("$groupId:dsp:$edcVersion")
+    implementation("$edcGroupId:auth-tokenbased:$edcVersion")
+    implementation("$edcGroupId:management-api:$edcVersion")
 
-    implementation("$groupId:aws-s3-core:$edcVersion")
-    implementation("$groupId:data-plane-aws-s3:$edcVersion")
+    implementation("$edcGroupId:dsp:$edcVersion")
 
-    implementation("$groupId:data-plane-selector-spi:$edcVersion")
-    implementation("$groupId:data-plane-selector-client:$edcVersion")
-    implementation("$groupId:data-plane-core:$edcVersion")
+    implementation("$edcGroupId:data-plane-aws-s3:$edcVersion")
+    implementation("$edcGroupId:data-plane-azure-storage:$edcVersion")
+    implementation("$edcGroupId:data-plane-http:$edcVersion")
 
-    implementation("$groupId:transfer-data-plane:$edcVersion")
+    implementation("$edcGroupId:data-plane-core:$edcVersion")
+    implementation("$edcGroupId:data-plane-api:$edcVersion")
+
+    implementation("$edcGroupId:data-plane-selector-core:$edcVersion")
+    implementation("$edcGroupId:data-plane-selector-client:$edcVersion")
+    implementation("$edcGroupId:data-plane-selector-api:$edcVersion")
+
+    implementation("$edcGroupId:transfer-data-plane:$edcVersion")
+
+    implementation("$edcGroupId:asset-index-sql:$edcVersion")
+    implementation("$edcGroupId:policy-definition-store-sql:$edcVersion")
+    implementation("$edcGroupId:contract-definition-store-sql:$edcVersion")
+    implementation("$edcGroupId:contract-negotiation-store-sql:$edcVersion")
+    implementation("$edcGroupId:transfer-process-store-sql:$edcVersion")
+
+    implementation("$edcGroupId:sql-pool-apache-commons:$edcVersion")
+    implementation("$edcGroupId:transaction-local:$edcVersion")
+    implementation("$edcGroupId:transaction-datasource-spi:$edcVersion")
+    implementation("$postgresqlGroupId:postgresql:$postgresqlVersion")
+    
+    implementation(project(":edc-extensions:federated-catalog"))
 }
 
 application {

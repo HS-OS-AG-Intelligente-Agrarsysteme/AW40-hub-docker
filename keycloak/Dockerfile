@@ -1,5 +1,6 @@
 ARG KC_VER
 FROM quay.io/keycloak/keycloak:$KC_VER
+ENV KC_HEALTH_ENABLED true
 
 # Set the working directory
 WORKDIR /opt/keycloak

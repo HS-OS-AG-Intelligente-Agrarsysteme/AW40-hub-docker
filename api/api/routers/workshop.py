@@ -1,9 +1,12 @@
-from typing import List
-from typing import Literal
+from typing import List, Union, Literal
 
 from bson import ObjectId
 from bson.errors import InvalidId
-from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
+from fastapi import (
+    APIRouter, HTTPException, Depends, UploadFile, File, Form
+)
+from fastapi.responses import Response
+from motor import motor_asyncio
 from pydantic import NonNegativeInt, PositiveInt
 
 from ..data_management import (
@@ -23,8 +26,12 @@ from ..data_management import (
     TimeseriesDataLabel,
     Vehicle,
     VehicleUpdate,
-    Customer
+    Customer,
+    Diagnosis,
+    DiagnosisDB,
+    AttachmentBucket
 )
+from ..diagnostics_management import DiagnosticTaskManager
 from ..upload_filereader import filereader_factory, FileReaderException
 
 tags_metadata = [
@@ -35,9 +42,12 @@ tags_metadata = [
     {
         "name": "Workshop - Data Management",
         "description": "Manage diagnostic data of a specific case."
+    },
+    {
+        "name": "Workshop - Diagnostics",
+        "description": "Manage diagnosis of a case."
     }
 ]
-
 
 router = APIRouter()
 
@@ -80,10 +90,10 @@ async def case_from_workshop(workshop_id: str, case_id: str) -> Case:
     """
 
     no_case_with_id_exception = HTTPException(
-            status_code=404,
-            detail=f"No case with id '{case_id}' found "
-                   f"for workshop '{workshop_id}'."
-        )
+        status_code=404,
+        detail=f"No case with id '{case_id}' found "
+               f"for workshop '{workshop_id}'."
+    )
 
     try:
         case_id = ObjectId(case_id)
@@ -112,6 +122,7 @@ async def get_case(case: Case = Depends(case_from_workshop)) -> Case:
 
 @router.put(
     "/{workshop_id}/cases/{case_id}",
+    status_code=200,
     tags=["Workshop - Case Management"]
 )
 async def update_case(
@@ -135,8 +146,7 @@ async def delete_case(case: Case = Depends(case_from_workshop)):
 @router.get(
     "/{workshop_id}/cases/{case_id}/customer",
     status_code=200,
-    response_model=Customer,
-    tags=["Workshop - Case Management"]
+    response_model=Customer, tags=["Workshop - Case Management"]
 )
 async def get_customer(case: Case = Depends(case_from_workshop)):
     customer = await Customer.get(case.customer_id)
@@ -146,8 +156,7 @@ async def get_customer(case: Case = Depends(case_from_workshop)):
 @router.get(
     "/{workshop_id}/cases/{case_id}/vehicle",
     status_code=200,
-    response_model=Vehicle,
-    tags=["Workshop - Case Management"]
+    response_model=Vehicle, tags=["Workshop - Case Management"]
 )
 async def get_vehicle(case: Case = Depends(case_from_workshop)):
     vehicle = await Vehicle.find_one({"vin": case.vehicle_vin})
@@ -157,8 +166,7 @@ async def get_vehicle(case: Case = Depends(case_from_workshop)):
 @router.put(
     "/{workshop_id}/cases/{case_id}/vehicle",
     status_code=200,
-    response_model=Vehicle,
-    tags=["Workshop - Case Management"]
+    response_model=Vehicle, tags=["Workshop - Case Management"]
 )
 async def update_vehicle(
         update: VehicleUpdate, case: Case = Depends(case_from_workshop)
@@ -171,8 +179,7 @@ async def update_vehicle(
 @router.get(
     "/{workshop_id}/cases/{case_id}/timeseries_data",
     status_code=200,
-    response_model=List[TimeseriesData],
-    tags=["Workshop - Data Management"]
+    response_model=List[TimeseriesData], tags=["Workshop - Data Management"]
 )
 def list_timeseries_data(case: Case = Depends(case_from_workshop)):
     """List all available timeseries datasets for a case."""
@@ -182,8 +189,7 @@ def list_timeseries_data(case: Case = Depends(case_from_workshop)):
 @router.post(
     "/{workshop_id}/cases/{case_id}/timeseries_data",
     status_code=201,
-    response_model=Case,
-    tags=["Workshop - Data Management"]
+    response_model=Case, tags=["Workshop - Data Management"]
 )
 async def add_timeseries_data(
         timeseries_data: NewTimeseriesData,
@@ -213,25 +219,29 @@ def read_file_or_400(upload: UploadFile, file_format: str) -> list:
 
 def channel_description_form(
         component_A: Component = Form(
-            default=None, description="The investigated vehicle component"),
+            default=None, description="The investigated vehicle component"
+        ),
         label_A: TimeseriesDataLabel = Form(
             default=TimeseriesDataLabel.unknown,
             description="Label for the oscillogram"
         ),
         component_B: Component = Form(
-            default=None, description="The investigated vehicle component"),
+            default=None, description="The investigated vehicle component"
+        ),
         label_B: TimeseriesDataLabel = Form(
             default=TimeseriesDataLabel.unknown,
             description="Label for the oscillogram"
         ),
         component_C: Component = Form(
-            default=None, description="The investigated vehicle component"),
+            default=None, description="The investigated vehicle component"
+        ),
         label_C: TimeseriesDataLabel = Form(
             default=TimeseriesDataLabel.unknown,
             description="Label for the oscillogram"
         ),
         component_D: Component = Form(
-            default=None, description="The investigated vehicle component"),
+            default=None, description="The investigated vehicle component"
+        ),
         label_D: TimeseriesDataLabel = Form(
             default=TimeseriesDataLabel.unknown,
             description="Label for the oscillogram"
@@ -361,6 +371,7 @@ async def upload_omniscope_data(
 
 @router.get(
     "/{workshop_id}/cases/{case_id}/timeseries_data/{data_id}",
+    status_code=200,
     tags=["Workshop - Data Management"]
 )
 async def get_timeseries_data(
@@ -379,6 +390,7 @@ async def get_timeseries_data(
 
 @router.get(
     "/{workshop_id}/cases/{case_id}/timeseries_data/{data_id}/signal",
+    status_code=200,
     tags=["Workshop - Data Management"]
 )
 async def get_timeseries_data_signal(
@@ -398,8 +410,7 @@ async def get_timeseries_data_signal(
 @router.put(
     "/{workshop_id}/cases/{case_id}/timeseries_data/{data_id}",
     status_code=200,
-    response_model=TimeseriesData,
-    tags=["Workshop - Data Management"]
+    response_model=TimeseriesData, tags=["Workshop - Data Management"]
 )
 async def update_timeseries_data(
         data_id: NonNegativeInt,
@@ -422,8 +433,7 @@ async def update_timeseries_data(
 @router.delete(
     "/{workshop_id}/cases/{case_id}/timeseries_data/{data_id}",
     status_code=200,
-    response_model=Case,
-    tags=["Workshop - Data Management"]
+    response_model=Case, tags=["Workshop - Data Management"]
 )
 async def delete_timeseries_data(
         data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
@@ -436,8 +446,7 @@ async def delete_timeseries_data(
 @router.get(
     "/{workshop_id}/cases/{case_id}/obd_data",
     status_code=200,
-    response_model=List[OBDData],
-    tags=["Workshop - Data Management"]
+    response_model=List[OBDData], tags=["Workshop - Data Management"]
 )
 async def list_obd_data(
         case: Case = Depends(case_from_workshop)
@@ -449,11 +458,11 @@ async def list_obd_data(
 @router.post(
     "/{workshop_id}/cases/{case_id}/obd_data",
     status_code=201,
-    response_model=Case,
-    tags=["Workshop - Data Management"]
+    response_model=Case, tags=["Workshop - Data Management"]
 )
 async def add_obd_data(
-        obd_data: NewOBDData, case: Case = Depends(case_from_workshop),
+        obd_data: NewOBDData,
+        case: Case = Depends(case_from_workshop)
 ) -> Case:
     """Add a new obd dataset to a case."""
     case = await case.add_obd_data(obd_data)
@@ -484,8 +493,7 @@ async def upload_vcds_data(
 @router.get(
     "/{workshop_id}/cases/{case_id}/obd_data/{data_id}",
     status_code=200,
-    response_model=OBDData,
-    tags=["Workshop - Data Management"]
+    response_model=OBDData, tags=["Workshop - Data Management"]
 )
 async def get_obd_data(
         data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
@@ -504,8 +512,7 @@ async def get_obd_data(
 @router.put(
     "/{workshop_id}/cases/{case_id}/obd_data/{data_id}",
     status_code=200,
-    response_model=OBDData,
-    tags=["Workshop - Data Management"]
+    response_model=OBDData, tags=["Workshop - Data Management"]
 )
 async def update_obd_data(
         data_id: NonNegativeInt,
@@ -526,8 +533,7 @@ async def update_obd_data(
 @router.delete(
     "/{workshop_id}/cases/{case_id}/obd_data/{data_id}",
     status_code=200,
-    response_model=Case,
-    tags=["Workshop - Data Management"]
+    response_model=Case, tags=["Workshop - Data Management"]
 )
 async def delete_obd_data(
         data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
@@ -540,8 +546,7 @@ async def delete_obd_data(
 @router.get(
     "/{workshop_id}/cases/{case_id}/symptoms",
     status_code=200,
-    response_model=List[Symptom],
-    tags=["Workshop - Data Management"]
+    response_model=List[Symptom], tags=["Workshop - Data Management"]
 )
 async def list_symptoms(
         case: Case = Depends(case_from_workshop)
@@ -553,8 +558,7 @@ async def list_symptoms(
 @router.post(
     "/{workshop_id}/cases/{case_id}/symptoms",
     status_code=201,
-    response_model=Case,
-    tags=["Workshop - Data Management"]
+    response_model=Case, tags=["Workshop - Data Management"]
 )
 async def add_symptom(
         symptom: NewSymptom, case: Case = Depends(case_from_workshop)
@@ -567,8 +571,7 @@ async def add_symptom(
 @router.get(
     "/{workshop_id}/cases/{case_id}/symptoms/{data_id}",
     status_code=200,
-    response_model=Symptom,
-    tags=["Workshop - Data Management"]
+    response_model=Symptom, tags=["Workshop - Data Management"]
 )
 async def get_symptom(
         data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
@@ -587,8 +590,7 @@ async def get_symptom(
 @router.put(
     "/{workshop_id}/cases/{case_id}/symptoms/{data_id}",
     status_code=200,
-    response_model=Symptom,
-    tags=["Workshop - Data Management"]
+    response_model=Symptom, tags=["Workshop - Data Management"]
 )
 async def update_symptom(
         data_id: NonNegativeInt,
@@ -609,8 +611,7 @@ async def update_symptom(
 @router.delete(
     "/{workshop_id}/cases/{case_id}/symptoms/{data_id}",
     status_code=200,
-    response_model=Case,
-    tags=["Workshop - Data Management"]
+    response_model=Case, tags=["Workshop - Data Management"]
 )
 async def delete_symptom(
         data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
@@ -618,3 +619,87 @@ async def delete_symptom(
     """Delete a specific symptom from a case."""
     await case.delete_symptom(data_id)
     return case
+
+
+@router.get(
+    "/{workshop_id}/cases/{case_id}/diag",
+    status_code=200,
+    response_model=Union[Diagnosis, None],
+    tags=["Workshop - Diagnostics"]
+)
+async def get_diagnosis(case: Case = Depends(case_from_workshop)):
+    """Get diagnosis data for this case."""
+    if case.diagnosis_id is None:
+        return None
+    diag_db = await DiagnosisDB.get(case.diagnosis_id)
+    diag = await diag_db.to_diagnosis()
+    return diag
+
+
+@router.post(
+    "/{workshop_id}/cases/{case_id}/diag",
+    status_code=201,
+    response_model=Diagnosis,
+    tags=["Workshop - Diagnostics"]
+)
+async def start_diagnosis(
+        case: Case = Depends(case_from_workshop),
+        manage_diagnostic_task: DiagnosticTaskManager = Depends(
+            DiagnosticTaskManager
+        )
+):
+    """Initialize the diagnosis process for this case."""
+    if case.diagnosis_id is not None:
+        # Diagnosis for this case was already initialized and is returned as is
+        diag_db = await DiagnosisDB.get(case.diagnosis_id)
+    else:
+        # New diagnosis is initialized
+        diag_db = DiagnosisDB(
+            case_id=case.id,
+            status="scheduled"
+        )
+        await diag_db.create()
+        case.diagnosis_id = diag_db.id
+        await case.save()
+
+        # New diagnosis is handed over to diagnostic backend
+        await manage_diagnostic_task(case.diagnosis_id)
+
+    diag = await diag_db.to_diagnosis()
+    return diag
+
+
+@router.delete(
+    "/{workshop_id}/cases/{case_id}/diag",
+    status_code=200,
+    response_model=None,
+    tags=["Workshop - Diagnostics"]
+)
+async def delete_diagnosis(case: Case = Depends(case_from_workshop)):
+    """Stop the diagnosis process for this case."""
+    diag_db = await DiagnosisDB.get(case.diagnosis_id)
+    await diag_db.delete()
+    case.diagnosis_id = None
+    await case.save()
+    return None
+
+
+@router.get(
+    "/{workshop_id}/cases/{case_id}/diag/attachments/{attachment_id}",
+    status_code=200,
+    response_class=Response,
+    tags=["Workshop - Diagnostics"]
+)
+async def get_diagnosis_attachment(
+        attachment_id: str,
+        case: Case = Depends(case_from_workshop),
+        attachment_bucket: motor_asyncio.AsyncIOMotorGridFSBucket = Depends(
+            AttachmentBucket.create
+        )
+):
+    """Retrieve a specific diagnosis attachment."""
+    attachment = await attachment_bucket.open_download_stream(
+        ObjectId(attachment_id)
+    )
+    content = await attachment.read()
+    return Response(content=content, media_type="image/png")

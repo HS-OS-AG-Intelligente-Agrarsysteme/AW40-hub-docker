@@ -2,24 +2,11 @@ from typing import List
 
 import pytest
 from api.data_management.timeseries_data import (
-    BaseSignalStore, GridFSSignalStore, NewTimeseriesData, TimeseriesData
+    BaseSignalStore, GridFSSignalStore, NewTimeseriesData, TimeseriesData,
+    TimeseriesMetaData
 )
 from beanie import PydanticObjectId
-from motor import motor_asyncio
 from pydantic import ValidationError
-
-
-@pytest.fixture
-def signal_bucket(motor_db):
-    test_bucket_name = "signals-pytest"  # dedicated test bucket
-    test_bucket = motor_asyncio.AsyncIOMotorGridFSBucket(
-        motor_db, bucket_name=test_bucket_name
-    )
-    yield test_bucket
-
-    # teardown by dropping the test bucket gridfs collections
-    motor_db.drop_collection(f"{test_bucket_name}.files")
-    motor_db.drop_collection(f"{test_bucket_name}.chunks")
 
 
 class TestGridFSSignalStore:
@@ -84,7 +71,7 @@ class TestTimeseriesData:
         signal_id = await signal_store.create(timeseries_signal)
 
         # configure TimeseriesData class to use the mock store
-        TimeseriesData.signal_store = signal_store
+        TimeseriesMetaData.signal_store = signal_store
 
         # after adding signal_id to metadata, a TimeseriesData instance can
         # be created
@@ -104,7 +91,7 @@ class TestTimeseriesData:
         signal_id = await signal_store.create(timeseries_signal)
 
         # configure TimeseriesData class to use the mock store
-        TimeseriesData.signal_store = signal_store
+        TimeseriesMetaData.signal_store = signal_store
 
         # after adding signal_id to metadata, a TimeseriesData instance can
         # be created
@@ -129,7 +116,7 @@ class TestNewTimeseriesData:
     async def test_to_timeseries_data(self, new_timeseries_data):
         # configure class to use MockSignalStore
         signal_store = MockSignalStore()
-        NewTimeseriesData.signal_store = signal_store
+        TimeseriesMetaData.signal_store = signal_store
 
         # convert valid data to model instance
         new_timeseries_data = NewTimeseriesData(**new_timeseries_data)

@@ -1,11 +1,14 @@
 from datetime import datetime
 from enum import Enum
-from typing import List, Union
+from typing import List, Union, Optional
 
-from beanie import Document, Indexed, before_event, Insert, Delete
+from beanie import (
+    Document, Indexed, before_event, Insert, Delete, PydanticObjectId
+)
 from pydantic import BaseModel, Field, NonNegativeInt
 
 from .customer import Customer
+from .diagnosis import DiagnosisDB
 from .obd_data import NewOBDData, OBDData, OBDDataUpdate
 from .symptom import NewSymptom, Symptom, SymptomUpdate
 from .timeseries_data import (
@@ -15,14 +18,14 @@ from .vehicle import Vehicle
 
 
 class Occasion(str, Enum):
-    unkown = "keine Angabe"
-    service_routine = "Service / Routine"
-    problem_defect = "Problem / Defekt"
+    unknown = "unknown"
+    service_routine = "service_routine"
+    problem_defect = "problem_defect"
 
 
 class Status(str, Enum):
-    open = "offen"
-    closed = "abgeschlossen"
+    open = "open"
+    closed = "closed"
 
 
 class NewCase(BaseModel):
@@ -40,7 +43,7 @@ class NewCase(BaseModel):
 
     vehicle_vin: str
     customer_id: Indexed(str, unique=False) = Customer.unknown_id
-    occasion: Occasion = Occasion.unkown
+    occasion: Occasion = Occasion.unknown
     milage: int = None
 
 
@@ -64,7 +67,7 @@ class Case(Document):
 
     # case descriptions
     timestamp: datetime = Field(default_factory=datetime.utcnow)
-    occasion: Occasion = Occasion.unkown
+    occasion: Occasion = Occasion.unknown
     milage: int = None
     status: Status = Status.open
 
@@ -72,6 +75,7 @@ class Case(Document):
     customer_id: Indexed(str, unique=False) = Customer.unknown_id
     vehicle_vin: Indexed(str, unique=False)
     workshop_id: Indexed(str, unique=False)
+    diagnosis_id: Optional[Indexed(PydanticObjectId)]
 
     # diagnostic data
     timeseries_data: List[TimeseriesData] = []
@@ -263,9 +267,20 @@ class Case(Document):
     @before_event(Delete)
     async def _delete_all_timeseries_signals(self):
         """
-        Makes sure that binary signal data stored outside of case is also
+        Make sure that binary signal data stored outside of case is also
         removed.
         """
         for ts in self.timeseries_data:
             if ts is not None:
                 await ts.delete_signal()
+
+    @before_event(Delete)
+    async def _delete_diagnosis(self):
+        """
+        Make sure any diagnosis attached to the case is also removed.
+        """
+        if self.diagnosis_id is not None:
+            # delete via instance to make sure Diagnosis event handlers
+            # are also executed
+            diag = await DiagnosisDB.get(self.diagnosis_id)
+            await diag.delete()

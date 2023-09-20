@@ -5,7 +5,7 @@ FROM gradle:8.0.0 AS builder
 WORKDIR /app
 
 # Copy the build files
-COPY gradle/* .
+COPY gradle/ /app/
 
 # Setup wrapper
 RUN gradle wrapper
@@ -22,8 +22,7 @@ WORKDIR /app
 # Copy the built JAR file from the builder stage
 COPY --from=builder /app/build/libs/connector.jar .
 
-# Copy any other necessary files
-COPY config.properties .
+# Copy script
 COPY entrypoint.sh .
 
 # Set permissions for the entrypoint script

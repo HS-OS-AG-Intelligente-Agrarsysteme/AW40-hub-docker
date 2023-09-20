@@ -1,7 +1,7 @@
 version: "3.8"
 
 x-restart-policy: &default_restart_policy
-  restart: ${DEFAULT_RESTART_POLICY}
+  restart: ${DEFAULT_RESTART_POLICY:-unless-stopped}
 
 services:
   proxy:
@@ -95,7 +95,7 @@ services:
     networks:
       - keycloaknet
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - keycloak-db-data:/var/lib/postgresql/data
 
   minio:
     build:
@@ -132,15 +132,15 @@ services:
           condition: service_healthy
       entrypoint: ["sh","-c","chmod +x /minio-config.sh && ./minio-config.sh"]
       environment:
-          - S3_ROOT_USER=${S3_ROOT_USER}
-          - S3_ROOT_PASSWORD=${S3_ROOT_PASSWORD}
+          - S3_ROOT_USER=${S3_ROOT_USER:?error}
+          - S3_ROOT_PASSWORD=${S3_ROOT_PASSWORD:?error}
       networks:
         - hubintranet
       volumes:
         - ./minio/minio-config.sh:/minio-config.sh
 
   edc:
-      build: 
+      build:
         context: ./edc
       <<: *default_restart_policy
       env_file:
@@ -169,7 +169,31 @@ services:
         - traefik.http.services.edc_protocol.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
       networks:
         - hubnet
-      
+      depends_on:
+          edc-database:
+              condition: service_healthy
+      ports:
+        - 8181:8181
+        - 8182:8182
+        - 8282:8282
+        - 8183:8183
+        - 8185:8185
+      volumes:
+          - ./edc/configs:/configs
+          - ./edc/vaults:/vaults
+          - ./edc/certs:/certs
+
+  edc-database:
+      build:
+          context: ./edc-db
+      env_file:
+          - edc-db/edc-db.env
+      hostname: "edc-db"
+      networks:
+          - hubnet
+      volumes:
+          - edc-db-data:/var/lib/postgresql/data
+          - ./edc/sql_tables:/docker-entrypoint-initdb.d/
   api:
     build:
       context: ./api
@@ -213,6 +237,45 @@ services:
     networks:
       - hubnet
 
+  redis:  # broker for communication between api and diagnostics
+    image: redis:alpine
+    <<: *default_restart_policy
+    expose:
+      - 6379
+    hostname: "redis"
+    networks:
+      - hubintranet
+    command: redis-server --requirepass ${REDIS_PASSWORD:?error}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 2s
+      retries: 5
+
+  diagnostics:  # background service that integrates the dfki state machine
+    build:
+      context: ./diagnostics
+    <<: *default_restart_policy
+    command: celery -A diagnostics.tasks worker --loglevel=INFO
+    env_file:
+      - diagnostics/diagnostics.env
+    hostname: "diagnostics"
+    networks:
+      - hubintranet
+    volumes:
+      - ./diagnostics/diagnostics:/home/runtime/diagnostics
+      - ./diagnostics/models:/home/runtime/models
+
+  knowledge-graph:  # utilized by the diagnostics service
+    build: ./knowledge-graph
+    <<: *default_restart_policy
+    ports:
+      - 3030:3030
+    hostname: "knowledge-graph"
+    networks:
+      - hubintranet
+      - hubnet
+
 networks:
   hubnet:
     name: hubnet
@@ -223,5 +286,6 @@ networks:
 
 volumes:
   mongo-data:
-  postgres-data:
+  keycloak-db-data:
   minio-data:
+  edc-db-data:

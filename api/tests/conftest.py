@@ -3,8 +3,18 @@ import os
 import sys
 
 import pytest
+from api.data_management import (
+    Case,
+    Vehicle,
+    Customer,
+    Workshop,
+    DiagnosisDB,
+    Action,
+    ToDo
+)
 from bson import ObjectId
 from motor import motor_asyncio
+from beanie import init_beanie
 
 
 @pytest.fixture
@@ -28,11 +38,55 @@ def motor_db(motor_client):
 
 
 @pytest.fixture
+def initialized_beanie_context(motor_db):
+    """
+    Could not get standard pytest fixture setup and teardown to work for
+    beanie initialization. As a workaround this fixture creates an async
+    context manager to handle test setup and teardown.
+    """
+    models = [
+        Case, Vehicle, Customer, Workshop, DiagnosisDB, Action, ToDo
+    ]
+
+    class InitializedBeanieContext:
+        async def __aenter__(self):
+            await init_beanie(
+                motor_db,
+                document_models=models
+            )
+            for model in models:
+                # make sure all collections are empty at the beginning of each
+                # test
+                await model.delete_all()
+
+        async def __aexit__(self, exc_type, exc, tb):
+            for model in models:
+                # drop all collections and indexes after each test
+                await model.get_motor_collection().drop()
+                await model.get_motor_collection().drop_indexes()
+
+    return InitializedBeanieContext()
+
+
+@pytest.fixture
+def signal_bucket(motor_db):
+    test_bucket_name = "signals-pytest"  # dedicated test bucket
+    test_bucket = motor_asyncio.AsyncIOMotorGridFSBucket(
+        motor_db, bucket_name=test_bucket_name
+    )
+    yield test_bucket
+
+    # teardown by dropping the test bucket gridfs collections
+    motor_db.drop_collection(f"{test_bucket_name}.files")
+    motor_db.drop_collection(f"{test_bucket_name}.chunks")
+
+
+@pytest.fixture
 def timeseries_meta_data():
     """Valid timeseries meta data"""
     return {
-        "component": "Batterie",
-        "label": "keine Angabe",
+        "component": "battery",
+        "label": "unknown",
         "sampling_rate": 1,
         "duration": 3,
         "type": "oscillogram"

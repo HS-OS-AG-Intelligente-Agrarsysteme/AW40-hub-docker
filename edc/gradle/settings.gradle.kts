@@ -22,3 +22,5 @@ dependencyResolutionManagement {
         mavenLocal()
     }
 }
+
+include(":edc-extensions:federated-catalog")

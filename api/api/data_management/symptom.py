@@ -7,9 +7,9 @@ from .vehicle import Component
 
 
 class SymptomLabel(str, Enum):
-    unkown = "keine Angabe"
-    ok = "nicht defekt"
-    defect = "defekt"
+    unknown = "unknown"
+    ok = "ok"
+    defect = "defect"
 
 
 class NewSymptom(BaseModel):
@@ -17,8 +17,8 @@ class NewSymptom(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "component": "Batterie",
-                "label": "defekt"
+                "component": "battery",
+                "label": "defect"
             }
         }
 
@@ -33,8 +33,8 @@ class Symptom(NewSymptom):
         schema_extra = {
             "example": {
                 "timestamp": "2023-04-04T07:15:22.887633",
-                "component": "Batterie",
-                "label": "defekt",
+                "component": "battery",
+                "label": "defect",
                 "data_id": 0
             }
         }
@@ -48,7 +48,7 @@ class SymptomUpdate(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "label": "defekt"
+                "label": "defect"
             }
         }
 

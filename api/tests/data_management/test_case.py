@@ -6,7 +6,6 @@ from api.data_management import (
     Case,
     Vehicle,
     Customer,
-    Workshop,
     TimeseriesDataUpdate,
     NewTimeseriesData,
     TimeseriesData,
@@ -15,7 +14,6 @@ from api.data_management import (
     NewSymptom,
     SymptomUpdate
 )
-from beanie import init_beanie
 from pydantic import ValidationError
 
 
@@ -25,7 +23,7 @@ def new_case():
     return {
         "vehicle_vin": "test-vin",
         "customer_id": "test.customer",
-        "occasion": "keine Angabe",
+        "occasion": "unknown",
         "milage": 42
     }
 
@@ -35,9 +33,9 @@ def case_with_diagnostic_data(new_case, timeseries_data):
     """Valid data for a case"""
     new_case["timeseries_data"] = timeseries_data
     new_case["obd_data"] = {"dtcs": ["P0001"]}
-    new_case["symtpoms"] = {
-                "component": "Batterie",
-                "label": "defekt"
+    new_case["symptoms"] = {
+                "component": "battery",
+                "label": "defect"
             }
     return new_case
 
@@ -55,40 +53,6 @@ class TestNewCase:
 
     def test_non_default_input(self, new_case):
         NewCase(**new_case)
-
-
-@pytest.fixture
-def initialized_beanie_context(motor_db):
-    """
-    Could not get standard pytest fixture setup and teardown to work for
-    beanie initialization. As a workaround this fixture creates an async
-    context manager to handle test setup and teardown.
-    """
-    models = [
-        Case,
-        Vehicle,
-        Customer,
-        Workshop
-    ]
-
-    class InitializedBeanieContext:
-        async def __aenter__(self):
-            await init_beanie(
-                motor_db,
-                document_models=models
-            )
-            for model in models:
-                # make sure all collections are empty at the beginning of each
-                # test
-                await model.delete_all()
-
-        async def __aexit__(self, exc_type, exc, tb):
-            for model in models:
-                # drop all collections and indexes after each test
-                await model.get_motor_collection().drop()
-                await model.get_motor_collection().drop_indexes()
-
-    return InitializedBeanieContext()
 
 
 class TestCase:
@@ -235,8 +199,8 @@ class TestCase:
         test_signal_id = "5eb7cf5a86d9755df3a6c593"
 
         new_timeseries_data = {
-            "component": "Batterie",
-            "label": "keine Angabe",
+            "component": "battery",
+            "label": "unknown",
             "sampling_rate": 1,
             "duration": 2,
             "type": "oscillogram",
@@ -318,7 +282,7 @@ class TestCase:
             case.symptoms_added = previous_adds
 
             await case.add_symptom(
-                NewSymptom(**{"component": "Batterie", "label": "defekt"})
+                NewSymptom(**{"component": "battery", "label": "defect"})
             )
 
             # refetch case and assert existence of single symptom
@@ -392,7 +356,7 @@ class TestCase:
         async with initialized_beanie_context:
             data_id = 5
             symptom = {
-                "component": "Batterie", "label": "defekt", "data_id": data_id
+                "component": "battery", "label": "defect", "data_id": data_id
             }
             new_case["symptoms"] = [symptom]
             case = Case(workshop_id=1, **new_case)
@@ -488,7 +452,7 @@ class TestCase:
 
             # seed case with symptom and save to db
             symptom = {
-                "component": "Batterie", "label": "defekt", "data_id": data_id
+                "component": "battery", "label": "defect", "data_id": data_id
             }
             new_case["symptoms"] = [symptom]
             case = Case(workshop_id=1, **new_case)
@@ -519,8 +483,8 @@ class TestCase:
     ):
         async with initialized_beanie_context:
             data_id = 42
-            old_label = "keine Angabe"
-            new_label = "Anomalie / Auffälligkeit"
+            old_label = "unknown"
+            new_label = "anomaly"
             timeseries_data["label"] = old_label
             timeseries_data["data_id"] = data_id
 
@@ -594,9 +558,9 @@ class TestCase:
     ):
         async with initialized_beanie_context:
             data_id = 100
-            symptom = {"component": "Batterie", "data_id": data_id}
-            old_label = "keine Angabe"
-            new_label = "defekt"
+            symptom = {"component": "battery", "data_id": data_id}
+            old_label = "unknown"
+            new_label = "defect"
             symptom["label"] = old_label
 
             # seed case with symptom that has old label
@@ -647,7 +611,7 @@ class TestCase:
         async with initialized_beanie_context:
             data_ids = [0, 42]
             new_case["symptoms"] = [
-                {"component": "Batterie", "label": "defekt", "data_id": d_id}
+                {"component": "battery", "label": "defect", "data_id": d_id}
                 for d_id in data_ids
             ]
             case = Case(workshop_id=1, **new_case)
