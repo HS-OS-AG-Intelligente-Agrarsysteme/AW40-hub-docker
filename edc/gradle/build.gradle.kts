@@ -24,7 +24,7 @@ dependencies {
     implementation("$edcGroupId:api-observability:$edcVersion")
 
     implementation("$edcGroupId:configuration-filesystem:$edcVersion")
-    implementation("$edcGroupId:vault-filesystem:$edcVersion")
+//    implementation("$edcGroupId:vault-filesystem:$edcVersion")
     implementation("$edcGroupId:iam-mock:$edcVersion")
 
     implementation("$edcGroupId:auth-tokenbased:$edcVersion")
@@ -55,7 +55,9 @@ dependencies {
     implementation("$edcGroupId:transaction-local:$edcVersion")
     implementation("$edcGroupId:transaction-datasource-spi:$edcVersion")
     implementation("$postgresqlGroupId:postgresql:$postgresqlVersion")
-    
+
+    implementation("$edcGroupId:vault-hashicorp:$edcVersion")
+
     implementation(project(":edc-extensions:federated-catalog"))
 }
 
