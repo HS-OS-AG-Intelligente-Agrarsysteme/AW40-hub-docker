@@ -149,6 +149,8 @@ services:
           - 8200:8200
       env_file:
           - hashicorp-vault/hashicorp-vault.env
+      networks:
+          - hubnet
 
   api:
     build:
