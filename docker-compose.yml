@@ -142,12 +142,13 @@ services:
           - ./edc/sql_tables:/docker-entrypoint-initdb.d/
 
   hashicorp-vault:
-      image: vault:1.13.3
+      build:
+          context: hashicorp-vault
       hostname: "vault"
       ports:
           - 8200:8200
-      environment:
-          VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_DEV_ROOT_TOKEN_ID:?error}
+      env_file:
+          - hashicorp-vault/hashicorp-vault.env
 
   api:
     build:
