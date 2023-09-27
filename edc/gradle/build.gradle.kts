@@ -20,6 +20,7 @@ dependencies {
     implementation("$edcGroupId:runtime-metamodel:$edcVersion")
 
     implementation("$edcGroupId:control-plane-core:$edcVersion")
+    implementation("$edcGroupId:control-plane-api-client:$edcVersion")
 
     implementation("$edcGroupId:api-observability:$edcVersion")
 
@@ -54,6 +55,8 @@ dependencies {
     implementation("$edcGroupId:transaction-local:$edcVersion")
     implementation("$edcGroupId:transaction-datasource-spi:$edcVersion")
     implementation("$postgresqlGroupId:postgresql:$postgresqlVersion")
+
+    implementation("$edcGroupId:self-description-api:$edcVersion")
 
     implementation("$edcGroupId:vault-hashicorp:$edcVersion")
 
