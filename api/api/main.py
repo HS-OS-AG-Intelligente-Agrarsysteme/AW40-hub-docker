@@ -13,6 +13,7 @@ from .diagnostics_management import DiagnosticTaskManager
 from .settings import settings
 from .utils import create_action_data
 from .v1 import api_v1
+from .storage.storage_factory import StorageFactory
 from .demo_ui import ui
 
 app = FastAPI()
@@ -62,4 +63,13 @@ async def init_diagnostics_management():
         Celery(
             broker=settings.redis_uri, backend=settings.redis_uri
         )
+    )
+
+
+@app.on_event("startup")
+def init_storages():
+    StorageFactory.initialise_storages(
+        minio_host=settings.minio_host,
+        minio_password=settings.minio_password,
+        minio_username=settings.minio_username
     )

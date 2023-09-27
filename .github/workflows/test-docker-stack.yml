@@ -48,8 +48,8 @@ jobs:
         run: docker compose --env-file=dev.env build
 
     # Start Containers
-      - name: Start containers
-        run: docker compose --env-file=dev.env up -d
+      - name: Start containers and wait for healthy state
+        run: docker compose --env-file=dev.env up -d --wait
 
     # Test documentation
       - name: Check if documentation is reachable

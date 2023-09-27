@@ -124,10 +124,9 @@ services:
         - 8282:8282
         - 8183:8183
         - 8185:8185
+        - 8186:8186
       volumes:
-          - ./edc/configs:/configs
-          - ./edc/vaults:/vaults
-          - ./edc/certs:/certs
+          - ./edc/resources:/resources
 
   edc-database:
       build:
@@ -139,7 +138,7 @@ services:
           - hubnet
       volumes:
           - edc-db-data:/var/lib/postgresql/data
-          - ./edc/sql_tables:/docker-entrypoint-initdb.d/
+          - ./edc-db/sql_tables:/docker-entrypoint-initdb.d/
 
   hashicorp-vault:
       build:
@@ -161,6 +160,8 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
+      minio-config:
+        condition: service_completed_successfully
     env_file:
       - api/api.env
     hostname: "api"
