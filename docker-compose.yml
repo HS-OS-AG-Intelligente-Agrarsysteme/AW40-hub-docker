@@ -128,28 +128,6 @@ services:
       volumes:
           - ./edc/resources:/resources
 
-  edc_consumer:
-      build:
-          context: ./edc_consumer
-      <<: *default_restart_policy
-      env_file:
-          - edc_consumer/edc.env
-      hostname: "edc_consumer"
-      networks:
-          - hubnet
-      depends_on:
-          edc-database:
-              condition: service_healthy
-      ports:
-          - 7191:7191
-          - 7192:7192
-          - 7292:7292
-          - 7193:7193
-          - 7195:7195
-          - 7196:7196
-      volumes:
-          - ./edc_consumer/resources:/resources
-
   edc-database:
       build:
           context: ./edc-db
