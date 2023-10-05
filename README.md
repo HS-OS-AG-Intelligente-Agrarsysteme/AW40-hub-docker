@@ -13,6 +13,7 @@ Currently included services:
 | minio                                                  | Object Storage for datasets shared with external dataspace participants. |
 | edc                                                    | Eclipse Dataspace Connector                                              |
 | edc-db                                                 | A PostgreSQL database used by the EDC.                                   |
+| hashicorp-vault                                        | Vault for storing and accessing secrets                                  |
 | api                                                    | HTTP interface to the stored data.                                       |
 | docs                                                   | Documentation and background information                                 |
 | redis                                                  | Broker / Task queue for communication between api and diagnostics        |
@@ -29,7 +30,7 @@ To start the HUB in developer mode use:\
 ```docker compose --env-file=dev.env up -d```
 
 The interactive docs of the API service can now be accessed via
-http://127.0.0.1:8000/v1/docs.  
+http://127.0.0.1:8000/v1/docs.
 
 The Hub documentation website is accessible via
 http://127.0.0.1:8001.
