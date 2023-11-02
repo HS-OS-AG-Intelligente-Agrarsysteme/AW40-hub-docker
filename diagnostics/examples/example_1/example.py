@@ -134,7 +134,6 @@ def provide_symptom(case_url):
 
 
 def main(interactive):
-
     # Setup steps required before a user interacts with the system
     setup_knowledge_graph()
     setup_model()
@@ -144,7 +143,9 @@ def main(interactive):
     start_diagnosis(case_url)
 
     # Progress of the example diagnosis can be followed via the demo ui
-    report_url = (case_url + "/diag").replace("v1", "ui")
+    report_url = ((case_url + "/diag")
+                  .replace("v1", "ui")
+                  .replace(":8000", ":8002"))
     print(
         f"For a graphical report of the diagnosis process go to: {report_url}"
     )
