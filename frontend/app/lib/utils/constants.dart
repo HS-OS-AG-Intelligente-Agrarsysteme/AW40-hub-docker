@@ -21,3 +21,7 @@ const Color kSecondaryColor = Color.fromARGB(255, 66, 227, 122);
 // Assets
 const String kAssetAwLogoKleinDarkTheme = "assets/logo_klein_dark_theme.png";
 const String kAssetAwLogoKleinLightTheme = "assets/logo_klein_light_theme.png";
+
+// Date Picker
+const int firstDateInDialog = 1900;
+const int lastDateInDialog = 2100;
