@@ -55,7 +55,7 @@ class DiagnosesView extends StatelessWidget {
           return DesktopDiagnosisView(
             diagnosisModels: diagnosisModels,
             diagnosisIndex:
-                foundModel != null ? diagnosisModels.indexOf(foundModel) : null,
+                foundModel == null ? null : diagnosisModels.indexOf(foundModel),
           );
         } else {
           return const Center(child: CircularProgressIndicator());
