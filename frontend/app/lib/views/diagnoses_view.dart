@@ -13,9 +13,11 @@ import "package:provider/provider.dart";
 import "package:routemaster/routemaster.dart";
 
 class DiagnosesView extends StatelessWidget {
-  const DiagnosesView({
+  DiagnosesView({
     super.key,
   });
+
+  final Logger _logger = Logger("diagnoses_view");
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +48,7 @@ class DiagnosesView extends StatelessWidget {
             (diagnosisModel) => diagnosisModel.id == diagnosisIdString,
           );
           if (foundModel == null) {
-            final Logger logger = Logger("diagnoses_view");
-            logger.info(
+            _logger.info(
               "Could not resolve diagnosis with ID: $diagnosisIdString",
             );
           }
