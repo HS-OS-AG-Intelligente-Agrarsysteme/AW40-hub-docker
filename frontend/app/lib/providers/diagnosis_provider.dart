@@ -35,7 +35,7 @@ class DiagnosisProvider with ChangeNotifier {
   Future<DiagnosisModel?> getDiagnosis(String caseId) async {
     final Response response =
         await _httpService.getDiagnosis(workShopId, caseId);
-    if (response.statusCode != 200) {
+    if (response.statusCode != 200 && response.statusCode != 404) {
       _logger.warning(
         "Could not get diagnosis. "
         "${response.statusCode}: ${response.reasonPhrase}",
