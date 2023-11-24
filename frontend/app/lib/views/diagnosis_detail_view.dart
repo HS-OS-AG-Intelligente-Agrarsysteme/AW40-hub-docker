@@ -14,10 +14,10 @@ class DiagnosisDetailView extends StatefulWidget {
   final DiagnosisModel diagnosisModel;
 
   @override
-  State<DiagnosisDetailView> createState() => _DesktopDiagnosisDetailView();
+  State<DiagnosisDetailView> createState() => _DiagnosisDetailView();
 }
 
-class _DesktopDiagnosisDetailView extends State<DiagnosisDetailView> {
+class _DiagnosisDetailView extends State<DiagnosisDetailView> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
