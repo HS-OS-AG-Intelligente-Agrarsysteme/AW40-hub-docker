@@ -319,14 +319,14 @@ class UpdateDialogForm extends StatelessWidget {
   }
 
   Future<DateTime?> pickDateTime(BuildContext context) async {
-    final Future<DateTime?> $date = showDatePicker(
+    final Future<DateTime?> datePicker = showDatePicker(
       context: context,
       initialDate: caseModel.timestamp,
       firstDate: DateTime(FIRST_DATE_IN_DIALOG),
       lastDate: DateTime(LAST_DATE_IN_DIALOG),
     );
 
-    final Future<TimeOfDay?> $time = showTimePicker(
+    final Future<TimeOfDay?> timePicker = showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(
         caseModel.timestamp,
@@ -339,10 +339,10 @@ class UpdateDialogForm extends StatelessWidget {
       },
     );
 
-    final DateTime? date = await $date;
+    final DateTime? date = await datePicker;
     if (date == null) return null;
 
-    final TimeOfDay? time = await $time;
+    final TimeOfDay? time = await timePicker;
     if (time == null) return null;
 
     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
