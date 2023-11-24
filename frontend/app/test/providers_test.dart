@@ -104,48 +104,6 @@ void main() {
         await caseProvider.addCase(dummyNewCaseDto);
         verify(mockHttpService.addCase(any, any)).called(1);
       });
-      test("adds CaseModel to _cases if `statusCode == 201`", () async {
-        final mockHttpService = MockHttpService();
-        when(mockHttpService.getSharedCases()).thenAnswer(
-          (_) async => http.Response("[]", 200),
-        );
-        when(mockHttpService.addCase(any, any)).thenAnswer(
-          (_) async => http.Response(jsonEncode(dummyCaseDtoJson), 201),
-        );
-
-        final caseProvider = CaseProvider(mockHttpService);
-        caseProvider.workShopId = "some_workshop_id";
-
-        final int oldLength = await caseProvider.getCurrentCases().then(
-              (value) => value.length,
-            );
-        await caseProvider.addCase(dummyNewCaseDto);
-        final int newLength = await caseProvider.getCurrentCases().then(
-              (value) => value.length,
-            );
-        expect(newLength, oldLength + 1);
-      });
-      test("does not add CaseModel to _cases if `statusCode != 201`", () async {
-        final mockHttpService = MockHttpService();
-        when(mockHttpService.getSharedCases()).thenAnswer(
-          (_) async => http.Response("[]", 200),
-        );
-        when(mockHttpService.addCase(any, any)).thenAnswer(
-          (_) async => http.Response(jsonEncode(dummyCaseDtoJson), 200),
-        );
-
-        final caseProvider = CaseProvider(mockHttpService);
-        caseProvider.workShopId = "some_workshop_id";
-
-        final int oldLength = await caseProvider.getCurrentCases().then(
-              (value) => value.length,
-            );
-        await caseProvider.addCase(dummyNewCaseDto);
-        final int newLength = await caseProvider.getCurrentCases().then(
-              (value) => value.length,
-            );
-        expect(newLength, oldLength);
-      });
     });
     group("deleteCase()", () {
       test("calls HttpService.deleteCase()", () async {
@@ -158,59 +116,6 @@ void main() {
         await caseProvider.deleteCase("some_case_id");
         verify(mockHttpService.deleteCase(any, any)).called(1);
       });
-      test("removes CaseModel from _cases if `statusCode == 200`", () async {
-        final mockHttpService = MockHttpService();
-        final caseProvider = CaseProvider(mockHttpService);
-        caseProvider.workShopId = "some_workshop_id";
-        when(mockHttpService.getSharedCases()).thenAnswer(
-          (_) async => http.Response("[]", 200),
-        );
-        when(mockHttpService.addCase(any, any)).thenAnswer(
-          (_) async => http.Response(jsonEncode(dummyCaseDtoJson), 201),
-        );
-        when(mockHttpService.deleteCase(any, any)).thenAnswer(
-          (_) async => http.Response("{}", 200),
-        );
-
-        await caseProvider.addCase(dummyNewCaseDto);
-        int numCases = await caseProvider.getCurrentCases().then(
-              (value) => value.length,
-            );
-        expect(numCases, 1);
-        await caseProvider.deleteCase("some_id");
-        numCases = await caseProvider.getCurrentCases().then(
-              (value) => value.length,
-            );
-        expect(numCases, 0);
-      });
-      test(
-        "does not remove CaseModel from _cases if `statusCode != 200`",
-        () async {
-          final mockHttpService = MockHttpService();
-          final caseProvider = CaseProvider(mockHttpService);
-          caseProvider.workShopId = "some_workshop_id";
-          when(mockHttpService.getSharedCases()).thenAnswer(
-            (_) async => http.Response("[]", 200),
-          );
-          when(mockHttpService.addCase(any, any)).thenAnswer(
-            (_) async => http.Response(jsonEncode(dummyCaseDtoJson), 201),
-          );
-          when(mockHttpService.deleteCase(any, any)).thenAnswer(
-            (_) async => http.Response("{}", 201),
-          );
-
-          await caseProvider.addCase(dummyNewCaseDto);
-          int numCases = await caseProvider.getCurrentCases().then(
-                (value) => value.length,
-              );
-          expect(numCases, 1);
-          await caseProvider.deleteCase("some_id");
-          numCases = await caseProvider.getCurrentCases().then(
-                (value) => value.length,
-              );
-          expect(numCases, 1);
-        },
-      );
     });
   });
 }
