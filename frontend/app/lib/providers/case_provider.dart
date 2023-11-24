@@ -23,8 +23,6 @@ class CaseProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Depending on [_showSharedCases], call [_httpService.getCases()] or
-  /// [_httpService.getSharedCases()].
   Future<List<CaseModel>> getCurrentCases() async {
     // * Return value currently not used.
     final Response response;
