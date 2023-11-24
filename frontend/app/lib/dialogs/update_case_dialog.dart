@@ -182,19 +182,16 @@ class UpdateDialogForm extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Text(
-                  tr("general.status"),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
+              Text(
+                tr("general.status"),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
+              const SizedBox(width: 16),
               FormField(
                 onSaved: (CaseStatus? newValue) {
-                  if (newValue != null) {
-                    statusController.text =
-                        EnumToString.convertToString(newValue);
-                  }
+                  if (newValue == null) return;
+                  statusController.text =
+                      EnumToString.convertToString(newValue);
                 },
                 builder: (FormFieldState<CaseStatus> field) {
                   return SizedBox(
@@ -229,19 +226,16 @@ class UpdateDialogForm extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Text(
-                  tr("general.occasion"),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
+              Text(
+                tr("general.occasion"),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
+              const SizedBox(width: 16),
               FormField(
                 onSaved: (CaseOccasion? newValue) {
-                  if (newValue != null) {
-                    occasionController.text =
-                        EnumToString.convertToString(newValue);
-                  }
+                  if (newValue == null) return;
+                  occasionController.text =
+                      EnumToString.convertToString(newValue);
                 },
                 builder: (FormFieldState<CaseOccasion> field) {
                   return SizedBox(
