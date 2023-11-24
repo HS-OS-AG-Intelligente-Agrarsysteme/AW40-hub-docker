@@ -27,10 +27,7 @@ class DiagnosesView extends StatelessWidget {
     final diagnosisProvider = Provider.of<DiagnosisProvider>(context);
     return FutureBuilder(
       // ignore: discarded_futures
-      future: diagnosisProvider.getDiagnoses(
-        _getCaseModels,
-        context,
-      ),
+      future: _getDiagnoses(context, diagnosisProvider),
       builder:
           (BuildContext context, AsyncSnapshot<List<DiagnosisModel>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
@@ -68,6 +65,20 @@ class DiagnosesView extends StatelessWidget {
   Future<List<CaseModel>> _getCaseModels(BuildContext context) {
     final caseProvider = Provider.of<CaseProvider>(context);
     return caseProvider.getCurrentCases();
+  }
+
+  Future<List<DiagnosisModel>> _getDiagnoses(
+    BuildContext context,
+    DiagnosisProvider diagnosisProvider,
+  ) async {
+    final Future<List<CaseModel>> caseModels = _getCaseModels(context);
+    final Future<List<DiagnosisModel>> diagnoses =
+        diagnosisProvider.getDiagnoses(
+      await caseModels,
+      context,
+    );
+
+    return diagnoses;
   }
 }
 

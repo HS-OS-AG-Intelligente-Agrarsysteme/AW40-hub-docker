@@ -17,10 +17,9 @@ class DiagnosisProvider with ChangeNotifier {
   late String workShopId;
 
   Future<List<DiagnosisModel>> getDiagnoses(
-    Future<List<CaseModel>> Function(BuildContext) getCaseModels,
+    List<CaseModel> cases,
     BuildContext context,
   ) async {
-    final List<CaseModel> cases = await getCaseModels(context);
     final List<String> caseIDs = cases.map((e) => e.id).toList();
 
     final List<Future<DiagnosisModel?>> individualDiagnosisRequests =

@@ -5,5 +5,5 @@ class DiagnosisScreen extends StatelessWidget {
   const DiagnosisScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => const DiagnosesView();
+  Widget build(BuildContext context) => DiagnosesView();
 }
