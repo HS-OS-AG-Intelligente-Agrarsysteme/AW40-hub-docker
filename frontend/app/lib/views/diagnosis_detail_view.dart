@@ -141,9 +141,9 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       final ScaffoldMessengerState scaffoldMessengerState =
           ScaffoldMessenger.of(context);
       if (dialogResult == null || !dialogResult) return;
-      final bool result =
+      final bool deletionResult =
           await diagnosisProvider.deleteDiagnosis(diagnosisModelCaseId);
-      final String message = result
+      final String message = deletionResult
           ? tr("diagnoses.details.deleteDiagnosisSuccessMessage")
           : tr("diagnoses.details.deleteDiagnosisErrorMessage");
       _showMessage(message, scaffoldMessengerState);
