@@ -1,3 +1,4 @@
+import "package:aw40_hub_frontend/dtos/action_dto.dart";
 import "package:aw40_hub_frontend/models/diagnosis_model.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:json_annotation/json_annotation.dart";
@@ -41,37 +42,4 @@ class DiagnosisDto {
   List<dynamic> stateMachineLog;
   @JsonKey(name: "todos")
   List<ActionDto> todos;
-}
-
-@JsonSerializable()
-class ActionDto {
-  ActionDto(
-    this.id,
-    this.instruction,
-    this.actionType,
-    this.dataType,
-    this.component,
-  );
-
-  factory ActionDto.fromJson(Map<String, dynamic> json) {
-    return _$ActionDtoFromJson(json);
-  }
-
-  ActionModel toModel() {
-    return ActionModel(
-      id,
-      instruction,
-      actionType,
-      dataType,
-      component,
-    );
-  }
-
-  String? id;
-  String instruction;
-  @JsonKey(name: "action_type")
-  dynamic actionType;
-  @JsonKey(name: "data_type")
-  dynamic dataType;
-  dynamic component;
 }

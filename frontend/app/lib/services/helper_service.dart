@@ -63,23 +63,53 @@ class HelperService {
     );
   }
 
-  static IconData getDiagnosisStatusIcon(DiagnosisStatus status) {
-    final Map<DiagnosisStatus, IconData> diagnosisStatusIcons = {
-      DiagnosisStatus.action_required: Icons.circle_notifications,
-      DiagnosisStatus.finished: Icons.check_circle,
-      DiagnosisStatus.failed: Icons.cancel,
-      DiagnosisStatus.processing: Icons.circle,
-      DiagnosisStatus.scheduled: Icons.circle,
-    };
+  static IconData getDiagnosisStatusIcon(DiagnosisStatus diagnosisStatus) {
+    switch (diagnosisStatus) {
+      case DiagnosisStatus.action_required:
+        return Icons.circle_notifications;
+      case DiagnosisStatus.finished:
+        return Icons.check_circle;
+      case DiagnosisStatus.failed:
+        return Icons.cancel;
+      case DiagnosisStatus.processing:
+        return Icons.circle;
+      case DiagnosisStatus.scheduled:
+        return Icons.circle;
+    }
+  }
 
-    final IconData? result = diagnosisStatusIcons[status];
-    if (result == null) {
-      throw AppException(
-        exceptionType: ExceptionType.notFound,
-        exceptionMessage: "No icon found for diagnois status: ${status.name}",
-      );
-    } else {
-      return result;
+  static Color getColorForDiagnosisStatus(
+    ColorScheme colorScheme,
+    DiagnosisStatus diagnosisStatus,
+  ) {
+    switch (diagnosisStatus) {
+      case DiagnosisStatus.action_required:
+        return colorScheme.tertiary;
+      case DiagnosisStatus.scheduled:
+        return colorScheme.primary;
+      case DiagnosisStatus.processing:
+        return colorScheme.primary;
+      case DiagnosisStatus.finished:
+        return colorScheme.secondary;
+      case DiagnosisStatus.failed:
+        return colorScheme.error;
+    }
+  }
+
+  static Color getColorComplementForDiagnosisStatus(
+    ColorScheme colorScheme,
+    DiagnosisStatus diagnosisStatus,
+  ) {
+    switch (diagnosisStatus) {
+      case DiagnosisStatus.action_required:
+        return colorScheme.onTertiary;
+      case DiagnosisStatus.finished:
+        return colorScheme.onSecondary;
+      case DiagnosisStatus.failed:
+        return colorScheme.onError;
+      case DiagnosisStatus.processing:
+      case DiagnosisStatus.scheduled:
+        return colorScheme.onPrimary;
     }
   }
 }

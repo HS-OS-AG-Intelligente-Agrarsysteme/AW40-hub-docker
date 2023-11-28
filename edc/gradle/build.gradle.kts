@@ -58,8 +58,6 @@ dependencies {
     implementation("$edcGroupId:transaction-datasource-spi:$edcVersion")
     implementation("$postgresqlGroupId:postgresql:$postgresqlVersion")
 
-    implementation("$edcGroupId:self-description-api:$edcVersion")
-
     implementation(project(":edc-extensions:federated-catalog"))
     implementation(project(":edc-extensions:healthcheck"))
 }

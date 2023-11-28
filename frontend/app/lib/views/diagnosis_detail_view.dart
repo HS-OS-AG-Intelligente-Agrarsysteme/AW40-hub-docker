@@ -24,11 +24,11 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
 
-    final color = _getColorForDiagnosisStatus(
+    final color = HelperService.getColorForDiagnosisStatus(
       colorScheme,
       widget.diagnosisModel.status,
     );
-    final complementColor = _getColorComplementForDiagnosisStatus(
+    final complementColor = HelperService.getColorComplementForDiagnosisStatus(
       colorScheme,
       widget.diagnosisModel.status,
     );
@@ -125,36 +125,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
         ),
       ),
     );
-  }
-
-  Color? _getColorForDiagnosisStatus(
-    ColorScheme colorScheme,
-    DiagnosisStatus diagnosisStatus,
-  ) {
-    final Map<DiagnosisStatus, Color> diagnosisStatusColor = {
-      DiagnosisStatus.action_required: colorScheme.tertiary,
-      DiagnosisStatus.finished: colorScheme.secondary,
-      DiagnosisStatus.failed: colorScheme.error,
-      DiagnosisStatus.processing: colorScheme.primary,
-      DiagnosisStatus.scheduled: colorScheme.primary,
-    };
-
-    return diagnosisStatusColor[diagnosisStatus];
-  }
-
-  Color? _getColorComplementForDiagnosisStatus(
-    ColorScheme colorScheme,
-    DiagnosisStatus diagnosisStatus,
-  ) {
-    final Map<DiagnosisStatus, Color> diagnosisStatusColor = {
-      DiagnosisStatus.action_required: colorScheme.onTertiary,
-      DiagnosisStatus.finished: colorScheme.onSecondary,
-      DiagnosisStatus.failed: colorScheme.onError,
-      DiagnosisStatus.processing: colorScheme.onPrimary,
-      DiagnosisStatus.scheduled: colorScheme.onPrimary,
-    };
-
-    return diagnosisStatusColor[diagnosisStatus];
   }
 
   static Future<bool?> _showConfirmDeleteDialog(BuildContext context) {
