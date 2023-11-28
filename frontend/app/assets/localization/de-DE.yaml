@@ -54,6 +54,7 @@ diagnoses:
     dialog:
       title: "Diagnose löschen"
       description: "Möchten Sie die Diagnose wirklich löschen?"
+    obdUpload: "OBD-Daten hochladen"
 cases:
   title: "Fälle"
   actions:

@@ -54,6 +54,7 @@ diagnoses:
     dialog:
       title: "Delete diagnosis"
       description: "Do you really want to delete the diagnosis?"
+    obdUpload: "Uplaod OBD data"
 cases:
   title: "Cases"
   actions:
