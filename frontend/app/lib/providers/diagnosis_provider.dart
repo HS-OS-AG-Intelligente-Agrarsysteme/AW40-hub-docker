@@ -20,7 +20,10 @@ class DiagnosisProvider with ChangeNotifier {
     List<CaseModel> cases,
     BuildContext context,
   ) async {
-    final List<String> caseIDs = cases.map((e) => e.id).toList();
+    final List<String> caseIDs = cases
+        .where((c) => c.workshopId == workShopId)
+        .map((e) => e.id)
+        .toList();
 
     final List<Future<DiagnosisModel?>> individualDiagnosisRequests =
         caseIDs.map(getDiagnosis).toList();
