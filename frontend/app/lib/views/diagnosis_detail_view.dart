@@ -117,22 +117,10 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                       : null,
                 ),
               ),
-
               const SizedBox(height: 32),
               const Placeholder(
                 fallbackHeight: 250,
               ),
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  FilledButton.icon(
-                    icon: const Icon(Icons.upload),
-                    label: Text(tr("diagnoses.details.obdUpload")),
-                    onPressed: () {},
-                  ),
-                ],
-              )
             ],
           ),
         ),
