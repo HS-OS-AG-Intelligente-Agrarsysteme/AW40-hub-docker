@@ -55,6 +55,7 @@ diagnoses:
       title: "Delete diagnosis"
       description: "Do you really want to delete the diagnosis?"
     obdUpload: "Uplaod OBD data"
+    dragAndDrop: "Drag and drop the file here"
 cases:
   title: "Cases"
   actions:

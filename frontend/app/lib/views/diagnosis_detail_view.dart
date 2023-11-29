@@ -2,6 +2,8 @@ import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:cross_file/cross_file.dart";
+import "package:desktop_drop/desktop_drop.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
@@ -19,6 +21,9 @@ class DiagnosisDetailView extends StatefulWidget {
 }
 
 class _DiagnosisDetailView extends State<DiagnosisDetailView> {
+  final List<XFile> _list = [];
+  bool _dragging = false;
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -93,28 +98,87 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
               // Current State
               Card(
                 color: color,
-                child: ListTile(
-                  leading: Icon(
-                    HelperService.getDiagnosisStatusIconData(
-                      widget.diagnosisModel.status,
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: Icon(
+                        HelperService.getDiagnosisStatusIconData(
+                          widget.diagnosisModel.status,
+                        ),
+                      ),
+                      title: Text(
+                        tr("diagnoses.status.${widget.diagnosisModel.status.name}"),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: complementColor,
+                        ),
+                      ),
+                      iconColor: complementColor,
+                      subtitle: widget.diagnosisModel.status ==
+                              DiagnosisStatus.action_required
+                          ? Text(
+                              widget.diagnosisModel.todos[0].instruction,
+                              style: TextStyle(
+                                color: complementColor,
+                              ),
+                            )
+                          : null,
                     ),
-                  ),
-                  title: Text(
-                    tr("diagnoses.status.${widget.diagnosisModel.status.name}"),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: complementColor,
+                    const SizedBox(height: 16),
+                    // TODO display name of uploaded File here
+                    // TODO remove Listview builder since there will only be max. one item
+
+                    if (_list.isNotEmpty)
+                      ListTile(
+                        title: Text(
+                          _list[0].name,
+                          style: const TextStyle(color: Colors.blue),
+                        ),
+                        selectedColor: Theme.of(context).colorScheme.secondary,
+                      )
+                    else
+                      Text(
+                        "Liste enthält ${_list.length} Elemente",
+                        style: const TextStyle(color: Colors.blue),
+                      ),
+
+                    const SizedBox(height: 16),
+                    DropTarget(
+                      onDragDone: (detail) {
+                        setState(() {
+                          _list.addAll(detail.files);
+                        });
+                      },
+                      onDragEntered: (detail) {
+                        setState(() {
+                          _dragging = true;
+                        });
+                      },
+                      onDragExited: (detail) {
+                        setState(() {
+                          _dragging = false;
+                        });
+                      },
+                      // TODO adjust colors and height/width
+                      child: Container(
+                        height: 200,
+                        width: 200,
+                        color: _dragging
+                            ? Colors.blue.withOpacity(0.4)
+                            : Colors.black26,
+                        child: _list.isEmpty
+                            ? Center(
+                                child: Center(
+                                  child: Text(
+                                    tr("diagnoses.details.dragAndDrop"),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              )
+                            : Text(_list.join("\n")),
+                      ),
                     ),
-                  ),
-                  iconColor: complementColor,
-                  subtitle: widget.diagnosisModel.status ==
-                          DiagnosisStatus.action_required
-                      ? Text(
-                          widget.diagnosisModel.todos[0].instruction,
-                          style: TextStyle(
-                            color: complementColor,
-                          ),
-                        )
-                      : null,
+                    const SizedBox(height: 16),
+                  ],
                 ),
               ),
               const SizedBox(height: 32),

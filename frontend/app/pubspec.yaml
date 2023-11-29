@@ -30,6 +30,7 @@ environment:
 dependencies:
   build_runner: ^2.3.3
   collection: ^1.17.0
+  cross_file: ^0.3.3
   crypto: ^3.0.3
   # ! Higher versions of `csslib` break `universal_html`
   # ! see https://github.com/dint-dev/universal_html/issues/76#issuecomment-1558621694
