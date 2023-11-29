@@ -11,5 +11,5 @@ class ActionModel {
   String instruction;
   String actionType;
   String dataType;
-  String component;
+  String? component;
 }

@@ -34,5 +34,5 @@ class ActionDto {
   String actionType;
   @JsonKey(name: "data_type")
   String dataType;
-  String component;
+  String? component;
 }
