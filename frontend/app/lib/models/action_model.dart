@@ -9,7 +9,7 @@ class ActionModel {
 
   String id;
   String instruction;
-  dynamic actionType;
-  dynamic dataType;
-  dynamic component;
+  String actionType;
+  String dataType;
+  String component;
 }

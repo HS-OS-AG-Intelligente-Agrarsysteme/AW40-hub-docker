@@ -24,7 +24,8 @@ class DiagnosisDataTableSource extends DataTableSource {
           )
         : Tooltip(
             message: tr("diagnoses.status.${diagnosisStatus.name}"),
-            child: Icon(HelperService.getDiagnosisStatusIcon(diagnosisStatus)),
+            child:
+                Icon(HelperService.getDiagnosisStatusIconData(diagnosisStatus)),
           );
   }
 

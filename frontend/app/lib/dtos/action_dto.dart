@@ -31,8 +31,8 @@ class ActionDto {
   String id;
   String instruction;
   @JsonKey(name: "action_type")
-  dynamic actionType;
+  String actionType;
   @JsonKey(name: "data_type")
-  dynamic dataType;
-  dynamic component;
+  String dataType;
+  String component;
 }

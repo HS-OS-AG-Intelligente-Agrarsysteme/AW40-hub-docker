@@ -24,11 +24,11 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
 
-    final color = HelperService.getColorForDiagnosisStatus(
+    final color = HelperService.getDiagnosisStatusBackgroundColor(
       colorScheme,
       widget.diagnosisModel.status,
     );
-    final complementColor = HelperService.getColorComplementForDiagnosisStatus(
+    final complementColor = HelperService.getDiagnosisStatusForegroundColor(
       colorScheme,
       widget.diagnosisModel.status,
     );
@@ -95,7 +95,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                 color: color,
                 child: ListTile(
                   leading: Icon(
-                    HelperService.getDiagnosisStatusIcon(
+                    HelperService.getDiagnosisStatusIconData(
                       widget.diagnosisModel.status,
                     ),
                   ),

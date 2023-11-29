@@ -63,7 +63,7 @@ class HelperService {
     );
   }
 
-  static IconData getDiagnosisStatusIcon(DiagnosisStatus diagnosisStatus) {
+  static IconData getDiagnosisStatusIconData(DiagnosisStatus diagnosisStatus) {
     switch (diagnosisStatus) {
       case DiagnosisStatus.action_required:
         return Icons.circle_notifications;
@@ -78,7 +78,7 @@ class HelperService {
     }
   }
 
-  static Color getColorForDiagnosisStatus(
+  static Color getDiagnosisStatusBackgroundColor(
     ColorScheme colorScheme,
     DiagnosisStatus diagnosisStatus,
   ) {
@@ -96,7 +96,7 @@ class HelperService {
     }
   }
 
-  static Color getColorComplementForDiagnosisStatus(
+  static Color getDiagnosisStatusForegroundColor(
     ColorScheme colorScheme,
     DiagnosisStatus diagnosisStatus,
   ) {
