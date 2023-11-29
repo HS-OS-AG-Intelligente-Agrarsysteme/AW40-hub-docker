@@ -176,7 +176,10 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                     style: IconButton.styleFrom(
                       foregroundColor: colorScheme.error,
                     ),
-                    onPressed: widget.onDelete,
+                    onPressed:
+                        caseProvider.workShopId == widget.caseModel.workshopId
+                            ? widget.onDelete
+                            : null,
                   ),
                 ],
               ),
