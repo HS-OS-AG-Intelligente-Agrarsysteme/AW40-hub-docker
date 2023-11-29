@@ -127,7 +127,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                     // TODO display name of uploaded File here
                     // TODO remove Listview builder since there will only be max. one item
 
-                    if (_list.isNotEmpty)
+                    if (_list.length == 1)
                       ListTile(
                         title: Text(
                           _list[0].name,
@@ -160,21 +160,19 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                       },
                       // TODO adjust colors and height/width
                       child: Container(
-                        height: 200,
-                        width: 200,
+                        height: 125,
+                        width: 300,
                         color: _dragging
                             ? Colors.blue.withOpacity(0.4)
                             : Colors.black26,
-                        child: _list.isEmpty
-                            ? Center(
-                                child: Center(
-                                  child: Text(
-                                    tr("diagnoses.details.dragAndDrop"),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              )
-                            : Text(_list.join("\n")),
+                        child: Center(
+                          child: Center(
+                            child: Text(
+                              tr("diagnoses.details.dragAndDrop"),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
