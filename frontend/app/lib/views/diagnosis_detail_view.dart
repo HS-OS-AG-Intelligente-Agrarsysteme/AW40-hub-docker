@@ -1,3 +1,6 @@
+import "dart:convert";
+
+import "package:aw40_hub_frontend/dtos/new_obd_data_dto.dart";
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
@@ -22,7 +25,7 @@ class DiagnosisDetailView extends StatefulWidget {
 
 class _DiagnosisDetailView extends State<DiagnosisDetailView> {
   bool _dragging = false;
-  bool _canUpload = false;
+  bool _canUpload = false; // TODO use later
   XFile? _file;
 
   @override
@@ -125,7 +128,42 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                           : null,
                       trailing: IconButton(
                         icon: const Icon(Icons.upload_file),
-                        onPressed: _file == null ? null : () {},
+                        onPressed: _file == null
+                            ? null
+                            : () async {
+                                // TODO transform _file into NewOBDDataDto
+                                final ScaffoldMessengerState
+                                    scaffoldMessengerState =
+                                    ScaffoldMessenger.of(context);
+                                final diagnosisProvider =
+                                    Provider.of<DiagnosisProvider>(
+                                  context,
+                                  listen: false,
+                                );
+                                XFile file = _file!;
+                                final String? mimeType = file.mimeType;
+                                bool isJson = _isJsonFile(mimeType);
+                                // TODO try catch...
+                                final String fileContent =
+                                    await file.readAsString();
+                                final Map<String, dynamic> jsonMap =
+                                    jsonDecode(fileContent);
+                                final NewOBDDataDto newOBDDataDto =
+                                    NewOBDDataDto.fromJson(jsonMap);
+                                final bool result =
+                                    await diagnosisProvider.uploadObdData(
+                                  widget.diagnosisModel.caseId,
+                                  newOBDDataDto,
+                                );
+                                _showMessage(
+                                  result
+                                      ? tr(
+                                          "diagnoses.details.uploadObdDataSuccessMessage")
+                                      : tr(
+                                          "diagnoses.details.uploadObdDataErrorMessage"),
+                                  scaffoldMessengerState,
+                                );
+                              },
                         disabledColor: colorScheme.outline,
                         tooltip: _file == null
                             ? null
@@ -202,6 +240,10 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
         ),
       ),
     );
+  }
+
+  bool _isJsonFile(String? mimemType) {
+    return mimemType == "application/json";
   }
 
   static Future<bool?> _showConfirmDeleteDialog(BuildContext context) {
