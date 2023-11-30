@@ -193,8 +193,9 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                         ),
                       )
                     else
+                      // TODO replace text based on canUpload (if canUpload false -> Hochgeladene Datei)
                       Text(
-                        _file!.name,
+                        "${tr("diagnoses.details.selectedFile")} ${_file!.name}",
                         style: const TextStyle(color: Colors.blue),
                       ),
                     const SizedBox(height: 16),
