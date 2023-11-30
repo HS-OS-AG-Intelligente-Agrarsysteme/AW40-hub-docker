@@ -9,6 +9,7 @@ import "package:cross_file/cross_file.dart";
 import "package:desktop_drop/desktop_drop.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
+import "package:logging/logging.dart";
 import "package:provider/provider.dart";
 
 class DiagnosisDetailView extends StatefulWidget {
@@ -27,6 +28,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
   bool _dragging = false;
   bool _canUpload = false; // TODO use later
   XFile? _file;
+  final Logger _logger = Logger("diagnosis detail view");
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +133,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                         onPressed: _file == null
                             ? null
                             : () async {
-                                // TODO transform _file into NewOBDDataDto
                                 final ScaffoldMessengerState
                                     scaffoldMessengerState =
                                     ScaffoldMessenger.of(context);
@@ -140,29 +141,42 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                                   context,
                                   listen: false,
                                 );
-                                XFile file = _file!;
-                                final String? mimeType = file.mimeType;
-                                bool isJson = _isJsonFile(mimeType);
-                                // TODO try catch...
-                                final String fileContent =
-                                    await file.readAsString();
-                                final Map<String, dynamic> jsonMap =
-                                    jsonDecode(fileContent);
-                                final NewOBDDataDto newOBDDataDto =
-                                    NewOBDDataDto.fromJson(jsonMap);
-                                final bool result =
-                                    await diagnosisProvider.uploadObdData(
-                                  widget.diagnosisModel.caseId,
-                                  newOBDDataDto,
-                                );
-                                _showMessage(
-                                  result
-                                      ? tr(
-                                          "diagnoses.details.uploadObdDataSuccessMessage")
-                                      : tr(
-                                          "diagnoses.details.uploadObdDataErrorMessage"),
-                                  scaffoldMessengerState,
-                                );
+
+                                try {
+                                  final XFile file = _file!;
+
+                                  final String fileContent =
+                                      await file.readAsString();
+                                  final Map<String, dynamic> jsonMap =
+                                      jsonDecode(fileContent);
+                                  final NewOBDDataDto newOBDDataDto =
+                                      NewOBDDataDto.fromJson(jsonMap);
+
+                                  final bool result =
+                                      await diagnosisProvider.uploadObdData(
+                                    widget.diagnosisModel.caseId,
+                                    newOBDDataDto,
+                                  );
+
+                                  _showMessage(
+                                    result
+                                        ? tr(
+                                            "diagnoses.details.uploadObdDataSuccessMessage",
+                                          )
+                                        : tr(
+                                            "diagnoses.details.uploadObdDataErrorMessage",
+                                          ),
+                                    scaffoldMessengerState,
+                                  );
+                                  // ignore: avoid_catches_without_on_clauses
+                                } catch (e) {
+                                  _logger
+                                      .info("Exception during file upload: $e");
+                                  _showMessage(
+                                    tr("diagnoses.details.uploadObdDataErrorMessage"),
+                                    scaffoldMessengerState,
+                                  );
+                                }
                               },
                         disabledColor: colorScheme.outline,
                         tooltip: _file == null
@@ -240,10 +254,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
         ),
       ),
     );
-  }
-
-  bool _isJsonFile(String? mimemType) {
-    return mimemType == "application/json";
   }
 
   static Future<bool?> _showConfirmDeleteDialog(BuildContext context) {

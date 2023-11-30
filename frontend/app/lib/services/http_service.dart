@@ -90,7 +90,10 @@ class HttpService {
   }
 
   Future<http.Response> uploadObdData(
-      String workshopId, String caseId, Map<String, dynamic> requestBody) {
+    String workshopId,
+    String caseId,
+    Map<String, dynamic> requestBody,
+  ) {
     return http.post(
       Uri.parse("$backendUrl/$workshopId/cases/$caseId/obd_data"),
       headers: {
