@@ -88,4 +88,16 @@ class HttpService {
       headers: {"Authorization": "Basic $basicAuthKey=="},
     );
   }
+
+  Future<http.Response> uploadObdData(
+      String workshopId, String caseId, Map<String, dynamic> requestBody) {
+    return http.post(
+      Uri.parse("$backendUrl/$workshopId/cases/$caseId/obd_data"),
+      headers: {
+        "Authorization": "Basic $basicAuthKey==",
+        "Content-Type": "application/json; charset=UTF-8",
+      },
+      body: jsonEncode(requestBody),
+    );
+  }
 }

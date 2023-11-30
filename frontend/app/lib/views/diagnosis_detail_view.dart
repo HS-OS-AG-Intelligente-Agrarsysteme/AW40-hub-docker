@@ -22,6 +22,7 @@ class DiagnosisDetailView extends StatefulWidget {
 
 class _DiagnosisDetailView extends State<DiagnosisDetailView> {
   bool _dragging = false;
+  bool _canUpload = false;
   XFile? _file;
 
   @override

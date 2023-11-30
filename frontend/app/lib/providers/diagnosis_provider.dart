@@ -1,6 +1,7 @@
 import "dart:convert";
 
 import "package:aw40_hub_frontend/dtos/diagnosis_dto.dart";
+import "package:aw40_hub_frontend/dtos/new_obd_data_dto.dart";
 import "package:aw40_hub_frontend/models/case_model.dart";
 import "package:aw40_hub_frontend/models/diagnosis_model.dart";
 import "package:aw40_hub_frontend/services/services.dart";
@@ -70,6 +71,22 @@ class DiagnosisProvider with ChangeNotifier {
     if (response.statusCode != 200) {
       _logger.warning(
         "Could not delete diagnosis. "
+        "${response.statusCode}: ${response.reasonPhrase}",
+      );
+      return false;
+    }
+
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> uploadObdData(String caseId, NewOBDDataDto obdDataDto) async {
+    final Map<String, dynamic> obdDataJson = obdDataDto.toJson();
+    final Response response =
+        await _httpService.uploadObdData(workShopId, caseId, obdDataJson);
+    if (response.statusCode != 201) {
+      _logger.warning(
+        "Could not uplaod obd data. "
         "${response.statusCode}: ${response.reasonPhrase}",
       );
       return false;
