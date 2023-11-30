@@ -21,8 +21,8 @@ class DiagnosisDetailView extends StatefulWidget {
 }
 
 class _DiagnosisDetailView extends State<DiagnosisDetailView> {
-  final List<XFile> _list = [];
   bool _dragging = false;
+  XFile? _file;
 
   @override
   Widget build(BuildContext context) {
@@ -122,30 +122,35 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                               ),
                             )
                           : null,
+                      trailing: IconButton(
+                        icon: const Icon(Icons.upload_file),
+                        onPressed: _file == null ? null : () {},
+                        disabledColor: colorScheme.outline,
+                        tooltip: _file == null
+                            ? null
+                            : tr("diagnoses.details.uploadFileTooltip"),
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    // TODO display name of uploaded File here
-                    // TODO remove Listview builder since there will only be max. one item
-
-                    if (_list.length == 1)
-                      ListTile(
-                        title: Text(
-                          _list[0].name,
-                          style: const TextStyle(color: Colors.blue),
+                    if (_file == null)
+                      Text(
+                        tr("diagnoses.details.uploadFile"),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onTertiary,
                         ),
-                        selectedColor: Theme.of(context).colorScheme.secondary,
                       )
                     else
                       Text(
-                        "Liste enthält ${_list.length} Elemente",
+                        _file!.name,
                         style: const TextStyle(color: Colors.blue),
                       ),
-
                     const SizedBox(height: 16),
                     DropTarget(
                       onDragDone: (detail) {
                         setState(() {
-                          _list.addAll(detail.files);
+                          final files = detail.files;
+                          final XFile file = files.first;
+                          _file = file;
                         });
                       },
                       onDragEntered: (detail) {
@@ -162,14 +167,22 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                       child: Container(
                         height: 125,
                         width: 300,
-                        color: _dragging
-                            ? Colors.blue.withOpacity(0.4)
-                            : Colors.black26,
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                          color: _dragging
+                              ? Colors.blue.withOpacity(0.4)
+                              : Colors.black26,
+                        ),
                         child: Center(
                           child: Center(
                             child: Text(
                               tr("diagnoses.details.dragAndDrop"),
                               textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onTertiary,
+                              ),
                             ),
                           ),
                         ),
