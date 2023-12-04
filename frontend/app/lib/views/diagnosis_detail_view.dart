@@ -26,7 +26,6 @@ class DiagnosisDetailView extends StatefulWidget {
 
 class _DiagnosisDetailView extends State<DiagnosisDetailView> {
   bool _dragging = false;
-  bool _canUpload = false; // TODO use later
   XFile? _file;
   final Logger _logger = Logger("diagnosis detail view");
 
@@ -143,6 +142,9 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                                 );
 
                                 try {
+                                  // TODO differentiate by Action.dataType!
+                                  // widget.diagnosisModel.todos.first.dataType
+
                                   final XFile file = _file!;
 
                                   final String fileContent =
@@ -193,7 +195,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                         ),
                       )
                     else
-                      // TODO replace text based on canUpload (if canUpload false -> Hochgeladene Datei)
                       Text(
                         "${tr("diagnoses.details.selectedFile")} ${_file!.name}",
                         style: const TextStyle(color: Colors.blue),
@@ -248,7 +249,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
               ),
               const SizedBox(height: 32),
               const Placeholder(
-                fallbackHeight: 250,
+                fallbackHeight: 150,
               ),
             ],
           ),
