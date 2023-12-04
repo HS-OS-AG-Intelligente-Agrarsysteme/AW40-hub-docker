@@ -186,64 +186,9 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                             : tr("diagnoses.details.uploadFileTooltip"),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    if (_file == null)
-                      Text(
-                        tr("diagnoses.details.uploadFile"),
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onTertiary,
-                        ),
-                      )
-                    else
-                      Text(
-                        "${tr("diagnoses.details.selectedFile")} ${_file!.name}",
-                        style: const TextStyle(color: Colors.blue),
-                      ),
-                    const SizedBox(height: 16),
-                    DropTarget(
-                      onDragDone: (detail) {
-                        setState(() {
-                          final files = detail.files;
-                          final XFile file = files.first;
-                          _file = file;
-                        });
-                      },
-                      onDragEntered: (detail) {
-                        setState(() {
-                          _dragging = true;
-                        });
-                      },
-                      onDragExited: (detail) {
-                        setState(() {
-                          _dragging = false;
-                        });
-                      },
-                      // TODO adjust colors and height/width
-                      child: Container(
-                        height: 125,
-                        width: 300,
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          color: _dragging
-                              ? Colors.blue.withOpacity(0.4)
-                              : Colors.black26,
-                        ),
-                        child: Center(
-                          child: Center(
-                            child: Text(
-                              tr("diagnoses.details.dragAndDrop"),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onTertiary,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    if (widget.diagnosisModel.status ==
+                        DiagnosisStatus.action_required)
+                      ..._displayDragAndDropArea()
                   ],
                 ),
               ),
@@ -256,6 +201,66 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
         ),
       ),
     );
+  }
+
+  List<Widget> _displayDragAndDropArea() {
+    return [
+      const SizedBox(height: 16),
+      if (_file == null)
+        Text(
+          tr("diagnoses.details.uploadFile"),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onTertiary,
+          ),
+        )
+      else
+        Text(
+          "${tr("diagnoses.details.selectedFile")} ${_file!.name}",
+          style: const TextStyle(color: Colors.blue),
+        ),
+      const SizedBox(height: 16),
+      DropTarget(
+        onDragDone: (detail) {
+          setState(() {
+            final files = detail.files;
+            final XFile file = files.first;
+            _file = file;
+          });
+        },
+        onDragEntered: (detail) {
+          setState(() {
+            _dragging = true;
+          });
+        },
+        onDragExited: (detail) {
+          setState(() {
+            _dragging = false;
+          });
+        },
+        // TODO adjust colors and height/width
+        child: Container(
+          height: 125,
+          width: 300,
+          decoration: BoxDecoration(
+            border: Border.all(),
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+            color: _dragging ? Colors.blue.withOpacity(0.4) : Colors.black26,
+          ),
+          child: Center(
+            child: Center(
+              child: Text(
+                tr("diagnoses.details.dragAndDrop"),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onTertiary,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      const SizedBox(height: 16),
+    ];
   }
 
   static Future<bool?> _showConfirmDeleteDialog(BuildContext context) {
