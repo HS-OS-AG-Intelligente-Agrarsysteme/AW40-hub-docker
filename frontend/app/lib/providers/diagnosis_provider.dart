@@ -96,6 +96,24 @@ class DiagnosisProvider with ChangeNotifier {
     return true;
   }
 
+  Future<bool> uploadPicoscopeCSVData(
+    String caseId,
+    List<int> byteData,
+  ) async {
+    final Response response =
+        await _httpService.uploadPicoscopeCSVData(workShopId, caseId, byteData);
+    if (response.statusCode != 201) {
+      _logger.warning(
+        "Could not uplaod picoscope csv data. "
+        "${response.statusCode}: ${response.reasonPhrase}",
+      );
+      return false;
+    }
+
+    notifyListeners();
+    return true;
+  }
+
   DiagnosisModel? _decodeDiagnosisModelFromResponseBody(Response response) {
     final decodedJson = jsonDecode(response.body);
     if (decodedJson is! Map<String, dynamic>) return null;

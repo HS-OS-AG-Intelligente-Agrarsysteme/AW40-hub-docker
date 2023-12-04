@@ -107,9 +107,8 @@ class HttpService {
   Future<http.Response> uploadPicoscopeCSVData(
     String workshopId,
     String caseId,
-    String binaryData,
+    List<int> byteData,
   ) {
-    final List<int> byteData = utf8.encode(binaryData);
     return http.post(
       Uri.parse(
           "$backendUrl/$workshopId/cases/$caseId/timeseries_data/upload/picoscope"),

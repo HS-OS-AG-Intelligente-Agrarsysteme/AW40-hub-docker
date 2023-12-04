@@ -59,8 +59,8 @@ diagnoses:
     selectedFile: "Selected file:"
     uploadFileTooltip: "Upload file"
     dragAndDrop: "Drag and drop the file here"
-    uploadObdDataSuccessMessage: "The OBD data has been uploaded successfully."
-    uploadObdDataErrorMessage: "The OBD data could not be uploaded."
+    uploadDataSuccessMessage: "The data has been uploaded successfully."
+    uploadDataErrorMessage: "The data could not be uploaded."
 cases:
   title: "Cases"
   actions:

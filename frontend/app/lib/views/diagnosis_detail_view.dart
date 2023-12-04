@@ -181,6 +181,13 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
 
         case "oscillogram":
           // TODO CSV case
+          if (file.mimeType == "text/csv") {
+            final List<int> byteData = utf8.encode(fileContent);
+            result = await diagnosisProvider.uploadPicoscopeCSVData(
+              widget.diagnosisModel.caseId,
+              byteData,
+            );
+          }
 
           // TODO MAT case
           break;
@@ -190,18 +197,17 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
           break;
 
         default:
-          // TODO Handle default case
+          // TODO Handle default case if needed
           break;
       }
 
-      // TODO neutral instead of obd
       _showMessage(
         result
             ? tr(
-                "diagnoses.details.uploadObdDataSuccessMessage",
+                "diagnoses.details.uploadDataSuccessMessage",
               )
             : tr(
-                "diagnoses.details.uploadObdDataErrorMessage",
+                "diagnoses.details.uploadDataErrorMessage",
               ),
         scaffoldMessengerState,
       );
