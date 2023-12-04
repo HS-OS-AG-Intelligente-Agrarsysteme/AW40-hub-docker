@@ -103,4 +103,21 @@ class HttpService {
       body: jsonEncode(requestBody),
     );
   }
+
+  Future<http.Response> uploadPicoscopeCSVData(
+    String workshopId,
+    String caseId,
+    String binaryData,
+  ) {
+    final List<int> byteData = utf8.encode(binaryData);
+    return http.post(
+      Uri.parse(
+          "$backendUrl/$workshopId/cases/$caseId/timeseries_data/upload/picoscope"),
+      headers: {
+        "Authorization": "Basic $basicAuthKey==",
+        "Content-Type": "application/octet-stream",
+      },
+      body: byteData,
+    );
+  }
 }

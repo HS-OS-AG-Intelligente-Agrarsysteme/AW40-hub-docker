@@ -129,57 +129,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                           : null,
                       trailing: IconButton(
                         icon: const Icon(Icons.upload_file),
-                        onPressed: _file == null
-                            ? null
-                            : () async {
-                                final ScaffoldMessengerState
-                                    scaffoldMessengerState =
-                                    ScaffoldMessenger.of(context);
-                                final diagnosisProvider =
-                                    Provider.of<DiagnosisProvider>(
-                                  context,
-                                  listen: false,
-                                );
-
-                                try {
-                                  // TODO differentiate by Action.dataType!
-                                  // widget.diagnosisModel.todos.first.dataType
-
-                                  final XFile file = _file!;
-
-                                  final String fileContent =
-                                      await file.readAsString();
-                                  final Map<String, dynamic> jsonMap =
-                                      jsonDecode(fileContent);
-                                  final NewOBDDataDto newOBDDataDto =
-                                      NewOBDDataDto.fromJson(jsonMap);
-
-                                  final bool result =
-                                      await diagnosisProvider.uploadObdData(
-                                    widget.diagnosisModel.caseId,
-                                    newOBDDataDto,
-                                  );
-
-                                  _showMessage(
-                                    result
-                                        ? tr(
-                                            "diagnoses.details.uploadObdDataSuccessMessage",
-                                          )
-                                        : tr(
-                                            "diagnoses.details.uploadObdDataErrorMessage",
-                                          ),
-                                    scaffoldMessengerState,
-                                  );
-                                  // ignore: avoid_catches_without_on_clauses
-                                } catch (e) {
-                                  _logger
-                                      .info("Exception during file upload: $e");
-                                  _showMessage(
-                                    tr("diagnoses.details.uploadObdDataErrorMessage"),
-                                    scaffoldMessengerState,
-                                  );
-                                }
-                              },
+                        onPressed: _file == null ? null : uploadFile,
                         disabledColor: colorScheme.outline,
                         tooltip: _file == null
                             ? null
@@ -201,6 +151,68 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
         ),
       ),
     );
+  }
+
+  Future<void> uploadFile() async {
+    final ScaffoldMessengerState scaffoldMessengerState =
+        ScaffoldMessenger.of(context);
+    final diagnosisProvider = Provider.of<DiagnosisProvider>(
+      context,
+      listen: false,
+    );
+
+    try {
+      final XFile file = _file!;
+
+      final String fileContent = await file.readAsString();
+
+      bool result = false;
+
+      switch (widget.diagnosisModel.todos.first.dataType) {
+        case "obd":
+          final Map<String, dynamic> jsonMap = jsonDecode(fileContent);
+          final NewOBDDataDto newOBDDataDto = NewOBDDataDto.fromJson(jsonMap);
+
+          result = await diagnosisProvider.uploadObdData(
+            widget.diagnosisModel.caseId,
+            newOBDDataDto,
+          );
+          break;
+
+        case "oscillogram":
+          // TODO CSV case
+
+          // TODO MAT case
+          break;
+
+        case "symptom":
+          // TODO Handle symptom case
+          break;
+
+        default:
+          // TODO Handle default case
+          break;
+      }
+
+      // TODO neutral instead of obd
+      _showMessage(
+        result
+            ? tr(
+                "diagnoses.details.uploadObdDataSuccessMessage",
+              )
+            : tr(
+                "diagnoses.details.uploadObdDataErrorMessage",
+              ),
+        scaffoldMessengerState,
+      );
+      // ignore: avoid_catches_without_on_clauses
+    } catch (e) {
+      _logger.info("Exception during file upload: $e");
+      _showMessage(
+        tr("diagnoses.details.uploadObdDataErrorMessage"),
+        scaffoldMessengerState,
+      );
+    }
   }
 
   List<Widget> _displayDragAndDropArea() {
