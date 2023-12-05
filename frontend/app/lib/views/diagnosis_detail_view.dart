@@ -181,16 +181,12 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
           break;
 
         case "oscillogram":
-          // TODO CSV case
-          if (file.mimeType == "text/csv") {
-            final List<int> byteData = utf8.encode(fileContent);
-            result = await diagnosisProvider.uploadPicoscopeCSVData(
-              widget.diagnosisModel.caseId,
-              byteData,
-            );
-          }
+          final List<int> byteData = utf8.encode(fileContent);
+          result = await diagnosisProvider.uploadPicoscopeCSVData(
+            widget.diagnosisModel.caseId,
+            byteData,
+          );
 
-          // TODO MAT case
           break;
 
         case "symptom":
