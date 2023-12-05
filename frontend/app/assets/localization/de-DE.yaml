@@ -55,7 +55,7 @@ diagnoses:
       title: "Diagnose löschen"
       description: "Möchten Sie die Diagnose wirklich löschen?"
     obdUpload: "OBD-Daten hochladen"
-    uploadFile: "Laden Sie eine Datei hoch..."
+    uploadFile: "Laden Sie eine Datei hoch"
     uploadFileTooltip: "Datei hochladen"
     selectedFile: "Ausgewählte Datei:"
     dragAndDrop: "Datei per Drag & Drop hier ablegen"

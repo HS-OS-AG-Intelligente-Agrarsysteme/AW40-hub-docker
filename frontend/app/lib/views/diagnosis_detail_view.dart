@@ -121,10 +121,16 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                       iconColor: complementColor,
                       subtitle: widget.diagnosisModel.status ==
                               DiagnosisStatus.action_required
-                          ? Text(
-                              widget.diagnosisModel.todos[0].instruction,
-                              style: TextStyle(
-                                color: complementColor,
+                          ? Tooltip(
+                              message:
+                                  widget.diagnosisModel.todos[0].instruction,
+                              child: Text(
+                                widget.diagnosisModel.todos[0].instruction,
+                                style: TextStyle(
+                                  color: complementColor,
+                                ),
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             )
                           : null,
