@@ -99,7 +99,10 @@ class DiagnosisProvider with ChangeNotifier {
   Future<bool> uploadSymtomData(String caseId, NewSymptomDto symptomDto) async {
     final Map<String, dynamic> symptomDataJson = symptomDto.toJson();
     final Response response = await _httpService.uploadSymtomData(
-        workShopId, caseId, symptomDataJson);
+      workShopId,
+      caseId,
+      symptomDataJson,
+    );
     if (response.statusCode != 201) {
       _logger.warning(
         "Could not upload symptom data. "
@@ -115,9 +118,14 @@ class DiagnosisProvider with ChangeNotifier {
   Future<bool> uploadPicoscopeData(
     String caseId,
     List<int> byteData,
+    String filename,
   ) async {
-    final Response response =
-        await _httpService.uploadPicoscopeData(workShopId, caseId, byteData);
+    final Response response = await _httpService.uploadPicoscopeData(
+      workShopId,
+      caseId,
+      byteData,
+      filename,
+    );
     if (response.statusCode != 201) {
       _logger.warning(
         "Could not upload picoscope data. "

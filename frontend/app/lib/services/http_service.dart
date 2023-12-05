@@ -104,21 +104,32 @@ class HttpService {
     );
   }
 
+  // TODO turn {byteData, filename} into dto
   Future<http.Response> uploadPicoscopeData(
     String workshopId,
     String caseId,
     List<int> byteData,
-  ) {
-    return http.post(
+    String filename,
+  ) async {
+    final request = http.MultipartRequest(
+      "POST",
       Uri.parse(
         "$backendUrl/$workshopId/cases/$caseId/timeseries_data/upload/picoscope",
       ),
-      headers: {
-        "Authorization": "Basic $basicAuthKey==",
-        "Content-Type": "application/octet-stream",
-      },
-      body: byteData,
     );
+
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        "upload",
+        byteData,
+        filename: filename,
+      ),
+    );
+
+    request.fields["file_format"] = "Picoscope CSV";
+    request.headers["Authorization"] = "Basic $basicAuthKey==";
+
+    return http.Response.fromStream(await request.send());
   }
 
   Future<http.Response> uploadSymtomData(

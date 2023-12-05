@@ -191,6 +191,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
           result = await diagnosisProvider.uploadPicoscopeData(
             widget.diagnosisModel.caseId,
             byteData,
+            file.name,
           );
 
           break;
