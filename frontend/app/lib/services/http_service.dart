@@ -120,4 +120,19 @@ class HttpService {
       body: byteData,
     );
   }
+
+  Future<http.Response> uploadSymtomData(
+    String workshopId,
+    String caseId,
+    Map<String, dynamic> requestBody,
+  ) {
+    return http.post(
+      Uri.parse("$backendUrl/$workshopId/cases/$caseId/symptoms"),
+      headers: {
+        "Authorization": "Basic $basicAuthKey==",
+        "Content-Type": "application/json; charset=UTF-8",
+      },
+      body: jsonEncode(requestBody),
+    );
+  }
 }

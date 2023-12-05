@@ -69,3 +69,9 @@ enum NavigationType {
   internal,
   external,
 }
+
+enum SymptomLabel {
+  unknown,
+  ok,
+  defect,
+}

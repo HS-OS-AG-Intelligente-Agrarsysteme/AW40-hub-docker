@@ -86,7 +86,23 @@ class DiagnosisProvider with ChangeNotifier {
         await _httpService.uploadObdData(workShopId, caseId, obdDataJson);
     if (response.statusCode != 201) {
       _logger.warning(
-        "Could not uplaod obd data. "
+        "Could not upload obd data. "
+        "${response.statusCode}: ${response.reasonPhrase}",
+      );
+      return false;
+    }
+
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> uploadSymtomData(String caseId, NewSymptomDto symptomDto) async {
+    final Map<String, dynamic> symptomDataJson = symptomDto.toJson();
+    final Response response = await _httpService.uploadSymtomData(
+        workShopId, caseId, symptomDataJson);
+    if (response.statusCode != 201) {
+      _logger.warning(
+        "Could not upload symptom data. "
         "${response.statusCode}: ${response.reasonPhrase}",
       );
       return false;
