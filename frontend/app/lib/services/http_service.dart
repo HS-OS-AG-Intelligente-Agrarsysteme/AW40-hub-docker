@@ -111,7 +111,8 @@ class HttpService {
   ) {
     return http.post(
       Uri.parse(
-          "$backendUrl/$workshopId/cases/$caseId/timeseries_data/upload/picoscope"),
+        "$backendUrl/$workshopId/cases/$caseId/timeseries_data/upload/picoscope",
+      ),
       headers: {
         "Authorization": "Basic $basicAuthKey==",
         "Content-Type": "application/octet-stream",

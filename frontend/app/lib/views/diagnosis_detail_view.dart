@@ -112,6 +112,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                         ),
                       ),
                       title: Text(
+                        // ignore: lines_longer_than_80_chars
                         tr("diagnoses.status.${widget.diagnosisModel.status.name}"),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: complementColor,
