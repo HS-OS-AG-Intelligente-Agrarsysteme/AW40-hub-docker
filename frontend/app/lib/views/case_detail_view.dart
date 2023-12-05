@@ -244,6 +244,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
 
                               if (createdDiagnosis != null) {
                                 message = tr(
+                                  // ignore: lines_longer_than_80_chars
                                   "diagnoses.details.startDiagnosisSuccessMessage",
                                 );
 
@@ -251,6 +252,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                                     .push("/diagnoses/${createdDiagnosis.id}");
                               } else {
                                 message = tr(
+                                  // ignore: lines_longer_than_80_chars
                                   "diagnoses.details.startDiagnosisFailureMessage",
                                 );
                               }
