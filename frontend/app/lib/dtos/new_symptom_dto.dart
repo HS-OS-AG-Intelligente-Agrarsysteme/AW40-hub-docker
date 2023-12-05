@@ -6,7 +6,7 @@ part "new_symptom_dto.g.dart";
 @JsonSerializable()
 class NewSymptomDto {
   NewSymptomDto(
-    this.compoent,
+    this.component,
     this.label,
     this.timestamp,
   );
@@ -15,7 +15,7 @@ class NewSymptomDto {
       _$NewSymptomDtoFromJson(json);
   Map<String, dynamic> toJson() => _$NewSymptomDtoToJson(this);
 
-  String compoent;
+  String component;
   SymptomLabel label;
   DateTime? timestamp;
 }
