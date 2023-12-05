@@ -500,14 +500,15 @@ void main() {
     const status = DiagnosisStatus.failed;
     const caseId = "some_case_id";
     const stateMachineLog = <dynamic>[1, 2, 3];
-    final todos = <ActionDto>[ActionDto("1", "some action", "1", "2", "3")];
+    final actionDto = ActionDto("1", "some action", "1", "2", "3");
+    final todoDtos = <ActionDto>[actionDto];
     final DiagnosisDto diagnosisDto = DiagnosisDto(
       id,
       timeStamp,
       status,
       caseId,
       stateMachineLog,
-      todos,
+      todoDtos,
     );
     final DiagnosisModel diagnosisModel = diagnosisDto.toModel();
     test("correctly assigns id", () {
@@ -526,7 +527,19 @@ void main() {
       expect(diagnosisModel.stateMachineLog, stateMachineLog);
     });
     test("correctly assigns todos", () {
-      expect(diagnosisModel.todos, todos.map((e) => e.toModel()).toList());
+      final List<ActionModel> todoModels =
+          todoDtos.map((e) => e.toModel()).toList();
+      assert(todoDtos.length == todoModels.length);
+
+      for (var i = 0; i < todoDtos.length; i++) {
+        final ActionDto todoDto = todoDtos[i];
+        final ActionModel todoModel = todoModels[i];
+        expect(todoModel.id, todoDto.id);
+        expect(todoModel.instruction, todoDto.instruction);
+        expect(todoModel.actionType, todoDto.actionType);
+        expect(todoModel.dataType, todoDto.dataType);
+        expect(todoModel.component, todoDto.component);
+      }
     });
   });
   group("NewCaseDto primary constructor", () {

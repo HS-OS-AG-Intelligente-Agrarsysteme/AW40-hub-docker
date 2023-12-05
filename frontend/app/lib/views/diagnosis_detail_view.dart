@@ -3,7 +3,7 @@ import "dart:convert";
 import "package:aw40_hub_frontend/dtos/new_obd_data_dto.dart";
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
-import "package:aw40_hub_frontend/services/helper_service.dart";
+import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:cross_file/cross_file.dart";
 import "package:desktop_drop/desktop_drop.dart";
