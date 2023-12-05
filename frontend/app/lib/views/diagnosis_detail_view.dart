@@ -182,7 +182,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
 
         case "oscillogram":
           final List<int> byteData = utf8.encode(fileContent);
-          result = await diagnosisProvider.uploadPicoscopeCSVData(
+          result = await diagnosisProvider.uploadPicoscopeData(
             widget.diagnosisModel.caseId,
             byteData,
           );

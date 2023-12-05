@@ -104,7 +104,7 @@ class HttpService {
     );
   }
 
-  Future<http.Response> uploadPicoscopeCSVData(
+  Future<http.Response> uploadPicoscopeData(
     String workshopId,
     String caseId,
     List<int> byteData,

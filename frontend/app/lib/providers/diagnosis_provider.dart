@@ -112,15 +112,15 @@ class DiagnosisProvider with ChangeNotifier {
     return true;
   }
 
-  Future<bool> uploadPicoscopeCSVData(
+  Future<bool> uploadPicoscopeData(
     String caseId,
     List<int> byteData,
   ) async {
     final Response response =
-        await _httpService.uploadPicoscopeCSVData(workShopId, caseId, byteData);
+        await _httpService.uploadPicoscopeData(workShopId, caseId, byteData);
     if (response.statusCode != 201) {
       _logger.warning(
-        "Could not uplaod picoscope csv data. "
+        "Could not upload picoscope data. "
         "${response.statusCode}: ${response.reasonPhrase}",
       );
       return false;
