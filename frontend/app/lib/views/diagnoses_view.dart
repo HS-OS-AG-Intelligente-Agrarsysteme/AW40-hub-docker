@@ -13,16 +13,18 @@ import "package:provider/provider.dart";
 import "package:routemaster/routemaster.dart";
 
 class DiagnosesView extends StatelessWidget {
-  const DiagnosesView({
+  DiagnosesView({
     super.key,
   });
 
+  late DiagnosisProvider _diagnosisProvider;
+
   @override
   Widget build(BuildContext context) {
-    final diagnosisProvider = Provider.of<DiagnosisProvider>(context);
+    _diagnosisProvider = Provider.of<DiagnosisProvider>(context);
     return FutureBuilder(
       // ignore: discarded_futures
-      future: _getDiagnoses(context, diagnosisProvider),
+      future: _getDiagnoses(context),
       builder:
           (BuildContext context, AsyncSnapshot<List<DiagnosisModel>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
@@ -38,6 +40,7 @@ class DiagnosesView extends StatelessWidget {
 
           return DesktopDiagnosisView(
             diagnosisModels: diagnosisModels,
+            diagnosisProvider: _diagnosisProvider,
           );
         } else {
           return const Center(child: CircularProgressIndicator());
@@ -53,11 +56,10 @@ class DiagnosesView extends StatelessWidget {
 
   Future<List<DiagnosisModel>> _getDiagnoses(
     BuildContext context,
-    DiagnosisProvider diagnosisProvider,
   ) async {
     final Future<List<CaseModel>> caseModels = _getCaseModels(context);
     final Future<List<DiagnosisModel>> diagnoses =
-        diagnosisProvider.getDiagnoses(
+        _diagnosisProvider.getDiagnoses(
       await caseModels,
       context,
     );
@@ -69,10 +71,12 @@ class DiagnosesView extends StatelessWidget {
 class DesktopDiagnosisView extends StatefulWidget {
   const DesktopDiagnosisView({
     required this.diagnosisModels,
+    required this.diagnosisProvider,
     super.key,
   });
 
   final List<DiagnosisModel> diagnosisModels;
+  final DiagnosisProvider diagnosisProvider;
 
   @override
   State<DesktopDiagnosisView> createState() => _DesktopDiagnosisViewState();
@@ -80,11 +84,11 @@ class DesktopDiagnosisView extends StatefulWidget {
 
 class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
   final Logger _logger = Logger("diagnoses_view_state");
-  int? currentDiagnosisIndex;
 
   @override
   Widget build(BuildContext context) {
-    currentDiagnosisIndex ??= getCaseIndex(context) ?? 0;
+    widget.diagnosisProvider.currentDiagnosisIndex ??=
+        getCaseIndex(context) ?? 0;
     return Row(
       children: [
         Expanded(
@@ -93,10 +97,11 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
             child: PaginatedDataTable(
               source: DiagnosisDataTableSource(
                 themeData: Theme.of(context),
-                currentIndex: currentDiagnosisIndex,
+                currentIndex: widget.diagnosisProvider.currentDiagnosisIndex,
                 diagnosisModels: widget.diagnosisModels,
-                onPressedRow: (int i) =>
-                    setState(() => currentDiagnosisIndex = i),
+                onPressedRow: (int i) => setState(() {
+                  widget.diagnosisProvider.currentDiagnosisIndex = i;
+                }),
               ),
               showCheckboxColumn: false,
               rowsPerPage: 50,
@@ -125,11 +130,13 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
             ),
           ),
         ),
-        if (currentDiagnosisIndex != null && widget.diagnosisModels.isNotEmpty)
+        if (widget.diagnosisProvider.currentDiagnosisIndex != null &&
+            widget.diagnosisModels.isNotEmpty)
           Expanded(
             flex: 2,
             child: DiagnosisDetailView(
-              diagnosisModel: widget.diagnosisModels[currentDiagnosisIndex!],
+              diagnosisModel: widget.diagnosisModels[
+                  widget.diagnosisProvider.currentDiagnosisIndex!],
             ),
           )
       ],
