@@ -135,14 +135,17 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                               ),
                             )
                           : null,
-                      trailing: IconButton(
-                        icon: const Icon(Icons.upload_file),
-                        onPressed: _file == null ? null : uploadFile,
-                        disabledColor: colorScheme.outline,
-                        tooltip: _file == null
-                            ? null
-                            : tr("diagnoses.details.uploadFileTooltip"),
-                      ),
+                      trailing: widget.diagnosisModel.status ==
+                              DiagnosisStatus.action_required
+                          ? IconButton(
+                              icon: const Icon(Icons.upload_file),
+                              onPressed: _file == null ? null : uploadFile,
+                              disabledColor: colorScheme.outline,
+                              tooltip: _file == null
+                                  ? null
+                                  : tr("diagnoses.details.uploadFileTooltip"),
+                            )
+                          : null,
                     ),
                     if (widget.diagnosisModel.status ==
                         DiagnosisStatus.action_required)
