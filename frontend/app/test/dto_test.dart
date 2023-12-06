@@ -657,6 +657,33 @@ void main() {
       expect(json["label"], label.name);
     });
   });
+  group("NewOBDDataDto primary constructor", () {
+    final dtcs = <String>["some_component"];
+    final NewOBDDataDto newOBDDataDto = NewOBDDataDto(
+      dtcs,
+    );
+    test("correctly assigns dtcs", () {
+      expect(newOBDDataDto.dtcs, dtcs);
+    });
+  });
+  group("NewOBDDataDto fromJson constructor", () {
+    final dtcs = <String>["some_component"];
+    final Map<String, dynamic> json = <String, dynamic>{
+      "dtcs": dtcs,
+    };
+    final NewOBDDataDto newOBDDataDto = NewOBDDataDto.fromJson(json);
+    test("correctly assigns dtcs", () {
+      expect(newOBDDataDto.dtcs, dtcs);
+    });
+  });
+  group("NewOBDDataDto toJson method", () {
+    final dtcs = <String>["some_component"];
+    final NewOBDDataDto newOBDDataDto = NewOBDDataDto(dtcs);
+    final Map<String, dynamic> json = newOBDDataDto.toJson();
+    test("correctly assigns dtcs", () {
+      expect(json["dtcs"], dtcs);
+    });
+  });
   group("ActionDto primary constructor", () {
     const String id = "some_id";
     const String instruction = "some_customer_id";
