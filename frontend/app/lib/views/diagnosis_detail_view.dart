@@ -259,7 +259,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             _dragging = false;
           });
         },
-        // TODO adjust colors and height/width
         child: Container(
           height: 125,
           width: 300,
