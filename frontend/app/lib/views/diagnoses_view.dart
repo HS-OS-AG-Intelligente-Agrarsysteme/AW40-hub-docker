@@ -13,17 +13,12 @@ import "package:provider/provider.dart";
 import "package:routemaster/routemaster.dart";
 
 class DiagnosesView extends StatelessWidget {
-  DiagnosesView({
+  const DiagnosesView({
     super.key,
   });
 
-  final Logger _logger = Logger("diagnoses_view");
-
   @override
   Widget build(BuildContext context) {
-    final pathParameters = Routemaster.of(context).currentRoute.pathParameters;
-    final String? diagnosisIdString = pathParameters["diagnosisId"];
-
     final diagnosisProvider = Provider.of<DiagnosisProvider>(context);
     return FutureBuilder(
       // ignore: discarded_futures
@@ -41,19 +36,8 @@ class DiagnosesView extends StatelessWidget {
           }
           diagnosisModels.sort((a, b) => a.status.index - b.status.index);
 
-          final DiagnosisModel? foundModel = diagnosisModels.firstWhereOrNull(
-            (diagnosisModel) => diagnosisModel.id == diagnosisIdString,
-          );
-          if (foundModel == null) {
-            _logger.info(
-              "Could not resolve diagnosis with ID: $diagnosisIdString",
-            );
-          }
-
           return DesktopDiagnosisView(
             diagnosisModels: diagnosisModels,
-            diagnosisIndex:
-                foundModel == null ? null : diagnosisModels.indexOf(foundModel),
           );
         } else {
           return const Center(child: CircularProgressIndicator());
@@ -85,23 +69,22 @@ class DiagnosesView extends StatelessWidget {
 class DesktopDiagnosisView extends StatefulWidget {
   const DesktopDiagnosisView({
     required this.diagnosisModels,
-    this.diagnosisIndex,
     super.key,
   });
 
   final List<DiagnosisModel> diagnosisModels;
-  final int? diagnosisIndex;
 
   @override
   State<DesktopDiagnosisView> createState() => _DesktopDiagnosisViewState();
 }
 
 class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
+  final Logger _logger = Logger("diagnoses_view_state");
   int? currentDiagnosisIndex;
 
   @override
   Widget build(BuildContext context) {
-    currentDiagnosisIndex ??= widget.diagnosisIndex ?? 0;
+    currentDiagnosisIndex ??= getCaseIndex(context) ?? 0;
     return Row(
       children: [
         Expanded(
@@ -151,5 +134,21 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
           )
       ],
     );
+  }
+
+  int? getCaseIndex(BuildContext context) {
+    final pathParameters = Routemaster.of(context).currentRoute.pathParameters;
+    final String? diagnosisIdString = pathParameters["diagnosisId"];
+    final DiagnosisModel? foundModel = widget.diagnosisModels.firstWhereOrNull(
+      (diagnosisModel) => diagnosisModel.id == diagnosisIdString,
+    );
+    if (foundModel == null) {
+      _logger.info(
+        "Could not resolve diagnosis with ID: $diagnosisIdString",
+      );
+    }
+    return foundModel == null
+        ? null
+        : widget.diagnosisModels.indexOf(foundModel);
   }
 }
