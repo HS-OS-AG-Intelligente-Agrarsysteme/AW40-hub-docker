@@ -8,7 +8,6 @@ class NewSymptomDto {
   NewSymptomDto(
     this.component,
     this.label,
-    this.timestamp,
   );
 
   factory NewSymptomDto.fromJson(Map<String, dynamic> json) =>
@@ -17,5 +16,4 @@ class NewSymptomDto {
 
   String component;
   SymptomLabel label;
-  DateTime? timestamp;
 }

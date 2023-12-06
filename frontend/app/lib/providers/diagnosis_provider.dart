@@ -96,25 +96,6 @@ class DiagnosisProvider with ChangeNotifier {
     return true;
   }
 
-  Future<bool> uploadSymtomData(String caseId, NewSymptomDto symptomDto) async {
-    final Map<String, dynamic> symptomDataJson = symptomDto.toJson();
-    final Response response = await _httpService.uploadSymtomData(
-      workShopId,
-      caseId,
-      symptomDataJson,
-    );
-    if (response.statusCode != 201) {
-      _logger.warning(
-        "Could not upload symptom data. "
-        "${response.statusCode}: ${response.reasonPhrase}",
-      );
-      return false;
-    }
-
-    notifyListeners();
-    return true;
-  }
-
   Future<bool> uploadPicoscopeData(
     String caseId,
     List<int> byteData,
@@ -129,6 +110,25 @@ class DiagnosisProvider with ChangeNotifier {
     if (response.statusCode != 201) {
       _logger.warning(
         "Could not upload picoscope data. "
+        "${response.statusCode}: ${response.reasonPhrase}",
+      );
+      return false;
+    }
+
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> uploadSymtomData(String caseId, NewSymptomDto symptomDto) async {
+    final Map<String, dynamic> symptomDataJson = symptomDto.toJson();
+    final Response response = await _httpService.uploadSymtomData(
+      workShopId,
+      caseId,
+      symptomDataJson,
+    );
+    if (response.statusCode != 201) {
+      _logger.warning(
+        "Could not upload symptom data. "
         "${response.statusCode}: ${response.reasonPhrase}",
       );
       return false;

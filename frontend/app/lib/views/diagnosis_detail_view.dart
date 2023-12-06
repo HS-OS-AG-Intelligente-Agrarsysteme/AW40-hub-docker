@@ -1,5 +1,6 @@
 import "dart:convert";
 
+import "package:aw40_hub_frontend/dtos/dtos.dart";
 import "package:aw40_hub_frontend/dtos/new_obd_data_dto.dart";
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
@@ -185,7 +186,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             newOBDDataDto,
           );
           break;
-
         case "oscillogram":
           final List<int> byteData = utf8.encode(fileContent);
           result = await diagnosisProvider.uploadPicoscopeData(
@@ -193,13 +193,16 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             byteData,
             file.name,
           );
-
           break;
-
         case "symptom":
-          // TODO Handle symptom case
-          break;
+          final Map<String, dynamic> jsonMap = jsonDecode(fileContent);
+          final NewSymptomDto newSymptomDto = NewSymptomDto.fromJson(jsonMap);
 
+          result = await diagnosisProvider.uploadSymtomData(
+            widget.diagnosisModel.caseId,
+            newSymptomDto,
+          );
+          break;
         default:
           // TODO Handle default case if needed
           break;
