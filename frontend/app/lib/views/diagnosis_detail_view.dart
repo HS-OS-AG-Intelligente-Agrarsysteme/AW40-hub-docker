@@ -240,7 +240,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
         )
       else
         Text(
-          "${tr("diagnoses.details.selectedFile")} ${_file!.name}",
+          _file!.name,
           style: const TextStyle(color: Colors.blue),
         ),
       const SizedBox(height: 16),

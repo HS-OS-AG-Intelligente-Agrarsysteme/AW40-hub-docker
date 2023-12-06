@@ -57,7 +57,6 @@ diagnoses:
     obdUpload: "OBD-Daten hochladen"
     uploadFile: "Laden Sie eine Datei hoch"
     uploadFileTooltip: "Datei hochladen"
-    selectedFile: "Ausgewählte Datei:"
     dragAndDrop: "Datei per Drag & Drop hier ablegen"
     uploadDataSuccessMessage: "Die Daten wurden erfolgreich hochgeladen."
     uploadDataErrorMessage: "Die Daten konnten nicht hochgeladen werden."
