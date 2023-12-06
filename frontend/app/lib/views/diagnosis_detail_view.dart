@@ -203,9 +203,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             newSymptomDto,
           );
           break;
-        default:
-          // TODO Handle default case if needed
-          break;
       }
 
       _showMessage(
