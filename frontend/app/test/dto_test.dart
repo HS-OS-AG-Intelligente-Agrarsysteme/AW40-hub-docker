@@ -616,6 +616,47 @@ void main() {
       expect(json["milage"], milage);
     });
   });
+  group("NewSymptomDto primary constructor", () {
+    const String component = "some_component";
+    const SymptomLabel label = SymptomLabel.ok;
+    final NewSymptomDto newSymptomDto = NewSymptomDto(
+      component,
+      label,
+    );
+    test("correctly assigns component", () {
+      expect(newSymptomDto.component, component);
+    });
+    test("correctly assigns label", () {
+      expect(newSymptomDto.label, label);
+    });
+  });
+  group("NewSymptomDto fromJson constructor", () {
+    const String component = "some_component";
+    const SymptomLabel label = SymptomLabel.ok;
+    final Map<String, dynamic> json = <String, dynamic>{
+      "component": component,
+      "label": label.name,
+    };
+    final NewSymptomDto newSymptomDto = NewSymptomDto.fromJson(json);
+    test("correctly assigns component", () {
+      expect(newSymptomDto.component, component);
+    });
+    test("correctly assigns label", () {
+      expect(newSymptomDto.label, label);
+    });
+  });
+  group("NewSymptomDto toJson method", () {
+    const String component = "some_component";
+    const SymptomLabel label = SymptomLabel.ok;
+    final NewSymptomDto newSymptomDto = NewSymptomDto(component, label);
+    final Map<String, dynamic> json = newSymptomDto.toJson();
+    test("correctly assigns component", () {
+      expect(json["component"], component);
+    });
+    test("correctly assigns label", () {
+      expect(json["label"], label.name);
+    });
+  });
   group("ActionDto primary constructor", () {
     const String id = "some_id";
     const String instruction = "some_customer_id";
