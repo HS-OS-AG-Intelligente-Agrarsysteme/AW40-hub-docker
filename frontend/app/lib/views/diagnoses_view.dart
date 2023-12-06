@@ -97,14 +97,11 @@ class DesktopDiagnosisView extends StatefulWidget {
 }
 
 class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
-  int? currentDiagnosisIndex = -1;
+  int? currentDiagnosisIndex;
 
   @override
   Widget build(BuildContext context) {
-    if (currentDiagnosisIndex == -1) {
-      currentDiagnosisIndex = widget.diagnosisIndex ??
-          0; // show details of first element as default
-    }
+    currentDiagnosisIndex ??= widget.diagnosisIndex ?? 0;
     return Row(
       children: [
         Expanded(

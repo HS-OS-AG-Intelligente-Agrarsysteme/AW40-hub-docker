@@ -15,7 +15,6 @@ class CaseProvider with ChangeNotifier {
   late String workShopId;
   bool _showSharedCases = true;
   bool get showSharedCases => _showSharedCases;
-  int? lastModifiedCaseIndex;
 
   Future<void> toggleShowSharedCases() async {
     _showSharedCases = !_showSharedCases;

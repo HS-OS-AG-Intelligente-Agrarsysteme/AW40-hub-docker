@@ -64,8 +64,7 @@ class _DesktopCasesViewState extends State<DesktopCasesView> {
 
   @override
   Widget build(BuildContext context) {
-    currentCaseIndex =
-        currentCaseIndex ?? widget.caseProvider.lastModifiedCaseIndex;
+    currentCaseIndex = currentCaseIndex;
 
     return Row(
       children: [
@@ -101,7 +100,6 @@ class _DesktopCasesViewState extends State<DesktopCasesView> {
               caseModel: widget.caseModels[currentCaseIndex!],
               onClose: () => setState(() {
                 currentCaseIndex = null;
-                widget.caseProvider.lastModifiedCaseIndex = null;
               }),
             ),
           )
