@@ -15,9 +15,11 @@ import "package:routemaster/routemaster.dart";
 class DiagnosesView extends StatelessWidget {
   DiagnosesView({
     super.key,
+    this.diagnosisId,
   });
 
   late DiagnosisProvider _diagnosisProvider;
+  final String? diagnosisId;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +43,7 @@ class DiagnosesView extends StatelessWidget {
           return DesktopDiagnosisView(
             diagnosisModels: diagnosisModels,
             diagnosisProvider: _diagnosisProvider,
+            diagnosisId: diagnosisId,
           );
         } else {
           return const Center(child: CircularProgressIndicator());
@@ -69,14 +72,16 @@ class DiagnosesView extends StatelessWidget {
 }
 
 class DesktopDiagnosisView extends StatefulWidget {
-  const DesktopDiagnosisView({
+  DesktopDiagnosisView({
     required this.diagnosisModels,
     required this.diagnosisProvider,
+    this.diagnosisId,
     super.key,
   });
 
   final List<DiagnosisModel> diagnosisModels;
   final DiagnosisProvider diagnosisProvider;
+  String? diagnosisId;
 
   @override
   State<DesktopDiagnosisView> createState() => _DesktopDiagnosisViewState();
@@ -87,6 +92,10 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.diagnosisId != null) {
+      widget.diagnosisProvider.currentDiagnosisIndex = null;
+      widget.diagnosisId = null;
+    }
     widget.diagnosisProvider.currentDiagnosisIndex ??=
         getCaseIndex(context) ?? 0;
     return Row(

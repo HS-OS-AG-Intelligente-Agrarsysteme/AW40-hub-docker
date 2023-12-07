@@ -27,7 +27,7 @@ class DiagnosisProvider with ChangeNotifier {
     if (uploadedData) {
       uploadedData = false;
       result = Future.delayed(
-        const Duration(seconds: 2),
+        const Duration(seconds: 1),
         () => _getDiagnoses(cases),
       );
     } else {
