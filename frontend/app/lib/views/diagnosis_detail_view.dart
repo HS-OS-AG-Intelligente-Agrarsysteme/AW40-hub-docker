@@ -174,9 +174,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
 
     try {
       final XFile file = _file!;
-
       final String fileContent = await file.readAsString();
-
       bool result = false;
 
       switch (widget.diagnosisModel.todos.first.dataType) {
@@ -218,9 +216,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
               ),
         scaffoldMessengerState,
       );
-      if (result) {
-        Timer(const Duration(seconds: 1), () {});
-      }
       // ignore: avoid_catches_without_on_clauses
     } catch (e) {
       _logger.info("Exception during file upload: $e");
