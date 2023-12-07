@@ -139,7 +139,7 @@ def main(interactive):
     setup_model()
 
     # User creates a new case and starts the diagnosis process
-    case_url = create_case(workshop_id="42")
+    case_url = create_case(workshop_id="example-workshop")
     start_diagnosis(case_url)
 
     # Progress of the example diagnosis can be followed via the demo ui
