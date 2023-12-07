@@ -172,6 +172,8 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       listen: false,
     );
 
+    diagnosisProvider.uploadedData = true;
+
     try {
       final XFile file = _file!;
       final String fileContent = await file.readAsString();
@@ -328,6 +330,9 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       if (dialogResult == null || !dialogResult) return;
       final bool deletionResult =
           await diagnosisProvider.deleteDiagnosis(diagnosisModelCaseId);
+      if (deletionResult) {
+        diagnosisProvider.currentDiagnosisIndex = null;
+      }
       final String message = deletionResult
           ? tr("diagnoses.details.deleteDiagnosisSuccessMessage")
           : tr("diagnoses.details.deleteDiagnosisErrorMessage");

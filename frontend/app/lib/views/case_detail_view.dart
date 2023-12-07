@@ -247,6 +247,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                                   // ignore: lines_longer_than_80_chars
                                   "diagnoses.details.startDiagnosisSuccessMessage",
                                 );
+                                // TODO onNavigatorPush
 
                                 routemaster
                                     .push("/diagnoses/${createdDiagnosis.id}");
