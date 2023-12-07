@@ -1,7 +1,7 @@
+import "dart:async";
 import "dart:convert";
 
 import "package:aw40_hub_frontend/dtos/dtos.dart";
-import "package:aw40_hub_frontend/dtos/new_obd_data_dto.dart";
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/services.dart";
@@ -218,6 +218,9 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
               ),
         scaffoldMessengerState,
       );
+      if (result) {
+        Timer(const Duration(seconds: 1), () {});
+      }
       // ignore: avoid_catches_without_on_clauses
     } catch (e) {
       _logger.info("Exception during file upload: $e");
