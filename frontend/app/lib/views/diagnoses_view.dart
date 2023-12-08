@@ -92,6 +92,7 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
 
   @override
   Widget build(BuildContext context) {
+    final Routemaster routemaster = Routemaster.of(context);
     if (widget.diagnosisId != null) {
       widget.diagnosisProvider.currentDiagnosisIndex = null;
       widget.diagnosisId = null;
@@ -109,7 +110,8 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
                 currentIndex: widget.diagnosisProvider.currentDiagnosisIndex,
                 diagnosisModels: widget.diagnosisModels,
                 onPressedRow: (int i) => setState(() {
-                  widget.diagnosisProvider.currentDiagnosisIndex = i;
+                  final DiagnosisModel model = widget.diagnosisModels[i];
+                  routemaster.push("/diagnoses/${model.id}");
                 }),
               ),
               showCheckboxColumn: false,
