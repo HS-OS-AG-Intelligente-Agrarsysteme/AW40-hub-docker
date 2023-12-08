@@ -116,13 +116,12 @@ class HelperService {
   }
 
   static String convertString(String inputString) {
-    // String mit ISO-8859-1 kodieren
+    // Encode string with ISO-8859-1
     final List<int> bytes = latin1.encode(inputString);
 
-    // Bytes mit UTF-8 dekodieren
+    // Decode bytes with UTF-8
     final String decodedString = utf8.decode(bytes);
 
-    // Rückgabe des dekodierten Texts
     return decodedString;
   }
 }
