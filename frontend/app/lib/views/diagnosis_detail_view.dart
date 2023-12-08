@@ -1,5 +1,4 @@
 import "dart:async";
-import "dart:convert";
 
 import "package:aw40_hub_frontend/dtos/dtos.dart";
 import "package:aw40_hub_frontend/models/models.dart";
@@ -123,10 +122,13 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                       subtitle: widget.diagnosisModel.status ==
                               DiagnosisStatus.action_required
                           ? Tooltip(
-                              message:
-                                  widget.diagnosisModel.todos[0].instruction,
-                              child: Text(
+                              message: HelperService.convertString(
                                 widget.diagnosisModel.todos[0].instruction,
+                              ),
+                              child: Text(
+                                HelperService.convertString(
+                                  widget.diagnosisModel.todos[0].instruction,
+                                ),
                                 style: TextStyle(
                                   color: complementColor,
                                 ),

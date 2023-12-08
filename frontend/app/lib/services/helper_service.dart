@@ -1,3 +1,5 @@
+import "dart:convert";
+
 import "package:aw40_hub_frontend/exceptions/exceptions.dart";
 import "package:aw40_hub_frontend/main.dart";
 import "package:aw40_hub_frontend/services/services.dart";
@@ -111,5 +113,16 @@ class HelperService {
       case DiagnosisStatus.scheduled:
         return colorScheme.onPrimary;
     }
+  }
+
+  static String convertString(String inputString) {
+    // String mit ISO-8859-1 kodieren
+    final List<int> bytes = latin1.encode(inputString);
+
+    // Bytes mit UTF-8 dekodieren
+    final String decodedString = utf8.decode(bytes);
+
+    // Rückgabe des dekodierten Texts
+    return decodedString;
   }
 }
