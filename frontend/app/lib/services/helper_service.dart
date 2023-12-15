@@ -115,7 +115,7 @@ class HelperService {
     }
   }
 
-  static String convertString(String inputString) {
+  static String convertIso88591ToUtf8(String inputString) {
     // Encode string with ISO-8859-1
     final List<int> bytes = latin1.encode(inputString);
 

@@ -123,11 +123,11 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                       subtitle: widget.diagnosisModel.status ==
                               DiagnosisStatus.action_required
                           ? Tooltip(
-                              message: HelperService.convertString(
+                              message: HelperService.convertIso88591ToUtf8(
                                 widget.diagnosisModel.todos[0].instruction,
                               ),
                               child: Text(
-                                HelperService.convertString(
+                                HelperService.convertIso88591ToUtf8(
                                   widget.diagnosisModel.todos[0].instruction,
                                 ),
                                 style: TextStyle(
