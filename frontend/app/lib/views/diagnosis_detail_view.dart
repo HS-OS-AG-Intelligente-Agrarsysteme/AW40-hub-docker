@@ -26,7 +26,6 @@ class DiagnosisDetailView extends StatefulWidget {
 }
 
 class _DiagnosisDetailView extends State<DiagnosisDetailView> {
-  bool _dragging = false;
   XFile? _file;
   final Logger _logger = Logger("diagnosis detail view");
 
@@ -34,19 +33,20 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
+    final TextTheme textTheme = theme.textTheme;
 
-    final color = HelperService.getDiagnosisStatusBackgroundColor(
+    final backgroundColor = HelperService.getDiagnosisStatusBackgroundColor(
       colorScheme,
       widget.diagnosisModel.status,
     );
-    final complementColor = HelperService.getDiagnosisStatusForegroundColor(
+    final foregroundColor = HelperService.getDiagnosisStatusForegroundColor(
       colorScheme,
       widget.diagnosisModel.status,
     );
 
     return SizedBox.expand(
       child: Card(
-        color: theme.colorScheme.primaryContainer,
+        color: colorScheme.primaryContainer,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -86,13 +86,13 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                       const SizedBox(height: 32),
                       Text(
                         tr("general.case"),
-                        style: theme.textTheme.bodyMedium?.copyWith(
+                        style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onPrimaryContainer,
                         ),
                       ),
                       Text(
                         widget.diagnosisModel.caseId,
-                        style: theme.textTheme.bodyMedium?.copyWith(
+                        style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onPrimaryContainer,
                         ),
                       ),
@@ -103,7 +103,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
               const SizedBox(height: 16),
               // Current State
               Card(
-                color: color,
+                color: backgroundColor,
                 child: Column(
                   children: [
                     ListTile(
@@ -115,11 +115,11 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                       title: Text(
                         // ignore: lines_longer_than_80_chars
                         tr("diagnoses.status.${widget.diagnosisModel.status.name}"),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: complementColor,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: foregroundColor,
                         ),
                       ),
-                      iconColor: complementColor,
+                      iconColor: foregroundColor,
                       subtitle: widget.diagnosisModel.status ==
                               DiagnosisStatus.action_required
                           ? Tooltip(
@@ -131,7 +131,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                                   widget.diagnosisModel.todos[0].instruction,
                                 ),
                                 style: TextStyle(
-                                  color: complementColor,
+                                  color: foregroundColor,
                                 ),
                                 softWrap: true,
                                 overflow: TextOverflow.ellipsis,
@@ -152,14 +152,25 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                     ),
                     if (widget.diagnosisModel.status ==
                         DiagnosisStatus.action_required)
-                      ..._displayDragAndDropArea()
+                      DragAndDropArea(
+                        fileName: _file?.name,
+                        onDragDone: (DropDoneDetails dropDoneDetails) {
+                          _logger.shout(
+                            "DropdoneDetails: ${dropDoneDetails.files.first.name}",
+                          );
+                          setState(() {
+                            final files = dropDoneDetails.files;
+                            final XFile f = files.first;
+                            _file = f;
+                          });
+                        },
+                      )
                   ],
                 ),
               ),
               const SizedBox(height: 32),
-              const Placeholder(
-                fallbackHeight: 150,
-              ),
+              // TBD: State Machine Log
+              const Expanded(child: Placeholder()),
             ],
           ),
         ),
@@ -231,58 +242,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     }
   }
 
-// TODO: Refactor as Widget.
-  List<Widget> _displayDragAndDropArea() {
-    return [
-      const SizedBox(height: 16),
-      if (_file == null)
-        Text(
-          tr("diagnoses.details.uploadFile"),
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onTertiary,
-          ),
-        )
-      else
-        Text(
-          _file!.name,
-          style: const TextStyle(color: Colors.blue),
-        ),
-      const SizedBox(height: 16),
-      DropTarget(
-        onDragDone: (DropDoneDetails detail) {
-          setState(() {
-            final files = detail.files;
-            final XFile file = files.first;
-            _file = file;
-          });
-        },
-        onDragEntered: (_) => setState(() => _dragging = true),
-        onDragExited: (_) => setState(() => _dragging = false),
-        child: Container(
-          height: 125,
-          width: 300,
-          decoration: BoxDecoration(
-            border: Border.all(),
-            borderRadius: const BorderRadius.all(Radius.circular(10)),
-            color: _dragging ? Colors.blue.withOpacity(0.4) : Colors.black26,
-          ),
-          child: Center(
-            child: Center(
-              child: Text(
-                tr("diagnoses.details.dragAndDrop"),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onTertiary,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-      const SizedBox(height: 16),
-    ];
-  }
-
   static Future<bool?> _showConfirmDeleteDialog(BuildContext context) {
     return showDialog<bool>(
       context: context,
@@ -341,5 +300,70 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       content: Center(child: Text(text)),
     );
     state.showSnackBar(snackBar);
+  }
+}
+
+class DragAndDropArea extends StatefulWidget {
+  const DragAndDropArea({
+    required this.onDragDone,
+    required this.fileName,
+    super.key,
+  });
+  final String? fileName;
+  final void Function(DropDoneDetails) onDragDone;
+
+  @override
+  State<DragAndDropArea> createState() => _DragAndDropAreaState();
+}
+
+class _DragAndDropAreaState extends State<DragAndDropArea> {
+  bool _dragging = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        if (widget.fileName == null)
+          Text(
+            tr("diagnoses.details.uploadFile"),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onTertiary,
+            ),
+          )
+        else
+          Text(
+            widget.fileName!,
+            style: const TextStyle(color: Colors.blue),
+          ),
+        const SizedBox(height: 16),
+        DropTarget(
+          onDragDone: (details) => widget.onDragDone(details),
+          onDragEntered: (_) => setState(() => _dragging = true),
+          onDragExited: (_) => setState(() => _dragging = false),
+          child: Container(
+            height: 125,
+            width: 300,
+            decoration: BoxDecoration(
+              border: Border.all(),
+              borderRadius: const BorderRadius.all(Radius.circular(10)),
+              color: _dragging ? Colors.blue.withOpacity(0.4) : Colors.black26,
+            ),
+            child: Center(
+              child: Center(
+                child: Text(
+                  tr("diagnoses.details.dragAndDrop"),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onTertiary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
   }
 }
