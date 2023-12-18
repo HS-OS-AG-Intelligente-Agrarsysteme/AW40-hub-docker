@@ -92,7 +92,7 @@ class AuthProvider with ChangeNotifier {
     await _storageService.resetLocalStorage();
 
     if (verifier == null) {
-      _logger.info(
+      _logger.config(
         "auth_provider updateUserLoginStateFromKeycloakCode: "
         "_verifier == null, restarting LogInProcess...",
       );
@@ -128,7 +128,7 @@ class AuthProvider with ChangeNotifier {
 
     _jwt = JwtModel.fromJwtString(returnedJwt);
 
-    _logger.info("Lang from jwt: ${_jwt?.locale}");
+    _logger.config("Lang from jwt: ${_jwt?.locale}");
 
     final Locale? locale = _jwt?.locale != null
         ? kSupportedLocales[_jwt?.locale]
@@ -184,7 +184,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> tryLoginWithStoredRefreshToken() async {
-    _logger.info("tryLoginWithStoredRefreshTokens");
+    _logger.config("tryLoginWithStoredRefreshTokens");
     _refreshToken = await _storageService.loadStringFromLocalStorage(
       key: LocalStorageKey.refreshToken,
     );
@@ -243,14 +243,14 @@ class AuthProvider with ChangeNotifier {
     if (res.statusCode == 200) {
       keycloakMap = json.decode(res.body) as Map<String, dynamic>;
     } else {
-      _logger.info(
+      _logger.config(
         "_getTokensFromCode: statusCode: ${res.statusCode}, ${res.body}",
       );
     }
 
     if (keycloakMap == null) {
       if (kIsWeb) {
-        _logger.info(
+        _logger.config(
           "auth_provider updateUserLoginStateFromKeycloakCode: "
           "keycloakMap null, reload page...",
         );
@@ -275,7 +275,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> _refreshJWT() async {
-    _logger.info("refreshJWT");
+    _logger.config("refreshJWT");
 
     final Map<String, dynamic> jsonMap = <String, dynamic>{
       "refresh_token": _refreshToken,
@@ -323,13 +323,13 @@ class AuthProvider with ChangeNotifier {
 
         notifyListeners();
       } else {
-        _logger.info(
+        _logger.config(
           res.statusCode == 503
               ? "Server not available, clearing tokens and Storage."
               : "Refresh token not accepted, clearing tokens and Storage.",
         );
-        _logger.info(res.reasonPhrase);
-        _logger.info(res.body);
+        _logger.config(res.reasonPhrase);
+        _logger.config(res.body);
         await resetAuthTokensAndStorage();
       }
     } on Exception catch (e) {
@@ -343,7 +343,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> logout() async {
     _logger.finest("logout()");
     if (kIsWeb) {
-      _logger.info("Web logout.");
+      _logger.config("Web logout.");
       final String? idToken = _idToken;
       if (idToken == null) {
         _logger.warning(
@@ -352,7 +352,7 @@ class AuthProvider with ChangeNotifier {
       }
       window.location.href = _authService.webGetKeycloakLogoutUrl(idToken);
     } else {
-      _logger.info("Mobile logout.");
+      _logger.config("Mobile logout.");
       _mobileRedirectNextLoginToHome = true;
 
       final Map<String, dynamic> jsonMap = <String, dynamic>{
@@ -374,7 +374,7 @@ class AuthProvider with ChangeNotifier {
       );
 
       if (res.statusCode == 204) {
-        _logger.info("Logout successful");
+        _logger.config("Logout successful");
       } else {
         _logger.warning("Logout unsuccessful");
       }

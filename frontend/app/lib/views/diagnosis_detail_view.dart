@@ -231,6 +231,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     }
   }
 
+// TODO: Refactor as Widget.
   List<Widget> _displayDragAndDropArea() {
     return [
       const SizedBox(height: 16),
@@ -334,7 +335,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       final bool deletionResult =
           await diagnosisProvider.deleteDiagnosis(diagnosisModelCaseId);
       if (deletionResult) {
-        diagnosisProvider.currentDiagnosisIndex = null;
+        // diagnosisProvider.currentDiagnosisIndex = null;
       }
       final String message = deletionResult
           ? tr("diagnoses.details.deleteDiagnosisSuccessMessage")
