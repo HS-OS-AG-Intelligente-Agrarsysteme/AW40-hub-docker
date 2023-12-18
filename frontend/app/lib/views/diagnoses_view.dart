@@ -42,7 +42,6 @@ class DiagnosesView extends StatelessWidget {
 
           return DesktopDiagnosisView(
             diagnosisModels: diagnosisModels,
-            diagnosisProvider: _diagnosisProvider,
             diagnosisId: diagnosisId,
           );
         } else {
@@ -68,13 +67,11 @@ class DiagnosesView extends StatelessWidget {
 class DesktopDiagnosisView extends StatefulWidget {
   DesktopDiagnosisView({
     required this.diagnosisModels,
-    required this.diagnosisProvider,
     this.diagnosisId,
     super.key,
   });
 
   final List<DiagnosisModel> diagnosisModels;
-  final DiagnosisProvider diagnosisProvider;
   String? diagnosisId;
 
   @override
@@ -86,13 +83,13 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
 
   @override
   Widget build(BuildContext context) {
+    final diagnosisProvider = Provider.of<DiagnosisProvider>(context);
     final Routemaster routemaster = Routemaster.of(context);
     if (widget.diagnosisId != null) {
-      widget.diagnosisProvider.currentDiagnosisIndex = null;
+      diagnosisProvider.currentDiagnosisIndex = null;
       widget.diagnosisId = null;
     }
-    widget.diagnosisProvider.currentDiagnosisIndex ??=
-        getCaseIndex(context) ?? 0;
+    diagnosisProvider.currentDiagnosisIndex ??= getCaseIndex(context) ?? 0;
     return Row(
       children: [
         Expanded(
@@ -101,7 +98,7 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
             child: PaginatedDataTable(
               source: DiagnosisDataTableSource(
                 themeData: Theme.of(context),
-                currentIndex: widget.diagnosisProvider.currentDiagnosisIndex,
+                currentIndex: diagnosisProvider.currentDiagnosisIndex,
                 diagnosisModels: widget.diagnosisModels,
                 onPressedRow: (int i) => setState(() {
                   final DiagnosisModel model = widget.diagnosisModels[i];
@@ -135,13 +132,13 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
             ),
           ),
         ),
-        if (widget.diagnosisProvider.currentDiagnosisIndex != null &&
+        if (diagnosisProvider.currentDiagnosisIndex != null &&
             widget.diagnosisModels.isNotEmpty)
           Expanded(
             flex: 2,
             child: DiagnosisDetailView(
-              diagnosisModel: widget.diagnosisModels[
-                  widget.diagnosisProvider.currentDiagnosisIndex!],
+              diagnosisModel: widget
+                  .diagnosisModels[diagnosisProvider.currentDiagnosisIndex!],
             ),
           )
       ],
