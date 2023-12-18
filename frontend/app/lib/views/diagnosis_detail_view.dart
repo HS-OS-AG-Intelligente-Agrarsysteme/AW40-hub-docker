@@ -152,7 +152,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                     ),
                     if (widget.diagnosisModel.status ==
                         DiagnosisStatus.action_required)
-                      DragAndDropArea(
+                      DiagnosisDragAndDropArea(
                         fileName: _file?.name,
                         onDragDone: (DropDoneDetails dropDoneDetails) {
                           _logger.shout(
@@ -303,8 +303,8 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
   }
 }
 
-class DragAndDropArea extends StatefulWidget {
-  const DragAndDropArea({
+class DiagnosisDragAndDropArea extends StatefulWidget {
+  const DiagnosisDragAndDropArea({
     required this.onDragDone,
     required this.fileName,
     super.key,
@@ -313,10 +313,10 @@ class DragAndDropArea extends StatefulWidget {
   final void Function(DropDoneDetails) onDragDone;
 
   @override
-  State<DragAndDropArea> createState() => _DragAndDropAreaState();
+  State<DiagnosisDragAndDropArea> createState() => _DiagnosisDragAndDropAreaState();
 }
 
-class _DragAndDropAreaState extends State<DragAndDropArea> {
+class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
   bool _dragging = false;
 
   @override
