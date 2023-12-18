@@ -50,6 +50,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               AppBar(
                 backgroundColor: const Color.fromARGB(0, 0, 0, 0),
@@ -78,30 +79,14 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
               ),
               const SizedBox(height: 16),
               // Case ID
-              Table(
-                columnWidths: const {0: IntrinsicColumnWidth()},
-                children: [
-                  TableRow(
-                    children: [
-                      const SizedBox(height: 32),
-                      Text(
-                        tr("general.case"),
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onPrimaryContainer,
-                        ),
-                      ),
-                      Text(
-                        widget.diagnosisModel.caseId,
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onPrimaryContainer,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+              Text(
+                "${tr('general.case')}: ${widget.diagnosisModel.caseId}",
+                style: textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onPrimaryContainer,
+                ),
               ),
               const SizedBox(height: 16),
-              // Current State
+              // Coloured card for current State
               Card(
                 color: backgroundColor,
                 child: Column(
@@ -151,20 +136,19 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                           : null,
                     ),
                     if (widget.diagnosisModel.status ==
-                        DiagnosisStatus.action_required)
+                        DiagnosisStatus.action_required) ...[
+                      const SizedBox(height: 16),
                       DiagnosisDragAndDropArea(
                         fileName: _file?.name,
                         onDragDone: (DropDoneDetails dropDoneDetails) {
-                          _logger.shout(
-                            "DropdoneDetails: ${dropDoneDetails.files.first.name}",
-                          );
                           setState(() {
                             final files = dropDoneDetails.files;
                             final XFile f = files.first;
                             _file = f;
                           });
                         },
-                      )
+                      ),
+                    ]
                   ],
                 ),
               ),
@@ -313,7 +297,8 @@ class DiagnosisDragAndDropArea extends StatefulWidget {
   final void Function(DropDoneDetails) onDragDone;
 
   @override
-  State<DiagnosisDragAndDropArea> createState() => _DiagnosisDragAndDropAreaState();
+  State<DiagnosisDragAndDropArea> createState() =>
+      _DiagnosisDragAndDropAreaState();
 }
 
 class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
@@ -323,7 +308,6 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: 16),
         if (widget.fileName == null)
           Text(
             tr("diagnoses.details.uploadFile"),
