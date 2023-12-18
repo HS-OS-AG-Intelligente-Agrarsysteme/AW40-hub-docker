@@ -15,11 +15,12 @@ class DiagnosisProvider with ChangeNotifier {
   final HttpService _httpService;
 
   final Logger _logger = Logger("diagnosis_provider");
-  late String workShopId;
+  late final String workShopId;
   bool uploadedData = false;
 
   Future<List<DiagnosisModel>> getDiagnoses(List<CaseModel> cases) async {
     late Future<List<DiagnosisModel>> result;
+    // TODO: Remove delay mechanism.
     if (uploadedData) {
       uploadedData = false;
       result = Future.delayed(
@@ -92,6 +93,7 @@ class DiagnosisProvider with ChangeNotifier {
     return true;
   }
 
+// TODO: Method should accept a NewDiagnosisModel instead of a NewDiagnosisDto.
   Future<bool> uploadObdData(String caseId, NewOBDDataDto obdDataDto) async {
     final Map<String, dynamic> obdDataJson = obdDataDto.toJson();
     final Response response =
@@ -131,6 +133,7 @@ class DiagnosisProvider with ChangeNotifier {
     return true;
   }
 
+// TODO: Method should accept a NewSymptomModel instead of a NewSymptomDto.
   Future<bool> uploadSymtomData(String caseId, NewSymptomDto symptomDto) async {
     final Map<String, dynamic> symptomDataJson = symptomDto.toJson();
     final Response response = await _httpService.uploadSymtomData(
