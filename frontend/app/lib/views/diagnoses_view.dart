@@ -71,7 +71,7 @@ class DesktopDiagnosisView extends StatefulWidget {
     super.key,
   });
 
-  final List<DiagnosisModel> diagnosisModels;
+  List<DiagnosisModel> diagnosisModels;
   String? diagnosisId;
 
   @override
@@ -83,13 +83,12 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
 
   @override
   Widget build(BuildContext context) {
-    final diagnosisProvider = Provider.of<DiagnosisProvider>(context);
+    final int currentDiagnosisIndex =
+        _getDiagnosisIndexFromId(widget.diagnosisModels, widget.diagnosisId);
     final Routemaster routemaster = Routemaster.of(context);
     if (widget.diagnosisId != null) {
-      diagnosisProvider.currentDiagnosisIndex = null;
       widget.diagnosisId = null;
     }
-    diagnosisProvider.currentDiagnosisIndex ??= getCaseIndex(context) ?? 0;
     return Row(
       children: [
         Expanded(
@@ -98,7 +97,7 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
             child: PaginatedDataTable(
               source: DiagnosisDataTableSource(
                 themeData: Theme.of(context),
-                currentIndex: diagnosisProvider.currentDiagnosisIndex,
+                currentIndex: currentDiagnosisIndex,
                 diagnosisModels: widget.diagnosisModels,
                 onPressedRow: (int i) => setState(() {
                   final DiagnosisModel model = widget.diagnosisModels[i];
@@ -132,13 +131,11 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
             ),
           ),
         ),
-        if (diagnosisProvider.currentDiagnosisIndex != null &&
-            widget.diagnosisModels.isNotEmpty)
+        if (widget.diagnosisModels.isNotEmpty)
           Expanded(
             flex: 2,
             child: DiagnosisDetailView(
-              diagnosisModel: widget
-                  .diagnosisModels[diagnosisProvider.currentDiagnosisIndex!],
+              diagnosisModel: widget.diagnosisModels[currentDiagnosisIndex],
             ),
           )
       ],
@@ -159,5 +156,18 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
     return foundModel == null
         ? null
         : widget.diagnosisModels.indexOf(foundModel);
+  }
+
+  static int _getDiagnosisIndexFromId(
+    List<DiagnosisModel> diagnosisModels,
+    String? diagnosisId,
+  ) {
+    if (diagnosisId == null) return 0;
+    for (final diagnosis in diagnosisModels) {
+      if (diagnosis.id == diagnosisId) {
+        return diagnosisModels.indexOf(diagnosis);
+      }
+    }
+    return 0;
   }
 }

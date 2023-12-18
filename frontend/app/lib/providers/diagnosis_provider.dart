@@ -16,7 +16,6 @@ class DiagnosisProvider with ChangeNotifier {
 
   final Logger _logger = Logger("diagnosis_provider");
   late String workShopId;
-  int? currentDiagnosisIndex;
   bool uploadedData = false;
 
   Future<List<DiagnosisModel>> getDiagnoses(List<CaseModel> cases) async {
