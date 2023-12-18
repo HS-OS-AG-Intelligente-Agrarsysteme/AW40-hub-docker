@@ -19,10 +19,7 @@ class DiagnosisProvider with ChangeNotifier {
   int? currentDiagnosisIndex;
   bool uploadedData = false;
 
-  Future<List<DiagnosisModel>> getDiagnoses(
-    List<CaseModel> cases,
-    BuildContext context,
-  ) async {
+  Future<List<DiagnosisModel>> getDiagnoses(List<CaseModel> cases) async {
     late Future<List<DiagnosisModel>> result;
     if (uploadedData) {
       uploadedData = false;
