@@ -65,14 +65,14 @@ class DiagnosesView extends StatelessWidget {
 }
 
 class DesktopDiagnosisView extends StatefulWidget {
-  DesktopDiagnosisView({
+  const DesktopDiagnosisView({
     required this.diagnosisModels,
     this.diagnosisId,
     super.key,
   });
 
-  List<DiagnosisModel> diagnosisModels;
-  String? diagnosisId;
+  final List<DiagnosisModel> diagnosisModels;
+  final String? diagnosisId;
 
   @override
   State<DesktopDiagnosisView> createState() => _DesktopDiagnosisViewState();
@@ -80,15 +80,12 @@ class DesktopDiagnosisView extends StatefulWidget {
 
 class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
   final Logger _logger = Logger("diagnoses_view_state");
+  int? currentDiagnosisIndex;
 
   @override
   Widget build(BuildContext context) {
-    final int currentDiagnosisIndex =
+    currentDiagnosisIndex ??=
         _getDiagnosisIndexFromId(widget.diagnosisModels, widget.diagnosisId);
-    final Routemaster routemaster = Routemaster.of(context);
-    if (widget.diagnosisId != null) {
-      widget.diagnosisId = null;
-    }
     return Row(
       children: [
         Expanded(
@@ -100,8 +97,7 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
                 currentIndex: currentDiagnosisIndex,
                 diagnosisModels: widget.diagnosisModels,
                 onPressedRow: (int i) => setState(() {
-                  final DiagnosisModel model = widget.diagnosisModels[i];
-                  routemaster.push("/diagnoses/${model.id}");
+                  currentDiagnosisIndex = i;
                 }),
               ),
               showCheckboxColumn: false,
@@ -135,7 +131,7 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
           Expanded(
             flex: 2,
             child: DiagnosisDetailView(
-              diagnosisModel: widget.diagnosisModels[currentDiagnosisIndex],
+              diagnosisModel: widget.diagnosisModels[currentDiagnosisIndex!],
             ),
           )
       ],
