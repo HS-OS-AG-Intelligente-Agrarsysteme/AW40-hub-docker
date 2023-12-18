@@ -5,12 +5,12 @@ import "package:aw40_hub_frontend/models/diagnosis_model.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:aw40_hub_frontend/views/diagnosis_detail_view.dart";
-import "package:collection/collection.dart";
+// import "package:collection/collection.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:logging/logging.dart";
 import "package:provider/provider.dart";
-import "package:routemaster/routemaster.dart";
+// import "package:routemaster/routemaster.dart";
 
 class DiagnosesView extends StatelessWidget {
   DiagnosesView({
@@ -18,12 +18,12 @@ class DiagnosesView extends StatelessWidget {
     this.diagnosisId,
   });
 
-  late DiagnosisProvider _diagnosisProvider;
+  // late DiagnosisProvider _diagnosisProvider;
   final String? diagnosisId;
 
   @override
   Widget build(BuildContext context) {
-    _diagnosisProvider = Provider.of<DiagnosisProvider>(context);
+    // _diagnosisProvider = Provider.of<DiagnosisProvider>(context);
     return FutureBuilder(
       // ignore: discarded_futures
       future: _getDiagnoses(context),
@@ -79,6 +79,7 @@ class DesktopDiagnosisView extends StatefulWidget {
 }
 
 class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
+  // ignore: unused_field
   final Logger _logger = Logger("diagnoses_view_state");
   int? currentDiagnosisIndex;
 
@@ -136,22 +137,6 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
           )
       ],
     );
-  }
-
-  int? getCaseIndex(BuildContext context) {
-    final pathParameters = Routemaster.of(context).currentRoute.pathParameters;
-    final String? diagnosisIdString = pathParameters["diagnosisId"];
-    final DiagnosisModel? foundModel = widget.diagnosisModels.firstWhereOrNull(
-      (diagnosisModel) => diagnosisModel.id == diagnosisIdString,
-    );
-    if (foundModel == null) {
-      _logger.info(
-        "Could not resolve diagnosis with ID: $diagnosisIdString",
-      );
-    }
-    return foundModel == null
-        ? null
-        : widget.diagnosisModels.indexOf(foundModel);
   }
 
   static int _getDiagnosisIndexFromId(
