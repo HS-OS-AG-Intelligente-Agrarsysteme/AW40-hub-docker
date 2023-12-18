@@ -249,23 +249,15 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
         ),
       const SizedBox(height: 16),
       DropTarget(
-        onDragDone: (detail) {
+        onDragDone: (DropDoneDetails detail) {
           setState(() {
             final files = detail.files;
             final XFile file = files.first;
             _file = file;
           });
         },
-        onDragEntered: (detail) {
-          setState(() {
-            _dragging = true;
-          });
-        },
-        onDragExited: (detail) {
-          setState(() {
-            _dragging = false;
-          });
-        },
+        onDragEntered: (_) => setState(() => _dragging = true),
+        onDragExited: (_) => setState(() => _dragging = false),
         child: Container(
           height: 125,
           width: 300,
