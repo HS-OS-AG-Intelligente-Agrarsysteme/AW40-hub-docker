@@ -52,15 +52,12 @@ class DiagnosesView extends StatelessWidget {
     );
   }
 
-  Future<List<CaseModel>> _getCaseModels(BuildContext context) {
-    final caseProvider = Provider.of<CaseProvider>(context);
-    return caseProvider.getCurrentCases();
-  }
 
   Future<List<DiagnosisModel>> _getDiagnoses(
     BuildContext context,
   ) async {
-    final Future<List<CaseModel>> caseModels = _getCaseModels(context);
+    final caseProvider = Provider.of<CaseProvider>(context);
+    final Future<List<CaseModel>> caseModels = caseProvider.getCurrentCases();
     final Future<List<DiagnosisModel>> diagnoses =
         _diagnosisProvider.getDiagnoses(
       await caseModels,
