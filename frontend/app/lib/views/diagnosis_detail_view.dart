@@ -50,6 +50,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
         color: colorScheme.primaryContainer,
         child: Padding(
           padding: const EdgeInsets.all(16),
+          // TODO: Separate into general content for all diagnosis states and extra content for action_required state.
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -67,6 +68,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                     icon: const Icon(Icons.delete_forever),
                     iconSize: 28,
                     style: IconButton.styleFrom(
+                      // TODO: This button has a horrible colour.
                       foregroundColor: colorScheme.error,
                     ),
                     onPressed: () async => _onDeleteButtonPress(
@@ -101,35 +103,33 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                       title: Text(
                         // ignore: lines_longer_than_80_chars
                         tr("diagnoses.status.${widget.diagnosisModel.status.name}"),
-                        style: textTheme.bodyMedium?.copyWith(
+                        style: textTheme.titleMedium?.copyWith(
                           color: foregroundColor,
                         ),
                       ),
                       iconColor: foregroundColor,
                       subtitle: widget.diagnosisModel.status ==
                               DiagnosisStatus.action_required
-                          ? Tooltip(
-                              message: HelperService.convertIso88591ToUtf8(
+                          ? Text(
+                              HelperService.convertIso88591ToUtf8(
                                 widget.diagnosisModel.todos[0].instruction,
                               ),
-                              child: Text(
-                                HelperService.convertIso88591ToUtf8(
-                                  widget.diagnosisModel.todos[0].instruction,
-                                ),
-                                style: TextStyle(
-                                  color: foregroundColor,
-                                ),
-                                softWrap: true,
-                                overflow: TextOverflow.ellipsis,
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: foregroundColor,
                               ),
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
                             )
                           : null,
                       trailing: widget.diagnosisModel.status ==
                               DiagnosisStatus.action_required
                           ? IconButton(
                               icon: const Icon(Icons.upload_file),
+                              style: IconButton.styleFrom(
+                                foregroundColor: foregroundColor,
+                                disabledForegroundColor: colorScheme.outline,
+                              ),
                               onPressed: _file == null ? null : uploadFile,
-                              disabledColor: colorScheme.outline,
                               tooltip: _file == null
                                   ? null
                                   : tr("diagnoses.details.uploadFileTooltip"),
@@ -170,8 +170,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       context,
       listen: false,
     );
-
-    diagnosisProvider.uploadedData = true;
 
     try {
       final XFile file = _file!;

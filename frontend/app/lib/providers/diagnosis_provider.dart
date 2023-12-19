@@ -16,24 +16,9 @@ class DiagnosisProvider with ChangeNotifier {
 
   final Logger _logger = Logger("diagnosis_provider");
   late final String workShopId;
-  bool uploadedData = false;
+
 
   Future<List<DiagnosisModel>> getDiagnoses(List<CaseModel> cases) async {
-    late Future<List<DiagnosisModel>> result;
-    // TODO: Remove delay mechanism.
-    if (uploadedData) {
-      uploadedData = false;
-      result = Future.delayed(
-        const Duration(seconds: 1),
-        () => _getDiagnoses(cases),
-      );
-    } else {
-      result = _getDiagnoses(cases);
-    }
-    return result;
-  }
-
-  Future<List<DiagnosisModel>> _getDiagnoses(List<CaseModel> cases) async {
     final List<String> caseIDs = cases
         .where((c) => c.workshopId == workShopId)
         .map((e) => e.id)
