@@ -17,7 +17,6 @@ class DiagnosisProvider with ChangeNotifier {
   final Logger _logger = Logger("diagnosis_provider");
   late final String workShopId;
 
-
   Future<List<DiagnosisModel>> getDiagnoses(List<CaseModel> cases) async {
     final List<String> caseIDs = cases
         .where((c) => c.workshopId == workShopId)
@@ -78,7 +77,6 @@ class DiagnosisProvider with ChangeNotifier {
     return true;
   }
 
-// TODO: Method should accept a NewDiagnosisModel instead of a NewDiagnosisDto.
   Future<bool> uploadObdData(String caseId, NewOBDDataDto obdDataDto) async {
     final Map<String, dynamic> obdDataJson = obdDataDto.toJson();
     final Response response =
@@ -95,6 +93,7 @@ class DiagnosisProvider with ChangeNotifier {
     return true;
   }
 
+  // TODO turn {byteData, filename} into dto
   Future<bool> uploadPicoscopeData(
     String caseId,
     List<int> byteData,
@@ -118,7 +117,6 @@ class DiagnosisProvider with ChangeNotifier {
     return true;
   }
 
-// TODO: Method should accept a NewSymptomModel instead of a NewSymptomDto.
   Future<bool> uploadSymtomData(String caseId, NewSymptomDto symptomDto) async {
     final Map<String, dynamic> symptomDataJson = symptomDto.toJson();
     final Response response = await _httpService.uploadSymtomData(
