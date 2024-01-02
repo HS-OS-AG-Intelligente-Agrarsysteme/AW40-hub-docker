@@ -93,16 +93,15 @@ class DiagnosisProvider with ChangeNotifier {
     return true;
   }
 
-  // TODO turn {byteData, filename} into dto
   Future<bool> uploadPicoscopeData(
     String caseId,
-    List<int> byteData,
+    List<int> picoscopeData,
     String filename,
   ) async {
     final Response response = await _httpService.uploadPicoscopeData(
       workShopId,
       caseId,
-      byteData,
+      picoscopeData,
       filename,
     );
     if (response.statusCode != 201) {

@@ -104,11 +104,10 @@ class HttpService {
     );
   }
 
-  // TODO turn {byteData, filename} into dto
   Future<http.Response> uploadPicoscopeData(
     String workshopId,
     String caseId,
-    List<int> byteData,
+    List<int> picoscopeData,
     String filename,
   ) async {
     final request = http.MultipartRequest(
@@ -121,7 +120,7 @@ class HttpService {
     request.files.add(
       http.MultipartFile.fromBytes(
         "upload",
-        byteData,
+        picoscopeData,
         filename: filename,
       ),
     );
