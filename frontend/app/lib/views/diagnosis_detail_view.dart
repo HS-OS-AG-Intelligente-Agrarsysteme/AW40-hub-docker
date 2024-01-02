@@ -50,7 +50,8 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
         color: colorScheme.primaryContainer,
         child: Padding(
           padding: const EdgeInsets.all(16),
-          // TODO: Separate into general content for all diagnosis states and extra content for action_required state.
+          // TODO: Separate into general content for all diagnosis states and
+          // extra content for action_required state.
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
