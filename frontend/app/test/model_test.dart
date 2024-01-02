@@ -1,4 +1,3 @@
-import "package:aw40_hub_frontend/models/action_model.dart";
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter/material.dart";
