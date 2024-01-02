@@ -658,7 +658,7 @@ void main() {
     });
   });
   group("NewOBDDataDto primary constructor", () {
-    final timestamp = DateTime.utc(2021, 1, 1).toIso8601String();
+    final timestamp = DateTime.utc(2021).toIso8601String();
     final obdSpecs = <dynamic>[1, 2, 3];
     final dtcs = <String>["some_component"];
     final NewOBDDataDto newOBDDataDto = NewOBDDataDto(
@@ -677,7 +677,7 @@ void main() {
     });
   });
   group("NewOBDDataDto fromJson constructor", () {
-    final timestamp = DateTime.utc(2021, 1, 1).toIso8601String();
+    final timestamp = DateTime.utc(2021).toIso8601String();
     final obdSpecs = <dynamic>[1, 2, 3];
     final dtcs = <String>["some_component"];
     final Map<String, dynamic> json = <String, dynamic>{
@@ -697,7 +697,7 @@ void main() {
     });
   });
   group("NewOBDDataDto toJson method", () {
-    final timestamp = DateTime.utc(2021, 1, 1).toIso8601String();
+    final timestamp = DateTime.utc(2021).toIso8601String();
     final obdSpecs = <dynamic>[1, 2, 3];
     final dtcs = <String>["some_component"];
     final NewOBDDataDto newOBDDataDto = NewOBDDataDto(
