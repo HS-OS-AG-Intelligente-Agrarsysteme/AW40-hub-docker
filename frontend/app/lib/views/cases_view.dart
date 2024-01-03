@@ -33,10 +33,7 @@ class CasesView extends StatelessWidget {
           }
           return EnvironmentService().isMobilePlatform
               ? MobileCasesView(caseModels: caseModels)
-              : DesktopCasesView(
-                  caseModels: caseModels,
-                  caseProvider: caseProvider,
-                );
+              : DesktopCasesView(caseModels: caseModels);
         } else {
           return const Center(child: CircularProgressIndicator());
         }
@@ -46,14 +43,8 @@ class CasesView extends StatelessWidget {
 }
 
 class DesktopCasesView extends StatefulWidget {
-  const DesktopCasesView({
-    required this.caseModels,
-    required this.caseProvider,
-    super.key,
-  });
-
+  const DesktopCasesView({required this.caseModels, super.key});
   final List<CaseModel> caseModels;
-  final CaseProvider caseProvider;
 
   @override
   State<DesktopCasesView> createState() => _DesktopCasesViewState();
@@ -64,8 +55,6 @@ class _DesktopCasesViewState extends State<DesktopCasesView> {
 
   @override
   Widget build(BuildContext context) {
-    currentCaseIndex = currentCaseIndex;
-
     return Row(
       children: [
         Expanded(
@@ -98,9 +87,7 @@ class _DesktopCasesViewState extends State<DesktopCasesView> {
             flex: 2,
             child: CaseDetailView(
               caseModel: widget.caseModels[currentCaseIndex!],
-              onClose: () => setState(() {
-                currentCaseIndex = null;
-              }),
+              onClose: () => setState(() => currentCaseIndex = null),
             ),
           )
       ],
