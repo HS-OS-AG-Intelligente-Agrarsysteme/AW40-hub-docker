@@ -36,6 +36,7 @@ dependencies:
   # ! see https://github.com/dint-dev/universal_html/issues/76#issuecomment-1558621694
   csslib: 0.17.2
   desktop_drop: ^0.4.4
+  dotted_border: ^2.1.0
   easy_localization: ^3.0.2
   easy_localization_loader: ^1.0.1+1
   # Used by easy_localization, import needed to access easy_localization logger levels.
