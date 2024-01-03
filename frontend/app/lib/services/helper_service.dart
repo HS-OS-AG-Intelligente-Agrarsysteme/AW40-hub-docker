@@ -67,51 +67,50 @@ class HelperService {
 
   static IconData getDiagnosisStatusIconData(DiagnosisStatus diagnosisStatus) {
     switch (diagnosisStatus) {
-      case DiagnosisStatus.action_required:
-        return Icons.circle_notifications;
+      case DiagnosisStatus.processing:
+        return Icons.pending;
+      case DiagnosisStatus.scheduled:
+        return Icons.schedule;
       case DiagnosisStatus.finished:
         return Icons.check_circle;
+      case DiagnosisStatus.action_required:
+        return Icons.circle_notifications;
       case DiagnosisStatus.failed:
         return Icons.cancel;
-      case DiagnosisStatus.processing:
-        return Icons.circle;
-      case DiagnosisStatus.scheduled:
-        return Icons.circle;
     }
   }
 
-  static Color getDiagnosisStatusBackgroundColor(
+  static Color getDiagnosisStatusContainerColor(
     ColorScheme colorScheme,
     DiagnosisStatus diagnosisStatus,
   ) {
     switch (diagnosisStatus) {
-      case DiagnosisStatus.action_required:
-        return colorScheme.tertiary;
-      case DiagnosisStatus.scheduled:
-        return colorScheme.primary;
       case DiagnosisStatus.processing:
+      case DiagnosisStatus.scheduled:
         return colorScheme.primary;
       case DiagnosisStatus.finished:
         return colorScheme.secondary;
+      case DiagnosisStatus.action_required:
+        return colorScheme.tertiary;
       case DiagnosisStatus.failed:
         return colorScheme.error;
     }
   }
 
-  static Color getDiagnosisStatusForegroundColor(
+  static Color getDiagnosisStatusOnContainerColor(
     ColorScheme colorScheme,
     DiagnosisStatus diagnosisStatus,
   ) {
     switch (diagnosisStatus) {
-      case DiagnosisStatus.action_required:
-        return colorScheme.onTertiary;
-      case DiagnosisStatus.finished:
-        return colorScheme.onSecondary;
-      case DiagnosisStatus.failed:
-        return colorScheme.onError;
       case DiagnosisStatus.processing:
       case DiagnosisStatus.scheduled:
         return colorScheme.onPrimary;
+      case DiagnosisStatus.finished:
+        return colorScheme.onSecondary;
+      case DiagnosisStatus.action_required:
+        return colorScheme.onTertiary;
+      case DiagnosisStatus.failed:
+        return colorScheme.onError;
     }
   }
 
