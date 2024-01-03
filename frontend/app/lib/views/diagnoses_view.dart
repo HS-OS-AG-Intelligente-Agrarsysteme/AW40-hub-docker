@@ -98,9 +98,8 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
                 themeData: Theme.of(context),
                 currentIndex: currentDiagnosisIndex,
                 diagnosisModels: widget.diagnosisModels,
-                onPressedRow: (int i) => setState(() {
-                  currentDiagnosisIndex = i;
-                }),
+                onPressedRow: (int i) =>
+                    setState(() => currentDiagnosisIndex = i),
               ),
               showCheckboxColumn: false,
               rowsPerPage: 50,
