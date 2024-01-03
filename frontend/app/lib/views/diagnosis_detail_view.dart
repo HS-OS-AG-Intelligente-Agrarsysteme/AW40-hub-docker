@@ -256,9 +256,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       if (dialogResult == null || !dialogResult) return;
       final bool deletionResult =
           await diagnosisProvider.deleteDiagnosis(diagnosisModelCaseId);
-      if (deletionResult) {
-        // diagnosisProvider.currentDiagnosisIndex = null;
-      }
       final String message = deletionResult
           ? tr("diagnoses.details.deleteDiagnosisSuccessMessage")
           : tr("diagnoses.details.deleteDiagnosisErrorMessage");
