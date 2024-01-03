@@ -3,6 +3,7 @@ import "dart:convert";
 
 import "package:aw40_hub_frontend/components/components.dart";
 import "package:aw40_hub_frontend/dtos/dtos.dart";
+import "package:aw40_hub_frontend/exceptions/app_exception.dart";
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/services.dart";
@@ -35,47 +36,45 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
     final TextTheme textTheme = theme.textTheme;
+    final DiagnosisStatus status = widget.diagnosisModel.status;
 
-    final backgroundColor = HelperService.getDiagnosisStatusBackgroundColor(
+    final diagnosisStatusContainerColor =
+        HelperService.getDiagnosisStatusContainerColor(
       colorScheme,
-      widget.diagnosisModel.status,
+      status,
     );
-    final foregroundColor = HelperService.getDiagnosisStatusForegroundColor(
+    final diagnosisStatusOnContainerColor =
+        HelperService.getDiagnosisStatusOnContainerColor(
       colorScheme,
-      widget.diagnosisModel.status,
+      status,
+    );
+    final diagnosisStatusIconData = HelperService.getDiagnosisStatusIconData(
+      status,
     );
 
     return SizedBox.expand(
       child: Card(
-        color: colorScheme.primaryContainer,
         child: Padding(
           padding: const EdgeInsets.all(16),
-          // TODO: Separate into general content for all diagnosis states and
-          // extra content for action_required state.
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppBar(
-                backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-                title: Text(
-                  tr("diagnoses.details.headline"),
-                  style: Theme.of(context)
-                      .textTheme
-                      .displaySmall
-                      ?.copyWith(color: colorScheme.onPrimaryContainer),
-                ),
-                actions: [
+              // Title bar
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    tr("diagnoses.details.headline"),
+                    style: Theme.of(context).textTheme.displaySmall,
+                  ),
                   IconButton(
                     icon: const Icon(Icons.delete_forever),
                     iconSize: 28,
                     style: IconButton.styleFrom(
-                      // TODO: This button has a horrible colour.
                       foregroundColor: colorScheme.error,
                     ),
                     onPressed: () async => _onDeleteButtonPress(
                       context,
-                      Provider.of<AuthProvider>(context, listen: false)
-                          .loggedInUser,
                       widget.diagnosisModel.caseId,
                     ),
                   ),
@@ -85,72 +84,29 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
               // Case ID
               Text(
                 "${tr('general.case')}: ${widget.diagnosisModel.caseId}",
-                style: textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onPrimaryContainer,
-                ),
+                style: textTheme.titleMedium,
               ),
               const SizedBox(height: 16),
               // Coloured card for current State
               Card(
-                color: backgroundColor,
+                color: diagnosisStatusContainerColor,
                 child: Column(
                   children: [
                     ListTile(
-                      leading: Icon(
-                        HelperService.getDiagnosisStatusIconData(
-                          widget.diagnosisModel.status,
-                        ),
-                      ),
+                      leading: Icon(diagnosisStatusIconData),
                       title: Text(
-                        // ignore: lines_longer_than_80_chars
-                        tr("diagnoses.status.${widget.diagnosisModel.status.name}"),
-                        style: textTheme.titleMedium?.copyWith(
-                          color: foregroundColor,
-                        ),
+                        tr("diagnoses.status.${status.name}"),
                       ),
-                      iconColor: foregroundColor,
-                      subtitle: widget.diagnosisModel.status ==
-                              DiagnosisStatus.action_required
-                          ? Text(
-                              HelperService.convertIso88591ToUtf8(
-                                widget.diagnosisModel.todos[0].instruction,
-                              ),
-                              style: textTheme.bodyMedium?.copyWith(
-                                color: foregroundColor,
-                              ),
-                              softWrap: true,
-                              overflow: TextOverflow.ellipsis,
-                            )
-                          : null,
-                      trailing: widget.diagnosisModel.status ==
-                              DiagnosisStatus.action_required
-                          ? IconButton(
-                              icon: const Icon(Icons.upload_file),
-                              style: IconButton.styleFrom(
-                                foregroundColor: foregroundColor,
-                                disabledForegroundColor: colorScheme.outline,
-                              ),
-                              onPressed: _file == null ? null : uploadFile,
-                              tooltip: _file == null
-                                  ? null
-                                  : tr("diagnoses.details.uploadFileTooltip"),
-                            )
-                          : null,
+                      subtitle: _getSubtitle,
+                      textColor: diagnosisStatusOnContainerColor,
+                      iconColor: diagnosisStatusOnContainerColor,
                     ),
-                    if (widget.diagnosisModel.status ==
-                        DiagnosisStatus.action_required) ...[
-                      const SizedBox(height: 16),
+                    if (status == DiagnosisStatus.action_required)
                       DiagnosisDragAndDropArea(
                         fileName: _file?.name,
-                        onDragDone: (DropDoneDetails dropDoneDetails) {
-                          setState(() {
-                            final files = dropDoneDetails.files;
-                            final XFile f = files.first;
-                            _file = f;
-                          });
-                        },
+                        onUploadFile: _uploadFile,
+                        onDragDone: _onDragDone,
                       ),
-                    ]
                   ],
                 ),
               ),
@@ -164,7 +120,33 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     );
   }
 
-  Future<void> uploadFile() async {
+  void _onDragDone(DropDoneDetails dropDoneDetails) {
+    setState(() {
+      final files = dropDoneDetails.files;
+      if (files.isEmpty) {
+        throw AppException(
+          exceptionType: ExceptionType.unexpectedNullValue,
+          exceptionMessage: "`dropDoneDetails.files` is empty.",
+        );
+      }
+      _file = files.first;
+    });
+  }
+
+  Text? get _getSubtitle {
+    final DiagnosisStatus status = widget.diagnosisModel.status;
+    if (status != DiagnosisStatus.action_required) return null;
+
+    return Text(
+      HelperService.convertIso88591ToUtf8(
+        widget.diagnosisModel.todos[0].instruction,
+      ),
+      softWrap: true,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
+  Future<void> _uploadFile() async {
     final ScaffoldMessengerState scaffoldMessengerState =
         ScaffoldMessenger.of(context);
     final diagnosisProvider = Provider.of<DiagnosisProvider>(
@@ -204,6 +186,12 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             newSymptomDto,
           );
           break;
+        default:
+          throw AppException(
+            exceptionType: ExceptionType.unexpectedNullValue,
+            exceptionMessage: "Unknown data type: "
+                "${widget.diagnosisModel.todos.first.dataType}",
+          );
       }
 
       _showMessage(
@@ -255,7 +243,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
 
   static Future<void> _onDeleteButtonPress(
     BuildContext context,
-    LoggedInUserModel loggedInUserModel,
     String diagnosisModelCaseId,
   ) async {
     final diagnosisProvider = Provider.of<DiagnosisProvider>(
