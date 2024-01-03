@@ -2,8 +2,7 @@ import "dart:async";
 import "dart:convert";
 
 import "package:aw40_hub_frontend/dtos/dtos.dart";
-import "package:aw40_hub_frontend/models/case_model.dart";
-import "package:aw40_hub_frontend/models/diagnosis_model.dart";
+import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:collection/collection.dart";
 import "package:flutter/material.dart";
@@ -18,6 +17,58 @@ class DiagnosisProvider with ChangeNotifier {
   late final String workShopId;
 
   Future<List<DiagnosisModel>> getDiagnoses(List<CaseModel> cases) async {
+    // * Easy way of testing UI for now.
+    // return <DiagnosisModel>[
+    //   DiagnosisModel(
+    //     id: "1",
+    //     timestamp: DateTime.now(),
+    //     status: DiagnosisStatus.action_required,
+    //     caseId: "1",
+    //     stateMachineLog: [],
+    //     todos: [
+    //       ActionModel(
+    //         id: "1",
+    //         instruction: "Laden Sie OBD-Daten hoch",
+    //         actionType: "",
+    //         dataType: "",
+    //         component: "",
+    //       )
+    //     ],
+    //   ),
+    //   DiagnosisModel(
+    //     id: "2",
+    //     timestamp: DateTime.now(),
+    //     status: DiagnosisStatus.scheduled,
+    //     caseId: "2",
+    //     stateMachineLog: [],
+    //     todos: [],
+    //   ),
+    //   DiagnosisModel(
+    //     id: "3",
+    //     timestamp: DateTime.now(),
+    //     status: DiagnosisStatus.processing,
+    //     caseId: "3",
+    //     stateMachineLog: [],
+    //     todos: [],
+    //   ),
+    //   DiagnosisModel(
+    //     id: "4",
+    //     timestamp: DateTime.now(),
+    //     status: DiagnosisStatus.finished,
+    //     caseId: "4",
+    //     stateMachineLog: [],
+    //     todos: [],
+    //   ),
+    //   DiagnosisModel(
+    //     id: "5",
+    //     timestamp: DateTime.now(),
+    //     status: DiagnosisStatus.failed,
+    //     caseId: "5",
+    //     stateMachineLog: [],
+    //     todos: [],
+    //   ),
+    // ];
+
     final List<String> caseIDs = cases
         .where((c) => c.workshopId == workShopId)
         .map((e) => e.id)
