@@ -121,6 +121,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
+    final TextTheme textTheme = theme.textTheme;
     final caseProvider = Provider.of<CaseProvider>(context, listen: false);
     final diagnosisProvider =
         Provider.of<DiagnosisProvider>(context, listen: false);
@@ -149,27 +150,26 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
 
     return SizedBox.expand(
       child: Card(
-        color: colorScheme.primaryContainer,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              AppBar(
-                backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-                leading: IconButton(
-                  icon: const Icon(Icons.keyboard_double_arrow_right),
-                  iconSize: 28,
-                  onPressed: widget.onClose,
-                  color: colorScheme.onPrimaryContainer,
-                ),
-                title: Text(
-                  tr("cases.details.headline"),
-                  style: Theme.of(context)
-                      .textTheme
-                      .displaySmall
-                      ?.copyWith(color: colorScheme.onPrimaryContainer),
-                ),
-                actions: [
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.keyboard_double_arrow_right),
+                    iconSize: 28,
+                    onPressed: widget.onClose,
+                    style: IconButton.styleFrom(
+                      foregroundColor: colorScheme.primary,
+                    ),
+                  ),
+                  // const SizedBox(width: 16),
+                  Text(
+                    tr("cases.details.headline"),
+                    style: textTheme.displaySmall,
+                  ),
+                  const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.delete_forever),
                     iconSize: 28,
@@ -191,18 +191,8 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                   (i) => TableRow(
                     children: [
                       const SizedBox(height: 32),
-                      Text(
-                        attributes[i],
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onPrimaryContainer,
-                        ),
-                      ),
-                      Text(
-                        values[i],
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onPrimaryContainer,
-                        ),
-                      ),
+                      Text(attributes[i]),
+                      Text(values[i]),
                     ],
                   ),
                 ),

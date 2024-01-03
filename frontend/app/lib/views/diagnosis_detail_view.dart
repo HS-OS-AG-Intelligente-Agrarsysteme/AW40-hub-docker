@@ -65,7 +65,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                 children: [
                   Text(
                     tr("diagnoses.details.headline"),
-                    style: Theme.of(context).textTheme.displaySmall,
+                    style: textTheme.displaySmall,
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete_forever),
