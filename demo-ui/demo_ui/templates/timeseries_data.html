@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+<a href="/ui">Anmeldung Werkstatt</a>
+<a href="/ui/{{ request.path_params['workshop_id'] }}/cases">Fälle</a>
+<a href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ request.path_params['case_id'] }}" style="margin-left: 10px;">Ausgewählt: {{ request.path_params["case_id"] }}</a>
+<a href="#" style="margin-left: 20px;"><b>Oscillogramm:</b> {{ request.path_params["data_id"] }}</a>
+{% endblock %}
+{% block content %}
+<h1>Oszillogramm {{ request.path_params["data_id"] }} <a class="linkbutton" href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ request.path_params['case_id'] }}">Zurück zum Fall</a></h1>
+<div style="display:grid;grid-template-columns: 1fr 1fr;">
+    <div>
+        <table>
+            <tr>
+                <td><b>Zeitstempel</b></td>
+                <td>{{ timeseries_data["timestamp"]|timestamp_format }} </td>
+            </tr>
+            <tr>
+                <td><b>Bauteil</b></td>
+                <td>{{ timeseries_data["component"] }} </td>
+            </tr>
+            <tr>
+                <td><b>Bewertung</b></td>
+                <td>{{ timeseries_data["label"]|schema_format("timeseries_data_label") }} </td>
+            </tr>
+            <tr>
+                <td><b>Abtastrate [Hz]</b></td>
+                <td>{{ timeseries_data["sampling_rate"] }} </td>
+            </tr>
+            <tr>
+                <td><b>Länge [s]</b></td>
+                <td>{{ timeseries_data["duration"] }} </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div id="signalChart" style="width:80%; height:500px;"></div>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+google.charts.load('current',{packages:['corechart']});
+google.charts.setOnLoadCallback(drawChart);
+
+function drawChart() {
+
+// Set Data
+var data = new google.visualization.DataTable();
+data.addColumn('number', 'Zeit');
+data.addColumn('number', 'Signal');
+data.addRows([
+{% for reading in signal %}
+{{ reading }},
+{% endfor %}
+]);
+
+// Set Options
+const options = {
+  hAxis: {title: 'Zeit [s]'},
+  vAxis: {title: 'Signal'},
+  legend: 'none'
+};
+
+// Draw
+const chart = new google.visualization.LineChart(document.getElementById('signalChart'));
+chart.draw(data, options);
+
+}
+</script>
+
+{% endblock %}

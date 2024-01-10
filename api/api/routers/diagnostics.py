@@ -9,16 +9,14 @@ from motor import motor_asyncio
 from ..data_management import (
     Case,
     Diagnosis,
-    DiagnosisDB,
     DiagnosisStatus,
     DiagnosisLogEntry,
     OBDData,
     Vehicle,
-    Component,
-    ToDo,
-    Action,
     Symptom,
-    AttachmentBucket
+    AttachmentBucket,
+    TimeseriesDataFull,
+    Action
 )
 
 tags_metadata = [
@@ -31,13 +29,13 @@ tags_metadata = [
 router = APIRouter(tags=["Diagnostics"])
 
 
-async def _diag_db_by_id_or_404(diag_id: str):
-    diag_db = await DiagnosisDB.get(diag_id)
-    if diag_db is None:
+async def _diag_by_id_or_404(diag_id: str):
+    diag = await Diagnosis.get(diag_id)
+    if diag is None:
         raise HTTPException(
             status_code=404, detail=f"No diagnosis with ID '{diag_id}'"
         )
-    return diag_db
+    return diag
 
 
 async def _case_by_diag_id_or_404(diag_id: str):
@@ -54,9 +52,8 @@ async def _case_by_diag_id_or_404(diag_id: str):
     status_code=200,
     response_model=Diagnosis
 )
-async def get_diagnosis(diag_db: DiagnosisDB = Depends(_diag_db_by_id_or_404)):
+async def get_diagnosis(diag: Diagnosis = Depends(_diag_by_id_or_404)):
     """Get data of a diagnosis."""
-    diag = await diag_db.to_diagnosis()
     return diag
 
 
@@ -84,20 +81,21 @@ async def get_vehicle(case: Case = Depends(_case_by_diag_id_or_404)):
 @router.get(
     "/{diag_id}/oscillograms",
     status_code=200,
-    response_model=List[List[float]]
+    response_model=List[TimeseriesDataFull]
 )
 async def get_oscillograms(
-        component: Component,
+        component: str,
         case: Case = Depends(_case_by_diag_id_or_404)
 ):
     """Get all oscillograms for a specific component."""
-    signals = []
+    output_data = []
     for tsd in case.timeseries_data:
         if tsd.component == component:
-            signals.append(
-                await tsd.get_signal()
+            signal = await tsd.get_signal()
+            output_data.append(
+                TimeseriesDataFull(signal=signal, **tsd.dict())
             )
-    return signals
+    return output_data
 
 
 @router.get(
@@ -106,30 +104,37 @@ async def get_oscillograms(
     response_model=List[Symptom]
 )
 async def get_symptoms(
-        component: Component, case: Case = Depends(_case_by_diag_id_or_404)
+        component: str, case: Case = Depends(_case_by_diag_id_or_404)
 ):
     """Get all symptoms for a specific component."""
     symptoms = [s for s in case.symptoms if s.component == component]
     return symptoms
 
 
-@router.post(
+@router.put(
     "/{diag_id}/todos/{action_id}",
     status_code=201,
-    response_model=ToDo
+    response_model=Diagnosis
 )
-async def create_todo(
-        action_id: str, diag: DiagnosisDB = Depends(_diag_db_by_id_or_404)
+async def set_todo(
+        action_id: str,
+        action: Action,
+        diag: Diagnosis = Depends(_diag_by_id_or_404)
 ):
     """Require a user action for a diagnosis."""
-    action = await Action.get(action_id)
-    if action is None:
-        raise HTTPException(404, detail=f"No action '{action_id}'")
-    # Requireing a user action is done by inserting a new entry for this
-    # diagnosis-action pair in the todos collection
-    todo = ToDo(diagnosis_id=diag.id, action_id=action_id)
-    todo = await todo.create()
-    return todo
+    action.id = action_id
+    todo_exists = False
+    # if action with same id exists in todos, replace it
+    for i, todo in enumerate(diag.todos):
+        if todo.id == action_id:
+            diag.todos[i] = action
+            todo_exists = True
+            break
+    # if action not yet in todos, create it
+    if not todo_exists:
+        diag.todos.append(action)
+    await diag.save()
+    return diag
 
 
 @router.delete(
@@ -138,17 +143,14 @@ async def create_todo(
     response_model=None
 )
 async def delete_todo(
-        action_id: str, diag: DiagnosisDB = Depends(_diag_db_by_id_or_404)
+        action_id: str, diag: Diagnosis = Depends(_diag_by_id_or_404)
 ):
     """Remove a required user action from a diagnosis."""
-    action = await Action.get(action_id)
-    if action is None:
-        raise HTTPException(404, detail=f"No action '{action_id}'")
-    todo = await ToDo.find_one(
-        {"action_id": action_id, "diagnosis_id": diag.id}
-    )
-    if todo is not None:
-        await todo.delete()
+    for i, todo in enumerate(diag.todos):
+        if todo.id == action_id:
+            diag.todos.pop(i)
+            break
+    await diag.save()
     return None
 
 
@@ -160,7 +162,7 @@ async def delete_todo(
 async def add_message_to_state_machine_log(
         message: str = Form(title="Message to be added to log."),
         attachment: Union[UploadFile, None] = File(default=None),
-        diag: DiagnosisDB = Depends(_diag_db_by_id_or_404),
+        diag: Diagnosis = Depends(_diag_by_id_or_404),
         attachment_bucket: motor_asyncio.AsyncIOMotorGridFSBucket = Depends(
             AttachmentBucket.create
         )
@@ -190,7 +192,7 @@ async def add_message_to_state_machine_log(
 )
 async def set_state_machine_status(
         status: DiagnosisStatus = Body(title="New status"),
-        diag: DiagnosisDB = Depends(_diag_db_by_id_or_404)
+        diag: Diagnosis = Depends(_diag_by_id_or_404)
 ):
     diag.status = status
     await diag.save()

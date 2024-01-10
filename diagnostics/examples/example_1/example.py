@@ -37,12 +37,24 @@ def setup_model():
     anomalies for boost_pressure_control_valve, which is in the example
     knowledge-graph.
     """
-    model_destination = os.path.join(
+    model_destination_folder = os.path.join(
         os.path.dirname(os.path.dirname(EXAMPLE_DIR)),
-        "models/boost_pressure_control_valve.h5"
+        "models"
     )
-    model_src = os.path.join(EXAMPLE_DIR, "boost_pressure_control_valve.h5")
-    shutil.copy(src=model_src, dst=model_destination)
+    model_destination_path = os.path.join(
+        model_destination_folder, "boost_pressure_control_valve.h5"
+    )
+    meta_info_destination_path = os.path.join(
+        model_destination_folder, "boost_pressure_control_valve_meta_info.json"
+    )
+    model_src_path = os.path.join(
+        EXAMPLE_DIR, "boost_pressure_control_valve.h5"
+    )
+    meta_info_src_path = os.path.join(
+        EXAMPLE_DIR, "boost_pressure_control_valve_meta_info.json"
+    )
+    shutil.copy(src=model_src_path, dst=model_destination_path)
+    shutil.copy(src=meta_info_src_path, dst=meta_info_destination_path)
 
 
 def create_case(workshop_id):
@@ -122,7 +134,6 @@ def provide_symptom(case_url):
 
 
 def main(interactive):
-
     # Setup steps required before a user interacts with the system
     setup_knowledge_graph()
     setup_model()
@@ -132,7 +143,9 @@ def main(interactive):
     start_diagnosis(case_url)
 
     # Progress of the example diagnosis can be followed via the demo ui
-    report_url = (case_url + "/diag").replace("v1", "ui")
+    report_url = ((case_url + "/diag")
+                  .replace("v1", "ui")
+                  .replace(":8000", ":8002"))
     print(
         f"For a graphical report of the diagnosis process go to: {report_url}"
     )

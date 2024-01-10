@@ -15,7 +15,6 @@ services:
       - traefik.http.routers.traefik.rule=Host(`${TRAEFIK_ADDRESS}`)
       - traefik.http.routers.traefik.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
       - traefik.http.routers.traefik.service=api@internal
-
     networks:
       - hubnet
     ports:
@@ -179,6 +178,12 @@ services:
         - traefik.http.routers.edc_public.service=edc_public
         - traefik.http.services.edc_public.loadbalancer.server.port=8185
         - traefik.http.services.edc_public.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
+
+        - traefik.http.routers.edc_identity.rule=Host(`${EDC_ADDRESS}`) && Path(`/identity`)
+        - traefik.http.routers.edc_identity.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
+        - traefik.http.routers.edc_identity.service=edc_identity
+        - traefik.http.services.edc_identity.loadbalancer.server.port=8186
+        - traefik.http.services.edc_identity.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
       networks:
         - hubnet
       depends_on:
@@ -190,10 +195,9 @@ services:
         - 8282:8282
         - 8183:8183
         - 8185:8185
+        - 8186:8186
       volumes:
-          - ./edc/configs:/configs
-          - ./edc/vaults:/vaults
-          - ./edc/certs:/certs
+          - ./edc/resources:/resources
 
   edc-database:
       build:
@@ -205,7 +209,8 @@ services:
           - hubnet
       volumes:
           - edc-db-data:/var/lib/postgresql/data
-          - ./edc/sql_tables:/docker-entrypoint-initdb.d/
+          - ./edc-db/sql_tables:/docker-entrypoint-initdb.d/
+
   api:
     build:
       context: ./api
@@ -215,6 +220,8 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
+      minio-config:
+        condition: service_completed_successfully
     env_file:
       - api/api.env
     hostname: "api"
@@ -230,8 +237,32 @@ services:
     networks:
       - hubintranet
       - hubnet
+      - frontend-backend
     volumes:
       - ./api/api/:/home/api/api/
+
+  frontend:
+    build:
+      context: ./frontend
+    <<: *default_restart_policy
+    depends_on:
+      api:
+        condition: service_healthy
+    env_file:
+      - frontend/frontend.env
+    hostname: "frontend"
+    lables:
+      - traefik.enable=true
+      - traefik.docker.network=hubnet
+
+      - traefik.http.routers.frontend.rule=Host(`${FRONTEND_ADDRESS}`)
+      - traefik.http.routers.frontend.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
+      - traefik.http.routers.frontend.service=frontend
+      - traefik.http.services.frontend.loadbalancer.server.port=4200
+      - traefik.http.services.frontend.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
+    networks:
+      - frontend-backend
+      - hubnet
 
   docs:
     build:
@@ -252,8 +283,6 @@ services:
   redis:  # broker for communication between api and diagnostics
     image: redis:alpine
     <<: *default_restart_policy
-    expose:
-      - 6379
     hostname: "redis"
     networks:
       - hubintranet
@@ -295,6 +324,7 @@ networks:
     internal: true
   keycloaknet:
     internal: true
+  frontend-backend:
 
 volumes:
   mongo-data:

@@ -19,3 +19,10 @@ def test_example():
         status = diag.json()["status"]
 
     assert status == "finished"
+
+    # confirm reporting of used datasets
+    smach_log = diag.json()["state_machine_log"]
+    smach_log_messages = [entry["message"] for entry in smach_log]
+    assert "RETRIEVED_DATASET: obd_data/0" in smach_log_messages
+    assert "RETRIEVED_DATASET: timeseries_data/0" in smach_log_messages
+    assert "RETRIEVED_DATASET: symptoms/0" in smach_log_messages

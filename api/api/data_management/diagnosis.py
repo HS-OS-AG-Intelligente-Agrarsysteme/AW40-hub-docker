@@ -2,19 +2,15 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 
-from beanie import Document, Indexed, PydanticObjectId, before_event, Delete
+from beanie import Document, Indexed, PydanticObjectId
 from motor import motor_asyncio
 from pydantic import BaseModel, Field
-from pymongo import IndexModel
 
 
-class Action(Document):
+class Action(BaseModel):
     """Describes an action, that can be required of an user"""
 
-    class Settings:
-        name = "actions"
-
-    id: str
+    id: str = None
     instruction: str
 
     action_type: str = None
@@ -22,30 +18,12 @@ class Action(Document):
     component: str = None
 
 
-class ToDo(Document):
-    """Maps diagnosis to their (currently) required actions."""
-
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-
-    action_id: Indexed(str)
-    diagnosis_id: Indexed(PydanticObjectId)
-
-    class Settings:
-        name = "todos"
-        indexes = [
-            IndexModel(
-                [("diagnosis_id", 1), ("action_id", 1)],
-                name="diagnosis_action_index_ASCENDING",
-                unique=True
-            ),
-        ]
-
-
 class DiagnosisStatus(str, Enum):
     scheduled = "scheduled"
     action_required = "action_required"
     processing = "processing"
     finished = "finished"
+    failed = "failed"
 
 
 class DiagnosisLogEntry(BaseModel):
@@ -67,55 +45,68 @@ class AttachmentBucket:
         return cls.bucket
 
 
-class DiagnosisBase(BaseModel):
-    """Diagnosis Meta Data"""
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-    status: DiagnosisStatus = None
-    state_machine_log: List[DiagnosisLogEntry] = []
-    case_id: PydanticObjectId
-
-
-class DiagnosisDB(DiagnosisBase, Document):
+class Diagnosis(Document):
     """Internal Diagnosis Representation"""
 
     class Settings:
         name = "diagnosis"
 
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    status: DiagnosisStatus = None
+    state_machine_log: List[DiagnosisLogEntry] = []
     case_id: Indexed(PydanticObjectId, unique=True)
-
-    @before_event(Delete)
-    async def _delete_todos(self):
-        """Make sure any todos associated with this diagnosis are removed"""
-        await ToDo.find(ToDo.diagnosis_id == self.id).delete()
-
-    async def to_diagnosis(self):
-        """
-        Convert this internal representation to the external Diagnosis
-        representation for serving via the API.
-        """
-
-        # Get all todos currently associated with this diagnosis and fetch the
-        # respective actions
-        todos = await ToDo.find_many({"diagnosis_id": self.id}).to_list()
-        action_ids = [todo.action_id for todo in todos]
-        todo_actions = await Action.find_many(
-            {"_id": {"$in": action_ids}}
-        ).to_list()
-
-        # The external representation will include all meta data stored in the
-        # internal representation plus the currently required actions
-        diag = Diagnosis(
-            todos=todo_actions,
-            **self.dict()
-        )
-        return diag
-
-
-class Diagnosis(DiagnosisBase, allow_population_by_field_name=True):
-    """Represents the current state of a diagnosis."""
-
-    # Includes list of actions required by user
     todos: List[Action] = []
 
-    # id field is needed for easy convertability from internal DiagnosisDB
-    id: PydanticObjectId = Field(alias="_id")
+    @classmethod
+    async def find_in_hub(
+            cls,
+            workshop_id: str = None,
+            status: Optional[DiagnosisStatus] = None
+    ) -> List["Diagnosis"]:
+        """
+        Get list of all diagnoses of a workshop, optionally filtered by status.
+        """
+        pipeline = [
+            # Lookup case in cases collection restricted to workshop
+            {
+                "$lookup": {
+                    "from": "cases",
+                    "localField": "case_id",
+                    "foreignField": "_id",
+                    "as": "case",
+                    "pipeline": [
+                        {"$match": {"workshop_id": workshop_id}},
+                        {"$project": {"_id": 1}}
+                    ]
+                }
+            },
+            # Indicate if a diagnosis has a matching case
+            {
+                "$addFields": {
+                    "case_found": {
+                        "$size": "$case"
+                    }
+                }
+            },
+            # Only keep diagnoses with matching case
+            {
+                "$match": {
+                    "case_found": 1
+                }
+            },
+            # Remove leftovers from lookup to recover plain diagnosis schema
+            {
+                "$project": {
+                    "case": 0,
+                    "case_found": 0
+                }
+            }
+        ]
+
+        if status is not None:
+            # Only keep results with specified status
+            pipeline.append({"$match": {"status": status}})
+
+        return await cls.aggregate(
+            pipeline, projection_model=Diagnosis
+        ).to_list()

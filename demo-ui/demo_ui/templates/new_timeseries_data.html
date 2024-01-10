@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+<a href="/ui">Anmeldung Werkstatt</a>
+<a href="/ui/{{ request.path_params['workshop_id'] }}/cases">Fälle</a>
+<a href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ request.path_params['case_id'] }}" style="margin-left: 10px;">Ausgewählt: {{ request.path_params["case_id"] }}</a>
+<a href="#" style="margin-left: 20px;"><b>OBD:</b> Neuer Datensatz</a>
+{% endblock %}
+{% block content %}
+<h1> Neues Oszillogramm hochladen <a class="linkbutton" href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ request.path_params['case_id'] }}">Abbrechen</a></h1>
+<div>
+    <h2> Option 1: Picoscope CSV Export </h2>
+    <form method="post" enctype="multipart/form-data">
+        {% for channel in ["A", "B", "C", "D"] %}
+        <p>
+            <label><b>Kanal {{ channel }}</b></label><br>
+            <label for="component_{{ channel }}">Komponente</label>
+            <input list="components" id="component_{{ channel }}" name="component_{{ channel }}" style="width:30%">
+            <datalist id="components">
+                {% for component in components %}
+                <option value="{{ component }}">
+                {% endfor %}
+            </datalist>
+            <label for="label_{{ channel }}">Bewertung</label>
+            <select id="label_{{ channel }}", name="label_{{ channel }}">
+                <option value="unknown">Unbekannt</option>
+                <option value="norm">Normalbild</option>
+                <option value="anomaly">Anomalie</option>
+            </select>
+        </p>
+        {% endfor %}
+        <script>
+        // If query param suggested_component was specified, prefill input for channel A with it
+        const inputA = document.getElementById("component_A")
+        inputA.setAttribute("value", "{{ suggested_component }}")
+        </script>
+        <p>
+            <label for="picoscope_file"><b>Picoscope Datei</b></label><br>
+            <input type="file" id="picoscope_file" name="picoscope_file" style="margin: 10px" required><br>
+        </p>
+        <p>
+            <input type="submit" value="Daten hochladen">
+            <input type="reset">
+        </p>
+    </form>
+</div>
+</div>
+{% endblock %}

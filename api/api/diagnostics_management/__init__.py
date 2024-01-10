@@ -1,5 +1,7 @@
 __all__ = [
-    "DiagnosticTaskManager"
+    "DiagnosticTaskManager",
+    "KnowledgeGraph"
 ]
 
 from .tasks import DiagnosticTaskManager
+from .knowledge_graph import KnowledgeGraph

@@ -2,4 +2,4 @@ redis==4.5.4
 celery==5.2.7
 httpx==0.23.3
 pydantic==1.10.5
-git+https://github.com/tbohne/vehicle_diag_smach
+git+https://github.com/tbohne/vehicle_diag_smach@v0.1

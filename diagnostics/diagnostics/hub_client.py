@@ -64,7 +64,7 @@ class HubClient:
     def get_vehicle(self) -> dict:
         return self._get_from_url(self.vehicle_url)
 
-    def get_oscillograms(self, component: str) -> List[List[float]]:
+    def get_oscillograms(self, component: str) -> List[dict]:
         return self._get_from_url(
             self.oscillograms_url, query_params={"component": component}
         )
@@ -74,39 +74,73 @@ class HubClient:
             self.symptoms_url, query_params={"component": component}
         )
 
-    def _require_action(self, action_id) -> dict:
+    def _create_action_add_oscillogram(self, component: str) -> dict:
+        return {
+            "id": f"add-data-oscillogram-{component.lower()}",
+            "instruction": f"Bitte ein Oszillogramm für das Bauteil '"
+                           f"{component}' "
+                           f"erstellen und hochladen.",
+            "action_type": "add_data",
+            "data_type": "oscillogram",
+            "component": f"{component}"
+        }
+
+    def _create_action_add_obd(self) -> dict:
+        return {
+            "id": "add-data-obd",
+            "instruction": "Bitte OBD Daten erstellen und hochladen.",
+            "action_type": "add_data",
+            "data_type": "obd",
+        }
+
+    def _create_action_add_symptom(self, component: str) -> dict:
+        return {
+            "id": f"add-data-symptom-{component.lower()}",
+            "instruction": f"Bitte manuelle Untersuchung des Bauteils "
+                           f"'{component}' durchführen und als Symptom "
+                           f"bereitstellen.",
+            "data_type": "symptom",
+            "action_type": "add_data",
+            "component": f"{component}"
+        }
+
+    def _require_action(self, action: dict) -> dict:
+        action_id = action["id"]
         url = f"{self.todos_url}/{action_id}"
-        response = httpx.post(url)
+        response = httpx.put(url, json=action)
         response.raise_for_status()
         return response.json()
 
-    def _unrequire_action(self, action_id) -> dict:
+    def _unrequire_action(self, action: dict) -> dict:
+        action_id = action["id"]
         url = f"{self.todos_url}/{action_id}"
         response = httpx.delete(url)
         response.raise_for_status()
         return response.json()
 
     def require_obd_data(self):
-        return self._require_action("add-data-obd")
+        action = self._create_action_add_obd()
+        return self._require_action(action)
 
     def unrequire_obd_data(self):
-        return self._unrequire_action("add-data-obd")
+        action = self._create_action_add_obd()
+        return self._unrequire_action(action)
 
     def require_oscillogram(self, component: str):
-        action_id = f"add-data-oscillogram-{component.lower()}"
-        return self._require_action(action_id)
+        action = self._create_action_add_oscillogram(component)
+        return self._require_action(action)
 
     def unrequire_oscillogram(self, component: str):
-        action_id = f"add-data-oscillogram-{component.lower()}"
-        return self._unrequire_action(action_id)
+        action = self._create_action_add_oscillogram(component)
+        return self._unrequire_action(action)
 
     def require_symptom(self, component: str):
-        action_id = f"add-data-symptom-{component.lower()}"
-        return self._require_action(action_id)
+        action = self._create_action_add_symptom(component)
+        return self._require_action(action)
 
     def unrequire_symptom(self, component: str):
-        action_id = f"add-data-symptom-{component.lower()}"
-        return self._unrequire_action(action_id)
+        action = self._create_action_add_symptom(component)
+        return self._unrequire_action(action)
 
     def clear_state_machine_log(self):
         raise NotImplementedError

@@ -1,7 +1,7 @@
 import pytest
 from api.data_management import (
-    DiagnosisDB, Case, NewOBDData, NewSymptom, NewTimeseriesData,
-    TimeseriesMetaData, Action, ToDo, AttachmentBucket
+    Case, NewOBDData, NewSymptom, NewTimeseriesData,
+    TimeseriesMetaData, Action, AttachmentBucket, Diagnosis
 )
 from api.data_management.timeseries_data import GridFSSignalStore
 from api.routers import diagnostics
@@ -29,7 +29,7 @@ def data_context(diag_id, case_id):
     # the diag_id and case_id fixtures.
     class DataContext:
         async def __aenter__(self):
-            await DiagnosisDB(id=diag_id, case_id=case_id).create()
+            await Diagnosis(id=diag_id, case_id=case_id).create()
             await Case(
                 id=case_id,
                 diagnosis_id=diag_id,
@@ -158,7 +158,7 @@ async def test_get_oscillograms(
         )
         # confirm expected response
         assert response.status_code == 200
-        assert response.json()[0] == oscillogram_data["signal"]
+        assert response.json()[0]["signal"] == oscillogram_data["signal"]
 
 
 @pytest.mark.asyncio
@@ -233,55 +233,46 @@ async def test_get_symptoms_404(diag_id, initialized_beanie_context):
 @pytest.mark.asyncio
 async def test_create_todo(diag_id, data_context, initialized_beanie_context):
     async with initialized_beanie_context, data_context:
-        # seed db with a possible action
-        action = await Action(
-            id="do-something", instruction="Go to the car and do something"
-        ).create()
-        action_id = action.id
+
+        new_action_data = {
+            "id": "add-data-obd",
+            "instruction": "Bitte OBD Daten erstellen und hochladen.",
+            "action_type": "add_data",
+            "data_type": "obd",
+            "component": None
+        }
 
         # test request
-        response = await client.post(f"{diag_id}/todos/{action_id}")
+        response = await client.put(
+            f"{diag_id}/todos/{new_action_data['id']}", json=new_action_data
+        )
 
         # confirm expected response data
         assert response.status_code == 201
         response_data = response.json()
-        assert response_data["diagnosis_id"] == diag_id
-        assert response_data["action_id"] == action_id
+        assert response_data["_id"] == diag_id
+        assert response_data["todos"][-1] == new_action_data
 
         # confirm expected new state in db
-        todo_db = await ToDo.get(response_data["_id"])
-        assert str(todo_db.diagnosis_id) == diag_id
-        assert todo_db.action_id == action_id
+        diag = await Diagnosis.get(response_data["_id"])
+        assert diag.todos[-1] == Action(**new_action_data)
 
 
 @pytest.mark.asyncio
 async def test_create_todo_no_diag_404(diag_id, initialized_beanie_context):
     async with initialized_beanie_context:
-        response = await client.post(f"{diag_id}/todos/a-id")
-        assert response.status_code == 404
-
-
-@pytest.mark.asyncio
-async def test_create_todo_no_action_404(
-        diag_id, data_context, initialized_beanie_context
-):
-    async with initialized_beanie_context, data_context:
-        response = await client.post(f"{diag_id}/todos/a-id")
+        response = await client.put(f"{diag_id}/todos/a-id")
         assert response.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_delete_todo(diag_id, data_context, initialized_beanie_context):
     async with initialized_beanie_context, data_context:
-        # seed db with possible action
-        action = await Action(
-            id="do-something", instruction="Go to the car and do something"
-        ).create()
-        action_id = action.id
-        # diagnosis is associated with action via entry in todos collection
-        todo = await ToDo(
-            diagnosis_id=diag_id, action_id=action_id
-        ).create()
+        # seed db diagnosis with an action
+        diag = await Diagnosis.get(diag_id)
+        action_id = "test-action"
+        diag.todos.append(Action(id=action_id, instruction="Do something"))
+        await diag.save()
 
         # test response
         response = await client.delete(f"{diag_id}/todos/{action_id}")
@@ -291,24 +282,18 @@ async def test_delete_todo(diag_id, data_context, initialized_beanie_context):
         assert response.json() is None
 
         # confirm expected new state in db
-        todo_db = await ToDo.get(todo.id)
-        assert todo_db is None
+        diag = await Diagnosis.get(diag_id)
+        assert diag.todos == []
 
 
 @pytest.mark.asyncio
-async def test_delete_todo_no_diag_404(diag_id, initialized_beanie_context):
-    async with initialized_beanie_context:
-        response = await client.delete(f"{diag_id}/todos/a-id")
-        assert response.status_code == 404
-
-
-@pytest.mark.asyncio
-async def test_delete_todo_no_action_404(
+async def test_delete_non_existent_todo(
         diag_id, data_context, initialized_beanie_context
 ):
     async with initialized_beanie_context, data_context:
-        response = await client.delete(f"{diag_id}/todos/a-id")
-        assert response.status_code == 404
+        response = await client.delete(f"{diag_id}/todos/action-id")
+        assert response.status_code == 200
+        assert response.json() is None
 
 
 @pytest.mark.asyncio
@@ -334,8 +319,8 @@ async def test_add_message_to_state_machine_log_no_attachment(
         assert response_data[-1]["attachment"] is None
 
         # confirm expected change of db state
-        diag_db = await DiagnosisDB.get(diag_id)
-        assert diag_db.state_machine_log[-1].message == msg
+        diag = await Diagnosis.get(diag_id)
+        assert diag.state_machine_log[-1].message == msg
 
 
 @pytest.mark.asyncio
@@ -362,11 +347,11 @@ async def test_add_message_to_state_machine_log_with_attachment(
         assert response_data[-1]["message"] == msg
 
         # confirm expected change of db state
-        diag_db = await DiagnosisDB.get(diag_id)
-        assert diag_db.state_machine_log[-1].message == msg
+        diag = await Diagnosis.get(diag_id)
+        assert diag.state_machine_log[-1].message == msg
 
         attachment_id = response_data[-1]["attachment"]
-        assert str(diag_db.state_machine_log[-1].attachment) == attachment_id
+        assert str(diag.state_machine_log[-1].attachment) == attachment_id
 
         bucket_stream = await AttachmentBucket.bucket.open_download_stream(
             ObjectId(attachment_id)
@@ -391,8 +376,8 @@ async def test_set_state_machine_status(
     new_status = "processing"
     async with initialized_beanie_context, data_context:
         # double check that diag in data_context does not have the new status
-        diag_db = await DiagnosisDB.get(diag_id)
-        assert diag_db.status != new_status
+        diag = await Diagnosis.get(diag_id)
+        assert diag.status != new_status
 
         # test request and confirm expected response data
         response = await client.put(f"{diag_id}/status", json=new_status)
@@ -400,8 +385,8 @@ async def test_set_state_machine_status(
         assert response.json() == new_status
 
         # confirm expected state in db
-        diag_db = await DiagnosisDB.get(diag_id)
-        assert diag_db.status == new_status
+        diag = await Diagnosis.get(diag_id)
+        assert diag.status == new_status
 
 
 @pytest.mark.asyncio

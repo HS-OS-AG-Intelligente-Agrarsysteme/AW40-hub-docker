@@ -3,8 +3,6 @@ from enum import Enum
 
 from pydantic import BaseModel, Field, NonNegativeInt
 
-from .vehicle import Component
-
 
 class SymptomLabel(str, Enum):
     unknown = "unknown"
@@ -23,7 +21,7 @@ class NewSymptom(BaseModel):
         }
 
     timestamp: datetime = Field(default_factory=datetime.utcnow)
-    component: Component
+    component: str
     label: SymptomLabel
 
 
@@ -53,5 +51,5 @@ class SymptomUpdate(BaseModel):
         }
 
     timestamp: datetime = None
-    component: Component = None
+    component: str = None
     label: SymptomLabel = None

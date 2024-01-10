@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  demo-ui:
+    build:
+      context: ./demo-ui
+      # DEVELOPMENT: run with reload and mount source code
+    command: uvicorn --host 0.0.0.0 --port 8002 --reload demo_ui.main:app
+    depends_on:
+      api:
+        condition: service_healthy
+    hostname: "demo-ui"
+    networks:
+      - frontend-backend
+    ports:
+      - 8002:8002
+    volumes:
+      - ./demo-ui/demo_ui/:/home/demo-ui/demo_ui/

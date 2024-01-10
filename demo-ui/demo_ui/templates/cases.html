@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+    <a href="/ui">Anmeldung Werkstatt</a>
+    <a href="#"><b>Fälle</b></a>
+{% endblock %}
+
+{% block content %}
+<h1> Alle Fälle <a class="linkbutton" href="cases/new">Neuen Fall anlegen</a> <a class="linkbutton" href="/ui">Zurück zur Anmeldung</a> </h1>
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Zeitstempel</th>
+    <th>Anlass</th>
+    <th>Kilometerstand</th>
+    <th>Kunde</th>
+    <th>Diagnose</th>
+    <th>Aktionen</th>
+    {% for entry in cases %}
+  <tr>
+    <td>{{ entry["_id"] }}</td>
+    <td>{{ entry["timestamp"]|timestamp_format }}</td>
+    <td>{{ entry["occasion"]|schema_format("occasion") }}</td>
+    <td>{{ entry["milage"] }}</td>
+    <td>{{ entry["customer_id"] }}</td>
+    <td>{{ entry["diagnosis"]["status"]|schema_format("diagnosis_status") }}</td>
+    <td>
+      <a class="linkbutton" href="cases/{{ entry['_id'] }}">Details</a>
+      <a class="deletelinkbutton" href="cases/{{ entry['_id'] }}/delete">Löschen</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

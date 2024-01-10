@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+<a href="/ui">Anmeldung Werkstatt</a>
+<a href="/ui/{{ request.path_params['workshop_id'] }}/cases">Fälle</a>
+<a href="#" style="margin-left: 10px;"><b>Neu anlegen</b></a>
+
+{% endblock %}
+
+{% block content %}
+<h1> Neuen Fall anlegen <a class="linkbutton" href="/ui/{{ request.path_params['workshop_id'] }}/cases">Abbrechen</a></h1>
+<form method="post">
+    <p>
+        <label for="vin"><b>VIN</b></label><br>
+        <input type="text" id="vin" name="vehicle_vin" required>
+    </p>
+    <p>
+        <label for="customer"><b>Kunde</b></label><br>
+        <input type="text" id="customer"  name="customer_id">
+    </p>
+    <p>
+        <label><b>Anlass</b></label><br>
+        <input type="radio" id="occasion_service_routine" name="occasion" value="service_routine">
+        <label for="occasion_service_routine">Service / Routine</label><br>
+        <input type="radio" id="occasion_problem_defect" name="occasion" value="problem_defect">
+        <label for="occasion_problem_defect">Problem / Defekt</label>
+    </p>
+    <p>
+        <label for="milage"><b>Kilometerstand</b></label><br>
+        <input type="number" min="0" id="milage" name="milage">
+    </p>
+    <p>
+        <input type="submit" value="Fall anlegen">
+        <input type="reset">
+    </p>
+</form>
+{% endblock %}

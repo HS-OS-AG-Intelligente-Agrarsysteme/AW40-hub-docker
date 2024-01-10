@@ -1,0 +1,106 @@
+general:
+  cancel: "Cancel"
+  case: "Case"
+  close: "Close"
+  customer: "Customer"
+  customerId: "Customer id"
+  date: "Date"
+  delete: "Delete"
+  edit: "Edit"
+  filter: "Filter"
+  id: "ID"
+  language: "Language"
+  logout: "Logout"
+  milage: "Milage"
+  notFound: "Not found"
+  notSpecified: "Not specified"
+  obligatoryField: "Obligatory"
+  occasion: "Occasion"
+  problem: "Problem"
+  repair: "Repair"
+  save: "Save"
+  saveChanges: "Save changes"
+  service: "Service"
+  sort: "Sort"
+  status: "Status"
+  unnamed: "Unnamed"
+  vehicle: "Vehicle"
+  vehicleVin: "Vehicle vin"
+  workshop: "Workshop"
+  workshopId: "Workshop id"
+  yes: "Yes"
+  no:
+    date: "No Date"
+    customerId: "No customer id"
+    vehiclevin: "No vehicle vin"
+    workshopid: "No workshop id"
+diagnoses:
+  title: "Diagnosis"
+  actions:
+    filterDiagnoses: "Filter by status"
+    sortDiagnoses: "@:general.sort"
+  status:
+    action_required: "Action required"
+    scheduled: "Scheduled"
+    processing: "Processing"
+    finished: "Finished"
+    failed: "Failed"
+  details:
+    headline: "Details"
+    deleteDiagnosisSuccessMessage: "The diagnosis was successfully deleted."
+    deleteDiagnosisErrorMessage: "The diagnosis could not be deleted."
+    startDiagnosisSuccessMessage: "The diagnosis was successfully started."
+    startDiagnosisFailureMessage: "The diagnosis could not be started."
+    dialog:
+      title: "Delete diagnosis"
+      description: "Do you really want to delete the diagnosis?"
+    obdUpload: "Uplaod OBD data"
+    uploadFile: "Upload a file"
+    uploadFileTooltip: "Upload file"
+    dragAndDrop: "Drag and drop the file here"
+    uploadDataSuccessMessage: "The data has been uploaded successfully."
+    uploadDataErrorMessage: "The data could not be uploaded."
+cases:
+  title: "Cases"
+  actions:
+    addCase: "Add case"
+    updateCase: "Update case"
+    sortCases: "@:general.sort"
+    filterCases: "@:general.filter"
+  occasions:
+    notSpecified: "@:general.notSpecified"
+    service: "@:general.service"
+    problem: "@:general.repair"
+  status:
+    open: "Open"
+    closed: "Closed"
+  filterDialog:
+    title: "Filter cases"
+    toggleShared: "Show cases from all workshops"
+  addCaseDialog:
+    vinCharactersInvalid: "The @:general.vehicleVin must not contain I, O, or Q"
+    vinLengthInvalid: "The @:general.vehicleVin must be 17 characters long"
+  details:
+    headline: "Details"
+    dialog:
+      title: "Delete case"
+      description: "Do you really want to delete the case?"
+    showDiagnosis: "Show diagnosis"
+    deleteCaseSuccessMessage: "The case was successfully deleted."
+    deleteCaseErrorMessage: "The case could not be deleted."
+    occasion:
+      unknown: "Unknown"
+      service_routine: "@:general.service"
+      problem_defect: "@:general.repair"
+    startDiagnosis: "Start diagnosis"
+    status:
+      open: "Open"
+      closed: "Closed"
+customers:
+  title: "Customers"
+vehicles:
+  title: "Vehicles"
+training:
+  title: "Training"
+pageNotFound:
+  title: "Page @:general.notFound"

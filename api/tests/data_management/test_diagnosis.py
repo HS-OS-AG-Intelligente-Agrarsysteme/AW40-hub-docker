@@ -1,79 +1,44 @@
 import pytest
 
-from bson import ObjectId
-from pymongo.errors import DuplicateKeyError
-
-from api.data_management.diagnosis import (
-    Action,
-    ToDo,
-    DiagnosisDB
-)
+from api.data_management import Case, Diagnosis
 
 
-@pytest.fixture
-def case_id():
-    return str(ObjectId())
+class TestDiagnosis:
 
+    @pytest.mark.asyncio
+    async def test_find_in_hub_without_data(self, initialized_beanie_context):
+        async with initialized_beanie_context:
+            diagnoses = await Diagnosis.find_in_hub(workshop_id="any")
+            assert diagnoses == [], "Expected empty list."
 
-@pytest.mark.asyncio
-async def test_automatic_todo_deletion(case_id, initialized_beanie_context):
-    async with initialized_beanie_context:
-        # add new diagnosis to
-        diag_db = DiagnosisDB(case_id=case_id)
-        await diag_db.save()
+    @pytest.mark.asyncio
+    async def test_find_in_hub(self, initialized_beanie_context):
+        async with initialized_beanie_context:
+            # Seed db with 2 cases for workshop "1"
+            case_11 = await Case(workshop_id="1", vehicle_vin="v11").insert()
+            case_12 = await Case(workshop_id="1", vehicle_vin="v12").insert()
+            # Seed db with 1 case for workshop "2"
+            case_21 = await Case(workshop_id="2", vehicle_vin="v21").insert()  # noqa F841
 
-        # add a action to the db
-        action = Action(id="test-action", instruction="We are testing!")
-        await action.save()
+            # Both cases of workshop "1" have a diagnosis
+            diag_11 = await Diagnosis(  # noqa F841
+                case_id=case_11.id, status="scheduled"
+            ).insert()
+            diag_12 = await Diagnosis(
+                case_id=case_12.id, status="finished"
+            ).insert()
 
-        # associate diagnosis and action by creating a todos entry in the db
-        todo = ToDo(action_id=action.id, diagnosis_id=diag_db.id)
-        await todo.save()
+            workshop_1_result = await Diagnosis.find_in_hub(workshop_id="1")
+            assert len(workshop_1_result) == 2, \
+                "Expected 2 diagnoses for workshop 1."
 
-        # delete the diagnosis and confirm that associated todos are deleted
-        await diag_db.delete()
-        todo_db = await ToDo.find_one({"diagnosis_id": diag_db.id})
-        assert todo_db is None
+            workshop_1_finished_result = await Diagnosis.find_in_hub(
+                workshop_id="1", status="finished"
+            )
+            assert len(workshop_1_finished_result) == 1
+            assert workshop_1_finished_result[0].id == diag_12.id, \
+                "Expected 1 diagnosis with status finished for workshop 1."
 
-
-@pytest.mark.asyncio
-async def test_to_diagnosis_without_todos(case_id, initialized_beanie_context):
-    async with initialized_beanie_context:
-        # seed db with new diagnosis
-        diag_db = DiagnosisDB(case_id=case_id)
-        await diag_db.save()
-        # convert to api representation
-        diag = await diag_db.to_diagnosis()
-        assert diag.todos == []
-
-
-@pytest.mark.asyncio
-async def test_to_diagnosis_with_todos(case_id, initialized_beanie_context):
-    async with initialized_beanie_context:
-        # add new diagnosis to
-        diag_db = DiagnosisDB(case_id=case_id)
-        await diag_db.save()
-
-        # add a action to the db
-        action = Action(id="test-action", instruction="We are testing!")
-        await action.save()
-
-        # associate diagnosis and action by creating a todos entry in the db
-        todo = ToDo(action_id=action.id, diagnosis_id=diag_db.id)
-        await todo.save()
-
-        # confirm that entries in todos collection are resolved when converting
-        # to api representation
-        diag = await diag_db.to_diagnosis()
-        assert diag.todos == [action]
-
-
-@pytest.mark.asyncio
-async def test_todos_are_indexed(initialized_beanie_context):
-    async with initialized_beanie_context:
-        todo = ToDo(diagnosis_id=ObjectId(), action_id="aid")
-        await todo.save()
-        todo_2 = ToDo(diagnosis_id=todo.diagnosis_id, action_id=todo.action_id)
-        # no duplication of a diagnosis - action pair in todos allowed
-        with pytest.raises(DuplicateKeyError):
-            await todo_2.save()
+            workshop_2_result = await Diagnosis.find_in_hub(workshop_id="2")
+            assert workshop_2_result == [], \
+                "Expected 0 diagnoses for workshop 2."

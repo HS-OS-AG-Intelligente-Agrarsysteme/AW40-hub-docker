@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+<a href="/ui">Anmeldung Werkstatt</a>
+<a href="/ui/{{ request.path_params['workshop_id'] }}/cases">Fälle</a>
+<a href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ request.path_params['case_id'] }}" style="margin-left: 10px;">Ausgewählt: {{ request.path_params["case_id"] }}</a>
+<a href="#" style="margin-left: 20px;"><b>Symptome:</b> Neuer Datensatz</a>
+{% endblock %}
+{% block content %}
+<h1> Neues Symptom hinzufügen <a class="linkbutton" href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ request.path_params['case_id'] }}">Abbrechen</a></h1>
+<form method="post">
+    <p>
+        <label for="component"><b>Bauteil</b></label><br>
+        <input list="components" id="component" name="component" style="width:30%" value="{{ suggested_component }}" required>
+        <datalist id="components">
+            {% for component in components %}
+            <option value="{{ component }}">
+            {% endfor %}
+        </datalist>
+    </p>
+    <p>
+        <label><b>Bewertung</b></label><br>
+        <input type="radio" id="label_unknown" name="label" value="unknown" required>
+        <label for="label_unknown">unklar</label><br>
+        <input type="radio" id="label_ok" name="label" value="ok" required>
+        <label for="label_ok">funktionsfähig</label><br>
+        <input type="radio" id="label_defect" name="label" value="defect" required>
+        <label for="label_defect">defekt</label><br>
+    </p>
+    <p>
+        <input type="submit" value="Hinzufügen">
+        <input type="reset">
+    </p>
+</form>
+{% endblock %}

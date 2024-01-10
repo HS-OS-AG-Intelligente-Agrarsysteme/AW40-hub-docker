@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+<a href="/ui">Anmeldung Werkstatt</a>
+<a href="/ui/{{ request.path_params['workshop_id'] }}/cases">Fälle</a>
+<a href="#" style="margin-left: 10px;"><b>Ausgewählt:</b> {{ case["_id"] }}</a>
+{% endblock %}
+
+{% block content %}
+<h1> Fall {{ case["_id"] }} <a class="linkbutton" href="/ui/{{ request.path_params['workshop_id'] }}/cases">Zurück zur Übersicht</a></h1>
+<div style="display:grid;grid-template-columns: 1fr 1fr;">
+    <div>
+        <h2> Details </h2>
+        <table>
+            <tr>
+                <td><b>Zeitstempel</b></td>
+                <td> {{ case["timestamp"]|timestamp_format }} </td>
+            </tr>
+            <tr>
+                <td><b>Anlass</b></td>
+                <td> {{ case["occasion"]|schema_format("occasion") }} </td>
+            </tr>
+            <tr>
+                <td><b>Kilometerstand</b></td>
+                <td> {{ case["milage"] }} </td>
+            </tr>
+            <tr>
+                <td><b>Kunde</b></td>
+                <td> {{ case["customer_id"] }} </td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h2>Diagnose</h2>
+        <div style="margin: 0px 20px 0px 20px;">
+            {% if not case["diagnosis_id"] %}
+            <form action="{{ request.path_params['case_id'] }}/diag" method="post">
+                <button type="submit">Diagnose starten</button>
+            </form>
+            {% else %}
+            <p>
+                <b>Status:</b> {{ case["diagnosis"]["status"]|schema_format("diagnosis_status") }}
+                <a class="linkbutton" href="javascript:window.location.href=window.location.href">Aktualisieren</a>
+                <a class="deletelinkbutton" href="{{ case['_id']}}/diagnosis/delete">Abbrechen und Löschen</a>
+            </p>
+            <p><hr></p>
+            <p>
+            {% for todo in case["diagnosis"]["todos"] %}
+                {% if todo["data_type"] == "obd" %}
+                  {% set url_data_type = "obd_data" %}
+                  {% set url_query_params = "" %}
+                {% elif todo["data_type"] == "oscillogram" %}
+                  {% set url_data_type = "timeseries_data" %}
+                  {% set url_query_params = "suggested_component=" + todo["component"] %}
+                {% elif todo["data_type"] == "symptom" %}
+                  {% set url_data_type = "symptoms" %}
+                  {% set url_query_params = "suggested_component=" + todo["component"] %}
+                {% endif %}
+                <div class="todo">
+                  <p>
+                      <b>{{ todo["instruction"] }}</b>
+                  </p>
+                  <p>
+                      <a class="linkbutton" href="{{ case['_id'] }}/{{ url_data_type }}/new?{{ url_query_params }}">Zum Upload</a>
+                  </p>
+                </div>
+            {% endfor %}
+            <p>
+                <a class="linkbutton" href="{{ case['_id'] }}/diag">Detailierter Report</a>
+            </p>
+            {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+<h2> Datensätze </h2>
+<h3> OBD</h3>
+<p>
+    <a class="linkbutton" href="{{ case['_id'] }}/obd_data/new">Neuen Datensatz hinzufügen</a>
+</p>
+<p>
+    Mittels OBD ausgelesene Fehlercodes.
+</p>
+{% if case["obd_data"]|length > 0 %}
+<table>
+    <tr>
+        <th>Datensatz ID</th>
+        <th>Zeitstempel</th>
+        <th>Fehlercodes</th>
+        <th>Aktionen</th>
+    </tr>
+    {% for entry in case["obd_data"] %}
+    <tr>
+        <td>{{ entry["data_id"] }}</td>
+        <td>{{ entry["timestamp"]|timestamp_format }}</td>
+        {% set dtcs = entry["dtcs"][:3] %}
+        {% if entry["dtcs"] | length > 3 %}
+        {% set dtcs = dtcs + ["..."] %}
+        {% endif %}
+        <td>{{ dtcs }}</td>
+        <td>
+            <a class="linkbutton" href="{{ case['_id']}}/obd_data/{{ entry['data_id'] }}">Details</a>
+            <a class="deletelinkbutton" href="{{ case['_id']}}/obd_data/{{ entry['data_id'] }}/delete">Löschen</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p style="color:gray;font-style:italic;margin-left:10px;">Noch keine Daten</p>
+{% endif %}
+<h3> Oszillogramme</h3>
+<p>
+    <a class="linkbutton" href="{{ case['_id'] }}/timeseries_data/new">Neuen Datensatz hinzufügen</a>
+</p>
+<p>
+    Oscillogramme von Fahrzeugbauteilen.
+</p>
+{% if case["timeseries_data"]|length > 0 %}
+<table>
+    <tr>
+        <th>Datensatz ID</th>
+        <th>Zeitstempel</th>
+        <th>Bauteil</th>
+        <th>Bewertung</th>
+        <th>Abtastrate [Hz]</th>
+        <th>Länge [s]</th>
+        <th>Aktionen</th>
+    </tr>
+    {% for entry in case["timeseries_data"] %}
+    <tr>
+        <td>{{ entry["data_id"] }}</td>
+        <td>{{ entry["timestamp"]|timestamp_format }}</td>
+        <td>{{ entry["component"] }}</td>
+        <td>{{ entry["label"]|schema_format("timeseries_data_label") }}</td>
+        <td>{{ entry["sampling_rate"] }}</td>
+        <td>{{ entry["duration"] }}</td>
+        <td>
+            <a class="linkbutton" href="{{ case['_id'] }}/timeseries_data/{{ entry['data_id'] }}">Details</a>
+            <a class="deletelinkbutton" href="{{ case['_id']}}/timeseries_data/{{ entry['data_id'] }}/delete">Löschen</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p style="color:gray;font-style:italic;margin-left:10px;">Noch keine Daten</p>
+{% endif %}
+<h3> Symptome</h3>
+<p>
+    <a class="linkbutton" href="{{ case['_id'] }}/symptoms/new">Neuen Datensatz hinzufügen</a>
+</p>
+<p>
+    Symptome protokollieren den Zustand von Fahrzeugbauteilen, die einer manuellen Untersuchung unterzogen wurden.
+</p>
+{% if case["symptoms"]|length > 0 %}
+<table>
+    <tr>
+        <th>Datensatz ID</th>
+        <th>Zeitstempel</th>
+        <th>Bauteil</th>
+        <th>Bewertung</th>
+        <th>Aktionen</th>
+    </tr>
+    {% for entry in case["symptoms"] %}
+    <tr>
+        <td>{{ entry["data_id"] }}</td>
+        <td>{{ entry["timestamp"]|timestamp_format }}</td>
+        <td>{{ entry["component"] }}</td>
+        <td>{{ entry["label"]|schema_format("symptom_label") }}</td>
+        <td>
+            <a class="linkbutton" style="color:gray;pointer-events: none;">Details</a>
+            <a class="deletelinkbutton" href="{{ case['_id']}}/symptoms/{{ entry['data_id'] }}/delete">Löschen</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p style="color:gray;font-style:italic;margin-left:10px;">Noch keine Daten</p>
+{% endif %}
+{% endblock %}

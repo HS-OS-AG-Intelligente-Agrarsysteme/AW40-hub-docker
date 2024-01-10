@@ -27,6 +27,10 @@ class HubDataAccessor(DataAccessor):
             diag_date=diag["timestamp"]
         )
 
+    @staticmethod
+    def _select_latest_dataset(datasets: list) -> dict:
+        return datasets[-1]
+
     def _wait_for_hub_obd_data(self) -> List:
         print("Waiting for Hub OBD Data ...")
         hub_obd_data = []
@@ -44,13 +48,11 @@ class HubDataAccessor(DataAccessor):
             self.hub_client.set_diagnosis_status("processing")
             self.hub_client.unrequire_obd_data()
 
-        if len(hub_obd_data) == 1:
-            return hub_obd_data[0]["dtcs"]
-        else:
-            raise ValueError(
-                "Case contains more than one OBD Dataset. "
-                "This cannot be handled yet"
-            )
+        selected_hub_obd_data = self._select_latest_dataset(hub_obd_data)
+        self.hub_client.add_to_state_machine_log(
+            f"RETRIEVED_DATASET: obd_data/{selected_hub_obd_data['data_id']}"
+        )
+        return selected_hub_obd_data["dtcs"]
 
     def get_obd_data(self) -> OnboardDiagnosisData:
         dtcs = self._get_dtcs()
@@ -63,37 +65,36 @@ class HubDataAccessor(DataAccessor):
             vin=vehicle.get("vin")
         )
 
-    def _wait_for_signal(self, component: str) -> List:
+    def _wait_for_oscillogram(self, component: str) -> List:
         print(
             f"Waiting for Hub Oscillogram signal for '{component}' ..."
         )
-        signals = []
-        while signals == []:
+        oscillograms = []
+        while oscillograms == []:
             sleep(self.data_poll_interval)
-            signals = self.hub_client.get_oscillograms(component)
-        return signals
+            oscillograms = self.hub_client.get_oscillograms(component)
+        return oscillograms
 
     def _get_oscillogram_by_component(
             self, component: str
     ) -> OscillogramData:
-        signals = self.hub_client.get_oscillograms(component)
-        if signals == []:
+        oscillograms = self.hub_client.get_oscillograms(component)
+        if oscillograms == []:
             self.hub_client.require_oscillogram(component)
             self.hub_client.set_diagnosis_status("action_required")
-            signals = self._wait_for_signal(component)
+            oscillograms = self._wait_for_oscillogram(component)
             self.hub_client.set_diagnosis_status("processing")
             self.hub_client.unrequire_oscillogram(component)
 
-        if len(signals) == 1:
-            return OscillogramData(
-                time_series=signals[0],
-                comp_name=component
-            )
-        else:
-            raise ValueError(
-                f"Got more than one Oscillogram for "
-                f"component {component}. This cannot be handled yet."
-            )
+        selected_oscillogram = self._select_latest_dataset(oscillograms)
+        self.hub_client.add_to_state_machine_log(
+            f"RETRIEVED_DATASET: timeseries_data/"
+            f"{selected_oscillogram['data_id']}"
+        )
+        selected_signal = selected_oscillogram["signal"]
+        return OscillogramData(
+            time_series=selected_signal, comp_name=component
+        )
 
     def get_oscillograms_by_components(
             self, components: List[str]
@@ -127,13 +128,11 @@ class HubDataAccessor(DataAccessor):
             self.hub_client.set_diagnosis_status("processing")
             self.hub_client.unrequire_symptom(component)
 
-        if len(symptoms) == 1:
-            return symptoms[0]
-        else:
-            raise ValueError(
-                f"Got more than one Symptom for "
-                f"component {component}. This cannot be handled yet."
-            )
+        selected_symptom = self._select_latest_dataset(symptoms)
+        self.hub_client.add_to_state_machine_log(
+            f"RETRIEVED_DATASET: symptoms/{selected_symptom['data_id']}"
+        )
+        return selected_symptom
 
     def get_manual_judgement_for_component(self, component: str) -> bool:
         symptom = self._get_symptom(component=component)

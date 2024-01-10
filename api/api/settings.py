@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseSettings
 
 
@@ -7,10 +9,15 @@ class Settings(BaseSettings):
     mongo_username: str
     mongo_password: str
     mongo_db: str
+    minio_host: str
+    minio_username: str
+    minio_password: str
 
     redis_password: str
     redis_host: str = "redis"
     redis_port: str = "6379"
+
+    knowledge_graph_url: Optional[str] = "http://knowledge-graph:3030"
 
     @property
     def mongo_uri(self):

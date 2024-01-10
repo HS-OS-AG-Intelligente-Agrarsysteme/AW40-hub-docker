@@ -1,0 +1,106 @@
+general:
+  cancel: "Abbrechen"
+  case: "Fall"
+  close: "Schließen"
+  customer: "Kunde"
+  customerId: "Kunden ID"
+  date: "Datum"
+  delete: "Löschen"
+  edit: "Bearbeiten"
+  filter: "Filtern"
+  id: "ID"
+  language: "Sprache"
+  logout: "Logout"
+  milage: "Kilometerstand"
+  notFound: "nicht gefunden"
+  notSpecified: "keine Angabe"
+  obligatoryField: "Pflichtfeld"
+  occasion: "Anlass"
+  problem: "Problem"
+  repair: "Reparatur"
+  save: "Speichern"
+  saveChanges: "Änderungen speichern"
+  service: "Service"
+  sort: "Sortieren"
+  status: "Status"
+  unnamed: "Unbenannt"
+  vehicle: "Fahrzeug"
+  vehicleVin: "Fahrzeug VIN"
+  workshop: "Werkstatt"
+  workshopId: "Werkstatt ID"
+  yes: "Ja"
+  no:
+    date: "Kein Datum"
+    customerId: "Keine Kunden ID"
+    vehicleVin: "Keine @:general.vehicleVin"
+    workshopId: "Keine @:general.workshop ID"
+diagnoses:
+  title: "Diagnosen"
+  actions:
+    filterDiagnoses: "Nach Status filtern"
+    sortDiagnoses: "@:general.sort"
+  status:
+    action_required: "Aktion erforderlich"
+    scheduled: "Geplant"
+    processing: "In Bearbeitung"
+    finished: "Abgeschlossen"
+    failed: "Gescheitert"
+  details:
+    headline: "Detailansicht"
+    deleteDiagnosisSuccessMessage: "Die Diagnose wurde erfolgreich gelöscht."
+    deleteDiagnosisErrorMessage: "Der Diagnose konnte nicht gelöscht werden."
+    startDiagnosisSuccessMessage: "Die Diagnose wurde erfolgreich gestartet."
+    startDiagnosisFailureMessage: "Die Diagnose konnte nicht erfolgreich gestartet werden."
+    dialog:
+      title: "Diagnose löschen"
+      description: "Möchten Sie die Diagnose wirklich löschen?"
+    obdUpload: "OBD-Daten hochladen"
+    uploadFile: "Laden Sie eine Datei hoch"
+    uploadFileTooltip: "Datei hochladen"
+    dragAndDrop: "Datei per Drag & Drop hier ablegen"
+    uploadDataSuccessMessage: "Die Daten wurden erfolgreich hochgeladen."
+    uploadDataErrorMessage: "Die Daten konnten nicht hochgeladen werden."
+cases:
+  title: "Fälle"
+  actions:
+    addCase: "Neuen Fall anlegen"
+    updateCase: "Fall bearbeiten"
+    sortCases: "@:general.sort"
+    filterCases: "@:general.filter"
+  occasions:
+    notSpecified: "@:general.notSpecified"
+    service: "@:general.service"
+    problem: "@:general.repair"
+  status:
+    open: "Offen"
+    closed: "Geschlossen"
+  filterDialog:
+    title: "Fälle filtern"
+    toggleShared: "Fälle aus allen Werkstätten anzeigen"
+  addCaseDialog:
+    vinCharactersInvalid: "@:general.vehicleVin darf nicht I, O oder Q enthalten"
+    vinLengthInvalid: "@:general.vehicleVin muss 17 Zeichen lang sein"
+  details:
+    headline: "Detailansicht"
+    dialog:
+      title: "Fall löschen"
+      description: "Möchten Sie den Fall wirklich löschen?"
+    showDiagnosis: "Diagnose anzeigen"
+    deleteCaseSuccessMessage: "Der Fall wurde erfolgreich gelöscht."
+    deleteCaseErrorMessage: "Der Fall konnte nicht gelöscht werden."
+    occasion:
+      unknown: "Unbekannt"
+      service_routine: "@:general.service"
+      problem_defect: "@:general.repair"
+    startDiagnosis: "Diagnose starten"
+    status:
+      open: "Offen"
+      closed: "Geschlossen"
+customers:
+  title: "Kunden"
+vehicles:
+  title: "Fahrzeuge"
+training:
+  title: "Schulung"
+pageNotFound:
+  title: "Seite @:general.notFound"

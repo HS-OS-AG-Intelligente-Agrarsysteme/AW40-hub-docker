@@ -8,13 +8,11 @@ from api.data_management import (
     Vehicle,
     Customer,
     Workshop,
-    DiagnosisDB,
-    Action,
-    ToDo
+    Diagnosis
 )
+from beanie import init_beanie
 from bson import ObjectId
 from motor import motor_asyncio
-from beanie import init_beanie
 
 
 @pytest.fixture
@@ -45,7 +43,7 @@ def initialized_beanie_context(motor_db):
     context manager to handle test setup and teardown.
     """
     models = [
-        Case, Vehicle, Customer, Workshop, DiagnosisDB, Action, ToDo
+        Case, Vehicle, Customer, Workshop, Diagnosis
     ]
 
     class InitializedBeanieContext:
@@ -203,6 +201,14 @@ def vcds_no_milage_txt_file(files_dir):
 @pytest.fixture
 def omniscope_v1_file(files_dir):
     path = os.path.join(files_dir, "omniscope")
+    f = open(path, "rb")
+    yield f
+    f.close()
+
+
+@pytest.fixture
+def knowledge_graph_file(files_dir):
+    path = os.path.join(files_dir, "minimalistic_kg.ttl")
     f = open(path, "rb")
     yield f
     f.close()

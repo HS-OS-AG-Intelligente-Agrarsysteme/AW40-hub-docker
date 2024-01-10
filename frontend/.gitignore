@@ -1,0 +1,130 @@
+# generated files
+app/linux/flutter
+app/windows/flutter
+app/macos/Flutter
+
+# Other
+app/assets/.config_developer
+# Miscellaneous
+app/*.class
+app/*.log
+app/*.pyc
+app/*.swp
+app/.DS_Store
+app/.atom/
+app/.buildlog/
+app/.history
+app/.svn/
+app/migrate_working_dir/
+
+# IntelliJ related
+app/*.iml
+app/*.ipr
+app/*.iws
+app/.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+app/.vscode/settings.json
+app/.classpath
+app/.project
+app/.settings/
+
+# Flutter/Dart/Pub related
+app/coverage/lcov.info
+app/**/doc/api/
+app/**/ios/Flutter/.last_build_id
+app/.dart_tool/
+app/**/*.g.dart
+app/**/*.mocks.dart
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/.packages
+app/.pub-cache/
+app/.pub/
+app/**/generated_plugin_registrant.dart
+app/build/
+app/flutter_*.png
+app/linked_*.ds
+app/unlinked.ds
+app/unlinked_spec.ds
+
+
+# Flutter repo-specific
+app/bin/cache/
+app/bin/internal/bootstrap.bat
+app/bin/internal/bootstrap.sh
+app/bin/mingit/
+app/dev/benchmarks/mega_gallery/
+app/dev/bots/.recipe_deps
+app/dev/bots/android_tools/
+app/dev/devicelab/ABresults*.json
+app/dev/docs/doc/
+app/dev/docs/flutter.docs.zip
+app/dev/docs/lib/
+app/dev/docs/pubspec.yaml
+app/dev/integration_tests/**/xcuserdata
+app/dev/integration_tests/**/Pods
+app/packages/flutter/coverage/
+app/version
+app/analysis_benchmark.json
+
+# packages file containing multi-root paths
+app/.packages.generated
+
+# Symbolication related
+app/app.*.symbols
+
+# Obfuscation related
+app/app.*.map.json
+
+# Android related
+app/**/android/**/gradle-wrapper.jar
+app/.gradle/
+app/**/android/captures/
+app/**/android/gradlew
+app/**/android/gradlew.bat
+app/**/android/local.properties
+app/**/android/**/GeneratedPluginRegistrant.java
+app/**/android/key.properties
+app/*.jks
+# Android Studio will place build artifacts here
+app/android/app/debug
+app/android/app/profile
+app/android/app/release
+app/**/android/.gradle
+
+# iOS/XCode related
+app/**/ios/**/*.mode1v3
+app/**/ios/**/*.mode2v3
+app/**/ios/**/*.moved-aside
+app/**/ios/**/*.pbxuser
+app/**/ios/**/*.perspectivev3
+app/**/ios/**/*sync/
+app/**/ios/**/.sconsign.dblite
+app/**/ios/**/.tags*
+app/**/ios/**/.vagrant/
+app/**/ios/**/DerivedData/
+app/**/ios/**/Icon?
+app/**/ios/**/Pods/
+app/**/ios/**/.symlinks/
+app/**/ios/**/profile
+app/**/ios/**/xcuserdata
+app/**/ios/.generated/
+app/**/ios/Flutter/App.framework
+app/**/ios/Flutter/Flutter.framework
+app/**/ios/Flutter/Generated.xcconfig
+app/**/ios/Flutter/app.flx
+app/**/ios/Flutter/app.zip
+app/**/ios/Flutter/flutter_assets/
+app/**/ios/ServiceDefinitions.json
+app/**/ios/Runner/GeneratedPluginRegistrant.*
+
+# Exceptions to above rules.
+!app/**/ios/**/default.mode1v3
+!app/**/ios/**/default.mode2v3
+!app/**/ios/**/default.pbxuser
+!app/**/ios/**/default.perspectivev3
+!app/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages

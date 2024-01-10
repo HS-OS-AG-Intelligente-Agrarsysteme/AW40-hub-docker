@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', path='/favicon.png') }}">
+  <title>AW4.0 Hub - Demo UI</title>
+</head>
+
+<body>
+<div id="main-container">
+  <div id="sidebar">
+    <img src="{{ url_for('static', path='/favicon.png') }}" width="60%" height="auto" style="padding: 10px;margin: 10px 0 0 0">
+    {% block sidebar %}
+    {% endblock %}
+  </div>
+  <div id="content">
+    {% block content %}{% endblock %}
+  </div>
+</div>
+</body>
+</html>

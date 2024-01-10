@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+<a href="/ui">Anmeldung Werkstatt</a>
+<a href="/ui/{{ request.path_params['workshop_id'] }}/cases">Fälle</a>
+<a href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ case_id }}" style="margin-left: 10px;">Ausgewählt: {{ case_id }}</a>
+<a href="#" style="margin-left: 20px;"><b>Diagnose</b></a>
+{% endblock %}
+
+{% block content %}
+  <h1>
+    Diagnose Report
+    <a class="linkbutton" href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ case_id }}">Zurück zum Fall</a>
+  </h1>
+  <hr>
+  <p><b>Fall:</b> {{ case_id }}</p>
+  <p>
+    <b>Status der Diagnose:</b> {{ diag_status|schema_format("diagnosis_status") }}
+    <a class="linkbutton" href="javascript:window.location.href=window.location.href">Aktualisieren</a>
+  </p>
+  <hr>
+  {% for todo in todos %}
+    {% if todo["data_type"] == "obd" %}
+      {% set url_data_type = "obd_data" %}
+      {% set url_query_params = "" %}
+    {% elif todo["data_type"] == "oscillogram" %}
+      {% set url_data_type = "timeseries_data" %}
+      {% set url_query_params = "suggested_component=" + todo["component"] %}
+    {% elif todo["data_type"] == "symptom" %}
+      {% set url_data_type = "symptoms" %}
+      {% set url_query_params = "suggested_component=" + todo["component"] %}
+    {% endif %}
+    <div class="todo">
+      <p>
+        <b>{{ todo["instruction"] }}</b>
+      </p>
+      <p>
+        <a class="linkbutton" href="{{ url_data_type }}/new?{{ url_query_params }}">Zum Upload</a>
+      </p>
+    </div>
+  {% endfor %}
+
+  <h2> State Machine Log </h2>
+  <table>
+    <tr>
+      <th>Nachricht</th>
+      <th>Anhang</th>
+      {% for entry in state_machine_log %}
+        <tr>
+          <td>{{ entry["message"] }}</td>
+          <td>
+          {% if entry["attachment"] %}
+            <a href={{ entry["attachment"] }}>
+              <img src={{ entry["attachment"] }} style="width:150px;height:150px;">
+            </a>
+          {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+  </table>
+
+{% endblock %}

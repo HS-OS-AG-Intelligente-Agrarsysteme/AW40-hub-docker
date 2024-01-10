@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+    <a href="#"><b>Anmeldung Werkstatt</b></a>
+{% endblock %}
+
+{% block content %}
+<h1> Demo Firma </h1>
+<h2> Anmeldung Werkstatt </h2>
+<form method="post">
+    <p>
+        <label for="workshop"><b>Werkstatt auswählen</b></label>
+        <input list="workshops" id="workshop_id" name="workshop_id" style="width:30%" required>
+        <datalist id="workshops">
+            {% for workshop in workshops %}
+            <option value="{{ workshop }}">
+            {% endfor %}
+        </datalist>
+    </p>
+    <p>
+        <input type="submit" value="Anmelden">
+    </p>
+</form>
+{% endblock %}

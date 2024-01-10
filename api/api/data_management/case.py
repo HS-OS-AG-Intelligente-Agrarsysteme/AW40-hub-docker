@@ -8,7 +8,7 @@ from beanie import (
 from pydantic import BaseModel, Field, NonNegativeInt
 
 from .customer import Customer
-from .diagnosis import DiagnosisDB
+from .diagnosis import Diagnosis
 from .obd_data import NewOBDData, OBDData, OBDDataUpdate
 from .symptom import NewSymptom, Symptom, SymptomUpdate
 from .timeseries_data import (
@@ -282,5 +282,5 @@ class Case(Document):
         if self.diagnosis_id is not None:
             # delete via instance to make sure Diagnosis event handlers
             # are also executed
-            diag = await DiagnosisDB.get(self.diagnosis_id)
+            diag = await Diagnosis.get(self.diagnosis_id)
             await diag.delete()

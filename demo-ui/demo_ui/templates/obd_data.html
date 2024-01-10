@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+<a href="/ui">Anmeldung Werkstatt</a>
+<a href="/ui/{{ request.path_params['workshop_id'] }}/cases">Fälle</a>
+<a href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ request.path_params['case_id'] }}" style="margin-left: 10px;">Ausgewählt: {{ request.path_params["case_id"] }}</a>
+<a href="#" style="margin-left: 20px;"><b>OBD:</b> {{ obd_data["data_id"] }}</a>
+{% endblock %}
+
+{% block content %}
+<h1> OBD Datensatz {{ obd_data["data_id"] }} <a class="linkbutton" href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ request.path_params['case_id'] }}">Zurück zum Fall</a></h1>
+
+<p>
+    <b>Zeitstempel: </b> {{ obd_data["timestamp"]|timestamp_format }}
+</p>
+<h2>Fehlercodes</h2>
+<p>
+<form>
+    <label for="dtcs">Suche nach Fehlercode</label>
+    <input list="dtcs" name="dtc" value="{{ request.query_params['dtc'] }}">
+    <datalist id="dtcs">
+        {% for dtc in obd_data["dtcs"] %}
+        <option value="{{ dtc }}">
+        {% endfor %}
+    </datalist>
+    <input type="submit" value="Suchen">
+</form>
+</p>
+<p>
+<h3>Alle Codes</h3>
+<table>
+    {% for dtc in obd_data["dtcs"] %}
+    {% if dtc == request.query_params["dtc"] %}
+    <tr style="background-color: #aed6f1;">
+        <td><b>{{ dtc }}</b></td>
+    </tr>
+    {% else %}
+    <tr>
+        <td>{{ dtc }}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+</table>
+</p>
+{% endblock %}

@@ -8,8 +8,6 @@ from beanie import PydanticObjectId
 from motor import motor_asyncio
 from pydantic import BaseModel, Field, NonNegativeInt
 
-from .vehicle import Component
-
 
 class BaseSignalStore(ABC):
     """Interface definition for a signal store."""
@@ -64,7 +62,7 @@ class TimeseriesMetaData(BaseModel):
         validate_assignment = True
 
     timestamp: datetime = Field(default_factory=datetime.utcnow)
-    component: Component
+    component: str
     label: TimeseriesDataLabel
     sampling_rate: int
     duration: int
@@ -87,7 +85,7 @@ class TimeseriesDataUpdate(BaseModel):
         }
 
     timestamp: datetime = None
-    component: Component = None
+    component: str = None
     label: TimeseriesDataLabel = None
     sampling_rate: int = None
     duration: int = None
@@ -157,3 +155,7 @@ class NewTimeseriesData(TimeseriesMetaData):
         meta_data = self.dict(exclude={"signal"})
         meta_data["signal_id"] = signal_id
         return TimeseriesData(**meta_data)
+
+
+class TimeseriesDataFull(TimeseriesData):
+    signal: List[float]

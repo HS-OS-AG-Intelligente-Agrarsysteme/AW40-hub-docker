@@ -11,7 +11,8 @@ Currently included services:
 | keycloak                                               | User and access management                                               |
 | keycloak-db                                            | A PostgreSQL database used by keycloak.                                  |
 | minio                                                  | Object Storage for datasets shared with external dataspace participants. |
-| edc                                                    | Dataspace Connector                                                      |
+| edc                                                    | Eclipse Dataspace Connector                                              |
+| edc-db                                                 | A PostgreSQL database used by the EDC.                                   |
 | api                                                    | HTTP interface to the stored data.                                       |
 | docs                                                   | Documentation and background information                                 |
 | redis                                                  | Broker / Task queue for communication between api and diagnostics        |

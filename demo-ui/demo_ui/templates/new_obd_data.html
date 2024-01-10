@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+<a href="/ui">Anmeldung Werkstatt</a>
+<a href="/ui/{{ request.path_params['workshop_id'] }}/cases">Fälle</a>
+<a href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ request.path_params['case_id'] }}" style="margin-left: 10px;">Ausgewählt: {{ request.path_params["case_id"] }}</a>
+<a href="#" style="margin-left: 20px;"><b>OBD:</b> Neuer Datensatz</a>
+{% endblock %}
+{% block content %}
+<h1> Neuen OBD Datensatz anlegen <a class="linkbutton" href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ request.path_params['case_id'] }}">Abbrechen</a></h1>
+<div style="display:grid;grid-template-columns: 1fr 1fr;">
+    <div>
+        <h2> Option 1: Fehlercodes manuell bereitstellen </h2>
+        <form method="post">
+            <label for="dtcs_text">Fehlercodes</label><br>
+            <textarea id="dtcs_text" name="dtcs_text" rows="20" style="width: 80%;resize: vertical;margin: 10px" placeholder="Einen Fehlercode pro Zeile angeben" required></textarea><br>
+            <input type="submit" value="Daten hochladen">
+            <input type="reset">
+        </form>
+    </div>
+
+    <div>
+        <h2> Option 2: VCDS Datei hochladen </h2>
+        <form method="post" enctype="multipart/form-data">
+            <label for="vcds_file">VCDS Datei</label><br>
+            <input type="file" id="vcds_file" name="vcds_file" style="margin: 10px" required><br>
+            <input type="submit" value="Daten hochladen">
+            <input type="reset">
+        </form>
+    </div>
+</div>
+{% endblock %}
