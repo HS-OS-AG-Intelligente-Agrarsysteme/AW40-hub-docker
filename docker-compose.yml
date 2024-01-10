@@ -117,6 +117,7 @@ services:
       - traefik.http.routers.minio.service=minio
       - traefik.http.services.minio.loadbalancer.server.port=9090
       - traefik.http.services.minio.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
+    
     hostname: "minio"
     networks:
       - hubintranet
@@ -251,14 +252,14 @@ services:
     env_file:
       - frontend/frontend.env
     hostname: "frontend"
-    lables:
+    labels:
       - traefik.enable=true
       - traefik.docker.network=hubnet
 
       - traefik.http.routers.frontend.rule=Host(`${FRONTEND_ADDRESS}`)
       - traefik.http.routers.frontend.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
       - traefik.http.routers.frontend.service=frontend
-      - traefik.http.services.frontend.loadbalancer.server.port=4200
+      - traefik.http.services.frontend.loadbalancer.server.port=80
       - traefik.http.services.frontend.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
     networks:
       - frontend-backend
