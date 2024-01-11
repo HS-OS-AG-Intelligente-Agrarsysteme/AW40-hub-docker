@@ -166,6 +166,15 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        - BACKEND_URL=${API_ADDRESS:?error}
+        - BASIC_AUTH_KEY=${FRONTEND_BASIC_AUTH_KEY}
+        - KC_CLIENT=${KEYCLOAK_FRONTEND_CLIENT:?error}
+        - KC_BASE_URL=${KEYCLOAK_ADDRESS:?error}/realms/<REALM>/protocol/openid-connect/
+        - KC_REALM=${KEYCLOAK_REALM:?error}
+        - LOG_LEVEL=${FRONTEND_LOG_LEVEL:-warning}
+        - ROOT_DOMAIN=${KEYCLOAK_ADDRESS:?error}
+        - REDIRECT_URI_MOBILE=${FRONTEND_REDIRECT_URI_MOBILE:?error}
     <<: *default_restart_policy
     depends_on:
       api:
