@@ -102,7 +102,7 @@ services:
       args:
         - MINIO_VER=RELEASE.2023-05-27T05-56-19Z
     <<: *default_restart_policy
-    command: server /data --console-address ":9090"
+    command: server /data --address ":80" --console-address ":9090"
     depends_on:
       keycloak-config:
         condition: service_completed_successfully
@@ -117,11 +117,19 @@ services:
       - traefik.http.routers.minio.service=minio
       - traefik.http.services.minio.loadbalancer.server.port=9090
       - traefik.http.services.minio.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
+
+      - traefik.http.routers.minio_api.rule=Host(`${MINIO_API_ADDRESS}`)
+      - traefik.http.routers.minio_api.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
+      - traefik.http.routers.minio_api.service=minio_api
+      - traefik.http.services.minio_api.loadbalancer.server.port=80
+      - traefik.http.services.minio_api.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
     
     hostname: "minio"
     networks:
-      - hubintranet
-      - hubnet
+      hubintranet:
+        aliases:
+          - ${MINIO_API_ADDRESS}
+      hubnet:
     volumes:
       - minio-data:/data
 

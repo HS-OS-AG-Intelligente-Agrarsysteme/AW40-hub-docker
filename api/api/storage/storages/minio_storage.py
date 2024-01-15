@@ -96,7 +96,7 @@ class MinIOStorage(Storage):
 
     def get_minio_client(self, internal: bool = True) -> Minio:
         if internal:
-            endpoint = "minio:9000"
+            endpoint = "minio:80"
         else:
             endpoint = self.host
         client = Minio(

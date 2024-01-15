@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     mongo_username: str
     mongo_password: str
     mongo_db: str
-    minio_host: str
+    minio_api_address: str
     minio_username: str
     minio_password: str
 
