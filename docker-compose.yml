@@ -158,37 +158,37 @@ services:
         - traefik.enable=true
         - traefik.docker.network=hubnet
 
-        - traefik.http.routers.edc_api.rule=Host(`${EDC_ADDRESS}`) && Path(`/api`)
+        - traefik.http.routers.edc_api.rule=Host(`${EDC_ADDRESS}`) && PathPrefix(`/api`)
         - traefik.http.routers.edc_api.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
         - traefik.http.routers.edc_api.service=edc_api
         - traefik.http.services.edc_api.loadbalancer.server.port=8181
         - traefik.http.services.edc_api.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
 
-        - traefik.http.routers.edc_management.rule=Host(`${EDC_ADDRESS}`) && Path(`/management`)
+        - traefik.http.routers.edc_management.rule=Host(`${EDC_ADDRESS}`) && PathPrefix(`/management`)
         - traefik.http.routers.edc_management.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
         - traefik.http.routers.edc_management.service=edc_management
         - traefik.http.services.edc_management.loadbalancer.server.port=8182
         - traefik.http.services.edc_management.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
 
-        - traefik.http.routers.edc_protocol.rule=Host(`${EDC_ADDRESS}`) && Path(`/protocol`)
+        - traefik.http.routers.edc_protocol.rule=Host(`${EDC_ADDRESS}`) && PathPrefix(`/protocol`)
         - traefik.http.routers.edc_protocol.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
         - traefik.http.routers.edc_protocol.service=edc_protocol
         - traefik.http.services.edc_protocol.loadbalancer.server.port=8282
         - traefik.http.services.edc_protocol.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
 
-        - traefik.http.routers.edc_control.rule=Host(`${EDC_ADDRESS}`) && Path(`/control`)
+        - traefik.http.routers.edc_control.rule=Host(`${EDC_ADDRESS}`) && PathPrefix(`/control`)
         - traefik.http.routers.edc_control.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
         - traefik.http.routers.edc_control.service=edc_control
         - traefik.http.services.edc_control.loadbalancer.server.port=8183
         - traefik.http.services.edc_control.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
 
-        - traefik.http.routers.edc_public.rule=Host(`${EDC_ADDRESS}`) && Path(`/public`)
+        - traefik.http.routers.edc_public.rule=Host(`${EDC_ADDRESS}`) && PathPrefix(`/public`)
         - traefik.http.routers.edc_public.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
         - traefik.http.routers.edc_public.service=edc_public
         - traefik.http.services.edc_public.loadbalancer.server.port=8185
         - traefik.http.services.edc_public.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME}
 
-        - traefik.http.routers.edc_identity.rule=Host(`${EDC_ADDRESS}`) && Path(`/identity`)
+        - traefik.http.routers.edc_identity.rule=Host(`${EDC_ADDRESS}`) && PathPrefix(`/identity`)
         - traefik.http.routers.edc_identity.entrypoints=${PROXY_DEFAULT_ENTRYPOINT}
         - traefik.http.routers.edc_identity.service=edc_identity
         - traefik.http.services.edc_identity.loadbalancer.server.port=8186
