@@ -198,13 +198,6 @@ services:
       depends_on:
           edc-database:
               condition: service_healthy
-      ports:
-        - 8181:8181
-        - 8182:8182
-        - 8282:8282
-        - 8183:8183
-        - 8185:8185
-        - 8186:8186
       volumes:
           - ./edc/resources:/resources
 
