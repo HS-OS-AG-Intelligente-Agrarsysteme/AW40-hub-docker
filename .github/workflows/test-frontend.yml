@@ -30,6 +30,15 @@
 
         - name: Run build_runner
           run: cd ./frontend/app && flutter pub run build_runner build --delete-conflicting-outputs
+          env:
+            BACKEND_URL: http://127.0.0.1
+            BASIC_AUTH_KEY: 
+            KC_CLIENT: test
+            KC_BASE_URL: http://127.0.0.1/realms/<REALM>/protocol/openid-connect/
+            KC_REALM: test
+            LOG_LEVEL: warning
+            ROOT_DOMAIN: http://127.0.0.1
+            REDIRECT_URI_MOBILE: http://127.0.0.1
 
         - name: Analyze project source
           run: cd ./frontend/app && dart analyze --fatal-infos

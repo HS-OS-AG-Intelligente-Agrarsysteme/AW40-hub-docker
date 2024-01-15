@@ -1,5 +1,14 @@
 FROM ubuntu:20.04 as build
 
+ARG BACKEND_URL
+ARG BASIC_AUTH_KEY
+ARG KC_CLIENT
+ARG KC_BASE_URL
+ARG KC_REALM
+ARG LOG_LEVEL
+ARG ROOT_DOMAIN
+ARG REDIRECT_URI_MOBILE
+
 RUN apt-get update \
  && apt-get install -y bash curl file git libglu1-mesa unzip xz-utils zip \
  && rm -rf /var/lib/apt/lists/*
