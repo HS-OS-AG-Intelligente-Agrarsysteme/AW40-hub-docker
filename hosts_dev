@@ -1,7 +1,0 @@
-172.17.0.1 werkstatthub.local
-172.17.0.1 docs.werkstatthub.local
-172.17.0.1 minio.werkstatthub.local
-172.17.0.1 keycloak.werkstatthub.local
-172.17.0.1 api.werkstatthub.local
-172.17.0.1 traefik.werkstatthub.local
-172.17.0.1 edc.werkstatthub.local

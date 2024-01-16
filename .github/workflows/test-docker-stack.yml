@@ -12,6 +12,15 @@ jobs:
   docker:
     timeout-minutes: 20
     runs-on: ubuntu-latest
+    env:
+      SCHEME: http://
+      BASE_ADDRESS: werkstatthub.docker.localhost
+      FRONTEND_ADDRESS: ${SCHEME}${BASE_ADDRESS}
+      DOCS_ADDRESS: ${SCHEME}docs.${BASE_ADDRESS}
+      MINIO_ADDRESS: ${SCHEME}minio.${BASE_ADDRESS}
+      KEYCLOAK_ADDRESS: ${SCHEME}keycloak.${BASE_ADDRESS}
+      API_ADDRESS: ${SCHEME}api.${BASE_ADDRESS}
+      EDC_ADDRESS: ${SCHEME}edc.${BASE_ADDRESS}
 
     steps:
     # Setup environment
@@ -20,13 +29,6 @@ jobs:
 
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v2
-
-      - name: Add Hosts entries
-        run: |
-          sudo sh -c "cat hosts_dev >> /etc/hosts"
-
-      - name: Add internal Docker IP to hosts
-        run: echo "172.17.0.1 host.docker.internal" | sudo tee -a /etc/hosts
 
     # Tag Containers
       - name: Build and tag containers
@@ -40,7 +42,7 @@ jobs:
       - name: Check if documentation is reachable
         run: |
           curl -fs -o /dev/null -w 'http_code:%{http_code}' \
-          http://localhost:8001 \
+          ${DOCS_ADDRESS} \
           || exit 1
 
     # Test MongoDB
@@ -54,33 +56,33 @@ jobs:
       - name: Check if Keycloak is healthy
         run: |
           curl -fs \
-          http://localhost:8080/health/live \
+          ${KEYLOAK_ADDRESS}/health/live \
           || exit 1
 
     # Test MinIO
       - name: Check if MinIO is healthy
         run: |
           curl -fs \
-          http://localhost:9000/minio/health/live \
+          ${MINIO_ADDRESS}/minio/health/live \
           || exit 1
 
     # Test EDC
       - name: Check if EDC is healthy
         run: |
             curl -fs \
-            http://localhost:8181/api/health \
+            ${EDC_ADDRESS}/api/health \
             || exit 1
 
     # Test API
       - name: Check if API is healthy
         run: |
           curl -fs \
-          http://localhost:8000/v1/health/ping \
+          ${API_ADDRESS}/v1/health/ping \
           || exit 1
 
       - name: Check for strict-transport-security header
         run: |
-          curl -sIX GET http://localhost:8000/v1/health/ping \
+          curl -sIX GET ${API_ADDRESS}/v1/health/ping \
             | grep -iq "strict-transport-security" \
             || exit 1
 
@@ -92,11 +94,12 @@ jobs:
 
       - name: Run flake8
         run: flake8 ./api
+
     # Test Frontend
       - name: Check if Frontend is reachable
         run: |
           curl -fs \
-          http://localhost:4200 \
+          ${FRONTEND_ADDRESS} \
           || exit 1
 
     # Clean up
