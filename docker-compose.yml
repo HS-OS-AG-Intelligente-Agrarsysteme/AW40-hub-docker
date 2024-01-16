@@ -46,7 +46,6 @@ services:
         - KC_VER=20.0
     <<: *default_restart_policy
     command: start-dev --import-realm
-    container_name: keycloak
     depends_on:
       keycloak-db:
         condition: service_healthy
@@ -87,7 +86,6 @@ services:
     build:
       context: ./keycloak-db
     <<: *default_restart_policy
-    container_name: keycloak-db
     env_file:
       - keycloak-db/postgres.env
     hostname: "keycloak-db"
