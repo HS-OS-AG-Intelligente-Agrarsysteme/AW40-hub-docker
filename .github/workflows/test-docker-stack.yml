@@ -13,14 +13,12 @@ jobs:
     timeout-minutes: 20
     runs-on: ubuntu-latest
     env:
-      GH_SCHEME: http://
-      GH_BASE_ADDRESS: werkstatthub.docker.localhost
-      GH_FRONTEND_ADDRESS: ${{env.GH_SCHEME}}${{env.GH_BASE_ADDRESS}}
-      GH_DOCS_ADDRESS: ${{env.GH_SCHEME}}docs.${{env.GH_BASE_ADDRESS}}
-      GH_MINIO_ADDRESS: ${{env.GH_SCHEME}}minio.${{env.GH_BASE_ADDRESS}}
-      GH_KEYCLOAK_ADDRESS: ${{env.GH_SCHEME}}keycloak.${{env.GH_BASE_ADDRESS}}
-      GH_API_ADDRESS: ${{env.GH_SCHEME}}api.${{env.GH_BASE_ADDRESS}}
-      GH_EDC_ADDRESS: ${{env.GH_SCHEME}}edc.${{env.GH_BASE_ADDRESS}}
+      GH_FRONTEND_ADDRESS: http://werkstatthub.docker.localhost
+      GH_DOCS_ADDRESS: http://docs.werkstatthub.docker.localhost
+      GH_MINIO_ADDRESS: http://minio.werkstatthub.docker.localhost
+      GH_KEYCLOAK_ADDRESS: http://keycloak.werkstatthub.docker.localhost
+      GH_API_ADDRESS: http://api.werkstatthub.docker.localhost
+      GH_EDC_ADDRESS: http://edc.werkstatthub.docker.localhost
 
     steps:
     # Setup environment
