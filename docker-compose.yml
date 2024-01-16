@@ -196,12 +196,12 @@ services:
       networks:
         - hubnet
       depends_on:
-          edc-database:
+          edc-db:
               condition: service_healthy
       volumes:
           - ./edc/resources:/resources
 
-  edc-database:
+  edc-db:
       build:
           context: ./edc-db
       env_file:
