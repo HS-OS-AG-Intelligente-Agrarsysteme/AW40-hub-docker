@@ -54,7 +54,7 @@ jobs:
       - name: Check if Keycloak is healthy
         run: |
           curl -fs \
-          $GH_KEYLOAK_ADDRESS/health/live \
+          $GH_KEYCLOAK_ADDRESS/health/live \
           || exit 1
 
     # Test MinIO
