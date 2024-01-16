@@ -15,12 +15,12 @@ jobs:
     env:
       GH_SCHEME: http://
       GH_BASE_ADDRESS: werkstatthub.docker.localhost
-      GH_FRONTEND_ADDRESS: ${SCHEME}${BASE_ADDRESS}
-      GH_DOCS_ADDRESS: ${SCHEME}docs.${BASE_ADDRESS}
-      GH_MINIO_ADDRESS: ${SCHEME}minio.${BASE_ADDRESS}
-      GH_KEYCLOAK_ADDRESS: ${SCHEME}keycloak.${BASE_ADDRESS}
-      GH_API_ADDRESS: ${SCHEME}api.${BASE_ADDRESS}
-      GH_EDC_ADDRESS: ${SCHEME}edc.${BASE_ADDRESS}
+      GH_FRONTEND_ADDRESS: ${{env.SCHEME}}${{env.BASE_ADDRESS}}
+      GH_DOCS_ADDRESS: ${{env.SCHEME}}docs.${{env.BASE_ADDRESS}}
+      GH_MINIO_ADDRESS: ${{env.SCHEME}}minio.${{env.BASE_ADDRESS}}
+      GH_KEYCLOAK_ADDRESS: ${{env.SCHEME}}keycloak.${{env.BASE_ADDRESS}}
+      GH_API_ADDRESS: ${{env.SCHEME}}api.${{env.BASE_ADDRESS}}
+      GH_EDC_ADDRESS: ${{env.SCHEME}}edc.${{env.BASE_ADDRESS}}
 
     steps:
     # Setup environment
@@ -42,7 +42,7 @@ jobs:
       - name: Check if documentation is reachable
         run: |
           curl -fs -o /dev/null -w 'http_code:%{http_code}' \
-          ${GH_DOCS_ADDRESS} \
+          $GH_DOCS_ADDRESS \
           || exit 1
 
     # Test MongoDB
@@ -56,33 +56,33 @@ jobs:
       - name: Check if Keycloak is healthy
         run: |
           curl -fs \
-          ${GH_KEYLOAK_ADDRESS}/health/live \
+          $GH_KEYLOAK_ADDRESS/health/live \
           || exit 1
 
     # Test MinIO
       - name: Check if MinIO is healthy
         run: |
           curl -fs \
-          ${GH_MINIO_ADDRESS}/minio/health/live \
+          $GH_MINIO_ADDRESS/minio/health/live \
           || exit 1
 
     # Test EDC
       - name: Check if EDC is healthy
         run: |
             curl -fs \
-            ${GH_EDC_ADDRESS}/api/health \
+            $GH_EDC_ADDRESS/api/health \
             || exit 1
 
     # Test API
       - name: Check if API is healthy
         run: |
           curl -fs \
-          ${GH_API_ADDRESS}/v1/health/ping \
+          $GH_API_ADDRESS/v1/health/ping \
           || exit 1
 
       - name: Check for strict-transport-security header
         run: |
-          curl -sIX GET ${GH_API_ADDRESS}/v1/health/ping \
+          curl -sIX GET $GH_API_ADDRESS/v1/health/ping \
             | grep -iq "strict-transport-security" \
             || exit 1
 
@@ -99,7 +99,7 @@ jobs:
       - name: Check if Frontend is reachable
         run: |
           curl -fs \
-          ${GH_FRONTEND_ADDRESS} \
+          $GH_FRONTEND_ADDRESS \
           || exit 1
 
     # Clean up
