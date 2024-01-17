@@ -16,7 +16,15 @@ services:
       - traefik.http.routers.traefik.entrypoints=${PROXY_DEFAULT_ENTRYPOINT:?error}
       - traefik.http.routers.traefik.service=api@internal
     networks:
-      - hubnet
+      hubnet:
+        aliases:
+          - ${FRONTEND_ADDRESS}
+          - ${DOCS_ADDRESS}
+          - ${MINIO_ADDRESS}
+          - ${MINIO_API_ADDRESS}
+          - ${KEYCLOAK_ADDRESS}
+          - ${API_ADDRESS}
+          - ${EDC_ADDRESS}
     ports:
       - 80:80
       - 443:443
@@ -100,7 +108,7 @@ services:
       args:
         - MINIO_VER=RELEASE.2023-05-27T05-56-19Z
     <<: *default_restart_policy
-    command: server /data --address ":80" --console-address ":9090"
+    command: server /data --address ":9000" --console-address ":9090"
     depends_on:
       keycloak-config:
         condition: service_completed_successfully
@@ -119,14 +127,12 @@ services:
       - traefik.http.routers.minio_api.rule=Host(`${MINIO_API_ADDRESS:?error}`)
       - traefik.http.routers.minio_api.entrypoints=${PROXY_DEFAULT_ENTRYPOINT:?error}
       - traefik.http.routers.minio_api.service=minio_api
-      - traefik.http.services.minio_api.loadbalancer.server.port=80
+      - traefik.http.services.minio_api.loadbalancer.server.port=9000
       - traefik.http.services.minio_api.loadbalancer.server.scheme=${PROXY_DEFAULT_SCHEME:?error}
     
     hostname: "minio"
     networks:
       hubintranet:
-        aliases:
-          - ${MINIO_API_ADDRESS}
       hubnet:
     volumes:
       - minio-data:/data
