@@ -56,6 +56,8 @@ class MinIOStorage(Storage):
         self.host = kwargs["host"]
         self.username = kwargs["username"]
         self.password = kwargs["password"]
+        self.use_tls = kwargs["use_tls"]
+        self.check_cert = kwargs["check_cert"]
 
     def get_data(self, key: str, **attributes) -> StorageData:
         bucket = attributes['bucket']
@@ -96,14 +98,19 @@ class MinIOStorage(Storage):
 
     def get_minio_client(self, internal: bool = True) -> Minio:
         if internal:
-            endpoint = "minio:9000"
+            client = Minio(
+                endpoint="minio:9000",
+                access_key=self.username,
+                secret_key=self.password,
+                secure=False,
+                cert_check=False
+            )
         else:
-            endpoint = self.host
-        client = Minio(
-            endpoint=endpoint,
-            access_key=self.username,
-            secret_key=self.password,
-            secure=False,
-            cert_check=False
-        )
+            client = Minio(
+                endpoint=self.host,
+                access_key=self.username,
+                secret_key=self.password,
+                secure=self.use_tls,
+                cert_check=self.check_cert
+            )
         return client

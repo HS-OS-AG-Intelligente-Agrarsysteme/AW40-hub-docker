@@ -71,7 +71,9 @@ def init_storages():
     StorageFactory.initialise_storages(
         minio_host=settings.minio_api_address,
         minio_password=settings.minio_password,
-        minio_username=settings.minio_username
+        minio_username=settings.minio_username,
+        minio_use_tls=settings.minio_use_tls,
+        minio_check_cert= settings.minio_check_cert
     )
 
 

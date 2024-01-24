@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     minio_api_address: str
     minio_username: str
     minio_password: str
+    minio_use_tls: bool = False
+    minio_check_cert: bool = False
 
     redis_password: str
     redis_host: str = "redis"
