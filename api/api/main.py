@@ -73,7 +73,7 @@ def init_storages():
         minio_password=settings.minio_password,
         minio_username=settings.minio_username,
         minio_use_tls=settings.minio_use_tls,
-        minio_check_cert= settings.minio_check_cert
+        minio_check_cert=settings.minio_check_cert
     )
 
 
