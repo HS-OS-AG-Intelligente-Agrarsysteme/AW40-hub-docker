@@ -108,3 +108,17 @@ header:
 ```
 curl -H "Authorization: Bearer $ACCESS_TOKEN" http://localhost:8000/v1/$WORKSHOP_ID/cases
 ```
+
+### Shared authentication
+
+Just as with the workshop router described in the previous section, access to
+the shared router at `/shared` requires a bearer token obtained from keycloak
+and the user needs to be assigned the role `shared`.  
+The account `aw40hub-dev-workshop` created with
+[keycloak/keycloak-config-dev.sh](../keycloak/keycloak-config-dev.sh)
+does also have this role. So the example in the previous section also applies
+to shared resources, e.g. after obtaining the token, a list of all cases from
+the shared router can be retrieved via
+```
+curl -H "Authorization: Bearer $ACCESS_TOKEN" http://localhost:8000/v1/shared/cases
+```
