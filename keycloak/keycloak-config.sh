@@ -27,9 +27,16 @@ $kcadm create roles \
     -s name=${WERKSTATT_MECHANIC_ROLE}
 
 # Create a user role 'workshop'
+# This role is intended for access to the Hub API's workshop router
 $kcadm create roles \
   -r werkstatt-hub \
   -s name=workshop
+
+# Create a user role 'shared'
+# This role is intended for access to the Hub API's shared router
+$kcadm create roles \
+  -r werkstatt-hub \
+  -s name=shared
 
 # Create MinIO administrator
 $kcadm create users \

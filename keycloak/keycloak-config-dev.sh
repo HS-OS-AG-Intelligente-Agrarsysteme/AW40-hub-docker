@@ -15,6 +15,12 @@ $kcadm add-roles \
   --uusername aw40hub-dev-workshop \
   --rolename workshop
 
+# Also assign the role 'shared' to enable access to /shared/... API endpoints
+$kcadm add-roles \
+  -r werkstatt-hub \
+  --uusername aw40hub-dev-workshop \
+  --rolename shared
+
 # Create a dev client
 $kcadm create clients \
   -r werkstatt-hub \
