@@ -31,7 +31,7 @@ from ..data_management import (
     AttachmentBucket
 )
 from ..diagnostics_management import DiagnosticTaskManager
-from ..security.workshop_auth import authorized_workshop_id
+from ..security.token_auth import authorized_workshop_id
 from ..upload_filereader import filereader_factory, FileReaderException
 
 tags_metadata = [
