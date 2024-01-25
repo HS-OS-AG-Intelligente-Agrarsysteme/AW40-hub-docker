@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     minio_api_address: str
     minio_username: str
     minio_password: str
-    minio_use_tls: bool = False
+    minio_scheme: str
     minio_check_cert: bool = False
 
     redis_password: str
@@ -42,6 +42,9 @@ class Settings(BaseSettings):
             f"redis://:{self.redis_password}@{self.redis_host}"
             f":{self.redis_port}"
         )
+    @property
+    def minio_use_tls(self):
+        return self.minio_scheme == "https"
 
 
 settings = Settings()

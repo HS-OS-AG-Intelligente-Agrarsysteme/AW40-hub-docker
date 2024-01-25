@@ -7,6 +7,21 @@ entrypoints:
     address: :80
   websecure:
     address: :443
+    http:
+      tls:
+        options: default
+        #certsolver: hubresolver
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12
 log:
   level: ERROR
 api: {}
+#certificateResolvers:
+#  hubresolver:
+#    acme:
+#      email: "test@example.com"
+#      storage: "acme.json"
+#      tlsChallenge: true
+
