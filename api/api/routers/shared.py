@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException, Depends
 
 from ..data_management import Case, Customer, Vehicle, Workshop
 from ..diagnostics_management import KnowledgeGraph
+from ..security.token_auth import authorized_shared_access
 
 tags_metadata = [
     {
@@ -16,7 +17,10 @@ tags_metadata = [
 ]
 
 
-router = APIRouter(tags=["Shared"])
+router = APIRouter(
+    tags=["Shared"],
+    dependencies=[Depends(authorized_shared_access)]
+)
 
 
 @router.get("/cases", status_code=200, response_model=List[Case])
