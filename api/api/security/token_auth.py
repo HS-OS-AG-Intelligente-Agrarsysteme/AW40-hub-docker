@@ -67,3 +67,14 @@ async def authorized_workshop_id(
         raise failed_auth_exception
     else:
         return workshop_id
+
+
+async def authorized_shared_access(
+        token_data: TokenData = Depends(verify_token)
+) -> None:
+    """
+    Authorize access to shared resources if the user is assigned the respective
+    role.
+    """
+    if REQUIRED_SHARED_ROLE not in token_data.roles:
+        raise failed_auth_exception
