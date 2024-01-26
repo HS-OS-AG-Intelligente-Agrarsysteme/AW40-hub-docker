@@ -8,6 +8,14 @@ services:
     image: traefik:2.10
     <<: *default_restart_policy
     hostname: "traefik"
+    command:
+      # Let's Encrypt
+      - '--certificatesresolvers.letsencrypt.acme.email=${ROOT_EMAIL:?error}'
+      - '--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web'
+      - '--certificatesresolvers.letsencrypt.acme.httpchallenge=true'
+      - '--certificatesresolvers.letsencrypt.acme.storage=/certs/acme.json'
+      # Global Certificate Resolver
+      - '--entrypoints.websecure.http.tls.certresolver=${PROXY_DEFAULT_CERTIFICATE_RESOLVER:-}'
     labels:
       - traefik.enable=true
       - traefik.docker.network=hubnet
@@ -31,6 +39,7 @@ services:
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock:ro
     - ./proxy/proxy-config.yml:/etc/traefik/traefik.yml:ro
+    - proxy-certs:/certs
 
   mongo:
     build:
@@ -336,3 +345,4 @@ volumes:
   keycloak-db-data:
   minio-data:
   edc-db-data:
+  proxy-certs:

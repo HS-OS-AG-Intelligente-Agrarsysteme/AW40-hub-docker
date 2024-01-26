@@ -42,6 +42,7 @@ class Settings(BaseSettings):
             f"redis://:{self.redis_password}@{self.redis_host}"
             f":{self.redis_port}"
         )
+
     @property
     def minio_use_tls(self):
         return self.minio_scheme == "https"
