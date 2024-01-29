@@ -13,6 +13,7 @@ from .interfaces import (
 
 class Settings(BaseSettings):
     redis_password: str
+    api_key_diagnostics: str
     redis_host: str = "redis"
     redis_port: str = "6379"
     hub_url: str = "http://api:8000/v1"
@@ -48,11 +49,11 @@ app.conf.update(timezone="UTC")
 @app.task
 def diagnose(diag_id):
     """Main task for a diagnosis."""
-
     # api client to interact with the specified diagnosis
     hub_client = HubClient(
         hub_url=settings.hub_url,
-        diag_id=diag_id
+        diag_id=diag_id,
+        api_key=settings.api_key_diagnostics
     )
 
     # set up vehicle_diag_smach interfaces

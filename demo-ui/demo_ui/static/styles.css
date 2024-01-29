@@ -41,6 +41,18 @@ body {
 	padding: 10px 0 0 10px;
 }
 
+.flashed-message {
+    font-weight: bold;
+	width: max-content;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #ddd;
+	border-radius: 10px;
+	background-color: #f0b27a;
+	text-align: center;
+	padding: 10px
+}
+
 * {
 	font-family: monospace;
 }

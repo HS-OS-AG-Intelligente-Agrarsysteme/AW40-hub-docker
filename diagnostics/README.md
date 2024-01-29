@@ -60,7 +60,7 @@ via `pip install -r requirements.txt`
 first example via
 
 ```
-python diagnostics/examples/example_1
+python diagnostics/examples/example_1.py
 ```
 
 The console output will show an URL, that you can access to view a report of
@@ -87,7 +87,7 @@ with a signal length, incompatible with the model used by the state machine.
 It can be run via
 
 ```
-python diagnostics/examples/example_2
+python diagnostics/examples/example_2.py
 ```
 
 ## Using the examples for testing

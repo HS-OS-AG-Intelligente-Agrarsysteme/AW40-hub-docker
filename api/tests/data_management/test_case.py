@@ -22,7 +22,7 @@ def new_case():
     """Valid meta data for a new case"""
     return {
         "vehicle_vin": "test-vin",
-        "customer_id": "test.customer",
+        "customer_id": "unknown",
         "occasion": "unknown",
         "milage": 42
     }
@@ -140,7 +140,7 @@ class TestCase:
             case_3 = dict(**new_case)
 
             # alter customer for case 1 and create
-            case_1_customer_id = "Case 1 Customer"
+            case_1_customer_id = "anonymous"
             case_1["customer_id"] = case_1_customer_id
             case_1 = Case(**case_1)
             await case_1.create()

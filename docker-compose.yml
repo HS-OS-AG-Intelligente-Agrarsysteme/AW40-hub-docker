@@ -89,14 +89,19 @@ services:
       depends_on:
         keycloak:
           condition: service_healthy
-      entrypoint: ["sh","-c","chmod +x /init.sh && ./init.sh"]
+      entrypoint: [
+        "sh",
+        "-c",
+        "chmod +x /keycloak-config.sh && ./keycloak-config.sh && chmod +x /keycloak-config-dev.sh && ./keycloak-config-dev.sh"
+      ]
       env_file:
         - keycloak/keycloak.env
       networks:
         - hubintranet
       user: root
       volumes:
-        - ./keycloak/keycloak-config.sh:/init.sh
+        - ./keycloak/keycloak-config.sh:/keycloak-config.sh
+        - ./keycloak/keycloak-config-dev.sh:/keycloak-config-dev.sh
 
   keycloak-db:
     build:
@@ -227,6 +232,10 @@ services:
       mongo:
         condition: service_healthy
       minio-config:
+        condition: service_completed_successfully
+      keycloak:
+        condition: service_healthy
+      keycloak-config:
         condition: service_completed_successfully
     env_file:
       - api/api.env

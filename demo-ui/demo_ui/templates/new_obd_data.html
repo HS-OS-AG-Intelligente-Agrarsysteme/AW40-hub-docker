@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block sidebar %}
-<a href="/ui">Anmeldung Werkstatt</a>
+<a href="/ui/logout">Werkstatt {{ request.path_params["workshop_id"] }} (Abmelden)</a>
 <a href="/ui/{{ request.path_params['workshop_id'] }}/cases">Fälle</a>
 <a href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ request.path_params['case_id'] }}" style="margin-left: 10px;">Ausgewählt: {{ request.path_params["case_id"] }}</a>
 <a href="#" style="margin-left: 20px;"><b>OBD:</b> Neuer Datensatz</a>

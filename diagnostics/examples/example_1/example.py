@@ -57,7 +57,7 @@ def setup_model():
     shutil.copy(src=meta_info_src_path, dst=meta_info_destination_path)
 
 
-def create_case(workshop_id):
+def create_case(workshop_id, api_token):
     """
     Create a new case for this example. Returns the url that allows managing
     the case via the Hub API.
@@ -67,10 +67,11 @@ def create_case(workshop_id):
         url=cases_url,
         json={
             "vehicle_vin": "1234567890ABCDEFGHJKLMNPRSTUVWXYZ",
-            "customer_id": "firstname.lastname",
+            "customer_id": "anonymous",
             "occasion": "service_routine",
             "milage": 42
-        }
+        },
+        headers={"Authorization": f"Bearer {api_token}"}
     )
     response.raise_for_status()
     case_id = response.json()["_id"]
@@ -78,13 +79,16 @@ def create_case(workshop_id):
     return case_url
 
 
-def start_diagnosis(case_url):
+def start_diagnosis(case_url, api_token):
     """Start the diagnosis process for a case."""
-    response = httpx.post(url=f"{case_url}/diag")
+    response = httpx.post(
+        url=f"{case_url}/diag",
+        headers={"Authorization": f"Bearer {api_token}"}
+    )
     response.raise_for_status()
 
 
-def provide_obd_data(case_url):
+def provide_obd_data(case_url, api_token):
     """
     Load OBD data into a case. The DTC provided is present in the knowledge
     graph data for this example.
@@ -95,12 +99,13 @@ def provide_obd_data(case_url):
             "dtcs": [
                 "P0123"
             ]
-        }
+        },
+        headers={"Authorization": f"Bearer {api_token}"}
     )
     response.raise_for_status()
 
 
-def provide_oscillogram(case_url):
+def provide_oscillogram(case_url, api_token):
     """
     Upload an oscillogram. Data was provided by DFKI and is supposed to be
     an anomalous battery signal. Again, we declare it a signal for
@@ -114,12 +119,13 @@ def provide_oscillogram(case_url):
             data={
                 "file_format": "Picoscope CSV",
                 "component_A": "boost_pressure_control_valve"
-            }
+            },
+            headers={"Authorization": f"Bearer {api_token}"}
         )
         response.raise_for_status()
 
 
-def provide_symptom(case_url):
+def provide_symptom(case_url, api_token):
     """
     Provide the information, that the boost pressure solenoid valve is broken.
     """
@@ -128,19 +134,22 @@ def provide_symptom(case_url):
         json={
             "component": "boost_pressure_solenoid_valve",
             "label": "defect"
-        }
+        },
+        headers={"Authorization": f"Bearer {api_token}"}
     )
     response.raise_for_status()
 
 
-def main(interactive):
+def main(interactive, api_token):
     # Setup steps required before a user interacts with the system
     setup_knowledge_graph()
     setup_model()
 
     # User creates a new case and starts the diagnosis process
-    case_url = create_case(workshop_id="example-workshop")
-    start_diagnosis(case_url)
+    case_url = create_case(
+        workshop_id="aw40hub-dev-workshop", api_token=api_token
+    )
+    start_diagnosis(case_url, api_token=api_token)
 
     # Progress of the example diagnosis can be followed via the demo ui
     report_url = ((case_url + "/diag")
@@ -154,6 +163,6 @@ def main(interactive):
     for func in [provide_obd_data, provide_oscillogram, provide_symptom]:
         if interactive:
             input(f"Press enter to {func.__name__}")
-        func(case_url)
+        func(case_url, api_token=api_token)
 
     return case_url

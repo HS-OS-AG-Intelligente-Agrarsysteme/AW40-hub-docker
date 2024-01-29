@@ -1,4 +1,5 @@
 from collections import namedtuple
+from datetime import datetime, timedelta
 from tempfile import TemporaryFile
 from unittest import mock
 
@@ -18,11 +19,18 @@ from api.data_management import (
 from api.routers.workshop import (
     router, case_from_workshop, DiagnosticTaskManager
 )
+from api.security.keycloak import Keycloak
 from beanie import init_beanie
 from bson import ObjectId
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
+from jose import jws
+
+
+@pytest.fixture
+def workshop_id():
+    return "test-workshop"
 
 
 @pytest.fixture
@@ -32,12 +40,12 @@ def case_id():
 
 
 @pytest.fixture
-def case_data(case_id):
+def case_data(case_id, workshop_id):
     """Valid (minimal) case data."""
     return {
         "_id": case_id,
         "vehicle_vin": "test-vin",
-        "workshop_id": "test-workshop",
+        "workshop_id": workshop_id,
     }
 
 
@@ -93,17 +101,48 @@ def test_app(motor_db):
 
 
 @pytest.fixture
-def client(test_app):
-    """
-    Convenience fixture. Can be used in tests that do not require
-    modification of the test_app fixture.
-    """
+def jwt_payload(workshop_id):
+    return {
+        "iat": datetime.utcnow().timestamp(),
+        "exp": (datetime.utcnow() + timedelta(60)).timestamp(),
+        "preferred_username": workshop_id,
+        "realm_access": {"roles": ["workshop"]}
+    }
+
+
+@pytest.fixture
+def signed_jwt(jwt_payload, rsa_private_key_pem: bytes):
+    """Create a JWT signed with private RSA key."""
+    return jws.sign(jwt_payload, rsa_private_key_pem, algorithm="RS256")
+
+
+@pytest.fixture
+def unauthenticated_client(test_app):
+    """Unauthenticated client, e.g. no bearer token in header."""
     yield TestClient(test_app)
 
 
+@pytest.fixture
+def authenticated_client(
+        unauthenticated_client, rsa_public_key_pem, signed_jwt
+):
+    """Turn unauthenticated client into authenticated client."""
+
+    # Client gets auth header with valid bearer token
+    client = unauthenticated_client
+    client.headers.update({"Authorization": f"Bearer {signed_jwt}"})
+
+    # Make app use public key from fixture for token validation
+    app = client.app
+    app.dependency_overrides[
+        Keycloak.get_public_key_for_workshop_realm
+    ] = lambda: rsa_public_key_pem.decode()
+
+    return client
+
+
 @mock.patch("api.routers.workshop.Case.find_in_hub", autospec=True)
-def test_list_cases(find_in_hub, client):
-    workshop_id = "test workshop"
+def test_list_cases(find_in_hub, authenticated_client, workshop_id):
 
     async def mock_find_in_hub(customer_id, workshop_id, vin):
         return []
@@ -112,7 +151,7 @@ def test_list_cases(find_in_hub, client):
     find_in_hub.side_effect = mock_find_in_hub
 
     # request without params
-    response = client.get(f"/{workshop_id}/cases")
+    response = authenticated_client.get(f"/{workshop_id}/cases")
 
     # confirm expected response and usage of db interface
     assert response.status_code == 200
@@ -123,8 +162,9 @@ def test_list_cases(find_in_hub, client):
 
 
 @mock.patch("api.routers.workshop.Case.find_in_hub", autospec=True)
-def test_list_cases_with_filters(find_in_hub, client):
-    workshop_id = "test workshop"
+def test_list_cases_with_filters(
+        find_in_hub, authenticated_client, workshop_id
+):
 
     async def mock_find_in_hub(customer_id, workshop_id, vin):
         return []
@@ -135,7 +175,7 @@ def test_list_cases_with_filters(find_in_hub, client):
     # request with filter params
     customer_id = "test customer"
     vin = "test vin"
-    response = client.get(
+    response = authenticated_client.get(
         f"/{workshop_id}/cases",
         params={"customer_id": customer_id, "vin": vin}
     )
@@ -148,15 +188,14 @@ def test_list_cases_with_filters(find_in_hub, client):
     )
 
 
-def test_add_case(client):
-    workshop_id = "test workshop"
+def test_add_case(authenticated_client, workshop_id):
     new_case = {
         "vehicle_vin": "test-vin",
-        "customer_id": "test.customer",
+        "customer_id": "unknown",
         "occasion": "unknown",
         "milage": 42
     }
-    with client:
+    with authenticated_client as client:
         response = client.post(f"/{workshop_id}/cases", json=new_case)
 
     assert response.status_code == 201
@@ -165,8 +204,7 @@ def test_add_case(client):
 
 @mock.patch("api.routers.workshop.Case.get", autospec=True)
 @pytest.mark.asyncio
-async def test_case_from_workshop(get, case_id):
-    workshop_id = "test workshop"
+async def test_case_from_workshop(get, case_id, workshop_id):
 
     async def mock_get(*args):
         """
@@ -203,8 +241,7 @@ async def test_case_from_workshop_is_none(get, case_id):
 
 @mock.patch("api.routers.workshop.Case.get", autospec=True)
 @pytest.mark.asyncio
-async def test_case_from_workshop_wrong_workshop(get, case_id):
-    workshop_id = "test workshop"
+async def test_case_from_workshop_wrong_workshop(get, case_id, workshop_id):
 
     async def mock_get(*args):
         """
@@ -237,15 +274,15 @@ async def test_case_from_workshop_invalid_case_id_format():
     assert excinfo.value.status_code == 404
 
 
-def test_get_case(case_data, test_app):
+def test_get_case(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.get(
             f"/{workshop_id}/cases/{case_id}"
         )
@@ -256,21 +293,21 @@ def test_get_case(case_data, test_app):
 
 
 @mock.patch("api.routers.workshop.Case.set", autospec=True)
-def test_update_case(case_set, case_data, test_app):
+def test_update_case(case_set, case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
     case_data["status"] = "open"
     new_status = "closed"
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # patch Case.set with AsyncMock to confirm use with await
     case_set.side_effect = mock.AsyncMock()
 
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.put(
             f"/{workshop_id}/cases/{case_id}",
             json={"status": new_status}
@@ -284,22 +321,24 @@ def test_update_case(case_set, case_data, test_app):
     case_set.side_effect.assert_awaited_once()
 
 
-def test_delete_case(case_data, test_app):
+def test_delete_case(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.delete(
             f"/{workshop_id}/cases/{case_id}"
         )
     assert response.status_code == 200
 
 
-def test_list_timeseries_data(case_data, timeseries_data, test_app):
+def test_list_timeseries_data(
+        case_data, timeseries_data, authenticated_client
+):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
@@ -307,11 +346,11 @@ def test_list_timeseries_data(case_data, timeseries_data, test_app):
     repeats = 2
     case_data["timeseries_data"] = repeats * [timeseries_data]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.get(
             f"/{workshop_id}/cases/{case_id}/timeseries_data"
         )
@@ -345,22 +384,22 @@ def test_add_timeseries_data(
         add_timeseries_data,
         case_data,
         new_timeseries_data,
-        test_app,
+        authenticated_client,
         timeseries_signal_id
 ):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # patch Case.add_timeseries_data to call mock instead
     add_timeseries_data.side_effect = mock_add_timeseries_data(
         signal_id=timeseries_signal_id
     )
 
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.post(
             f"/{workshop_id}/cases/{case_id}/timeseries_data",
             json=new_timeseries_data
@@ -389,7 +428,7 @@ def test_upload_picoscope_data_single_channel(
         file,
         file_format,
         case_data,
-        test_app,
+        authenticated_client,
         timeseries_signal_id,
         request
 ):
@@ -400,9 +439,9 @@ def test_upload_picoscope_data_single_channel(
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # patch Case.add_timeseries_data to call mock instead
     add_timeseries_data.side_effect = mock_add_timeseries_data(
@@ -412,7 +451,7 @@ def test_upload_picoscope_data_single_channel(
     # upload file and only specify component for one channel
     channel = "A"
     component = "maf_sensor"
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.post(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/upload/picoscope",
             files={"upload": ("filename", file)},
@@ -444,7 +483,7 @@ def test_upload_picoscope_data_multi_channel(
         file,
         file_format,
         case_data,
-        test_app,
+        authenticated_client,
         timeseries_signal_id,
         request
 ):
@@ -455,9 +494,9 @@ def test_upload_picoscope_data_multi_channel(
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # patch Case.add_timeseries_data to call mock instead
     add_timeseries_data.side_effect = mock_add_timeseries_data(
@@ -469,7 +508,7 @@ def test_upload_picoscope_data_multi_channel(
     component_0 = "maf_sensor"
     channel_1 = "C"
     component_1 = "battery"
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.post(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/upload/picoscope",
             files={"upload": ("filename", file)},
@@ -502,7 +541,7 @@ def test_upload_picoscope_data_wrong_channel_specs(
         file,
         file_format,
         case_data,
-        test_app,
+        authenticated_client,
         request
 ):
     # use request fixture to convert file parameter from str to actual
@@ -512,13 +551,13 @@ def test_upload_picoscope_data_wrong_channel_specs(
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # upload file and only specify component for channel B, even though files
     # only have channel A
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.post(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/upload/picoscope",
             files={"upload": ("filename", file)},
@@ -536,17 +575,17 @@ def test_upload_picoscope_data_wrong_channel_specs(
 def test_upload_picoscope_data_wrong_file(
         file_format,
         case_data,
-        test_app,
+        authenticated_client,
 ):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # upload wrong file
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.post(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/upload/picoscope",
             files={"upload": ("filename", TemporaryFile())},
@@ -562,22 +601,22 @@ def test_upload_omniscope_data(
         add_timeseries_data,
         case_data,
         omniscope_v1_file,
-        test_app,
+        authenticated_client,
         timeseries_signal_id
 ):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # patch Case.add_timeseries_data to call mock instead
     add_timeseries_data.side_effect = mock_add_timeseries_data(
         signal_id=timeseries_signal_id
     )
 
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.post(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/upload/omniscope",
             files={"upload": ("filename", omniscope_v1_file)},
@@ -589,15 +628,15 @@ def test_upload_omniscope_data(
     assert len(response.json()["timeseries_data"]) == 1
 
 
-def test_upload_omniscope_data_empty_signal(case_data, test_app):
+def test_upload_omniscope_data_empty_signal(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         with TemporaryFile() as empty_file:
             response = client.post(
                 f"/{workshop_id}/cases/{case_id}/timeseries_data/upload/"
@@ -612,16 +651,16 @@ def test_upload_omniscope_data_empty_signal(case_data, test_app):
 
 @pytest.mark.parametrize("sr", [-1, 0])
 def test_upload_omniscope_data_invalid_sampling_rate(
-        sr, omniscope_v1_file, case_data, test_app
+        sr, omniscope_v1_file, case_data, authenticated_client
 ):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.post(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/upload/omniscope",
             files={"upload": ("filename", omniscope_v1_file)},
@@ -632,17 +671,17 @@ def test_upload_omniscope_data_invalid_sampling_rate(
     assert response.status_code == 422
 
 
-def test_get_timeseries_data_not_found(case_data, test_app):
+def test_get_timeseries_data_not_found(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # request timeseries_data with data_id 1 eventhough case does not have
     # any timeseries data
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.get(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/1"
         )
@@ -651,7 +690,7 @@ def test_get_timeseries_data_not_found(case_data, test_app):
     assert response.status_code == 404
 
 
-def test_get_timeseries_data(case_data, timeseries_data, test_app):
+def test_get_timeseries_data(case_data, timeseries_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
@@ -660,12 +699,12 @@ def test_get_timeseries_data(case_data, timeseries_data, test_app):
     timeseries_data["data_id"] = data_id
     case_data["timeseries_data"] = [timeseries_data]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # request timeseries_data with specified data_id, which should exist
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.get(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/{data_id}"
         )
@@ -675,17 +714,17 @@ def test_get_timeseries_data(case_data, timeseries_data, test_app):
     assert TimeseriesData(**response.json())
 
 
-def test_get_timeseries_data_signal_not_found(case_data, test_app):
+def test_get_timeseries_data_signal_not_found(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # request signal from timeseries_data with data_id 1 eventhough case does
     # not have any timeseries data
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.get(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/1/signal"
         )
@@ -696,7 +735,7 @@ def test_get_timeseries_data_signal_not_found(case_data, test_app):
 
 @mock.patch("api.routers.workshop.TimeseriesData.get_signal", autospec=True)
 def test_get_timeseries_data_signal(
-        get_signal, case_data, timeseries_data, test_app
+        get_signal, case_data, timeseries_data, authenticated_client
 ):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
@@ -706,9 +745,9 @@ def test_get_timeseries_data_signal(
     timeseries_data["data_id"] = data_id
     case_data["timeseries_data"] = [timeseries_data]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     test_signal = [0., 1., 2.]
 
@@ -719,7 +758,7 @@ def test_get_timeseries_data_signal(
     get_signal.side_effect = mock_get_signal
 
     # request signal from timeseries_data with data_id, which should exist
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.get(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/{data_id}/signal"
         )
@@ -745,17 +784,17 @@ def create_mock_save():
     return mock_save, saved_cases
 
 
-def test_update_timeseries_data_not_found(case_data, test_app):
+def test_update_timeseries_data_not_found(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # request update of timeseries_data with data_id 1 eventhough case does not
     # have any timeseries data
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.put(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/1",
             json={"label": "norm"}
@@ -766,7 +805,9 @@ def test_update_timeseries_data_not_found(case_data, test_app):
 
 
 @mock.patch("api.routers.workshop.Case.save", autospec=True)
-def test_update_timeseries_data(save, case_data, timeseries_data, test_app):
+def test_update_timeseries_data(
+        save, case_data, timeseries_data, authenticated_client
+):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
@@ -780,16 +821,16 @@ def test_update_timeseries_data(save, case_data, timeseries_data, test_app):
     timeseries_data["data_id"] = data_id
     case_data["timeseries_data"] = [timeseries_data]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # patch Case.save to use mock_save
     mock_save, saved_cases = create_mock_save()
     save.side_effect = mock_save
 
     # request update of timeseries_data with data_id, which should exist
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.put(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/{data_id}",
             json={"label": new_label}
@@ -805,17 +846,17 @@ def test_update_timeseries_data(save, case_data, timeseries_data, test_app):
            saved_cases[0].timeseries_data[0]
 
 
-def test_delete_timeseries_data_not_found(case_data, test_app):
+def test_delete_timeseries_data_not_found(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # request deletion of timeseries_data with data_id 1 eventhough case does
     # not have any timeseriers data
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.delete(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/1"
         )
@@ -827,7 +868,10 @@ def test_delete_timeseries_data_not_found(case_data, test_app):
 
 @mock.patch("api.routers.workshop.Case.delete_timeseries_data", autospec=True)
 def test_delete_timeseries_data(
-        delete_timeseries_data, case_data, timeseries_data, test_app
+        delete_timeseries_data,
+        case_data,
+        timeseries_data,
+        authenticated_client
 ):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
@@ -837,15 +881,15 @@ def test_delete_timeseries_data(
     timeseries_data["data_id"] = data_id
     case_data["timeseries_data"] = [timeseries_data]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # patch Case.delete_timeseries_data
     delete_timeseries_data.side_effect = mock.AsyncMock()
 
     # request deletion of timeseries_data with data_id, which should exist
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.delete(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/{data_id}"
         )
@@ -855,7 +899,7 @@ def test_delete_timeseries_data(
     delete_timeseries_data.side_effect.assert_awaited_once()
 
 
-def test_list_obd_data(case_data, obd_data, test_app):
+def test_list_obd_data(case_data, obd_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
@@ -863,11 +907,11 @@ def test_list_obd_data(case_data, obd_data, test_app):
     repeats = 2
     case_data["obd_data"] = repeats * [obd_data]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.get(
             f"/{workshop_id}/cases/{case_id}/obd_data"
         )
@@ -893,19 +937,19 @@ def mock_add_obd_data():
 
 
 @mock.patch("api.routers.workshop.Case.save", autospec=True)
-def test_add_obd_data(save, case_data, obd_data, test_app):
+def test_add_obd_data(save, case_data, obd_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # patch Case.save to use mock_save
     mock_save, saved_cases = create_mock_save()
     save.side_effect = mock_save
 
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.post(
             f"/{workshop_id}/cases/{case_id}/obd_data",
             json=obd_data
@@ -922,19 +966,19 @@ def test_add_obd_data(save, case_data, obd_data, test_app):
 
 @mock.patch("api.routers.workshop.Case.add_obd_data", autospec=True)
 def test_upload_vcds_data(
-        add_obd_data, case_data, obd_data, vcds_txt_file, test_app
+        add_obd_data, case_data, obd_data, vcds_txt_file, authenticated_client
 ):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # patch Case.add_obd_data to use mock
     add_obd_data.side_effect = mock_add_obd_data()
 
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.post(
             f"/{workshop_id}/cases/{case_id}/obd_data/upload/vcds",
             files={"upload": ("filename", vcds_txt_file)}
@@ -947,17 +991,17 @@ def test_upload_vcds_data(
 
 def test_upload_vcds_data_wrong_file(
         case_data,
-        test_app,
+        authenticated_client,
 ):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # upload wrong file
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.post(
             f"/{workshop_id}/cases/{case_id}/obd_data/upload/vcds",
             files={"upload": ("filename", TemporaryFile())}
@@ -967,17 +1011,17 @@ def test_upload_vcds_data_wrong_file(
     assert response.status_code == 400
 
 
-def test_get_obd_data_not_found(case_data, test_app):
+def test_get_obd_data_not_found(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # request obd_data with data_id 1 eventhough case does not have
     # any obd data
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.get(
             f"/{workshop_id}/cases/{case_id}/obd_data/1"
         )
@@ -986,7 +1030,7 @@ def test_get_obd_data_not_found(case_data, test_app):
     assert response.status_code == 404
 
 
-def test_get_obd_data(case_data, obd_data, test_app):
+def test_get_obd_data(case_data, obd_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
@@ -995,12 +1039,12 @@ def test_get_obd_data(case_data, obd_data, test_app):
     obd_data["data_id"] = data_id
     case_data["obd_data"] = [obd_data]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # request obd_data with data_id, which should exist
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.get(
             f"/{workshop_id}/cases/{case_id}/obd_data/{data_id}"
         )
@@ -1010,17 +1054,17 @@ def test_get_obd_data(case_data, obd_data, test_app):
     assert OBDData(**response.json())
 
 
-def test_update_obd_data_not_found(case_data, test_app):
+def test_update_obd_data_not_found(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # request update of obd_data with data_id 1 eventhough case does not have
     # any obd data
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.put(
             f"/{workshop_id}/cases/{case_id}/obd_data/1",
             json={"obd_specs": {"some field": "some value"}}
@@ -1031,7 +1075,7 @@ def test_update_obd_data_not_found(case_data, test_app):
 
 
 @mock.patch("api.routers.workshop.Case.save", autospec=True)
-def test_update_obd_data(save, case_data, obd_data, test_app):
+def test_update_obd_data(save, case_data, obd_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
@@ -1044,16 +1088,16 @@ def test_update_obd_data(save, case_data, obd_data, test_app):
     obd_data["data_id"] = data_id
     case_data["obd_data"] = [obd_data]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # patch Case.save to use mock_save
     mock_save, saved_cases = create_mock_save()
     save.side_effect = mock_save
 
     # request update of obd_data with data_id, which should exist
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.put(
             f"/{workshop_id}/cases/{case_id}/obd_data/{data_id}",
             json={"obd_specs": new_obd_specs}
@@ -1069,17 +1113,17 @@ def test_update_obd_data(save, case_data, obd_data, test_app):
     assert OBDData(**response.json()) == saved_cases[0].obd_data[0]
 
 
-def test_delete_obd_data_not_found(case_data, test_app):
+def test_delete_obd_data_not_found(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # request deletion of obd_data with data_id 1 eventhough case does not have
     # any obd data
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.delete(
             f"/{workshop_id}/cases/{case_id}/obd_data/1"
         )
@@ -1090,7 +1134,7 @@ def test_delete_obd_data_not_found(case_data, test_app):
 
 
 @mock.patch("api.routers.workshop.Case.save", autospec=True)
-def test_delete_obd_data(save, case_data, obd_data, test_app):
+def test_delete_obd_data(save, case_data, obd_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
@@ -1099,16 +1143,16 @@ def test_delete_obd_data(save, case_data, obd_data, test_app):
     obd_data["data_id"] = data_id
     case_data["obd_data"] = [obd_data]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # patch Case.save to use mock_save
     mock_save, saved_cases = create_mock_save()
     save.side_effect = mock_save
 
     # request deletion of obd_data with data_id, which should exist
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.delete(
             f"/{workshop_id}/cases/{case_id}/obd_data/{data_id}"
         )
@@ -1123,7 +1167,7 @@ def test_delete_obd_data(save, case_data, obd_data, test_app):
     assert Case(**response.json()) == saved_cases[0]
 
 
-def test_list_symptoms(case_data, symptom, test_app):
+def test_list_symptoms(case_data, symptom, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
@@ -1131,11 +1175,11 @@ def test_list_symptoms(case_data, symptom, test_app):
     repeats = 2
     case_data["symptoms"] = repeats * [symptom]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.get(
             f"/{workshop_id}/cases/{case_id}/symptoms"
         )
@@ -1146,19 +1190,19 @@ def test_list_symptoms(case_data, symptom, test_app):
 
 
 @mock.patch("api.routers.workshop.Case.save", autospec=True)
-def test_add_symptom(save, case_data, symptom, test_app):
+def test_add_symptom(save, case_data, symptom, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # patch Case.save to use mock_save
     mock_save, saved_cases = create_mock_save()
     save.side_effect = mock_save
 
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.post(
             f"/{workshop_id}/cases/{case_id}/symptoms",
             json=symptom
@@ -1173,17 +1217,17 @@ def test_add_symptom(save, case_data, symptom, test_app):
     assert Case(**response.json()) == saved_cases[0]
 
 
-def test_get_symptom_not_found(case_data, test_app):
+def test_get_symptom_not_found(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # request symptom with data_id 1 eventhough case does not have
     # any symptoms
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.get(
             f"/{workshop_id}/cases/{case_id}/symptoms/1"
         )
@@ -1192,7 +1236,7 @@ def test_get_symptom_not_found(case_data, test_app):
     assert response.status_code == 404
 
 
-def test_get_symptom(case_data, symptom, test_app):
+def test_get_symptom(case_data, symptom, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
@@ -1201,12 +1245,12 @@ def test_get_symptom(case_data, symptom, test_app):
     symptom["data_id"] = data_id
     case_data["symptoms"] = [symptom]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # request symptom with data_id, which should exist
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.get(
             f"/{workshop_id}/cases/{case_id}/symptoms/{data_id}"
         )
@@ -1216,17 +1260,17 @@ def test_get_symptom(case_data, symptom, test_app):
     assert Symptom(**response.json())
 
 
-def test_update_symptom_not_found(case_data, test_app):
+def test_update_symptom_not_found(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # request update of symptom with data_id 1 eventhough case does not have
     # any symptoms
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.put(
             f"/{workshop_id}/cases/{case_id}/symptoms/1",
             json={"label": "ok"}
@@ -1237,7 +1281,7 @@ def test_update_symptom_not_found(case_data, test_app):
 
 
 @mock.patch("api.routers.workshop.Case.save", autospec=True)
-def test_update_symptom(save, case_data, symptom, test_app):
+def test_update_symptom(save, case_data, symptom, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
@@ -1251,16 +1295,16 @@ def test_update_symptom(save, case_data, symptom, test_app):
     symptom["data_id"] = data_id
     case_data["symptoms"] = [symptom]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # patch Case.save to use mock_save
     mock_save, saved_cases = create_mock_save()
     save.side_effect = mock_save
 
     # request update of symptom with data_id, which should exist
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.put(
             f"/{workshop_id}/cases/{case_id}/symptoms/{data_id}",
             json={"label": new_label}
@@ -1275,17 +1319,17 @@ def test_update_symptom(save, case_data, symptom, test_app):
     assert Symptom(**response.json()) == saved_cases[0].symptoms[0]
 
 
-def test_delete_symptom_not_found(case_data, test_app):
+def test_delete_symptom_not_found(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # request deletion of symptom with data_id 1 eventhough case does not have
     # any symptoms
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.delete(
             f"/{workshop_id}/cases/{case_id}/symptoms/1"
         )
@@ -1296,7 +1340,7 @@ def test_delete_symptom_not_found(case_data, test_app):
 
 
 @mock.patch("api.routers.workshop.Case.save", autospec=True)
-def test_delete_symptom(save, case_data, symptom, test_app):
+def test_delete_symptom(save, case_data, symptom, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
@@ -1305,16 +1349,16 @@ def test_delete_symptom(save, case_data, symptom, test_app):
     symptom["data_id"] = data_id
     case_data["symptoms"] = [symptom]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
     # patch Case.save to use mock_save
     mock_save, saved_cases = create_mock_save()
     save.side_effect = mock_save
 
     # request deletion of symptom with data_id, which should exist
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.delete(
             f"/{workshop_id}/cases/{case_id}/symptoms/{data_id}"
         )
@@ -1329,23 +1373,48 @@ def test_delete_symptom(save, case_data, symptom, test_app):
     assert Case(**response.json()) == saved_cases[0]
 
 
-def test_get_diagnosis_no_diag(case_data, test_app):
+def test_get_diagnosis_no_diag(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
 
-    test_app.dependency_overrides = {
-        case_from_workshop: lambda case_id, workshop_id: Case(**case_data)
-    }
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
 
-    with TestClient(test_app) as client:
+    with authenticated_client as client:
         response = client.get(f"/{workshop_id}/cases/{case_id}/diag")
 
     assert response.status_code == 200
     assert response.json() is None
 
 
+@pytest.fixture
+def authenticated_async_client(
+        test_app, rsa_public_key_pem, signed_jwt
+):
+    """
+    Authenticated async client for tests that require mongodb access via beanie
+    """
+
+    # Client with valid auth header
+    client = AsyncClient(
+        app=test_app,
+        base_url="http://",
+        headers={"Authorization": f"Bearer {signed_jwt}"}
+    )
+
+    # Make app use public key from fixture for token validation
+    test_app.dependency_overrides[
+        Keycloak.get_public_key_for_workshop_realm
+    ] = lambda: rsa_public_key_pem.decode()
+
+    return client
+
+
 @pytest.mark.asyncio
-async def test_get_diagnosis(case_data, test_app, initialized_beanie_context):
+async def test_get_diagnosis(
+        case_data, authenticated_async_client, initialized_beanie_context
+):
     async with initialized_beanie_context:
         workshop_id = case_data["workshop_id"]
         case_id = case_data["_id"]
@@ -1360,8 +1429,9 @@ async def test_get_diagnosis(case_data, test_app, initialized_beanie_context):
         await Case(**case_data).create()
 
         # execute test request
-        client = AsyncClient(app=test_app, base_url="http://")
-        response = await client.get(f"{workshop_id}/cases/{case_id}/diag")
+        response = await authenticated_async_client.get(
+            f"{workshop_id}/cases/{case_id}/diag"
+        )
 
         # confirm expected response data
         assert response.status_code == 200
@@ -1374,7 +1444,7 @@ async def test_get_diagnosis(case_data, test_app, initialized_beanie_context):
 
 @pytest.mark.asyncio
 async def test_start_diagnosis_already_exists(
-        case_data, test_app, initialized_beanie_context
+        case_data, authenticated_async_client, initialized_beanie_context
 ):
     async with initialized_beanie_context:
         workshop_id = case_data["workshop_id"]
@@ -1394,13 +1464,14 @@ async def test_start_diagnosis_already_exists(
             async def __call__(self, diagnosis_id):
                 raise Exception("This dependency is not expected to be called")
 
-        test_app.dependency_overrides[
+        authenticated_async_client._transport.app.dependency_overrides[
             DiagnosticTaskManager
         ] = TestDiagnosticTaskManager
 
         # execute test request
-        client = AsyncClient(app=test_app, base_url="http://")
-        response = await client.post(f"{workshop_id}/cases/{case_id}/diag")
+        response = await authenticated_async_client.post(
+            f"{workshop_id}/cases/{case_id}/diag"
+        )
 
         # confirm expected response data
         assert response.status_code == 201
@@ -1413,7 +1484,7 @@ async def test_start_diagnosis_already_exists(
 
 @pytest.mark.asyncio
 async def test_start_diagnosis(
-        case_data, test_app, initialized_beanie_context
+        case_data, authenticated_async_client, initialized_beanie_context
 ):
     async with initialized_beanie_context:
         workshop_id = case_data["workshop_id"]
@@ -1428,13 +1499,14 @@ async def test_start_diagnosis(
             async def __call__(self, diagnosis_id):
                 self.calls.append(diagnosis_id)
 
-        test_app.dependency_overrides[
+        authenticated_async_client._transport.app.dependency_overrides[
             DiagnosticTaskManager
         ] = TestDiagnosticTaskManager
 
         # execute test request
-        client = AsyncClient(app=test_app, base_url="http://")
-        response = await client.post(f"{workshop_id}/cases/{case_id}/diag")
+        response = await authenticated_async_client.post(
+            f"{workshop_id}/cases/{case_id}/diag"
+        )
 
         # confirm expected response data
         assert response.status_code == 201
@@ -1456,7 +1528,7 @@ async def test_start_diagnosis(
 @pytest.mark.asyncio
 async def test_delete_diagnosis(
         case_data,
-        test_app,
+        authenticated_async_client,
         initialized_beanie_context
 ):
     async with initialized_beanie_context:
@@ -1473,8 +1545,9 @@ async def test_delete_diagnosis(
         await Case(**case_data).create()
 
         # execute test request
-        client = AsyncClient(app=test_app, base_url="http://")
-        response = await client.delete(f"{workshop_id}/cases/{case_id}/diag")
+        response = await authenticated_async_client.delete(
+            f"{workshop_id}/cases/{case_id}/diag"
+        )
 
         # confirm expected response data
         assert response.status_code == 200
@@ -1490,41 +1563,121 @@ async def test_delete_diagnosis(
 @pytest.mark.asyncio
 async def test_list_diagnoses(
         case_data,
-        test_app,
-        initialized_beanie_context
+        authenticated_async_client,
+        initialized_beanie_context,
+        workshop_id
 ):
     async with initialized_beanie_context:
-        # Seed db with 2 cases for workshop "1"
-        case_11 = await Case(workshop_id="1", vehicle_vin="v11").insert()
-        case_12 = await Case(workshop_id="1", vehicle_vin="v12").insert()
-        # Seed db with 1 case for workshop "2"
-        case_21 = await Case(workshop_id="2", vehicle_vin="v21").insert()  # noqa F841
-
-        # Both cases of workshop "1" have a diagnosis
-        diag_11 = await Diagnosis(  # noqa F841
-            case_id=case_11.id, status="scheduled"
+        # Seed db with 2 cases
+        case_1 = await Case(
+            workshop_id=workshop_id, vehicle_vin="v11"
         ).insert()
-        diag_12 = await Diagnosis(
-            case_id=case_12.id, status="finished"
+        case_2 = await Case(
+            workshop_id=workshop_id, vehicle_vin="v12"
         ).insert()
 
-        # execute test requests
-        client = AsyncClient(app=test_app, base_url="http://")
-
-        # All diagnoses for workshop 1
-        response = await client.get("1/diagnoses")
-        assert response.status_code == 200
-        assert len(response.json()) == 2, \
-            "Expected 2 diagnoses for workshop 1."
-
-        # All diagnoses for workshop 1 with status "finished"
-        response = await client.get("1/diagnoses?status=finished")
-        assert response.status_code == 200
-        assert len(response.json()) == 1, \
-            "Expected 1 diagnoses for workshop 1."
-        assert response.json()[0]["_id"] == str(diag_12.id)
-
-        # All diagnoses for workshop 2
-        response = await client.get("2/diagnoses")
+        # There are no diagnoses, yet
+        response = await authenticated_async_client.get(
+            f"{workshop_id}/diagnoses"
+        )
         assert response.status_code == 200
         assert response.json() == []
+
+        # Add diagnosis for each case
+        diag_1 = await Diagnosis(case_id=case_1.id, status="scheduled").insert()  # noqa F841
+        diag_2 = await Diagnosis(case_id=case_2.id, status="finished").insert()
+
+        # There are two diagnoses now
+        response = await authenticated_async_client.get(
+            f"{workshop_id}/diagnoses"
+        )
+        assert response.status_code == 200
+        assert len(response.json()) == 2, "Expected 2 diagnoses."
+
+        # Only diagnosis 2 has status 'finished'
+        response = await authenticated_async_client.get(
+            f"{workshop_id}/diagnoses?status=finished"
+        )
+        assert response.status_code == 200
+        assert len(response.json()) == 1, "Expected 1 diagnosis."
+        assert response.json()[0]["_id"] == str(diag_2.id)
+
+
+@pytest.mark.parametrize("route", router.routes, ids=lambda r: r.name)
+def test_missing_bearer_token(route, workshop_id, unauthenticated_client):
+    """Endpoints should not be accessible without a bearer token."""
+    assert len(route.methods) == 1, "Test assumes one method per route."
+    path = route.path.replace("{workshop_id}", workshop_id)
+    method = next(iter(route.methods))
+    response = unauthenticated_client.request(method=method, url=path)
+    assert response.status_code == 403
+    assert response.json() == {"detail": "Not authenticated"}
+
+
+@pytest.mark.parametrize("route", router.routes, ids=lambda r: r.name)
+def test_unauthorized_workshop(route, authenticated_client):
+    """
+    Endpoints should not be accessible, if the workshop_id in the path
+    does not match the workshop_id encoded in the bearer token.
+    """
+    assert len(route.methods) == 1, "Test assumes one method per route."
+    path = route.path.replace("{workshop_id}", "another workshop id")
+    method = next(iter(route.methods))
+    response = authenticated_client.request(method=method, url=path)
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Could not validate token."}
+
+
+@pytest.mark.parametrize("route", router.routes, ids=lambda r: r.name)
+def test_invalid_jwt_signature(
+        route, workshop_id, authenticated_client, another_rsa_public_key_pem
+):
+    """
+    Endpoints should not be accessible, if the public key retrieved from
+    keycloak does not match the private key used to sign a JWT.
+    """
+    assert len(route.methods) == 1, "Test assumes one method per route."
+    path = route.path.replace("{workshop_id}", workshop_id)
+    method = next(iter(route.methods))
+    # The token signature of the authenticated client will not match the public
+    #  key anymore
+    authenticated_client.app.dependency_overrides[
+        Keycloak.get_public_key_for_workshop_realm
+    ] = lambda: another_rsa_public_key_pem.decode()
+    response = authenticated_client.request(method=method, url=path)
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Could not validate token."}
+
+
+@pytest.fixture
+def expired_jwt_payload(workshop_id):
+    return {
+        "iat": (datetime.utcnow() - timedelta(60)).timestamp(),
+        "exp": datetime.utcnow().timestamp(),
+        "preferred_username": workshop_id
+    }
+
+
+@pytest.fixture
+def expired_jwt(expired_jwt_payload, rsa_private_key_pem: bytes):
+    """Create an expired JWT signed with private RSA key."""
+    return jws.sign(
+        expired_jwt_payload, rsa_private_key_pem, algorithm="RS256"
+    )
+
+
+@pytest.mark.parametrize("route", router.routes, ids=lambda r: r.name)
+def test_expired_jwt(route, workshop_id, authenticated_client, expired_jwt):
+    """
+    Endpoints should not be accessible, if the bearer token is expired.
+    """
+    assert len(route.methods) == 1, "Test assumes one method per route."
+    path = route.path.replace("{workshop_id}", workshop_id)
+    method = next(iter(route.methods))
+    # The token offered by the authenticated client is expired
+    authenticated_client.headers.update(
+        {"Authorization": f"Bearer {expired_jwt}"}
+    )
+    response = authenticated_client.request(method=method, url=path)
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Could not validate token."}

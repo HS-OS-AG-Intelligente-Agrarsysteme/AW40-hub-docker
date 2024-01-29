@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException, Request, Header
+from fastapi import APIRouter, HTTPException, Request, Header, Depends
 from fastapi.responses import StreamingResponse
 from tempfile import SpooledTemporaryFile
 from typing import Union
 import logging
 from ..storage.storage_factory import StorageFactory
+from ..security.api_key_auth import APIKeyAuth
 
 tags_metadata = [
     {
@@ -12,7 +13,9 @@ tags_metadata = [
     }
 ]
 
-router = APIRouter(tags=["MinIO"])
+api_key_auth = APIKeyAuth()
+
+router = APIRouter(tags=["MinIO"], dependencies=[Depends(api_key_auth)])
 
 
 @router.get(

@@ -11,3 +11,4 @@ minio==7.1.15
 redis==4.5.4
 celery==5.2.7
 httpx==0.23.3
+python-jose[cryptography]==3.3.0

@@ -31,6 +31,7 @@ from ..data_management import (
     AttachmentBucket
 )
 from ..diagnostics_management import DiagnosticTaskManager
+from ..security.token_auth import authorized_workshop_id
 from ..upload_filereader import filereader_factory, FileReaderException
 
 tags_metadata = [
@@ -48,7 +49,7 @@ tags_metadata = [
     }
 ]
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(authorized_workshop_id)])
 
 
 @router.get(
@@ -58,9 +59,7 @@ router = APIRouter()
     tags=["Workshop - Case Management"]
 )
 async def list_cases(
-        workshop_id: str,
-        customer_id: str = None,
-        vin: str = None
+        workshop_id: str, customer_id: str = None, vin: str = None
 ) -> List[Case]:
     cases = await Case.find_in_hub(
         customer_id=customer_id, vin=vin, workshop_id=workshop_id

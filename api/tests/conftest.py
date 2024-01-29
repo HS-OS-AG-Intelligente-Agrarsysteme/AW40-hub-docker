@@ -12,6 +12,8 @@ from api.data_management import (
 )
 from beanie import init_beanie
 from bson import ObjectId
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 from motor import motor_asyncio
 
 
@@ -212,3 +214,42 @@ def knowledge_graph_file(files_dir):
     f = open(path, "rb")
     yield f
     f.close()
+
+
+def _create_rsa_key_pair() -> tuple[bytes, bytes]:
+    private_key = rsa.generate_private_key(
+        public_exponent=65537, key_size=2048
+    )
+    private_key_pem = private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption()
+    )
+    public_key_pem = private_key.public_key().public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    return private_key_pem, public_key_pem
+
+
+@pytest.fixture
+def rsa_key_pair() -> tuple[bytes, bytes]:
+    """Create RSA private and public key in PEM format."""
+    return _create_rsa_key_pair()
+
+
+@pytest.fixture
+def rsa_private_key_pem(rsa_key_pair) -> bytes:
+    return rsa_key_pair[0]
+
+
+@pytest.fixture
+def rsa_public_key_pem(rsa_key_pair) -> bytes:
+    return rsa_key_pair[1]
+
+
+@pytest.fixture
+def another_rsa_public_key_pem() -> bytes:
+    """Get a public key that does not match keys from any other fixture."""
+    _, public_key_pem = _create_rsa_key_pair()
+    return public_key_pem

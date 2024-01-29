@@ -15,6 +15,9 @@
     {% endblock %}
   </div>
   <div id="content">
+    {% for message in get_flashed_messages(request) %}
+      <div class="flashed-message">{{ message }}</div>
+    {% endfor %}
     {% block content %}{% endblock %}
   </div>
 </div>

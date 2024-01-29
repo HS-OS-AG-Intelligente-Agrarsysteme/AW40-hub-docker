@@ -21,6 +21,15 @@ class Settings(BaseSettings):
 
     knowledge_graph_url: Optional[str] = "http://knowledge-graph:3030"
 
+    keycloak_url: str = "http://keycloak:8080"
+    keycloak_workshop_realm: str = "werkstatt-hub"
+
+    api_key_diagnostics: str
+    api_key_minio: str
+
+    exclude_minio_router: bool = False
+    exclude_diagnostics_router: bool = False
+
     @property
     def mongo_uri(self):
         username = self.mongo_username

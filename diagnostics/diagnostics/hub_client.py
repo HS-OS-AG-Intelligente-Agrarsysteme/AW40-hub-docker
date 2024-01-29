@@ -9,9 +9,10 @@ class HubClient:
     needed to run a specific diagnosis and to provide (intermediate) results.
     """
 
-    def __init__(self, hub_url, diag_id):
+    def __init__(self, hub_url, diag_id, api_key):
         self.hub_url = hub_url
         self.diag_id = diag_id
+        self.http_client = httpx.Client(headers={"x-api-key": api_key})
         self.test_connection()
 
     @property
@@ -47,11 +48,10 @@ class HubClient:
         return f"{self.diag_url}/state-machine-log"
 
     def test_connection(self):
-        httpx.get(self.ping_url).raise_for_status()
+        self.http_client.get(self.ping_url).raise_for_status()
 
-    @staticmethod
-    def _get_from_url(url: str, query_params: dict = {}):
-        response = httpx.get(url, params=query_params)
+    def _get_from_url(self, url: str, query_params: dict = {}):
+        response = self.http_client.get(url, params=query_params)
         response.raise_for_status()
         return response.json()
 
@@ -107,14 +107,14 @@ class HubClient:
     def _require_action(self, action: dict) -> dict:
         action_id = action["id"]
         url = f"{self.todos_url}/{action_id}"
-        response = httpx.put(url, json=action)
+        response = self.http_client.put(url, json=action)
         response.raise_for_status()
         return response.json()
 
     def _unrequire_action(self, action: dict) -> dict:
         action_id = action["id"]
         url = f"{self.todos_url}/{action_id}"
-        response = httpx.delete(url)
+        response = self.http_client.delete(url)
         response.raise_for_status()
         return response.json()
 
@@ -149,7 +149,7 @@ class HubClient:
         files = None
         if attachment is not None:
             files = {"attachment": attachment}
-        httpx.post(
+        self.http_client.post(
             self.state_machine_log_url,
             data={"message": message},
             files=files
@@ -157,4 +157,4 @@ class HubClient:
 
     def set_diagnosis_status(self, status: str):
         url = f"{self.diag_url}/status"
-        httpx.put(url, json=status).raise_for_status()
+        self.http_client.put(url, json=status).raise_for_status()

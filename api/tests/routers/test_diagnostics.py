@@ -7,6 +7,7 @@ from api.data_management.timeseries_data import GridFSSignalStore
 from api.routers import diagnostics
 from bson import ObjectId
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 from httpx import AsyncClient
 from motor import motor_asyncio
 
@@ -47,6 +48,11 @@ test_app = FastAPI()
 test_app.include_router(diagnostics.router)
 
 client = AsyncClient(app=test_app, base_url="http://")
+
+# The test client needs to use a header for API key authentication
+test_api_key = "valid key"
+diagnostics.api_key_auth.valid_key = test_api_key
+client.headers["x-api-key"] = test_api_key
 
 
 @pytest.mark.asyncio
@@ -152,7 +158,6 @@ async def test_get_oscillograms(
         )
 
         # request oscillogram data
-        client = AsyncClient(app=test_app, base_url="http://")
         response = await client.get(
             f"/{diag_id}/oscillograms?component={component}"
         )
@@ -396,3 +401,38 @@ async def test_set_state_machine_status_404(
     async with initialized_beanie_context:
         response = await client.put(f"{diag_id}/status")
         assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    "route", diagnostics.router.routes, ids=lambda r: r.name
+)
+def test_missing_api_key(route):
+    """
+    Endpoints should not be accessible, if no api key is passed
+    """
+    assert len(route.methods) == 1, "Test assumes one method per route."
+    path = route.path.replace("{diag_id}", "any-id")
+    method = next(iter(route.methods))
+    test_client = TestClient(test_app)
+    response = test_client.request(method=method, url=path)
+    assert response.status_code == 403
+    assert list(response.json().keys()) == ["detail"], \
+        "No data but exception details expected in response body."
+
+
+@pytest.mark.parametrize(
+    "route", diagnostics.router.routes, ids=lambda r: r.name
+)
+def test_invalid_api_key(route):
+    """
+    Endpoints should not be accessible, if invalid api key is passed
+    """
+    assert len(route.methods) == 1, "Test assumes one method per route."
+    path = route.path.replace("{diag_id}", "any-id")
+    method = next(iter(route.methods))
+    test_client = TestClient(test_app)
+    test_client.headers["x-api-key"] = test_api_key[1:]
+    response = test_client.request(method=method, url=path)
+    assert response.status_code == 401
+    assert list(response.json().keys()) == ["detail"], \
+        "No data but exception details expected in response body."

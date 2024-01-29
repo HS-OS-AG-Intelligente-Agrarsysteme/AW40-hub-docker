@@ -18,6 +18,7 @@ from ..data_management import (
     TimeseriesDataFull,
     Action
 )
+from ..security.api_key_auth import APIKeyAuth
 
 tags_metadata = [
     {
@@ -26,7 +27,9 @@ tags_metadata = [
     }
 ]
 
-router = APIRouter(tags=["Diagnostics"])
+api_key_auth = APIKeyAuth()
+
+router = APIRouter(tags=["Diagnostics"], dependencies=[Depends(api_key_auth)])
 
 
 async def _diag_by_id_or_404(diag_id: str):
