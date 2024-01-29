@@ -211,9 +211,10 @@ def test_expired_jwt(route, authenticated_client, expired_jwt):
     assert len(route.methods) == 1, "Test assumes one method per route."
     method = next(iter(route.methods))
     # The token offered by the authenticated client is expired
-    authenticated_client.headers.update(
-        {"Authorization": f"Bearer {expired_jwt}"}
+    response = authenticated_client.request(
+        method=method,
+        url=route.path,
+        headers={"Authorization": f"Bearer {expired_jwt}"}
     )
-    response = authenticated_client.request(method=method, url=route.path)
     assert response.status_code == 401
     assert response.json() == {"detail": "Could not validate token."}
