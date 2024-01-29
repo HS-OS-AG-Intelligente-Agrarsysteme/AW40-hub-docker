@@ -204,17 +204,9 @@ def expired_jwt(expired_jwt_payload, rsa_private_key_pem: bytes):
 
 
 @pytest.mark.parametrize("route", shared.router.routes, ids=lambda r: r.name)
-def test_expired_jwt(
-        route, unauthenticated_client, authenticated_client, expired_jwt
-):
+def test_expired_jwt(route, authenticated_client, expired_jwt):
     """
     Endpoints should not be accessible, if the bearer token is expired.
-
-    Note: Even though the authentication_client fixture is used in the testcode
-    below, we also request the unauthenticated_client fixture to make sure that
-    a fresh client instance is initiated for each test. Otherwise, there could
-    be unexpected behaviour in certain test environments (e.g. in GitHub
-    Actions) due to httpx connection pooling.
     """
     assert len(route.methods) == 1, "Test assumes one method per route."
     method = next(iter(route.methods))
