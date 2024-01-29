@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 # Test run again the api container. Use the api key configured for the api's
 # minio router in dev.env
-client = Client(headers={"x-api-key": "minio-key-dev"})
+client = Client(headers={"x-api-key": "minio-key-dev"}, verify=False)
 
 base_addr = "http://localhost:8000/v1/minio"
 bucket = "werkstatthub"
