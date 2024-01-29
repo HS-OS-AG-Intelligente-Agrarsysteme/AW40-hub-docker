@@ -189,7 +189,7 @@ def test_invalid_jwt_signature(
 def expired_jwt_payload():
     return {
         "iat": (datetime.utcnow() - timedelta(60)).timestamp(),
-        "exp": datetime.utcnow().timestamp(),
+        "exp": (datetime.utcnow()- timedelta(1)).timestamp(),
         "preferred_username": "user",
         "realm_access": {"roles": ["shared"]}
     }
