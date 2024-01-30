@@ -62,7 +62,7 @@ def create_case(workshop_id, api_token):
     Create a new case for this example. Returns the url that allows managing
     the case via the Hub API.
     """
-    cases_url = f"http://api.werkstatthub.local/v1/{workshop_id}/cases"
+    cases_url = f"http://127.0.0.1:8000/v1/{workshop_id}/cases"
     response = httpx.post(
         url=cases_url,
         json={

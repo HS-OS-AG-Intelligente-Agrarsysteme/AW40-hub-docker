@@ -2,7 +2,7 @@ import httpx
 
 
 def get_workshop_token_from_keycloak(
-    kc_url: str = "localhost:8080",
+    kc_url: str = "keycloak.werkstatthub.docker.localhost",
     kc_realm: str = "werkstatt-hub",
     kc_workshop_id: str = "aw40hub-dev-workshop",
     kc_workshop_password: str = "dev",
