@@ -201,14 +201,6 @@ def vcds_no_milage_txt_file(files_dir):
 
 
 @pytest.fixture
-def omniscope_v1_file(files_dir):
-    path = os.path.join(files_dir, "omniscope")
-    f = open(path, "rb")
-    yield f
-    f.close()
-
-
-@pytest.fixture
 def knowledge_graph_file(files_dir):
     path = os.path.join(files_dir, "minimalistic_kg.ttl")
     f = open(path, "rb")
