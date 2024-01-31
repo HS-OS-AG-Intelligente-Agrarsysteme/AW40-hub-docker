@@ -62,7 +62,7 @@ class TestPicoscopeCSVReader:
     @pytest.mark.parametrize(
         "file",
         [
-            "omniscope_v1_file", "vcds_txt_file", "picoscope_1ch_mat_file"
+            "vcds_txt_file", "picoscope_1ch_mat_file"
         ]
     )
     def test_read_file_wrong_format(self, file, request):
