@@ -36,8 +36,39 @@ http://api.werkstatthub.docker.localhost/v1/docs.
 The Hub documentation website is accessible via
 http://docs.werkstatthub.docker.localhost.
 
+
+### Access services of developement HUB
+The services of the developement HUB are locally reachable via Webbrowser:
+
+| Service         | Address                                             |
+|-----------------|-----------------------------------------------------|
+| frontend        | http://werkstatthub.docker.localhost                |
+| proxy           | http://traefik.werkstatthub.docker.localhost        |
+| keycloak        | http://keycloak.werkstatthub.docker.localhost       |
+| minio           | http://minio.werkstatthub.docker.localhost          |
+| api             | http://api.werkstatthub.docker.localhost            |
+| docs            | http://docs.werkstatthub.docker.localhost           |
+| edc(api)        | http://edc.werkstatthub.docker.localhost/api        |
+| edc(management) | http://edc.werkstatthub.docker.localhost/management |
+| edc(protocol)   | http://edc.werkstatthub.docker.localhost/protocol   |
+| edc(control)    | http://edc.werkstatthub.docker.localhost/control    |
+| edc(pulbic)     | http://edc.werkstatthub.docker.localhost/public     |
+| edc(identidy)   | http://edc.werkstatthub.docker.localhost/identity   |
+
+### Use TLS
+To use TLS set ```PROXY_DEFAULT_ENTRYPOINTS=websecure``` and 
+```PROXY_DEFAULT_SCHEME=https```. The frontend container has to be rebuild since
+it does not recognize the change in URLs by itself.
+
+Known Issues with TLS are:
+- Frontend can't use api if api address has not been visited and before since
+the self signed certificate has to be accepted by the browser.
+- All links have to start with https. There is no http &rarr; https redirect in 
+place yet.
+- Libraries like httpx have to be instructed to not verify the certificate.
+
 ### Stop the HUB
-To stop the HUB use:\
+To stop the HUB use:
 ```docker compose --env-file=dev.env down``` \
 To stop the HUB and **clear all Databases** use:\
 ```docker compose --env-file=dev.env down -v ```
