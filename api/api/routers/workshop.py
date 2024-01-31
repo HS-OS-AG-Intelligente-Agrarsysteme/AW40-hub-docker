@@ -7,7 +7,7 @@ from fastapi import (
 )
 from fastapi.responses import Response
 from motor import motor_asyncio
-from pydantic import NonNegativeInt, PositiveInt
+from pydantic import NonNegativeInt
 
 from ..data_management import (
     NewCase,
@@ -320,50 +320,6 @@ async def upload_picoscope_data(
         case = await case.add_timeseries_data(
             NewTimeseriesData(**data)
         )
-    return case
-
-
-@router.post(
-    "/{workshop_id}/cases/{case_id}/timeseries_data/upload/omniscope",
-    status_code=201,
-    response_model=Case,
-    tags=["Workshop - Data Management"]
-)
-async def upload_omniscope_data(
-        upload: UploadFile = File(description="Omniscope Data File"),
-        file_format: Literal["Omniscope V1 RAW"] = Form(
-            default="Omniscope V1 RAW"
-        ),
-        component: str = Form(
-            description="The investigated vehicle component"
-        ),
-        label: TimeseriesDataLabel = Form(
-            default=TimeseriesDataLabel.unknown,
-            description="Label for the oscillogram"
-        ),
-        sampling_rate: PositiveInt = Form(
-            description="Sampling rate used (Hz)"
-        ),
-        case: Case = Depends(case_from_workshop)
-):
-    reader = filereader_factory.get_reader(file_format)
-    data = reader.read_file(upload.file)[0]
-
-    if len(data["signal"]) == 0:
-        raise HTTPException(
-            status_code=422, detail=f"File '{upload.filename}' seems to "
-                                    f"contain no data."
-        )
-
-    data["component"] = component
-    data["label"] = label
-    data["type"] = "oscillogram"
-    data["sampling_rate"] = sampling_rate
-    # duration is derived from length of signal and sampling_rate
-    data["duration"] = len(data["signal"]) / sampling_rate
-    case = await case.add_timeseries_data(
-        NewTimeseriesData(**data)
-    )
     return case
 
 
