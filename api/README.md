@@ -60,7 +60,7 @@ the workshop router (`/{workshop_id}/...`) first needs to obtain a bearer token 
 that access is on behalf of the workshop with this id.
 
 This section is intended to illustrate this process with the dev stack. So
-keycloak and the hub api are available at `localhost:8080` and `localhost:8000`.
+keycloak and the hub api are available at `keycloak.werkstatthub.docker.localhost` and `api.werkstatthub.docker.localhost`.
 
 Prerequisites: Both the client and the workshop (=user) need to be configured
 in keycloak's `werkstatt-hub` realm. In addition, the (keycloak)user has to have
@@ -77,13 +77,13 @@ PASSWORD=dev
 
 Attempting to access the workshop's cases will fail without a token:
 ```
-curl http://localhost:8000/v1/$WORKSHOP_ID/cases
+curl http://api.werkstatthub.docker.localhost/v1/$WORKSHOP_ID/cases
 ```
 
 So, first the client has to send a request to keycloak like so:
 ```
 TOKEN_RESPONSE=$( \
-    curl http://localhost:8080/realms/werkstatt-hub/protocol/openid-connect/token \
+    curl http://keycloak.werkstatthub.docker.localhost/realms/werkstatt-hub/protocol/openid-connect/token \
         -X POST \
         -H "Content-Type=application/x-www-form-urlencoded" \
         -d "client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&username=$WORKSHOP_ID&password=$PASSWORD&grant_type=password" \
@@ -106,7 +106,7 @@ ACCESS_TOKEN=$(echo $TOKEN_RESPONSE | jq -r .access_token)
 Now the client can access the API by passing the access token in an authorization
 header:
 ```
-curl -H "Authorization: Bearer $ACCESS_TOKEN" http://localhost:8000/v1/$WORKSHOP_ID/cases
+curl -H "Authorization: Bearer $ACCESS_TOKEN" http://api.werkstatthub.docker.localhost/v1/$WORKSHOP_ID/cases
 ```
 
 ### Shared authentication
@@ -120,5 +120,5 @@ does also have this role. So the example in the previous section also applies
 to shared resources, e.g. after obtaining the token, a list of all cases from
 the shared router can be retrieved via
 ```
-curl -H "Authorization: Bearer $ACCESS_TOKEN" http://localhost:8000/v1/shared/cases
+curl -H "Authorization: Bearer $ACCESS_TOKEN" http://api.werkstatthub.docker.localhost/v1/shared/cases
 ```
