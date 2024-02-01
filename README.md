@@ -55,6 +55,10 @@ The services of the developement HUB are locally reachable via Webbrowser:
 | edc(pulbic)     | http://edc.werkstatthub.docker.localhost/public     |
 | edc(identidy)   | http://edc.werkstatthub.docker.localhost/identity   |
 
+Known issues with the local addresses:
+- The addresses might not resolve when using WSL. A quick fix is to add
+entries such as `127.0.0.1 api.werkstatthub.docker.localhost` to `/etc/hosts`.
+
 ### Use TLS
 To use TLS set ```PROXY_DEFAULT_ENTRYPOINTS=websecure``` and 
 ```PROXY_DEFAULT_SCHEME=https```. The frontend container has to be rebuild since
