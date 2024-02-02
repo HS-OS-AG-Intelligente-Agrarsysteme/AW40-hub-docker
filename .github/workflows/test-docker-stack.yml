@@ -24,6 +24,7 @@ jobs:
       KEYCLOAK_ADDRESS: keycloak.werkstatthub.docker.localhost
       API_ADDRESS: api.werkstatthub.docker.localhost
       EDC_ADDRESS: edc.werkstatthub.docker.localhost
+      COMPOSE_PROFILES: full
 
     steps:
     # Setup environment
