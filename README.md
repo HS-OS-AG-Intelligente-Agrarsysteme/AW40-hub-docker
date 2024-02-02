@@ -28,7 +28,7 @@ Currently included services:
 ### Start the developement HUB
 **WARNING: DO NOT RUN THE DEVELOPEMENT HUB ON PUBLIC SERVER**\
 To start the HUB in developer mode use:\
-```docker compose --env-file=dev.env up -d```
+```docker compose --env-file=dev.env --profile full up -d```
 
 The interactive docs of the API service can now be accessed via
 http://api.werkstatthub.docker.localhost/v1/docs.  
@@ -73,6 +73,6 @@ place yet.
 
 ### Stop the HUB
 To stop the HUB use:
-```docker compose --env-file=dev.env down``` \
+```docker compose --env-file=dev.env --profile full down``` \
 To stop the HUB and **clear all Databases** use:\
-```docker compose --env-file=dev.env down -v ```
+```docker compose --env-file=dev.env --profile full down -v ```
