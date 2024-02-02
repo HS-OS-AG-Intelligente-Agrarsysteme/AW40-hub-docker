@@ -231,8 +231,6 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
-      minio-config:
-        condition: service_completed_successfully
       keycloak:
         condition: service_healthy
       keycloak-config:
