@@ -291,6 +291,8 @@ services:
   docs:
     build:
       context: ./docs
+      args:
+        - BUILD_WITH_PDF=${DOCS_BUILD_WITH_PDF:-1}
     <<: *default_restart_policy
     labels:
       - traefik.enable=true

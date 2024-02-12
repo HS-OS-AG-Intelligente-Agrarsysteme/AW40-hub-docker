@@ -1,4 +1,8 @@
 site_name: Autowerkstatt 4.0 - Hub
+site_author: | 
+        Hochschule Osnabrück, 
+        Technische Hochschule Georg Agricola, 
+        LMIS AG
 nav:
   - Hintergrund: 'background.md'
   - Technische Umsetzung:
@@ -8,7 +12,13 @@ nav:
       - KI: 'tech/ai.md'
       - Integration heterogener Messgeräte: 'tech/device_integration.md'
       - Federated Catalog: 'tech/federatedcatalog.md'
+  - Download: 'download/aw40-docs.pdf'
 theme:
     name: mkdocs
     navigation_depth: 3
-
+plugins:
+  - with-pdf:
+      cover_subtitle: Technische Dokumentation
+      toc_title: Inhaltsverzeichnis
+      output_path: download/aw40-docs.pdf
+      enabled_if_env: BUILD_WITH_PDF
