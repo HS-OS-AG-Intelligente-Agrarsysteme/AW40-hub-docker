@@ -24,6 +24,7 @@ jobs:
       KEYCLOAK_ADDRESS: keycloak.werkstatthub.docker.localhost
       API_ADDRESS: api.werkstatthub.docker.localhost
       EDC_ADDRESS: edc.werkstatthub.docker.localhost
+      DOCS_BUILD_WITH_PDF: 0
 
     steps:
     # Setup environment
