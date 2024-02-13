@@ -42,6 +42,16 @@ jobs:
       - name: Start containers and wait for healthy state
         run: docker compose --env-file=dev.env up -d --wait
 
+    # Test Code Compliance
+      - name: Install python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pytest
+        run: pytest ./api
+
+      - name: Run flake8
+        run: flake8 ./api
+
     # Test documentation
       - name: Check if documentation is reachable
         run: |
@@ -89,15 +99,6 @@ jobs:
           curl -sIX GET $PROXY_DEFAULT_SCHEME://$API_ADDRESS/v1/health/ping \
             | grep -iq "strict-transport-security" \
             || exit 1
-
-      - name: Install python dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run pytest
-        run: pytest ./api
-
-      - name: Run flake8
-        run: flake8 ./api
 
     # Test Frontend
       - name: Check if Frontend is reachable
