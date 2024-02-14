@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 import httpx
 import pytest
 from api.data_management import (
-    Case, NewTimeseriesData, TimeseriesMetaData, GridFSSignalStore
+    Case, NewTimeseriesData, TimeseriesMetaData, GridFSSignalStore, NewOBDData,
+    NewSymptom
 )
 from api.diagnostics_management import KnowledgeGraph
 from api.routers import shared
@@ -115,7 +116,22 @@ def timeseries_data():
 
 
 @pytest.fixture
-def data_context(motor_db, case_data, timeseries_data):
+def obd_data():
+    return {
+        "dtcs": ["P0001", "U0001"]
+    }
+
+
+@pytest.fixture
+def symptom_data():
+    return {
+        "component": "battery",
+        "label": "defect"
+    }
+
+
+@pytest.fixture
+def data_context(motor_db, case_data, timeseries_data, obd_data, symptom_data):
     """
     Seed db with test data.
 
@@ -136,6 +152,14 @@ def data_context(motor_db, case_data, timeseries_data):
             await case.add_timeseries_data(
                 NewTimeseriesData(**timeseries_data)
             )
+            # Add obd data to the case
+            await case.add_obd_data(
+                NewOBDData(**obd_data)
+            )
+            # Add symptom to the case
+            await case.add_symptom(
+                NewSymptom(**symptom_data)
+            )
 
         async def __aexit__(self, exc_type, exc, tb):
             pass
@@ -147,10 +171,10 @@ def data_context(motor_db, case_data, timeseries_data):
     # Drop signal collections from test database
     signal_files = motor_db[
         bucket.collection.name + ".files"
-    ]
+        ]
     signal_chunks = motor_db[
         bucket.collection.name + ".chunks"
-    ]
+        ]
     signal_files.drop()
     signal_files.drop_indexes()
     signal_chunks.drop()
@@ -204,6 +228,38 @@ async def test_list_timeseries_data(
     assert len(response_data) == 1
     assert response_data[0]["sampling_rate"] == \
            timeseries_data["sampling_rate"]
+
+
+@pytest.mark.asyncio
+async def test_list_obd_data(
+        authenticated_async_client, case_id, obd_data,
+        initialized_beanie_context, data_context
+):
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            f"/cases/{case_id}/obd_data"
+        )
+
+    assert response.status_code == 200
+    response_data = response.json()
+    assert len(response_data) == 1
+    assert response_data[0]["dtcs"] == obd_data["dtcs"]
+
+
+@pytest.mark.asyncio
+async def test_list_symptoms(
+        authenticated_async_client, case_id, symptom_data,
+        initialized_beanie_context, data_context
+):
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            f"/cases/{case_id}/symptoms"
+        )
+
+    assert response.status_code == 200
+    response_data = response.json()
+    assert len(response_data) == 1
+    assert response_data[0]["label"] == symptom_data["label"]
 
 
 def test_list_vehicle_components_no_kg_configured(authenticated_client):
