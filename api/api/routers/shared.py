@@ -5,7 +5,9 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from fastapi import APIRouter, HTTPException, Depends
 
-from ..data_management import Case, Customer, Vehicle, Workshop, TimeseriesData
+from ..data_management import (
+    Case, Customer, Vehicle, Workshop, TimeseriesData, OBDData, Symptom
+)
 from ..diagnostics_management import KnowledgeGraph
 from ..security.token_auth import authorized_shared_access
 
@@ -73,6 +75,30 @@ async def get_case(case: Case = Depends(case_by_id)) -> Case:
 def list_timeseries_data(case: Case = Depends(case_by_id)):
     """List all available timeseries datasets for a case."""
     return case.timeseries_data
+
+
+@router.get(
+    "/cases/{case_id}/obd_data",
+    status_code=200,
+    response_model=List[OBDData], tags=["Workshop - Data Management"]
+)
+async def list_obd_data(
+        case: Case = Depends(case_by_id)
+) -> List[OBDData]:
+    """List all available obd datasets for a case."""
+    return case.obd_data
+
+
+@router.get(
+    "/cases/{case_id}/symptoms",
+    status_code=200,
+    response_model=List[Symptom], tags=["Workshop - Data Management"]
+)
+async def list_symptoms(
+        case: Case = Depends(case_by_id)
+) -> List[Symptom]:
+    """List all available symptoms for a case."""
+    return case.symptoms
 
 
 @router.get("/customers", status_code=200, response_model=List[Customer])
