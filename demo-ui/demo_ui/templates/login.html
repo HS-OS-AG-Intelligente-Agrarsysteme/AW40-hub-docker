@@ -10,12 +10,7 @@
 <form method="post">
     <p>
         <label for="workshop"><b>Werkstatt auswählen</b></label><br>
-        <input list="workshops" id="workshop_id" name="workshop_id" style="width:30%" required>
-        <datalist id="workshops">
-            {% for workshop in workshops %}
-            <option value="{{ workshop }}">
-            {% endfor %}
-        </datalist>
+        <input type="text" id="workshop_id" name="workshop_id" style="width:30%" required>
     </p>
     <p>
         <label for="password"><b>Passwort</b></label><br>

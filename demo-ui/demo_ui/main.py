@@ -154,21 +154,10 @@ def get_components(url: str = Depends(get_components_url)) -> List[str]:
     return sorted(components)
 
 
-def get_workshops(url: str = Depends(get_shared_cases_url)) -> List[str]:
-    """Retrieve list of alphabetically sorted workshops from the API."""
-    # The API does not store any information about workshops outside of cases
-    # ,yet. So for now, just retrieve list of all cases and extract workshop
-    # ids
-    cases = get_from_api(url)
-    workshops = [case["workshop_id"] for case in cases]
-    workshops = list(set(workshops))
-    return sorted(workshops)
-
-
 @app.get("/ui", response_class=HTMLResponse)
-def login_get(request: Request, workshops: List[str] = Depends(get_workshops)):
+def login_get(request: Request):
     return templates.TemplateResponse(
-        "login.html", {"request": request, "workshops": workshops}
+        "login.html", {"request": request}
     )
 
 
