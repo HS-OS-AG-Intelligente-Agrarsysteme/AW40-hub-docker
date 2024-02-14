@@ -333,6 +333,41 @@ async def test_list_symptoms(
     assert response_data[0]["label"] == symptom_data["label"]
 
 
+@pytest.mark.asyncio
+async def test_get_symptom(
+        authenticated_async_client, case_id, symptom_data,
+        initialized_beanie_context, data_context
+):
+    data_id = 0  # id in data_context
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            f"/cases/{case_id}/symptoms/{data_id}"
+        )
+
+    assert response.status_code == 200
+    response_data = response.json()
+    assert response_data["label"] == symptom_data["label"]
+    assert response_data["data_id"] == data_id
+
+
+@pytest.mark.asyncio
+async def test_get_symptom_not_found(
+        authenticated_async_client, case_id, symptom_data,
+        initialized_beanie_context, data_context
+):
+    data_id = 1  # id not in data_context
+    expected_exception_detail = f"No symptom with data_id " \
+                                f"`{data_id}` in case {case_id}."
+
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            f"/cases/{case_id}/symptoms/{data_id}"
+        )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == expected_exception_detail
+
+
 def test_list_vehicle_components_no_kg_configured(authenticated_client):
     KnowledgeGraph.set_kg_url(None)
     response = authenticated_client.get("/known-components")
