@@ -1,9 +1,10 @@
-from typing import List, Optional
+from typing import List, Optional, Literal, Callable
 
 import httpx
 from bson import ObjectId
 from bson.errors import InvalidId
 from fastapi import APIRouter, HTTPException, Depends
+from pydantic import NonNegativeInt
 
 from ..data_management import (
     Case, Customer, Vehicle, Workshop, TimeseriesData, OBDData, Symptom
@@ -75,6 +76,50 @@ async def get_case(case: Case = Depends(case_by_id)) -> Case:
 def list_timeseries_data(case: Case = Depends(case_by_id)):
     """List all available timeseries datasets for a case."""
     return case.timeseries_data
+
+
+class DatasetById:
+    """
+    Parameterized dependency to fetch a dataset by id or raise 404 if the
+    data_id is not existent.
+    """
+    def __init__(
+            self, data_type: Literal["timeseries_data", "obd_data", "symptom"]
+    ):
+        self.data_type = data_type
+
+    def __call__(
+            self, data_id: NonNegativeInt, case: Case = Depends(case_by_id)
+    ):
+        # Depending on the configured data_type, another db access function
+        # from case is used
+        get_func = getattr(case, f"get_{self.data_type}")
+        dataset = get_func(data_id)
+        if dataset is not None:
+            return dataset
+        else:
+            exception_detail = f"No {self.data_type} with data_id " \
+                               f"`{data_id}` in case {case.id}."
+            raise HTTPException(status_code=404, detail=exception_detail)
+
+
+# Endpoint dependency to fetch timeseries_data by data_id
+timeseries_data_by_id: Callable[
+    [NonNegativeInt, Case], TimeseriesData
+] = DatasetById("timeseries_data")
+
+
+@router.get(
+    "/cases/{case_id}/timeseries_data/{data_id}",
+    status_code=200,
+    tags=["Workshop - Data Management"],
+    response_model=TimeseriesData
+)
+async def get_timeseries_data(
+        timeseries_data: TimeseriesData = Depends(timeseries_data_by_id)
+) -> TimeseriesData:
+    """Get a specific timeseries dataset from a case."""
+    return timeseries_data
 
 
 @router.get(
