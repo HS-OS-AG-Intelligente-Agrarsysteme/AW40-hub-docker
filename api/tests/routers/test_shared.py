@@ -267,6 +267,22 @@ async def test_get_timeseries_data_not_found(
 
 
 @pytest.mark.asyncio
+async def test_list_obd_data(
+        authenticated_async_client, case_id, obd_data,
+        initialized_beanie_context, data_context
+):
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            f"/cases/{case_id}/obd_data"
+        )
+
+    assert response.status_code == 200
+    response_data = response.json()
+    assert len(response_data) == 1
+    assert response_data[0]["dtcs"] == obd_data["dtcs"]
+
+
+@pytest.mark.asyncio
 async def test_get_obd_data(
         authenticated_async_client, case_id, obd_data,
         initialized_beanie_context, data_context
@@ -299,22 +315,6 @@ async def test_get_obd_data_not_found(
 
     assert response.status_code == 404
     assert response.json()["detail"] == expected_exception_detail
-
-
-@pytest.mark.asyncio
-async def test_list_obd_data(
-        authenticated_async_client, case_id, obd_data,
-        initialized_beanie_context, data_context
-):
-    async with initialized_beanie_context, data_context:
-        response = await authenticated_async_client.get(
-            f"/cases/{case_id}/obd_data"
-        )
-
-    assert response.status_code == 200
-    response_data = response.json()
-    assert len(response_data) == 1
-    assert response_data[0]["dtcs"] == obd_data["dtcs"]
 
 
 @pytest.mark.asyncio
