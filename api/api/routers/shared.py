@@ -61,6 +61,7 @@ async def case_by_id(case_id: str) -> Case:
 
 @router.get("/cases/{case_id}", status_code=200, response_model=Case)
 async def get_case(case: Case = Depends(case_by_id)) -> Case:
+    """Get a specific case by id."""
     return case
 
 
