@@ -71,7 +71,7 @@ async def get_case(case: Case = Depends(case_by_id)) -> Case:
 @router.get(
     "/cases/{case_id}/timeseries_data",
     status_code=200,
-    response_model=List[TimeseriesData], tags=["Workshop - Data Management"]
+    response_model=List[TimeseriesData]
 )
 def list_timeseries_data(case: Case = Depends(case_by_id)):
     """List all available timeseries datasets for a case."""
@@ -112,7 +112,6 @@ timeseries_data_by_id: Callable[
 @router.get(
     "/cases/{case_id}/timeseries_data/{data_id}",
     status_code=200,
-    tags=["Workshop - Data Management"],
     response_model=TimeseriesData
 )
 async def get_timeseries_data(
@@ -125,7 +124,6 @@ async def get_timeseries_data(
 @router.get(
     "/cases/{case_id}/timeseries_data/{data_id}/signal",
     status_code=200,
-    tags=["Workshop - Data Management"],
     response_model=List[float]
 )
 async def get_timeseries_data_signal(
@@ -138,7 +136,7 @@ async def get_timeseries_data_signal(
 @router.get(
     "/cases/{case_id}/obd_data",
     status_code=200,
-    response_model=List[OBDData], tags=["Workshop - Data Management"]
+    response_model=List[OBDData]
 )
 async def list_obd_data(
         case: Case = Depends(case_by_id)
@@ -156,7 +154,7 @@ obd_data_by_id: Callable[
 @router.get(
     "/cases/{case_id}/obd_data/{data_id}",
     status_code=200,
-    response_model=OBDData, tags=["Workshop - Data Management"]
+    response_model=OBDData
 )
 async def get_obd_data(
         obd_data: OBDData = Depends(obd_data_by_id)
@@ -168,7 +166,7 @@ async def get_obd_data(
 @router.get(
     "/cases/{case_id}/symptoms",
     status_code=200,
-    response_model=List[Symptom], tags=["Workshop - Data Management"]
+    response_model=List[Symptom]
 )
 async def list_symptoms(
         case: Case = Depends(case_by_id)
@@ -186,7 +184,7 @@ symptom_by_id: Callable[
 @router.get(
     "/cases/{case_id}/symptoms/{data_id}",
     status_code=200,
-    response_model=Symptom, tags=["Workshop - Data Management"]
+    response_model=Symptom
 )
 async def get_symptom(
         symptom: Symptom = Depends(symptom_by_id)
