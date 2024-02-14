@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import httpx
 import pytest
 from api.data_management import (
-    Case
+    Case, NewTimeseriesData, TimeseriesMetaData, GridFSSignalStore
 )
 from api.diagnostics_management import KnowledgeGraph
 from api.routers import shared
@@ -12,6 +12,7 @@ from bson import ObjectId
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from jose import jws
+from motor import motor_asyncio
 
 
 @pytest.fixture
@@ -93,12 +94,67 @@ def case_id():
 
 @pytest.fixture
 def case_data(case_id):
-    """Valid case data."""
+    """Valid minimal case data."""
     return {
         "_id": case_id,
         "vehicle_vin": "test-vin",
         "workshop_id": "test-workshop-id",
     }
+
+
+@pytest.fixture
+def timeseries_data():
+    return {
+        "component": "battery",
+        "label": "norm",
+        "sampling_rate": 1,
+        "duration": 3,
+        "type": "oscillogram",
+        "signal": [0., 1., 2.]
+    }
+
+
+@pytest.fixture
+def data_context(motor_db, case_data, timeseries_data):
+    """
+    Seed db with test data.
+
+    Usage: `async with initialized_beanie_context, data_context: ...`
+    """
+    # Configure the GridFS signal store to allow timeseries data CRUD
+    bucket = motor_asyncio.AsyncIOMotorGridFSBucket(
+        motor_db, bucket_name="test-signals"
+    )
+    TimeseriesMetaData.signal_store = GridFSSignalStore(bucket=bucket)
+
+    class DataContext:
+        async def __aenter__(self):
+            # Seed the db with a case
+            case = Case(**case_data)
+            await case.create()
+            # Add timeseries data to the case
+            await case.add_timeseries_data(
+                NewTimeseriesData(**timeseries_data)
+            )
+
+        async def __aexit__(self, exc_type, exc, tb):
+            pass
+
+    # Yield context instance to the test function
+    yield DataContext()
+    # Reset timeseries signal store after test
+    TimeseriesMetaData.signal_store = None
+    # Drop signal collections from test database
+    signal_files = motor_db[
+        bucket.collection.name + ".files"
+    ]
+    signal_chunks = motor_db[
+        bucket.collection.name + ".chunks"
+    ]
+    signal_files.drop()
+    signal_files.drop_indexes()
+    signal_chunks.drop()
+    signal_chunks.drop_indexes()
 
 
 def test_get_case_invalid_id(authenticated_client):
@@ -131,6 +187,23 @@ async def test_get_case(
 
     assert response.status_code == 200
     assert response.json()["_id"] == case_id
+
+
+@pytest.mark.asyncio
+async def test_list_timeseries_data(
+        authenticated_async_client, case_id, timeseries_data,
+        initialized_beanie_context, data_context
+):
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            f"/cases/{case_id}/timeseries_data"
+        )
+
+    assert response.status_code == 200
+    response_data = response.json()
+    assert len(response_data) == 1
+    assert response_data[0]["sampling_rate"] == \
+           timeseries_data["sampling_rate"]
 
 
 def test_list_vehicle_components_no_kg_configured(authenticated_client):
