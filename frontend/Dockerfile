@@ -1,13 +1,4 @@
-FROM ubuntu:20.04 as build
-
-ARG BACKEND_URL
-ARG BASIC_AUTH_KEY
-ARG KC_CLIENT
-ARG KC_BASE_URL
-ARG KC_REALM
-ARG LOG_LEVEL
-ARG ROOT_DOMAIN
-ARG REDIRECT_URI_MOBILE
+FROM ubuntu:20.04 AS base
 
 RUN apt-get update \
  && apt-get install -y bash curl file git libglu1-mesa unzip xz-utils zip \
@@ -28,14 +19,25 @@ ENV PATH="$PATH:/home/flutter/flutter-sdk/bin:/home/flutter/flutter-sdk/bin/cach
 RUN flutter precache
 RUN flutter config --no-analytics
 
+FROM base AS build
 COPY --chown=flutter:flutter ./app /home/flutter/app
 COPY --chown=flutter:flutter ./frontend.env /home/flutter/frontend.env
 WORKDIR /home/flutter/app
 RUN flutter pub get
+
+ARG BACKEND_URL
+ARG BASIC_AUTH_KEY
+ARG KC_CLIENT
+ARG KC_BASE_URL
+ARG KC_REALM
+ARG LOG_LEVEL
+ARG ROOT_DOMAIN
+ARG REDIRECT_URI_MOBILE
+
 RUN flutter pub run build_runner build --delete-conflicting-outputs --release
 RUN flutter build web
 
-FROM nginx:alpine as serve
+FROM nginx:alpine AS serve
 
 COPY --from=build /home/flutter/app/build/web /usr/share/nginx/html
 
