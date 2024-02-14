@@ -148,9 +148,12 @@ def get_shared_cases_url() -> str:
     return f"{shared_url}/cases"
 
 
-def get_components(url: str = Depends(get_components_url)) -> List[str]:
+def get_components(
+        url: str = Depends(get_components_url),
+        access_token: str = Depends(get_session_token)
+) -> List[str]:
     """Retrieve list of alphabetically sorted components from the API."""
-    components = get_from_api(url)
+    components = get_from_api(url, access_token)
     return sorted(components)
 
 
@@ -375,7 +378,6 @@ def obd_data_delete_get(
 )
 def new_timeseries_data_get(
         request: Request,
-        access_token: str = Depends(get_session_token),
         components: List[str] = Depends(get_components),
         suggested_component: str = ""
 
@@ -436,7 +438,7 @@ def timeseries_data(
     signal = get_from_api(signal_url, access_token)
     # convert signal to 2d array with columns 'Zeit' and 'Signal'
     sr = timeseries_data["sampling_rate"]
-    signal = [[i/sr, v] for i, v in enumerate(signal)]
+    signal = [[i / sr, v] for i, v in enumerate(signal)]
 
     return templates.TemplateResponse(
         "timeseries_data.html",
@@ -473,7 +475,6 @@ def timeseries_data_delete_get(
 )
 def new_symptom_get(
         request: Request,
-        access_token: str = Depends(get_session_token),
         components: List[str] = Depends(get_components),
         suggested_component: str = ""
 ):
