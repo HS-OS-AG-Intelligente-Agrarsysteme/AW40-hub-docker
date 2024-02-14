@@ -33,15 +33,15 @@ async def http_status_error_handler(request, exc):
         if exc.response.status_code in [401, 403]:
             flash_message(request, "Bitte anmelden!")
             return RedirectResponse("/ui", status_code=303)
-    else:
-        return templates.TemplateResponse(
-            "http_exception.html",
-            {
-                "request": request,
-                "status_code": exc.response.status_code,
-                "details": exc.response.json().get("detail")
-            }
-        )
+        else:
+            return templates.TemplateResponse(
+                "http_exception.html",
+                {
+                    "request": request,
+                    "status_code": exc.response.status_code,
+                    "details": exc.response.json().get("detail")
+                }
+            )
 
 
 def get_session_token(request: Request) -> str:
