@@ -39,10 +39,12 @@ async def list_cases(
     return cases
 
 
-@router.get("/cases/{case_id}", status_code=200, response_model=Case)
-async def get_case(case_id: str) -> Case:
+async def case_by_id(case_id: str) -> Case:
+    """
+    Fetch a case from the database or throw 404 if the passed id is invalid.
+    """
     no_case_exception = HTTPException(
-        status_code=404, detail=f"No case with id `{case_id}`"
+        status_code=404, detail=f"No case with id `{case_id}`."
     )
     try:
         case_id = ObjectId(case_id)
@@ -55,6 +57,11 @@ async def get_case(case_id: str) -> Case:
         return case
     else:
         raise no_case_exception
+
+
+@router.get("/cases/{case_id}", status_code=200, response_model=Case)
+async def get_case(case: Case = Depends(case_by_id)) -> Case:
+    return case
 
 
 @router.get("/customers", status_code=200, response_model=List[Customer])
