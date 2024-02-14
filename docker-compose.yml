@@ -8,6 +8,9 @@ services:
     image: traefik:2.10
     <<: *default_restart_policy
     hostname: "traefik"
+    profiles:
+      - full
+      - rollout1
     command:
       # Let's Encrypt
       - '--certificatesresolvers.letsencrypt.acme.email=${ROOT_EMAIL:?error}'
@@ -45,6 +48,9 @@ services:
     build:
       context: ./mongo
     <<: *default_restart_policy
+    profiles:
+      - full
+      - rollout1
     env_file:
       - mongo/mongo.env
     hostname: "mongo"
@@ -63,6 +69,9 @@ services:
         - KC_VER=20.0
     <<: *default_restart_policy
     command: start-dev --import-realm
+    profiles:
+      - full
+      - rollout1
     depends_on:
       keycloak-db:
         condition: service_healthy
@@ -94,6 +103,9 @@ services:
         "-c",
         "chmod +x /keycloak-config.sh && ./keycloak-config.sh && chmod +x /keycloak-config-dev.sh && ./keycloak-config-dev.sh"
       ]
+      profiles:
+        - full
+        - rollout1
       env_file:
         - keycloak/keycloak.env
       networks:
@@ -107,6 +119,9 @@ services:
     build:
       context: ./keycloak-db
     <<: *default_restart_policy
+    profiles:
+      - full
+      - rollout1
     env_file:
       - keycloak-db/postgres.env
     hostname: "keycloak-db"
@@ -121,6 +136,8 @@ services:
       args:
         - MINIO_VER=RELEASE.2023-05-27T05-56-19Z
     <<: *default_restart_policy
+    profiles:
+      - full
     command: server /data --address ":9000" --console-address ":9090"
     depends_on:
       keycloak-config:
@@ -140,7 +157,6 @@ services:
       - traefik.http.routers.minio_api.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
       - traefik.http.routers.minio_api.service=minio_api
       - traefik.http.services.minio_api.loadbalancer.server.port=9000
-    
     hostname: "minio"
     networks:
       hubintranet:
@@ -154,6 +170,8 @@ services:
         minio:
           condition: service_healthy
       entrypoint: ["sh","-c","chmod +x /minio-config.sh && ./minio-config.sh"]
+      profiles:
+        - full
       environment:
           - S3_ROOT_USER=${S3_ROOT_USER:?error}
           - S3_ROOT_PASSWORD=${S3_ROOT_PASSWORD:?error}
@@ -166,6 +184,15 @@ services:
       build:
         context: ./edc
       <<: *default_restart_policy
+      depends_on:
+        minio:
+          condition: service_healthy
+        edc-db:
+          condition: service_healthy
+        minio-config:
+          condition: service_completed_successfully
+      profiles:
+        - full
       env_file:
         - edc/edc.env
       hostname: "edc"
@@ -204,15 +231,14 @@ services:
         - traefik.http.services.edc_identity.loadbalancer.server.port=8186
       networks:
         - hubnet
-      depends_on:
-          edc-db:
-              condition: service_healthy
       volumes:
           - ./edc/resources:/resources
 
   edc-db:
       build:
           context: ./edc-db
+      profiles:
+        - full
       env_file:
           - edc-db/edc-db.env
       hostname: "edc-db"
@@ -228,11 +254,12 @@ services:
     <<: *default_restart_policy
     # DEVELOPMENT: run with reload and mount api package code
     command: uvicorn --host 0.0.0.0 --reload api.main:app
+    profiles:
+      - full
+      - rollout1
     depends_on:
       mongo:
         condition: service_healthy
-      minio-config:
-        condition: service_completed_successfully
       keycloak:
         condition: service_healthy
       keycloak-config:
@@ -270,6 +297,8 @@ services:
         - ROOT_DOMAIN=${PROXY_DEFAULT_SCHEME:?error}://${FRONTEND_ADDRESS:?error}
         - REDIRECT_URI_MOBILE=${FRONTEND_REDIRECT_URI_MOBILE:?error}
     <<: *default_restart_policy
+    profiles:
+      - full
     depends_on:
       api:
         condition: service_healthy
@@ -291,7 +320,11 @@ services:
   docs:
     build:
       context: ./docs
+      args:
+        - BUILD_WITH_PDF=${DOCS_BUILD_WITH_PDF:-1}
     <<: *default_restart_policy
+    profiles:
+      - full
     labels:
       - traefik.enable=true
       - traefik.docker.network=hubnet
@@ -306,6 +339,8 @@ services:
   redis:  # broker for communication between api and diagnostics
     image: redis:alpine
     <<: *default_restart_policy
+    profiles:
+      - full
     hostname: "redis"
     networks:
       - hubintranet
@@ -321,6 +356,8 @@ services:
       context: ./diagnostics
     <<: *default_restart_policy
     command: celery -A diagnostics.tasks worker --loglevel=INFO
+    profiles:
+      - full
     env_file:
       - diagnostics/diagnostics.env
     hostname: "diagnostics"
@@ -333,6 +370,9 @@ services:
   knowledge-graph:  # utilized by the diagnostics service
     build: ./knowledge-graph
     <<: *default_restart_policy
+    profiles:
+      - full
+      - rollout1
     ports:
       - 3030:3030
     hostname: "knowledge-graph"
