@@ -231,6 +231,42 @@ async def test_list_timeseries_data(
 
 
 @pytest.mark.asyncio
+async def test_get_timeseries_data(
+        authenticated_async_client, case_id, timeseries_data,
+        initialized_beanie_context, data_context
+):
+    data_id = 0  # id in data_context
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            f"/cases/{case_id}/timeseries_data/{data_id}"
+        )
+
+    assert response.status_code == 200
+    response_data = response.json()
+    assert response_data["sampling_rate"] == \
+           timeseries_data["sampling_rate"]
+    assert response_data["data_id"] == data_id
+
+
+@pytest.mark.asyncio
+async def test_get_timeseries_data_not_found(
+        authenticated_async_client, case_id, timeseries_data,
+        initialized_beanie_context, data_context
+):
+    data_id = 1  # id not in data_context
+    expected_exception_detail = f"No timeseries_data with data_id " \
+                                f"`{data_id}` in case {case_id}."
+
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            f"/cases/{case_id}/timeseries_data/{data_id}"
+        )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == expected_exception_detail
+
+
+@pytest.mark.asyncio
 async def test_list_obd_data(
         authenticated_async_client, case_id, obd_data,
         initialized_beanie_context, data_context
