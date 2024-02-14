@@ -123,6 +123,19 @@ async def get_timeseries_data(
 
 
 @router.get(
+    "/cases/{case_id}/timeseries_data/{data_id}/signal",
+    status_code=200,
+    tags=["Workshop - Data Management"],
+    response_model=List[float]
+)
+async def get_timeseries_data_signal(
+        timeseries_data: TimeseriesData = Depends(timeseries_data_by_id)
+) -> List[float]:
+    """Get the signal of a specific timeseries dataset from a case."""
+    return await timeseries_data.get_signal()
+
+
+@router.get(
     "/cases/{case_id}/obd_data",
     status_code=200,
     response_model=List[OBDData], tags=["Workshop - Data Management"]
