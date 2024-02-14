@@ -164,6 +164,24 @@ async def list_symptoms(
     return case.symptoms
 
 
+# Endpoint dependency to fetch symptom by data_id
+symptom_by_id: Callable[
+    [NonNegativeInt, Case], Symptom
+] = DatasetById("symptom")
+
+
+@router.get(
+    "/cases/{case_id}/symptoms/{data_id}",
+    status_code=200,
+    response_model=Symptom, tags=["Workshop - Data Management"]
+)
+async def get_symptom(
+        symptom: Symptom = Depends(symptom_by_id)
+) -> Symptom:
+    """Get a specific symptom from a case."""
+    return symptom
+
+
 @router.get("/customers", status_code=200, response_model=List[Customer])
 async def list_customers() -> List[Customer]:
     """
