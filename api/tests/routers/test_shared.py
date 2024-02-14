@@ -2,9 +2,13 @@ from datetime import datetime, timedelta
 
 import httpx
 import pytest
+from api.data_management import (
+    Case
+)
 from api.diagnostics_management import KnowledgeGraph
 from api.routers import shared
 from api.security.keycloak import Keycloak
+from bson import ObjectId
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from jose import jws
@@ -27,10 +31,10 @@ def signed_jwt(jwt_payload, rsa_private_key_pem: bytes):
 
 
 @pytest.fixture
-def test_app():
-    app = FastAPI()
-    app.include_router(shared.router)
-    return app
+def test_app(motor_db):
+    test_app = FastAPI()
+    test_app.include_router(shared.router)
+    yield test_app
 
 
 @pytest.fixture
@@ -56,6 +60,77 @@ def authenticated_client(
     ] = lambda: rsa_public_key_pem.decode()
 
     return client
+
+
+@pytest.fixture
+def authenticated_async_client(
+        test_app, rsa_public_key_pem, signed_jwt
+):
+    """
+    Authenticated async client for tests that require mongodb access via beanie
+    """
+
+    # Client with valid auth header
+    client = httpx.AsyncClient(
+        app=test_app,
+        base_url="http://",
+        headers={"Authorization": f"Bearer {signed_jwt}"}
+    )
+
+    # Make app use public key from fixture for token validation
+    test_app.dependency_overrides[
+        Keycloak.get_public_key_for_workshop_realm
+    ] = lambda: rsa_public_key_pem.decode()
+
+    return client
+
+
+@pytest.fixture
+def case_id():
+    """Valid case_id, e.g. needs to work with PydanticObjectId"""
+    return str(ObjectId())
+
+
+@pytest.fixture
+def case_data(case_id):
+    """Valid case data."""
+    return {
+        "_id": case_id,
+        "vehicle_vin": "test-vin",
+        "workshop_id": "test-workshop-id",
+    }
+
+
+def test_get_case_invalid_id(authenticated_client):
+    # Invalid case_id format is passed
+    response = authenticated_client.get("/cases/invalidid")
+    assert response.status_code == 404
+    assert "detail" in response.json()
+
+
+@pytest.mark.asyncio
+async def test_get_case_non_existent(
+        authenticated_async_client, case_id, initialized_beanie_context
+):
+    async with initialized_beanie_context:
+        # Try to get case from an empty db
+        response = await authenticated_async_client.get(f"/cases/{case_id}")
+
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_case(
+        authenticated_async_client, case_data, case_id,
+        initialized_beanie_context
+):
+    async with initialized_beanie_context:
+        # Seed db with a case and try to get it
+        await Case(**case_data).create()
+        response = await authenticated_async_client.get(f"/cases/{case_id}")
+
+    assert response.status_code == 200
+    assert response.json()["_id"] == case_id
 
 
 def test_list_vehicle_components_no_kg_configured(authenticated_client):
