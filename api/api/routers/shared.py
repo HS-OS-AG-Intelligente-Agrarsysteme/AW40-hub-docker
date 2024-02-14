@@ -134,6 +134,24 @@ async def list_obd_data(
     return case.obd_data
 
 
+# Endpoint dependency to fetch obd_data by data_id
+obd_data_by_id: Callable[
+    [NonNegativeInt, Case], OBDData
+] = DatasetById("obd_data")
+
+
+@router.get(
+    "/cases/{case_id}/obd_data/{data_id}",
+    status_code=200,
+    response_model=OBDData, tags=["Workshop - Data Management"]
+)
+async def get_obd_data(
+        obd_data: OBDData = Depends(obd_data_by_id)
+) -> OBDData:
+    """Get a specific obd dataset from a case."""
+    return obd_data
+
+
 @router.get(
     "/cases/{case_id}/symptoms",
     status_code=200,
