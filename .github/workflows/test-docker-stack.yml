@@ -41,7 +41,7 @@ jobs:
           password: ${{secrets.GITHUB_TOKEN}}
 
       - name: Install Python Development package
-        run: apt-get update && apt-get install python3-dev -y
+        run: sudo apt-get update && sudo apt-get install python3-dev -y
 
       - name: Install python dependencies
         run: pip install -r requirements.txt
