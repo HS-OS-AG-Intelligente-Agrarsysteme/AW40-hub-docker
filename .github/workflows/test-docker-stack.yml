@@ -1,9 +1,5 @@
 name: Test Docker Stack
 
-permissions:
-  contents: read
-  packages: write
-
 on:
   push:
     branches:
