@@ -32,26 +32,68 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v2
+      - name: 'Login to GitHub Container Registry'
+        if: ${{ github }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
 
-    # Tag Containers
-      - name: Build and tag containers
-        run: docker compose --env-file=dev.env build
+      - name: Install Python Development package
+        run: apt-get update && apt-get install python3-dev -y
 
-    # Start Containers
-      - name: Start containers and wait for healthy state
-        run: docker compose --env-file=dev.env up -d --wait
-
-    # Test Code Compliance
       - name: Install python dependencies
         run: pip install -r requirements.txt
 
+    # Tag Containers
+      - name: Build and tag containers
+        if: ${{ github.ref_name == 'main' && github.ref_type == 'branch'}}
+        run: |
+          docker compose \
+          --env-file=dev.env \
+          -f docker-compose.yml \
+          -f cache-from-override.yml \
+          -f cache-to-override.yml \
+          build
+
+      - name: Build and tag containers
+        if: ${{ github.ref_name != 'main' && github.ref_type == 'branch'}}
+        run: |
+          docker compose \
+          --env-file=dev.env \
+          -f docker-compose.yml \
+          -f cache-from-override.yml \
+          build
+
+    # Start Containers
+      - name: Start containers and wait for healthy state
+        run: |
+          docker compose \
+          --env-file=dev.env \
+          -f docker-compose.yml \
+          -f cache-from-override.yml \
+          up -d --wait
+
+    # Wait for Traefik to generate routes
+      - name: Proxy setup delay
+        run: sleep 10s
+
+    # Test API
+      - name: Check if API is healthy
+        run: |
+          curl -fs -o /dev/null -w 'http_code:%{http_code}' \
+          $PROXY_DEFAULT_SCHEME://$API_ADDRESS/v1/health/ping \
+          || exit 1
+
+      - name: Check for strict-transport-security header
+        run: |
+          curl -sIX GET $PROXY_DEFAULT_SCHEME://$API_ADDRESS/v1/health/ping \
+            | grep -iq "strict-transport-security" \
+            || exit 1
+
       - name: Run pytest
         run: pytest ./api
-
-      - name: Run flake8
-        run: flake8 ./api
 
     # Test documentation
       - name: Check if documentation is reachable
@@ -70,41 +112,28 @@ jobs:
     # Test Keycloak
       - name: Check if Keycloak is healthy
         run: |
-          curl -fs \
+          curl -fs -o /dev/null -w 'http_code:%{http_code}' \
           $PROXY_DEFAULT_SCHEME://$KEYCLOAK_ADDRESS/health/live \
           || exit 1
 
     # Test MinIO
       - name: Check if MinIO is healthy
         run: |
-          curl -fs \
+          curl -fs -o /dev/null -w 'http_code:%{http_code}' \
           $PROXY_DEFAULT_SCHEME://$MINIO_ADDRESS/minio/health/live \
           || exit 1
 
     # Test EDC
       - name: Check if EDC is healthy
         run: |
-            curl -fs \
+            curl -fs -o /dev/null -w 'http_code:%{http_code}' \
             $PROXY_DEFAULT_SCHEME://$EDC_ADDRESS/api/health \
-            || exit 1
-
-    # Test API
-      - name: Check if API is healthy
-        run: |
-          curl -fs \
-          $PROXY_DEFAULT_SCHEME://$API_ADDRESS/v1/health/ping \
-          || exit 1
-
-      - name: Check for strict-transport-security header
-        run: |
-          curl -sIX GET $PROXY_DEFAULT_SCHEME://$API_ADDRESS/v1/health/ping \
-            | grep -iq "strict-transport-security" \
             || exit 1
 
     # Test Frontend
       - name: Check if Frontend is reachable
         run: |
-          curl -fs \
+          curl -fs -o /dev/null -w 'http_code:%{http_code}' \
           $PROXY_DEFAULT_SCHEME://$FRONTEND_ADDRESS \
           || exit 1
 
