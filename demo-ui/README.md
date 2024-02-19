@@ -13,7 +13,7 @@ and demonstrating the end-user experience.
 
 The application can be started by using the dedicated compose file [demo_ui.yml](../demo_ui.yml).
 ```
-docker compose --env-file dev.env -f docker-compose.yml -f demo_ui.yml up -d
+docker compose --env-file dev.env -f docker-compose.yml -f demo_ui.yml --profile full up -d
 ```
 
 The Demo UI can be accessed at http://localhost:8002/ui.

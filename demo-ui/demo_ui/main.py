@@ -33,15 +33,15 @@ async def http_status_error_handler(request, exc):
         if exc.response.status_code in [401, 403]:
             flash_message(request, "Bitte anmelden!")
             return RedirectResponse("/ui", status_code=303)
-    else:
-        return templates.TemplateResponse(
-            "http_exception.html",
-            {
-                "request": request,
-                "status_code": exc.response.status_code,
-                "details": exc.response.json().get("detail")
-            }
-        )
+        else:
+            return templates.TemplateResponse(
+                "http_exception.html",
+                {
+                    "request": request,
+                    "status_code": exc.response.status_code,
+                    "details": exc.response.json().get("detail")
+                }
+            )
 
 
 def get_session_token(request: Request) -> str:
@@ -148,27 +148,19 @@ def get_shared_cases_url() -> str:
     return f"{shared_url}/cases"
 
 
-def get_components(url: str = Depends(get_components_url)) -> List[str]:
+def get_components(
+        url: str = Depends(get_components_url),
+        access_token: str = Depends(get_session_token)
+) -> List[str]:
     """Retrieve list of alphabetically sorted components from the API."""
-    components = get_from_api(url)
+    components = get_from_api(url, access_token)
     return sorted(components)
 
 
-def get_workshops(url: str = Depends(get_shared_cases_url)) -> List[str]:
-    """Retrieve list of alphabetically sorted workshops from the API."""
-    # The API does not store any information about workshops outside of cases
-    # ,yet. So for now, just retrieve list of all cases and extract workshop
-    # ids
-    cases = get_from_api(url)
-    workshops = [case["workshop_id"] for case in cases]
-    workshops = list(set(workshops))
-    return sorted(workshops)
-
-
 @app.get("/ui", response_class=HTMLResponse)
-def login_get(request: Request, workshops: List[str] = Depends(get_workshops)):
+def login_get(request: Request):
     return templates.TemplateResponse(
-        "login.html", {"request": request, "workshops": workshops}
+        "login.html", {"request": request}
     )
 
 
@@ -386,7 +378,6 @@ def obd_data_delete_get(
 )
 def new_timeseries_data_get(
         request: Request,
-        access_token: str = Depends(get_session_token),
         components: List[str] = Depends(get_components),
         suggested_component: str = ""
 
@@ -447,7 +438,7 @@ def timeseries_data(
     signal = get_from_api(signal_url, access_token)
     # convert signal to 2d array with columns 'Zeit' and 'Signal'
     sr = timeseries_data["sampling_rate"]
-    signal = [[i/sr, v] for i, v in enumerate(signal)]
+    signal = [[i / sr, v] for i, v in enumerate(signal)]
 
     return templates.TemplateResponse(
         "timeseries_data.html",
@@ -484,7 +475,6 @@ def timeseries_data_delete_get(
 )
 def new_symptom_get(
         request: Request,
-        access_token: str = Depends(get_session_token),
         components: List[str] = Depends(get_components),
         suggested_component: str = ""
 ):
