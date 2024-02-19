@@ -32,15 +32,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: 'Login to GitHub Container Registry'
-        if: ${{ github }}
+      - name: Login to GitHub Container Registry
+        if: ${{ !env.ACT }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{github.actor}}
           password: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Install Python Development package
+      - name: Install Python Development package (only ACT)
+        if: ${{ env.ACT }}
         run: sudo apt-get update && sudo apt-get install python3-dev -y
 
       - name: Install python dependencies
