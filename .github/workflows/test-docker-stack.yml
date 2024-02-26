@@ -52,7 +52,7 @@ jobs:
 
     # Tag Containers
       - name: Build containers and save cache (only on main)
-        #if: ${{ github.ref_name == 'main' && github.ref_type == 'branch'}}
+        if: ${{ github.ref_name == 'main' && github.ref_type == 'branch'}}
         run: |
           docker compose \
           --env-file=dev.env \
@@ -62,8 +62,7 @@ jobs:
           build
 
       - name: Build containers (other than main)
-        #if: ${{ github.ref_name != 'main' && github.ref_type == 'branch'}}
-        if: ${{ env.ACT }}
+        if: ${{ github.ref_name != 'main' && github.ref_type == 'branch'}}
         run: |
           docker compose \
           --env-file=dev.env \
