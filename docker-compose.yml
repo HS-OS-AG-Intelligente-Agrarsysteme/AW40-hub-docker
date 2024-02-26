@@ -368,8 +368,7 @@ services:
       - ./diagnostics/models:/home/runtime/models
 
   knowledge-graph:  # utilized by the diagnostics service
-    build: 
-      context: ./knowledge-graph
+    build: ./knowledge-graph
     <<: *default_restart_policy
     profiles:
       - full
