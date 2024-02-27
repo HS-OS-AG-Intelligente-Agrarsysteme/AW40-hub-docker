@@ -32,7 +32,8 @@ class JwtModel {
     dynamic jsonData;
     jsonData = TokenService().decodeBodyFromJWT(jwt);
     exp = DateTime.fromMillisecondsSinceEpoch(jsonData["exp"] * 1000 as int);
-    final String kcClient = ConfigService().getConfigValue(ConfigKey.kcClient);
+    final String kcClient =
+        ConfigService().getConfigValue(ConfigKey.keyCloakClient);
     roles = jsonData["resource_access"]?[kcClient]?["roles"].cast<String>()
             as List<String>? ??
         [];

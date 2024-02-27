@@ -19,14 +19,16 @@ class ConfigService {
   }
 
   Future<void> _importConfigValues() async {
-    _configMap[ConfigKey.logLevel] = Env.logLevel;
-    _configMap[ConfigKey.backendUrl] = Env.backendUrl;
+    _configMap[ConfigKey.apiAddress] = Env.apiAddress;
+    _configMap[ConfigKey.frontendAddress] = Env.frontendAddress;
     _configMap[ConfigKey.basicAuthKey] = Env.basicAuthKey;
-    _configMap[ConfigKey.kcClient] = Env.kcClient;
-    _configMap[ConfigKey.kcBaseUrl] = Env.kcBaseUrl;
-    _configMap[ConfigKey.kcRealm] = Env.kcRealm;
-    _configMap[ConfigKey.rootDomain] = Env.rootDomain;
+    _configMap[ConfigKey.keyCloakAddress] = Env.keyCloakAddress;
+    _configMap[ConfigKey.keyCloakClient] = Env.keyCloakClient;
+    _configMap[ConfigKey.keyCloakRealm] = Env.keyCloakRealm;
+    _configMap[ConfigKey.logLevel] = Env.logLevel;
     _configMap[ConfigKey.redirectUriMobile] = Env.redirectUriMobile;
+    _configMap[ConfigKey.proxyDefaultScheme] = Env.proxyDefaultScheme;
+
     if (EnvironmentService().hostPlatform == HostPlatform.android) {
       for (final key in ConfigKey.values) {
         final String value = _configMap[key]!;
@@ -62,9 +64,16 @@ class ConfigService {
   /// Replaces `localhost` with `10.0.2.2`. On Android, `localhost` refers to
   /// the emulator itself, `10.0.2.2` refers to the webbrowser within the
   /// Android app.
+  // TODO: Will this still work with proxies?
   String _androidifyUrl(String oldUrl) {
     final String newUrl = oldUrl.replaceFirst("localhost", "10.0.2.2");
     _logger.warning("Androidifying URL $oldUrl to $newUrl");
     return newUrl;
+  }
+
+  void logValues() {
+    for (final key in _configMap.keys) {
+      _logger.warning("$key: ${_configMap[key]}");
+    }
   }
 }

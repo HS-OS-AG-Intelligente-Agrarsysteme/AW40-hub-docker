@@ -76,7 +76,7 @@ class AuthProvider with ChangeNotifier {
       _jwt?.name ?? tr("general.unnamed"),
       _jwt?.preferredUsername ?? tr("general.unnamed"),
       _jwt?.email ?? "",
-      //! Dummy value for workshop ID!
+      // TODO: Dummy value for workshop ID!
       "42",
     );
   }
@@ -225,7 +225,7 @@ class AuthProvider with ChangeNotifier {
       "code": code,
       "grant_type": "authorization_code",
       "redirect_uri": redirectUri,
-      "client_id": _configService.getConfigValue(ConfigKey.kcClient),
+      "client_id": _configService.getConfigValue(ConfigKey.keyCloakClient),
       "code_verifier": verifier,
     };
 
@@ -280,7 +280,7 @@ class AuthProvider with ChangeNotifier {
     final Map<String, dynamic> jsonMap = <String, dynamic>{
       "refresh_token": _refreshToken,
       "grant_type": "refresh_token",
-      "client_id": _configService.getConfigValue(ConfigKey.kcClient),
+      "client_id": _configService.getConfigValue(ConfigKey.keyCloakClient),
     };
 
     try {
@@ -358,7 +358,7 @@ class AuthProvider with ChangeNotifier {
       final Map<String, dynamic> jsonMap = <String, dynamic>{
         // can throw errors without <?? ''>
         "refresh_token": _refreshToken ?? "",
-        "client_id": _configService.getConfigValue(ConfigKey.kcClient),
+        "client_id": _configService.getConfigValue(ConfigKey.keyCloakClient),
       };
 
       final String? token = await getAuthToken();

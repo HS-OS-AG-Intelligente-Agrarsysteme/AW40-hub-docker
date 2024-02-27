@@ -1,23 +1,39 @@
+// ignore_for_file: prefer_const_declarations
+
 import "package:envied/envied.dart";
+import "package:flutter/foundation.dart";
 
 part "env.g.dart";
 
-@Envied(path: "../frontend.env", obfuscate: true)
+@Envied(
+  path: kDebugMode ? "../../dev.env" : "../frontend.env",
+  obfuscate: !kDebugMode,
+)
 abstract class Env {
-  @EnviedField(varName: "BACKEND_URL")
-  static final String backendUrl = _Env.backendUrl;
-  @EnviedField(varName: "BASIC_AUTH_KEY")
+  @EnviedField(varName: "API_ADDRESS")
+  static final String apiAddress = _Env.apiAddress;
+
+  @EnviedField(varName: "FRONTEND_ADDRESS")
+  static final String frontendAddress = _Env.frontendAddress;
+
+  @EnviedField(varName: "FRONTEND_BASIC_AUTH_KEY")
   static final String basicAuthKey = _Env.basicAuthKey;
-  @EnviedField(varName: "KC_CLIENT")
-  static final String kcClient = _Env.kcClient;
-  @EnviedField(varName: "KC_BASE_URL")
-  static final String kcBaseUrl = _Env.kcBaseUrl;
-  @EnviedField(varName: "KC_REALM")
-  static final String kcRealm = _Env.kcRealm;
-  @EnviedField(varName: "LOG_LEVEL")
+
+  @EnviedField(varName: "KEYCLOAK_ADDRESS")
+  static final String keyCloakAddress = _Env.keyCloakAddress;
+
+  @EnviedField(varName: "KEYCLOAK_FRONTEND_CLIENT")
+  static final String keyCloakClient = _Env.keyCloakClient;
+
+  @EnviedField(varName: "KEYCLOAK_REALM")
+  static final String keyCloakRealm = _Env.keyCloakRealm;
+
+  @EnviedField(varName: "FRONTEND_LOG_LEVEL")
   static final String logLevel = _Env.logLevel;
-  @EnviedField(varName: "ROOT_DOMAIN")
-  static final String rootDomain = _Env.rootDomain;
-  @EnviedField(varName: "REDIRECT_URI_MOBILE")
+
+  @EnviedField(varName: "FRONTEND_REDIRECT_URI_MOBILE")
   static final String redirectUriMobile = _Env.redirectUriMobile;
+
+  @EnviedField(varName: "PROXY_DEFAULT_SCHEME")
+  static final String proxyDefaultScheme = _Env.proxyDefaultScheme;
 }

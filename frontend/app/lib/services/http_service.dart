@@ -7,7 +7,8 @@ import "package:http/http.dart" as http;
 class HttpService {
   static final http.Client _client = http.Client();
   static final String backendUrl =
-      ConfigService().getConfigValue(ConfigKey.backendUrl);
+      "${ConfigService().getConfigValue(ConfigKey.proxyDefaultScheme)}://${ConfigService().getConfigValue(ConfigKey.apiAddress)}/v1";
+  // TODO: Wtf how did this ever contain a token?
   static final String basicAuthKey =
       ConfigService().getConfigValue(ConfigKey.basicAuthKey);
 
