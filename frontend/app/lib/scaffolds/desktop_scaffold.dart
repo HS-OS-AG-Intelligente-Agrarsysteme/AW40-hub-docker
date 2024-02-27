@@ -2,6 +2,7 @@ import "package:aw40_hub_frontend/components/components.dart";
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/utils/constants.dart";
+import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 
@@ -44,6 +45,7 @@ class DesktopScaffold extends StatelessWidget {
                 color: colorScheme.surface,
                 child: Column(
                   children: [
+                    const Text("kDebugMode: $kDebugMode"),
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Image.asset(

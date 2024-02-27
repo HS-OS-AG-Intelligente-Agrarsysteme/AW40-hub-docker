@@ -28,6 +28,7 @@ Future<void> _initialize() async {
   // Get rid of super annoying # symbol in the URI.
   if (kIsWeb) setUrlStrategy(PathUrlStrategy());
   _initRootLogger();
+  ConfigService().logValues();
   await _checkBackendHealth();
 }
 
