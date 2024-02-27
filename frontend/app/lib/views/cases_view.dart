@@ -89,7 +89,7 @@ class _DesktopCasesViewState extends State<DesktopCasesView> {
               caseModel: widget.caseModels[currentCaseIndex!],
               onClose: () => setState(() => currentCaseIndex = null),
             ),
-          )
+          ),
       ],
     );
   }

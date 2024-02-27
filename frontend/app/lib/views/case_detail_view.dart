@@ -263,7 +263,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),

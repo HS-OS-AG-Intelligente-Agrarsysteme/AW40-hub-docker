@@ -82,7 +82,7 @@ void main() {
         actionType: "1",
         dataType: "2",
         component: "3",
-      )
+      ),
     ];
 
     final diagnosisModel = DiagnosisModel(

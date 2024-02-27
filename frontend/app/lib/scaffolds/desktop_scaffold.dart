@@ -65,7 +65,7 @@ class DesktopScaffold extends StatelessWidget {
                                     children: [
                                       Text(navItem.title),
                                       const SizedBox(width: 8),
-                                      const Icon(Icons.open_in_new)
+                                      const Icon(Icons.open_in_new),
                                     ],
                                   )
                                 : Text(navItem.title),

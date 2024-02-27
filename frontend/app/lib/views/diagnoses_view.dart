@@ -134,7 +134,7 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
             child: DiagnosisDetailView(
               diagnosisModel: widget.diagnosisModels[currentDiagnosisIndex!],
             ),
-          )
+          ),
       ],
     );
   }

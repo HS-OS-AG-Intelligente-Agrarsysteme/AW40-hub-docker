@@ -28,7 +28,7 @@ class DesktopAppBar extends StatelessWidget {
             children: <Widget>[
               Text(title, style: Theme.of(context).textTheme.displayMedium),
               const Spacer(),
-              if (actions != null) Row(children: actions!)
+              if (actions != null) Row(children: actions!),
             ],
           ),
         ),

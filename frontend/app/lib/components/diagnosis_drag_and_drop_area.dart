@@ -53,7 +53,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
                   ),
                   onPressed: widget.onUploadFile,
                   tooltip: tr("diagnoses.details.uploadFileTooltip"),
-                )
+                ),
               ],
             ),
             const SizedBox(height: 16),

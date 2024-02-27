@@ -57,7 +57,7 @@ class MobileScaffold extends StatelessWidget {
                             children: [
                               Text(item.title),
                               const SizedBox(width: 8),
-                              const Icon(Icons.open_in_new)
+                              const Icon(Icons.open_in_new),
                             ],
                           )
                         : Text(item.title),

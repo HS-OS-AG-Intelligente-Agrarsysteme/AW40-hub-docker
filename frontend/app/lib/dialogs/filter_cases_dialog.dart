@@ -24,7 +24,7 @@ class FilterCasesDialog extends StatelessWidget {
               TextButton(
                 child: Text(tr("general.close")),
                 onPressed: () async => _onCancel(context),
-              )
+              ),
             ],
           );
   }
