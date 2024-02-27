@@ -5,7 +5,7 @@
       paths:
         - "frontend/**"
   jobs:
-    test:
+    test_frontend:
       timeout-minutes: 10
       runs-on: ubuntu-latest
 
