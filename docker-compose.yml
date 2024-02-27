@@ -288,14 +288,15 @@ services:
     build:
       context: ./frontend
       args:
-        - BACKEND_URL=${PROXY_DEFAULT_SCHEME:?error}://${API_ADDRESS:?error}/v1
-        - BASIC_AUTH_KEY=${FRONTEND_BASIC_AUTH_KEY}
-        - KC_CLIENT=${KEYCLOAK_FRONTEND_CLIENT:?error}
-        - KC_BASE_URL=${PROXY_DEFAULT_SCHEME:?error}://${KEYCLOAK_ADDRESS:?error}/realms/<REALM>/protocol/openid-connect/
-        - KC_REALM=${KEYCLOAK_REALM:?error}
-        - LOG_LEVEL=${FRONTEND_LOG_LEVEL:-warning}
-        - ROOT_DOMAIN=${PROXY_DEFAULT_SCHEME:?error}://${FRONTEND_ADDRESS:?error}
-        - REDIRECT_URI_MOBILE=${FRONTEND_REDIRECT_URI_MOBILE:?error}
+        - API_ADDRESS=${API_ADDRESS:?error}
+        - FRONTEND_ADDRESS=${FRONTEND_ADDRESS:?error}
+        - FRONTEND_BASIC_AUTH_KEY=${FRONTEND_BASIC_AUTH_KEY}
+        - KEYCLOAK_ADDRESS=${KEYCLOAK_ADDRESS:?error}
+        - KEYCLOAK_FRONTEND_CLIENT=${KEYCLOAK_FRONTEND_CLIENT:?error}
+        - KEYCLOAK_REALM=${KEYCLOAK_REALM:?error}
+        - FRONTEND_LOG_LEVEL=${FRONTEND_LOG_LEVEL:?error}
+        - FRONTEND_REDIRECT_URI_MOBILE=${FRONTEND_REDIRECT_URI_MOBILE:?error}
+        - PROXY_DEFAULT_SCHEME=${PROXY_DEFAULT_SCHEME:?error}
     <<: *default_restart_policy
     profiles:
       - full
