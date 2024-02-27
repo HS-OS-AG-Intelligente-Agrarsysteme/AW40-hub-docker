@@ -13,5 +13,5 @@ FROM nginx:alpine as serve
 
 COPY --from=build de/site/ /usr/share/nginx/html
 
-HEALTHCHECK --interval=30s --timeout=2s --retries=5 \
+HEALTHCHECK --start-period=30s --start-interval=1s --interval=30s --timeout=2s --retries=5 \
   CMD curl -fs http://localhost:80|| exit 1
