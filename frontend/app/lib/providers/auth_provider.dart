@@ -76,8 +76,8 @@ class AuthProvider with ChangeNotifier {
       _jwt?.name ?? tr("general.unnamed"),
       _jwt?.preferredUsername ?? tr("general.unnamed"),
       _jwt?.email ?? "",
-      // TODO: Dummy value for workshop ID!
-      "42",
+      // TODO: Workshop ID == username for now.
+      _jwt?.preferredUsername ?? "",
     );
   }
 
