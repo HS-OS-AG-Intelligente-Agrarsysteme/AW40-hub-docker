@@ -16,9 +16,6 @@ abstract class Env {
   @EnviedField(varName: "FRONTEND_ADDRESS")
   static final String frontendAddress = _Env.frontendAddress;
 
-  @EnviedField(varName: "FRONTEND_BASIC_AUTH_KEY")
-  static final String basicAuthKey = _Env.basicAuthKey;
-
   @EnviedField(varName: "KEYCLOAK_ADDRESS")
   static final String keyCloakAddress = _Env.keyCloakAddress;
 
