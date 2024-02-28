@@ -28,7 +28,6 @@ enum TokenType {
 enum ConfigKey {
   apiAddress,
   frontendAddress,
-  basicAuthKey,
   keyCloakAddress,
   keyCloakClient,
   keyCloakRealm,

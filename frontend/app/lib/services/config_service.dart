@@ -21,7 +21,6 @@ class ConfigService {
   Future<void> _importConfigValues() async {
     _configMap[ConfigKey.apiAddress] = Env.apiAddress;
     _configMap[ConfigKey.frontendAddress] = Env.frontendAddress;
-    _configMap[ConfigKey.basicAuthKey] = Env.basicAuthKey;
     _configMap[ConfigKey.keyCloakAddress] = Env.keyCloakAddress;
     _configMap[ConfigKey.keyCloakClient] = Env.keyCloakClient;
     _configMap[ConfigKey.keyCloakRealm] = Env.keyCloakRealm;
