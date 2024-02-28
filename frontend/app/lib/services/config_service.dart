@@ -72,7 +72,7 @@ class ConfigService {
 
   void logValues() {
     for (final key in _configMap.keys) {
-      _logger.warning("$key: ${_configMap[key]}");
+      _logger.info("$key: ${_configMap[key]}");
     }
   }
 }
