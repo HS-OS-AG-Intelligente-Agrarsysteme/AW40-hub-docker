@@ -5,7 +5,6 @@ import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:crypto/crypto.dart";
 import "package:logging/logging.dart";
-import "package:universal_html/html.dart" as html;
 
 class AuthService {
   static const String _charset =
@@ -68,13 +67,13 @@ class AuthService {
     final String frontendAddress =
         ConfigService().getConfigValue(ConfigKey.frontendAddress);
     String rootDomain = "$proxyDefaultScheme://$frontendAddress";
-    final bool isHttps = !html.window.location.href.contains("localhost");
     if (rootDomain.contains("*")) {
       final String realm =
           ConfigService().getConfigValue(ConfigKey.keyCloakRealm);
       rootDomain = rootDomain.replaceAll("*", realm);
     }
     if (idToken == null) return "${getKeyCloakUrlWithRealm()}logout";
-    return "${getKeyCloakUrlWithRealm()}logout?post_logout_redirect_uri=http${isHttps ? "s" : ""}://$rootDomain&id_token_hint=$idToken";
+    return "${getKeyCloakUrlWithRealm()}logout?post_logout_redirect_uri="
+        "$rootDomain&id_token_hint=$idToken";
   }
 }
