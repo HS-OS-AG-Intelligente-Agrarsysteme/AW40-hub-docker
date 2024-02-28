@@ -302,8 +302,6 @@ services:
     depends_on:
       api:
         condition: service_healthy
-    env_file:
-      - frontend/frontend.env
     hostname: "frontend"
     labels:
       - traefik.enable=true
