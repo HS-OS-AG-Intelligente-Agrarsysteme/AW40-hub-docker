@@ -3,7 +3,6 @@ import "package:flutter/foundation.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:logging/logging.dart";
 
-
 void main() {
   //do not print to console
   debugPrint = (String? message, {int? wrapWidth}) {};
@@ -68,7 +67,7 @@ void main() {
       test("returns only auth header if `otherHeaders` is null", () {
         const String token = "some-token";
         final Map<String, String> expected = {
-          "Authorization": "Bearer some-token=="
+          "Authorization": "Bearer some-token==",
         };
         final Map<String, String> actual = httpService.getAuthHeaderWith(token);
         expect(actual, expected);

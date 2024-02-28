@@ -2,7 +2,6 @@ import "package:aw40_hub_frontend/components/components.dart";
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/utils/constants.dart";
-import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 
