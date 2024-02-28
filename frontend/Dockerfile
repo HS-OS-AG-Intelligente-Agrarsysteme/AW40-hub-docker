@@ -21,7 +21,6 @@ RUN flutter config --no-analytics
 
 FROM base AS build
 COPY --chown=flutter:flutter ./app /home/flutter/app
-COPY --chown=flutter:flutter ./frontend.env /home/flutter/frontend.env
 WORKDIR /home/flutter/app
 RUN flutter pub get
 
