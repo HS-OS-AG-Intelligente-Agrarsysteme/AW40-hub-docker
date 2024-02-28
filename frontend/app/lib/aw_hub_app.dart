@@ -35,14 +35,20 @@ class AWHubApp extends StatelessWidget {
               ConfigService(),
             ),
           ),
-          ChangeNotifierProvider<CaseProvider>(
+          ChangeNotifierProxyProvider<AuthProvider, CaseProvider>(
             create: (_) => CaseProvider(HttpService()),
+            update: (_, authProvider, caseProvider) =>
+                // ignore: discarded_futures
+                caseProvider!..fetchAndSetAuthToken(authProvider),
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, DiagnosisProvider>(
+            create: (_) => DiagnosisProvider(HttpService()),
+            update: (_, authProvider, caseProvider) =>
+                // ignore: discarded_futures
+                caseProvider!..fetchAndSetAuthToken(authProvider),
           ),
           ChangeNotifierProvider<ThemeProvider>(
             create: (_) => ThemeProvider(),
-          ),
-          ChangeNotifierProvider<DiagnosisProvider>(
-            create: (_) => DiagnosisProvider(HttpService()),
           ),
         ],
         child: const AWMaterialApp(),

@@ -9,12 +9,17 @@ import "package:http/http.dart" as http;
 import "package:mockito/annotations.dart";
 import "package:mockito/mockito.dart";
 
-@GenerateNiceMocks([MockSpec<HttpService>()])
+@GenerateNiceMocks([MockSpec<HttpService>(), MockSpec<AuthProvider>()])
 import "providers_test.mocks.dart";
 
 void main() {
   group("CaseProvider", () {
-    setUpAll(() async => ConfigService().initialize());
+    final mockAuthProvider = MockAuthProvider();
+    setUpAll(() async {
+      when(mockAuthProvider.getAuthToken())
+          .thenAnswer((_) async => "some_token");
+      await ConfigService().initialize();
+    });
     final NewCaseDto dummyNewCaseDto = NewCaseDto(
       "some_vehicle_vin",
       "some_customer_id",
@@ -43,13 +48,15 @@ void main() {
     });
     test("toggleShowSharedCases toggles showSharedCases", () async {
       final mockHttpService = MockHttpService();
-      when(mockHttpService.getSharedCases()).thenAnswer(
+      when(mockHttpService.getSharedCases(any)).thenAnswer(
         (_) async => http.Response("[]", 200),
       );
-      when(mockHttpService.getCases(any)).thenAnswer(
+      when(mockHttpService.getCases(any, any)).thenAnswer(
         (_) async => http.Response("[]", 200),
       );
+
       final caseProvider = CaseProvider(mockHttpService);
+      await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
       caseProvider.workShopId = "some_workshop_id";
       await caseProvider.toggleShowSharedCases();
       expect(caseProvider.showSharedCases, false);
@@ -60,27 +67,29 @@ void main() {
         "when showSharedCases=true",
         () async {
           final mockHttpService = MockHttpService();
-          when(mockHttpService.getSharedCases()).thenAnswer(
+          when(mockHttpService.getSharedCases(any)).thenAnswer(
             (_) async => http.Response("[]", 200),
           );
           final caseProvider = CaseProvider(mockHttpService);
+          await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
           if (caseProvider.showSharedCases == false) {
             await caseProvider.toggleShowSharedCases();
           }
           assert(caseProvider.showSharedCases == true);
           await caseProvider.getCurrentCases();
-          verify(mockHttpService.getSharedCases()).called(1);
-          verifyNever(mockHttpService.getCases(any));
+          verify(mockHttpService.getSharedCases(any)).called(1);
+          verifyNever(mockHttpService.getCases(any, any));
         },
       );
       test(
           "getCurrentCases() calls HttpService.getCases() "
           "when showSharedCases=false", () async {
         final mockHttpService = MockHttpService();
-        when(mockHttpService.getCases(any)).thenAnswer(
+        when(mockHttpService.getCases(any, any)).thenAnswer(
           (_) async => http.Response("[]", 200),
         );
         final caseProvider = CaseProvider(mockHttpService);
+        await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
         caseProvider.workShopId = "some_workshop_id";
         if (caseProvider.showSharedCases == true) {
           // First call to `getCases()`.
@@ -89,32 +98,34 @@ void main() {
         assert(caseProvider.showSharedCases == false);
         // Second call to `getCases()`.
         await caseProvider.getCurrentCases();
-        verify(mockHttpService.getCases(any)).called(2);
-        verifyNever(mockHttpService.getSharedCases());
+        verify(mockHttpService.getCases(any, any)).called(2);
+        verifyNever(mockHttpService.getSharedCases(any));
       });
     });
     group("addCase()", () {
       test("calls HttpService.addCase()", () async {
         final mockHttpService = MockHttpService();
-        when(mockHttpService.addCase(any, any)).thenAnswer(
+        when(mockHttpService.addCase(any, any, any)).thenAnswer(
           (_) async => http.Response(jsonEncode(dummyCaseDtoJson), 201),
         );
         final caseProvider = CaseProvider(mockHttpService);
+        await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
         caseProvider.workShopId = "some_workshop_id";
         await caseProvider.addCase(dummyNewCaseDto);
-        verify(mockHttpService.addCase(any, any)).called(1);
+        verify(mockHttpService.addCase(any, any, any)).called(1);
       });
     });
     group("deleteCase()", () {
       test("calls HttpService.deleteCase()", () async {
         final mockHttpService = MockHttpService();
-        when(mockHttpService.deleteCase(any, any)).thenAnswer(
+        when(mockHttpService.deleteCase(any, any, any)).thenAnswer(
           (_) async => http.Response("{}", 201),
         );
         final caseProvider = CaseProvider(mockHttpService);
+        await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
         caseProvider.workShopId = "some_workshop_id";
         await caseProvider.deleteCase("some_case_id");
-        verify(mockHttpService.deleteCase(any, any)).called(1);
+        verify(mockHttpService.deleteCase(any, any, any)).called(1);
       });
     });
   });

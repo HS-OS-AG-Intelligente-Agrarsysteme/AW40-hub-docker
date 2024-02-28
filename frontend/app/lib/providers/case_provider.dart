@@ -1,8 +1,11 @@
 import "dart:convert";
 
 import "package:aw40_hub_frontend/dtos/dtos.dart";
+import "package:aw40_hub_frontend/exceptions/exceptions.dart";
 import "package:aw40_hub_frontend/models/models.dart";
+import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/services/services.dart";
+import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:flutter/material.dart";
 import "package:http/http.dart";
 import "package:logging/logging.dart";
@@ -15,6 +18,7 @@ class CaseProvider with ChangeNotifier {
   late String workShopId;
   bool _showSharedCases = true;
   bool get showSharedCases => _showSharedCases;
+  String? _authToken;
 
   Future<void> toggleShowSharedCases() async {
     _showSharedCases = !_showSharedCases;
@@ -23,12 +27,13 @@ class CaseProvider with ChangeNotifier {
   }
 
   Future<List<CaseModel>> getCurrentCases() async {
+    final String authToken = _getAuthToken();
     // * Return value currently not used.
     final Response response;
     if (_showSharedCases) {
-      response = await _httpService.getSharedCases();
+      response = await _httpService.getSharedCases(authToken);
     } else {
-      response = await _httpService.getCases(workShopId);
+      response = await _httpService.getCases(authToken, workShopId);
     }
     if (response.statusCode != 200) {
       _logger.warning(
@@ -52,9 +57,10 @@ class CaseProvider with ChangeNotifier {
   }
 
   Future<CaseModel?> addCase(NewCaseDto newCaseDto) async {
+    final String authToken = _getAuthToken();
     final Map<String, dynamic> newCaseJson = newCaseDto.toJson();
     final Response response =
-        await _httpService.addCase(workShopId, newCaseJson);
+        await _httpService.addCase(authToken, workShopId, newCaseJson);
     if (response.statusCode != 201) {
       _logger.warning(
         "Could not add case. "
@@ -77,9 +83,14 @@ class CaseProvider with ChangeNotifier {
     String caseId,
     CaseUpdateDto updateCaseDto,
   ) async {
+    final String authToken = _getAuthToken();
     final Map<String, dynamic> updateCaseJson = updateCaseDto.toJson();
-    final Response response =
-        await _httpService.updateCase(workShopId, caseId, updateCaseJson);
+    final Response response = await _httpService.updateCase(
+      authToken,
+      workShopId,
+      caseId,
+      updateCaseJson,
+    );
     if (response.statusCode != 200) {
       _logger.warning(
         "Could not update case. "
@@ -93,7 +104,9 @@ class CaseProvider with ChangeNotifier {
   }
 
   Future<bool> deleteCase(String caseId) async {
-    final Response response = await _httpService.deleteCase(workShopId, caseId);
+    final String authToken = _getAuthToken();
+    final Response response =
+        await _httpService.deleteCase(authToken, workShopId, caseId);
     if (response.statusCode != 200) {
       _logger.warning(
         "Could not delete case. "
@@ -115,5 +128,20 @@ class CaseProvider with ChangeNotifier {
     // Aktuelle Filter werden durch Zustand einer FilterCriteria Instanz
     // definiert.
     _logger.warning("Unimplemented: filterCases()");
+  }
+
+  Future<void> fetchAndSetAuthToken(AuthProvider authProvider) async {
+    _authToken = await authProvider.getAuthToken();
+  }
+
+  String _getAuthToken() {
+    final String? authToken = _authToken;
+    if (authToken == null) {
+      throw AppException(
+        exceptionMessage: "Called CaseProvider without auth token.",
+        exceptionType: ExceptionType.unexpectedNullValue,
+      );
+    }
+    return authToken;
   }
 }

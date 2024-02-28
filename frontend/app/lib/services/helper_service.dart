@@ -4,6 +4,7 @@ import "package:aw40_hub_frontend/exceptions/exceptions.dart";
 import "package:aw40_hub_frontend/main.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:collection/collection.dart";
 import "package:flutter/material.dart";
 import "package:logging/logging.dart";
 
@@ -11,22 +12,13 @@ class HelperService {
   static Level? getLogLevelFromConfigMap() {
     final String logLevelValueFromConfigMap =
         ConfigService().getConfigValue(ConfigKey.logLevel);
-    return HelperService._stringToLogLevel(logLevelValueFromConfigMap);
+    return HelperService.stringToLogLevel(logLevelValueFromConfigMap);
   }
 
-  static Level? _stringToLogLevel(String s) {
-    final String ss = s.toLowerCase();
-    if (ss == "all") return Level.ALL;
-    if (ss == "finest") return Level.FINEST;
-    if (ss == "finer") return Level.FINER;
-    if (ss == "fine") return Level.FINE;
-    if (ss == "config") return Level.CONFIG;
-    if (ss == "info") return Level.INFO;
-    if (ss == "warning") return Level.WARNING;
-    if (ss == "severe") return Level.SEVERE;
-    if (ss == "shout") return Level.SHOUT;
-    if (ss == "off") return Level.OFF;
-    return null;
+  static Level? stringToLogLevel(String s) {
+    return Level.LEVELS.firstWhereOrNull(
+      (level) => level.toString().toLowerCase() == s.toLowerCase(),
+    );
   }
 
   static BuildContext get globalContext {
