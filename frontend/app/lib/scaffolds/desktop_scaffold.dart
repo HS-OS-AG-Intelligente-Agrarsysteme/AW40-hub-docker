@@ -45,7 +45,6 @@ class DesktopScaffold extends StatelessWidget {
                 color: colorScheme.surface,
                 child: Column(
                   children: [
-                    const Text("kDebugMode: $kDebugMode"),
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Image.asset(
