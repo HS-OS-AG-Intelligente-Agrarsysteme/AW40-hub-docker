@@ -6,7 +6,7 @@ import "package:flutter/foundation.dart";
 part "env.g.dart";
 
 @Envied(
-  path: kDebugMode ? "../../dev.env" : "../frontend.env",
+  path: kDebugMode ? "../../dev.env" : null,
   obfuscate: !kDebugMode,
 )
 abstract class Env {

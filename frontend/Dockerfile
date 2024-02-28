@@ -1,7 +1,7 @@
 FROM ubuntu:20.04 AS base
 
 RUN apt-get update \
- && apt-get install -y bash curl file gettext-base git libglu1-mesa unzip xz-utils zip \
+ && apt-get install -y bash curl file git libglu1-mesa unzip xz-utils zip \
  && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd -r -g 1234 flutter \
@@ -34,9 +34,6 @@ ARG KEYCLOAK_REALM
 ARG FRONTEND_LOG_LEVEL
 ARG FRONTEND_REDIRECT_URI_MOBILE
 ARG PROXY_DEFAULT_SCHEME
-
-RUN envsubst < ../frontend.env > tmp.txt \
- && mv tmp.txt ../frontend.env
 
 RUN flutter pub run build_runner build --delete-conflicting-outputs --release
 RUN flutter build web
