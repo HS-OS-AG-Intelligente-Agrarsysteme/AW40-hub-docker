@@ -3,7 +3,7 @@ name: Build and publish docs
 on:
   push:
     branches:
-      - feature/deploy-docs
+      - main
     paths:
       - "docs/de/**"
 jobs:
