@@ -62,7 +62,7 @@ Map<String, PageBuilder> _basicRoutes = {
     return MaterialPage<Widget>(
       child: ScaffoldWrapper(
         currentIndex: 1,
-        child: DiagnosisScreen(diagnosisId: diagnosisId),
+        child: DiagnosesScreen(diagnosisId: diagnosisId),
       ),
     );
   },
@@ -70,7 +70,7 @@ Map<String, PageBuilder> _basicRoutes = {
     return const MaterialPage<Widget>(
       child: ScaffoldWrapper(
         currentIndex: 1,
-        child: DiagnosisScreen(),
+        child: DiagnosesScreen(),
       ),
     );
   },
