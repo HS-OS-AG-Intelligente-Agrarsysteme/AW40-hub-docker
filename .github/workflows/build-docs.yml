@@ -7,7 +7,7 @@ on:
     paths:
       - "docs/de/**"
 jobs:
-  syntaxcheck-api:
+  build-docs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     env:
@@ -16,7 +16,7 @@ jobs:
     steps:
       # Setup environment
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -26,6 +26,11 @@ jobs:
       # Build and publish docs
       - name: Install python dependencies
         run: pip install mkdocs-with-pdf
+
+      - name: Set username and e-mail
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
 
       - name: Build and upload to gh-pages branch
         run: mkdocs gh-deploy --config-file ./docs/de/mkdocs.yml
