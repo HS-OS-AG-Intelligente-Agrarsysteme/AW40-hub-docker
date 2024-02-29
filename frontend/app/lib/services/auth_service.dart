@@ -45,7 +45,11 @@ class AuthService {
 
   String getKeyCloakUrlWithRealm() {
     final String keyCloakBaseUrl =
-        "${ConfigService().getConfigValue(ConfigKey.proxyDefaultScheme)}://${ConfigService().getConfigValue(ConfigKey.keyCloakAddress)}/realms/<REALM>/protocol/openid-connect/";
+        "${ConfigService().getConfigValue(ConfigKey.proxyDefaultScheme)}"
+        "://"
+        "${ConfigService().getConfigValue(ConfigKey.keyCloakAddress)}"
+        "/realms/<REALM>/protocol/openid-connect/";
+
     if (!keyCloakBaseUrl.contains(kRealmPlaceholder)) {
       throw AppException(
         exceptionMessage:

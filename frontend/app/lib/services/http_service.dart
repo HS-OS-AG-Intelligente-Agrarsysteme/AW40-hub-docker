@@ -8,7 +8,10 @@ import "package:http/http.dart" as http;
 class HttpService {
   static final http.Client _client = http.Client();
   static final String backendUrl =
-      "${ConfigService().getConfigValue(ConfigKey.proxyDefaultScheme)}://${ConfigService().getConfigValue(ConfigKey.apiAddress)}/v1";
+      "${ConfigService().getConfigValue(ConfigKey.proxyDefaultScheme)}"
+      "://"
+      "${ConfigService().getConfigValue(ConfigKey.apiAddress)}"
+      "/v1";
 
   Map<String, String> getAuthHeaderWith(
     String token, [
