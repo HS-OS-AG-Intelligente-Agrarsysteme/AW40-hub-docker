@@ -104,7 +104,7 @@ services:
       entrypoint: [
         "sh",
         "-c",
-        "chmod +x /keycloak-config.sh && ./keycloak-config.sh && chmod +x /keycloak-config-dev.sh && ./keycloak-config-dev.sh"
+        "chmod +x /keycloak-config.sh && ./keycloak-config.sh"
       ]
       profiles:
         - full
