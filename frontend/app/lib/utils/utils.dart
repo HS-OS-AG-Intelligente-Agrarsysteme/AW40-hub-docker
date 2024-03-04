@@ -7,7 +7,7 @@ export "extensions.dart";
 
 final Logger _logger = Logger(
   "diagnosis_provider",
-); //funktioniert das mit logger hier oder muss übergeben werden??
+);
 
 bool verifyStatusCode(
   int actualStatusCode,

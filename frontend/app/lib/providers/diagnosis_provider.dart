@@ -10,13 +10,11 @@ import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:collection/collection.dart";
 import "package:flutter/material.dart";
 import "package:http/http.dart";
-//import "package:logging/logging.dart";
 
 class DiagnosisProvider with ChangeNotifier {
   DiagnosisProvider(this._httpService);
   final HttpService _httpService;
 
-  //final Logger _logger = Logger("diagnosis_provider");
   late final String workShopId;
   String? _authToken;
 
@@ -92,14 +90,6 @@ class DiagnosisProvider with ChangeNotifier {
     final Response response =
         await _httpService.getDiagnosis(authToken, workShopId, caseId);
     if (response.statusCode == 404) return null;
-    /*  dieser block wird ersetzt
-    if (response.statusCode != 200) {
-      _logger.warning(
-        "Could not get diagnosis. "
-        "${response.statusCode}: ${response.reasonPhrase}",
-      );
-      return null;
-    }*/
     verifyStatusCode(
       response.statusCode,
       201,
@@ -114,14 +104,6 @@ class DiagnosisProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response =
         await _httpService.startDiagnosis(authToken, workShopId, caseId);
-/*  dieser block wird ersetzt
-    if (response.statusCode != 201) {
-      _logger.warning(
-        "Could not start diagnosis. "
-        "${response.statusCode}: ${response.reasonPhrase}",
-      );
-      return null;
-    }*/
     verifyStatusCode(
       response.statusCode,
       201,
@@ -137,14 +119,6 @@ class DiagnosisProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response =
         await _httpService.deleteDiagnosis(authToken, workShopId, caseId);
-    /*  dieser block wird ersetzt
-    if (response.statusCode != 200) {
-      _logger.warning(
-        "Could not delete diagnosis. "
-        "${response.statusCode}: ${response.reasonPhrase}",
-      );
-      return false;
-    }*/
     verifyStatusCode(
       response.statusCode,
       200,
@@ -165,14 +139,6 @@ class DiagnosisProvider with ChangeNotifier {
       caseId,
       obdDataJson,
     );
-/*  dieser block wird ersetzt
-    if (response.statusCode != 201) {
-      _logger.warning(
-        "Could not upload obd data. "
-        "${response.statusCode}: ${response.reasonPhrase}",
-      );
-      return false;
-    }*/
     verifyStatusCode(
       response.statusCode,
       201,
@@ -197,14 +163,6 @@ class DiagnosisProvider with ChangeNotifier {
       picoscopeData,
       filename,
     );
-    /*  dieser block wird ersetzt
-    if (response.statusCode != 201) {
-      _logger.warning(
-        "Could not upload picoscope data. "
-        "${response.statusCode}: ${response.reasonPhrase}",
-      );
-      return false;
-    }*/
     verifyStatusCode(
       response.statusCode,
       201,
@@ -225,14 +183,6 @@ class DiagnosisProvider with ChangeNotifier {
       caseId,
       symptomDataJson,
     );
-    /*  dieser block wird ersetzt    
-    if (response.statusCode != 201) {
-      _logger.warning(
-        "Could not upload symptom data. "
-        "${response.statusCode}: ${response.reasonPhrase}",
-      );
-      return false;
-    }*/
     verifyStatusCode(
       response.statusCode,
       201,
