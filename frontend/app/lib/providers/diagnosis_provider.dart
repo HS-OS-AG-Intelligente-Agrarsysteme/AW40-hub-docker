@@ -10,7 +10,7 @@ import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:collection/collection.dart";
 import "package:flutter/material.dart";
 import "package:http/http.dart";
-import "package:logging/logging.dart";
+//import "package:logging/logging.dart";
 
 class DiagnosisProvider with ChangeNotifier {
   DiagnosisProvider(this._httpService);
@@ -101,7 +101,11 @@ class DiagnosisProvider with ChangeNotifier {
       return null;
     }*/
     verifyStatusCode(
-        response.statusCode, 201, "Could not start diagnosis. ", response);
+      response.statusCode,
+      201,
+      "Could not start diagnosis. ",
+      response,
+    );
 
     return _decodeDiagnosisModelFromResponseBody(response);
   }
@@ -119,7 +123,11 @@ class DiagnosisProvider with ChangeNotifier {
       return null;
     }*/
     verifyStatusCode(
-        response.statusCode, 201, "Could not start diagnosis. ", response);
+      response.statusCode,
+      201,
+      "Could not start diagnosis. ",
+      response,
+    );
 
     notifyListeners();
     return _decodeDiagnosisModelFromResponseBody(response);
@@ -138,7 +146,11 @@ class DiagnosisProvider with ChangeNotifier {
       return false;
     }*/
     verifyStatusCode(
-        response.statusCode, 200, "Could not delete diagnosis. ", response);
+      response.statusCode,
+      200,
+      "Could not delete diagnosis. ",
+      response,
+    );
 
     notifyListeners();
     return true;
@@ -162,7 +174,11 @@ class DiagnosisProvider with ChangeNotifier {
       return false;
     }*/
     verifyStatusCode(
-        response.statusCode, 201, "Could not upload obd data. ", response);
+      response.statusCode,
+      201,
+      "Could not upload obd data. ",
+      response,
+    );
 
     notifyListeners();
     return true;
@@ -189,8 +205,12 @@ class DiagnosisProvider with ChangeNotifier {
       );
       return false;
     }*/
-    verifyStatusCode(response.statusCode, 201,
-        "Could not upload picoscope data. ", response);
+    verifyStatusCode(
+      response.statusCode,
+      201,
+      "Could not upload picoscope data. ",
+      response,
+    );
 
     notifyListeners();
     return true;
@@ -214,7 +234,11 @@ class DiagnosisProvider with ChangeNotifier {
       return false;
     }*/
     verifyStatusCode(
-        response.statusCode, 201, "Could not upload symptom data. ", response);
+      response.statusCode,
+      201,
+      "Could not upload symptom data. ",
+      response,
+    );
 
     notifyListeners();
     return true;
