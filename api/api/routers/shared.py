@@ -1,4 +1,4 @@
-from typing import List, Optional, Literal, Callable
+from typing import List, Literal, Callable
 
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -7,9 +7,6 @@ from pydantic import NonNegativeInt
 
 from ..data_management import (
     Case, Customer, Vehicle, Workshop, TimeseriesData, OBDData, Symptom
-)
-from ..diagnostics_management import (
-    KnowledgeGraph, get_components_from_knowledge_graph
 )
 from ..security.token_auth import authorized_shared_access
 
@@ -222,22 +219,6 @@ async def list_vehicles() -> List[Vehicle]:
     """
     vehicles = await Vehicle.find_all().to_list()
     return vehicles
-
-
-@router.get(
-    "/known-components", status_code=200, response_model=List[str]
-)
-async def list_vehicle_components(
-        kg_obd_url: Optional[str] = Depends(KnowledgeGraph.get_obd_url)
-) -> List[str]:
-    """List all vehicle component names known to the Hub's diagnostic
-    backend.
-    """
-    if not kg_obd_url:
-        # No knowledge graph configured
-        return []
-    components = get_components_from_knowledge_graph(kg_obd_url)
-    return components
 
 
 @router.get("/vehicles/{vin}", status_code=200, response_model=Vehicle)

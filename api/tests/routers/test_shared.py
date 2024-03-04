@@ -6,7 +6,6 @@ from api.data_management import (
     Case, NewTimeseriesData, TimeseriesMetaData, GridFSSignalStore, NewOBDData,
     NewSymptom
 )
-from api.diagnostics_management import KnowledgeGraph
 from api.routers import shared
 from api.security.keycloak import Keycloak
 from bson import ObjectId
@@ -399,33 +398,6 @@ async def test_get_symptom_not_found(
 
     assert response.status_code == 404
     assert response.json()["detail"] == expected_exception_detail
-
-
-def test_list_vehicle_components_no_kg_configured(authenticated_client):
-    KnowledgeGraph.set_kg_url(None)
-    response = authenticated_client.get("/known-components")
-    assert response.status_code == 200
-    assert response.json() == []
-
-
-def test_list_vehicle_components_kg_not_available(authenticated_client):
-    KnowledgeGraph.set_kg_url("http://no-kg-hosted-here:4242")
-    response = authenticated_client.get("/known-components")
-    assert response.status_code == 200
-    assert response.json() == []
-
-
-def test_list_vehicle_components(
-        authenticated_client, kg_url, kg_obd_dataset_name,
-        kg_prefilled, kg_components
-):
-    # point the endpoint dependency to the test dataset
-    KnowledgeGraph.set_kg_url(kg_url)
-    KnowledgeGraph.obd_dataset_name = kg_obd_dataset_name
-    # test
-    response = authenticated_client.get("/known-components")
-    assert response.status_code == 200
-    assert sorted(response.json()) == sorted(kg_components)
 
 
 @pytest.mark.parametrize("route", shared.router.routes, ids=lambda r: r.name)
