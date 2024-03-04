@@ -1,5 +1,9 @@
 # AW40-hub-docker
 
+## Requirements
+
+Docker 25.0 or later is required to build the images. Please refer to the [official docs](https://docs.docker.com/engine/install/) for directions.
+
 ## Overview
 
 Prototype implementation of the AW40 HUB Architecture on Docker\
