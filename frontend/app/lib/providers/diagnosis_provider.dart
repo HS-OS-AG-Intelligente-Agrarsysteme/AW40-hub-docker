@@ -95,7 +95,7 @@ class DiagnosisProvider with ChangeNotifier {
     HelperService.verifyStatusCode(
       response.statusCode,
       201,
-      "Could not start diagnosis. ",
+      "Could not get diagnosis. ",
       response,
       _logger,
     );
