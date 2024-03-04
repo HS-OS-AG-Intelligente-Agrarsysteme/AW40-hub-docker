@@ -10,11 +10,13 @@ import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:collection/collection.dart";
 import "package:flutter/material.dart";
 import "package:http/http.dart";
+import "package:logging/logging.dart";
 
 class DiagnosisProvider with ChangeNotifier {
   DiagnosisProvider(this._httpService);
   final HttpService _httpService;
 
+  final Logger _logger = Logger("diagnosis_provider");
   late final String workShopId;
   String? _authToken;
 
@@ -90,11 +92,12 @@ class DiagnosisProvider with ChangeNotifier {
     final Response response =
         await _httpService.getDiagnosis(authToken, workShopId, caseId);
     if (response.statusCode == 404) return null;
-    verifyStatusCode(
+    HelperService.verifyStatusCode(
       response.statusCode,
       201,
       "Could not start diagnosis. ",
       response,
+      _logger,
     );
 
     return _decodeDiagnosisModelFromResponseBody(response);
@@ -104,11 +107,12 @@ class DiagnosisProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response =
         await _httpService.startDiagnosis(authToken, workShopId, caseId);
-    verifyStatusCode(
+    HelperService.verifyStatusCode(
       response.statusCode,
       201,
       "Could not start diagnosis. ",
       response,
+      _logger,
     );
 
     notifyListeners();
@@ -119,11 +123,12 @@ class DiagnosisProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response =
         await _httpService.deleteDiagnosis(authToken, workShopId, caseId);
-    verifyStatusCode(
+    HelperService.verifyStatusCode(
       response.statusCode,
       200,
       "Could not delete diagnosis. ",
       response,
+      _logger,
     );
 
     notifyListeners();
@@ -139,11 +144,12 @@ class DiagnosisProvider with ChangeNotifier {
       caseId,
       obdDataJson,
     );
-    verifyStatusCode(
+    HelperService.verifyStatusCode(
       response.statusCode,
       201,
       "Could not upload obd data. ",
       response,
+      _logger,
     );
 
     notifyListeners();
@@ -163,11 +169,12 @@ class DiagnosisProvider with ChangeNotifier {
       picoscopeData,
       filename,
     );
-    verifyStatusCode(
+    HelperService.verifyStatusCode(
       response.statusCode,
       201,
       "Could not upload picoscope data. ",
       response,
+      _logger,
     );
 
     notifyListeners();
@@ -183,11 +190,12 @@ class DiagnosisProvider with ChangeNotifier {
       caseId,
       symptomDataJson,
     );
-    verifyStatusCode(
+    HelperService.verifyStatusCode(
       response.statusCode,
       201,
       "Could not upload symptom data. ",
       response,
+      _logger,
     );
 
     notifyListeners();
