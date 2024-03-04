@@ -2,6 +2,7 @@ import inspect
 import os
 import sys
 
+import httpx
 import pytest
 from api.data_management import (
     Case,
@@ -201,11 +202,64 @@ def vcds_no_milage_txt_file(files_dir):
 
 
 @pytest.fixture
-def knowledge_graph_file(files_dir):
+def kg_url():
+    """Assume local knowledge graph is available at 3030"""
+    return "http://127.0.0.1:3030"
+
+
+@pytest.fixture()
+def kg_obd_dataset_name():
+    """
+    Dedicated knowledge graph dataset name for testing to avoid interference
+    with any real datasets.
+    """
+    return "OBDpytest"
+
+
+@pytest.fixture
+def kg_file(files_dir):
+    """
+    Knowledge graph data to put into test instance.
+
+    This file currently has two components defined:
+    - "boost_pressure_solenoid_valve"
+    - "boost_pressure_control_valve"
+    Note that they are available via the kg_components fixture
+    """
     path = os.path.join(files_dir, "minimalistic_kg.ttl")
     f = open(path, "rb")
     yield f
     f.close()
+
+
+@pytest.fixture
+def kg_components():
+    """The components present in the test knowledge graph data."""
+    return ["boost_pressure_solenoid_valve", "boost_pressure_control_valve"]
+
+
+@pytest.fixture
+def kg_prefilled(
+        kg_url, kg_obd_dataset_name, kg_file
+):
+    """Prefill the local knowledge graph for testing."""
+    # create a fresh dataset for testing
+    httpx.post(
+        url=f"{kg_url}/$/datasets",
+        data={
+            "dbType": "mem",
+            "dbName": f"/{kg_obd_dataset_name}",
+        }
+    )
+    # load content from knowledge_graph_file fixture into the test dataset
+    httpx.put(
+        url=f"{kg_url}/{kg_obd_dataset_name}",
+        content=kg_file,
+        headers={"Content-Type": "text/turtle"}
+    )
+    yield
+    # remove the dataset after testing
+    httpx.delete(url=f"{kg_url}/$/datasets/{kg_obd_dataset_name}")
 
 
 def _create_rsa_key_pair() -> tuple[bytes, bytes]:
