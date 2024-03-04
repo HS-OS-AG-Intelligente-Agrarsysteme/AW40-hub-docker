@@ -25,5 +25,5 @@ FROM base as prod
 
 USER runtime
 
-HEALTHCHECK --interval=30s --timeout=10s --retries=5 \
+HEALTHCHECK --start-period=30s --start-interval=1s --interval=30s --timeout=10s --retries=5 \
   CMD celery -A diagnostics.tasks inspect ping
