@@ -53,7 +53,6 @@ $kcadm create -x "client-scopes" \
 
 # Get Scope ID
 SCOPE_ID=$($kcadm get -x "client-scopes" -r werkstatt-hub | $jq -r '.[] | select(.name == "minio-policy-scope") | .id')
-echo $SCOPE_ID
 
 # Add Mappings
 $kcadm create client-scopes/${SCOPE_ID}/protocol-mappers/models \
@@ -132,8 +131,6 @@ $kcadm create clients \
     -s 'webOrigins=["*"]' \
     -s redirectUris=$(var_to_kc_array "$FRONTEND_REDIRECT_URIS") \
     -s directAccessGrantsEnabled=true \
-    -s defaultClientScopes='["web-origins","acr","minio-policy-scope","profile","roles","email"]' \
-    -s optionalClientScopes='["minio-policy-scope","address","phone","offline_access","microprofile-jwt"]'
 
 $kcadm create clients \
     -r werkstatt-hub \
@@ -147,8 +144,16 @@ $kcadm create clients \
     -s 'webOrigins=["*"]' \
     -s 'redirectUris=["*"]' \
     -s directAccessGrantsEnabled=true \
-    -s defaultClientScopes='["minio-policy-scope","web-origins","acr","minio-policy-scope","profile","roles","email"]' \
-    -s optionalClientScopes='["address","phone","offline_access","microprofile-jwt"]' \
     -s secret=${MINIO_CLIENT_SECRET}
+
+# Add Client Scopes
+SCOPE_ID=$($kcadm get -x "client-scopes" -r werkstatt-hub | $jq -r '.[] | select(.name == "minio-policy-scope") | .id')
+ID=$($kcadm get clients -r werkstatt-hub --fields id,clientId | $jq -r '.[] | select(.clientId == "minio") | .id')
+$kcadm update clients/${ID}/default-client-scopes/${SCOPE_ID} \
+    -r werkstatt-hub
+
+ID=$($kcadm get clients -r werkstatt-hub --fields id,clientId | $jq -r '.[] | select(.clientId == "aw40hub-frontend") | .id')
+$kcadm update clients/${ID}/optional-client-scopes/${SCOPE_ID} \
+    -r werkstatt-hub
 
 exit 0
