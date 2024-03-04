@@ -138,9 +138,13 @@ def get_shared_url() -> str:
     return f"{settings.hub_api_base_url}/shared"
 
 
+def get_knowledge_url() -> str:
+    return f"{settings.hub_api_base_url}/knowledge"
+
+
 def get_components_url() -> str:
-    shared_url = get_shared_url()
-    return f"{shared_url}/known-components"
+    knowledge_url = get_knowledge_url()
+    return f"{knowledge_url}/components"
 
 
 def get_shared_cases_url() -> str:
