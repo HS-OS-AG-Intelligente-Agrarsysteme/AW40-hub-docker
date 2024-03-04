@@ -127,6 +127,7 @@ $kcadm create clients \
     -s enabled=true \
     -s 'description=Client for Frontend' \
     -s 'rootUrl=${authBaseUrl}' \
+    -s publicClient=true \
     -s 'clientAuthenticatorType=client-secret' \
     -s 'webOrigins=["*"]' \
     -s redirectUris=$(var_to_kc_array "$FRONTEND_REDIRECT_URIS") \
