@@ -35,13 +35,14 @@ class CaseProvider with ChangeNotifier {
     } else {
       response = await _httpService.getCases(authToken, workShopId);
     }
-    if (response.statusCode != 200) {
-      _logger.warning(
-        "Could not get ${_showSharedCases ? 'shared ' : ''}cases. "
-        "${response.statusCode}: ${response.reasonPhrase}",
-      );
-      return [];
-    }
+    if (!HelperService.verifyStatusCode(
+      response.statusCode,
+      201,
+      "Could not get ${_showSharedCases ? 'shared ' : ''}cases. "
+      "${response.statusCode}: ${response.reasonPhrase}",
+      response,
+      _logger,
+    )) return [];
     return _jsonBodyToCaseModelList(response.body);
   }
 
@@ -61,13 +62,13 @@ class CaseProvider with ChangeNotifier {
     final Map<String, dynamic> newCaseJson = newCaseDto.toJson();
     final Response response =
         await _httpService.addCase(authToken, workShopId, newCaseJson);
-    if (response.statusCode != 201) {
-      _logger.warning(
-        "Could not add case. "
-        "${response.statusCode}: ${response.reasonPhrase}",
-      );
-      return null;
-    }
+    HelperService.verifyStatusCode(
+      response.statusCode,
+      201,
+      "Could not add case. ",
+      response,
+      _logger,
+    );
 
     notifyListeners();
     return _decodeCaseModelFromResponseBody(response);
@@ -91,14 +92,13 @@ class CaseProvider with ChangeNotifier {
       caseId,
       updateCaseJson,
     );
-    if (response.statusCode != 200) {
-      _logger.warning(
-        "Could not update case. "
-        "${response.statusCode}: ${response.reasonPhrase}",
-      );
-      return null;
-    }
-
+    HelperService.verifyStatusCode(
+      response.statusCode,
+      200,
+      "Could not update case. ",
+      response,
+      _logger,
+    );
     notifyListeners();
     return _decodeCaseModelFromResponseBody(response);
   }
@@ -107,14 +107,13 @@ class CaseProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response =
         await _httpService.deleteCase(authToken, workShopId, caseId);
-    if (response.statusCode != 200) {
-      _logger.warning(
-        "Could not delete case. "
-        "${response.statusCode}: ${response.reasonPhrase}",
-      );
-      return false;
-    }
-
+    HelperService.verifyStatusCode(
+      response.statusCode,
+      200,
+      "Could not delete case. ",
+      response,
+      _logger,
+    );
     notifyListeners();
     return true;
   }
