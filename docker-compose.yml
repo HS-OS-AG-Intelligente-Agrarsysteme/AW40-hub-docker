@@ -90,8 +90,8 @@ services:
       - keycloaknet
       - hubintranet
       - hubnet
-    volumes:
-      - ./keycloak/werkstatthub-realm.json:/opt/keycloak/data/import/wh.json:ro
+    #volumes:
+    #  - ./keycloak/werkstatthub-realm.json:/opt/keycloak/data/import/wh.json:ro
 
   keycloak-config:
       build:
@@ -115,8 +115,8 @@ services:
         - hubintranet
       user: root
       volumes:
-        - ./keycloak/keycloak-config.sh:/keycloak-config.sh
-        - ./keycloak/keycloak-config-dev.sh:/keycloak-config-dev.sh
+        - ./keycloak/keycloak-new-config.sh:/keycloak-config.sh
+        #- ./keycloak/keycloak-config-dev.sh:/keycloak-config-dev.sh
 
   keycloak-db:
     build:
