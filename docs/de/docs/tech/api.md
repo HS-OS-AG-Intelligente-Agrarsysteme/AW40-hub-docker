@@ -12,15 +12,26 @@ Die API hat mehrere Teilbereiche (Router)
 
 | Bereich     | Pfad             | Beschreibung                                                                                 | Authentifizierung |
 |-------------|------------------|----------------------------------------------------------------------------------------------|-------------------|
-| Diagnostics | `/diagnostics`   | Zugriffspunkte für das Diagnosebackend.                                                      | *WIP*             |
-| Health      | `/health`        | Funktionskontrolle                                                                           | *WIP*             |
-| MinIO       | `/minio`         | *WIP*                                                                                        | *WIP*             |
+| Diagnostics | `/diagnostics`   | Zugriffspunkte für das Diagnosebackend.                                                      | API Key           |
+| Health      | `/health`        | Funktionskontrolle                                                                           | keine             |
+| MinIO       | `/minio`         | *WIP*                                                                                        | API Key           |
 | Shared      | `/shared`        | Lesezugriff auf geteilte Ressourcen innerhalb einer Betreiberfirma.                          | Keycloak          |
 | Workshops   | `/{workshop_id}` | Verwaltung eigener Daten und Diagnosen durch Endnutzer Anwendungen in einzelnen Werkstätten. | Keycloak          |
+| Knowledge   | `/knowledge`     | Vereinfachter Zugriff auf Informationen, die im [Wissensgraph](./ai.md) gespeichert sind.    | Keycloak          |
 
 </font>
 
 ## Details
+
+Die oben beschriebenen Router können grob in zwei Gruppen unterteilt werden.
+
+Die erste Gruppe bilden die Bereiche Diagnostics, Health und MinIO. Alle in
+diesen Routern bereitgestellten Endpunkte sind für die M2M Kommunikation 
+zwischen verschiedenen Services "im Hintergrund" vorgesehen.
+
+Die zweite Gruppen bilden die Bereiche Shared, Workshops und Knowledge welche
+für die Kommunikation mit (menschlichen) Endnutzern vorgesehen sind.
+
 ### Workshop Router
 
 Wie in [Hintergrund](../background.md) beschrieben, ist der Hub als Plattform
@@ -45,3 +56,11 @@ zu Analysezwecken.
 Auch für die zu diesem Bereich gehörenden Endpunkte wird eine Authentifizierung
 mittels eines von Keycloak ausgestellten Tokens vorausgesetzt. Dem Nutzeraccount
 muss dabei die Rolle `shared` zugewiesen sein.
+
+### Knowledge Router
+
+Die unter `/knowledge` bereitgestellten Endpunkte ermöglichen den Zugriff
+auf ausgewählte Fakten zu im Wissensgraph beinhalteten Informationen, wie z.B.
+die Namen der gespeicherten Fahrzeugbauteile.  
+Der Zugriff ist mit einem von Keycloak ausgestellten Token möglich, wobei sowohl
+die Rollen `workshop` als auch `shared` autorisiert sind.
