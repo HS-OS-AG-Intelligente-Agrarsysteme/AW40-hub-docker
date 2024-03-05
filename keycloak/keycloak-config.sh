@@ -11,6 +11,7 @@ function var_to_kc_array() {
 
 kcadm=/opt/keycloak/bin/kcadm.sh
 jq=/opt/keycloak/bin/jq
+
 # Setup Client
 $kcadm config credentials \
     --server http://keycloak:8080 \
@@ -18,10 +19,22 @@ $kcadm config credentials \
     --user ${KEYCLOAK_ADMIN} \
     --password ${KEYCLOAK_ADMIN_PASSWORD}
 
+# Check if realm already exists
+REALM_ID=$(
+    $kcadm get realms --fields realm,id | 
+    $jq -r '.[] | select(.realm == "werkstatt-hub") | .id'
+)
+
+if [ ! -z "$REALM_ID" ]
+then
+    echo "Realm already exists. Skipping initialization."
+    exit 0
+fi
+
 # Add Realms
 $kcadm create realms \
-	-s realm=werkstatt-hub \
-	-s enabled=true
+    -s realm=werkstatt-hub \
+    -s enabled=true
 
 # Add Roles
 $kcadm create roles \
@@ -94,10 +107,10 @@ $kcadm create users \
     -s credentials='[{"type":"password","value":"'${WERKSTATT_MECHANIC_PASSWORD}'"}]'
 
 $kcadm create users \
-  -r werkstatt-hub \
-  -s username="aw40hub-dev-workshop" \
-  -s credentials='[{"type": "password", "value": "dev"}]' \
-  -s enabled=true
+    -r werkstatt-hub \
+    -s username="aw40hub-dev-workshop" \
+    -s credentials='[{"type": "password", "value": "dev"}]' \
+    -s enabled=true
 
 # Assign Roles
 $kcadm add-roles \
@@ -111,14 +124,14 @@ $kcadm add-roles \
     --rolename ${WERKSTATT_MECHANIC_ROLE}
 
 $kcadm add-roles \
-  -r werkstatt-hub \
-  --uusername aw40hub-dev-workshop \
-  --rolename workshop
+    -r werkstatt-hub \
+    --uusername aw40hub-dev-workshop \
+    --rolename workshop
 
 $kcadm add-roles \
-  -r werkstatt-hub \
-  --uusername aw40hub-dev-workshop \
-  --rolename shared
+    -r werkstatt-hub \
+    --uusername aw40hub-dev-workshop \
+    --rolename shared
 
 # Add Clients
 $kcadm create clients \
