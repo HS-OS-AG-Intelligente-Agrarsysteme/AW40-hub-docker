@@ -65,8 +65,6 @@ services:
   keycloak:
     build:
       context: ./keycloak
-      args:
-        - KC_VER=20.0
     <<: *default_restart_policy
     command: start-dev --import-realm
     profiles:
@@ -94,8 +92,6 @@ services:
   keycloak-config:
       build:
         context: ./keycloak
-        args:
-          - KC_VER=20.0
       depends_on:
         keycloak:
           condition: service_healthy

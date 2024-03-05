@@ -1,5 +1,4 @@
-ARG KC_VER
-FROM quay.io/keycloak/keycloak:$KC_VER
+FROM quay.io/keycloak/keycloak:20.0
 ENV KC_HEALTH_ENABLED true
 ARG TARGETARCH
 ARG JQ_VER=1.7.1
