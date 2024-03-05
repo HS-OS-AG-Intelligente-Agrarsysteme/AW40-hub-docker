@@ -6,7 +6,6 @@ import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:collection/collection.dart";
 import "package:flutter/material.dart";
-import "package:http/http.dart";
 import "package:logging/logging.dart";
 
 class HelperService {
@@ -115,20 +114,5 @@ class HelperService {
     final String decodedString = utf8.decode(bytes);
 
     return decodedString;
-  }
-
-  static bool verifyStatusCode(
-    int actualStatusCode,
-    int expectedStatusCode,
-    String errorMessage,
-    Response response,
-    Logger logger,
-  ) {
-    if (actualStatusCode == expectedStatusCode) return true;
-    logger.warning(
-      "$errorMessage"
-      "${response.statusCode}: ${response.reasonPhrase}",
-    );
-    return false;
   }
 }
