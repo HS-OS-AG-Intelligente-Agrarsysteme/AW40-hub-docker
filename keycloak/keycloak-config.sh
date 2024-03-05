@@ -40,25 +40,25 @@ $kcadm create realms \
 $kcadm create roles \
 	-r werkstatt-hub \
 	-s name=${WERKSTATT_ANALYST_ROLE} \
-	-s 'description=Role for Data Analysts'
+	-s description="Role for Data Analysts"
 
 $kcadm create roles \
 	-r werkstatt-hub \
 	-s name=${WERKSTATT_MECHANIC_ROLE} \
-	-s 'description=Role for Machanics'
+	-s description="Role for Mechanics"
 
 $kcadm create roles \
 	-r werkstatt-hub \
 	-s name=workshop \
-	-s 'description=Role for basic API Access'
+	-s description="Role for basic API Access"
 
 $kcadm create roles \
 	-r werkstatt-hub \
 	-s name=shared \
-	-s 'description=Role for API shared Endpoint'
+	-s description="Role for API shared Endpoint"
 
 # Add Client Scopes
-$kcadm create -x "client-scopes" \
+$kcadm create client-scopes \
     -r werkstatt-hub \
     -s name=minio-policy-scope \
     -s protocol=openid-connect \
@@ -138,7 +138,7 @@ $kcadm create clients \
     -r werkstatt-hub \
     -s clientId=aw40hub-dev-client \
     -s enabled=true \
-    -s 'description=Client für Developer' \
+    -s description="Client für Developer" \
     -s secret=N5iImyRP1bzbzXoEYJ6zZMJx0XWiqhCw \
     -s publicClient=false \
     -s directAccessGrantsEnabled=true
@@ -147,10 +147,10 @@ $kcadm create clients \
     -r werkstatt-hub \
     -s clientId=aw40hub-frontend \
     -s enabled=true \
-    -s 'description=Client for Frontend' \
+    -s description="Client for Frontend" \
     -s publicClient=true \
-    -s 'clientAuthenticatorType=client-secret' \
-    -s 'webOrigins=["*"]' \
+    -s clientAuthenticatorType=client-secret \
+    -s webOrigins='["*"]' \
     -s redirectUris=$(var_to_kc_array "$FRONTEND_REDIRECT_URIS") \
     -s directAccessGrantsEnabled=true \
     -s 'attributes."post.logout.redirect.uris"="+"'
@@ -159,11 +159,11 @@ $kcadm create clients \
     -r werkstatt-hub \
     -s clientId=minio \
     -s enabled=true \
-    -s 'description=Client for MinIO' \
+    -s description="Client for MinIO" \
     -s directAccessGrantsEnabled=true \
-    -s 'clientAuthenticatorType=client-secret' \
-    -s 'webOrigins=["*"]' \
-    -s 'redirectUris=["*"]' \
+    -s clientAuthenticatorType=client-secret \
+    -s webOrigins='["*"]' \
+    -s redirectUris='["*"]' \
     -s directAccessGrantsEnabled=true \
     -s secret=${MINIO_CLIENT_SECRET}
 
