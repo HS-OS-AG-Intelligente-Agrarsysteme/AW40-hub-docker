@@ -2,11 +2,11 @@
 
 # Function to convert enviroment variable to kc array
 function var_to_kc_array() {
-  local ENV_VAR="$(echo -e "$1" | tr -d '[:space:]')"
-  IFS=',' read -ra redir_arr <<< "$ENV_VAR"
-  local KC_ARR=$(printf "\"%s\"," "${redir_arr[@]}")
-  KC_ARR=${KC_ARR%,}
-  echo "[$KC_ARR]"
+    local ENV_VAR="$(echo -e "$1" | tr -d '[:space:]')"
+    IFS=',' read -ra redir_arr <<< "$ENV_VAR"
+    local KC_ARR=$(printf "\"%s\"," "${redir_arr[@]}")
+    KC_ARR=${KC_ARR%,}
+    echo "[$KC_ARR]"
 }
 
 kcadm=/opt/keycloak/bin/kcadm.sh
