@@ -1,13 +1,17 @@
 ARG KC_VER
 FROM quay.io/keycloak/keycloak:$KC_VER
 ENV KC_HEALTH_ENABLED true
+ARG TARGETARCH
+ARG JQ_VER=1.7.1
 
 # Set the working directory
-# WORKDIR /opt/keycloak
+WORKDIR /opt/keycloak
+
+# Install jq
+RUN curl -sL https://github.com/jqlang/jq/releases/download/jq-${JQ_VER}/jq-linux-${TARGETARCH} -o /opt/keycloak/bin/jq
+RUN chmod +x /opt/keycloak/bin/jq
 
 # Build Keycloak
-RUN curl -sL https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-amd64 -o /opt/keycloak/bin/jq
-RUN chmod +x /opt/keycloak/bin/jq
 RUN /opt/keycloak/bin/kc.sh build --health-enabled=true
 
 # Run the script as the entrypoint
