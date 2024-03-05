@@ -35,14 +35,15 @@ class CaseProvider with ChangeNotifier {
     } else {
       response = await _httpService.getCases(authToken, workShopId);
     }
-    if (!HelperService.verifyStatusCode(
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       201,
       "Could not get ${_showSharedCases ? 'shared ' : ''}cases. "
       "${response.statusCode}: ${response.reasonPhrase}",
       response,
       _logger,
-    )) return [];
+    );
+    if (!verifyStatusCode) return [];
     return _jsonBodyToCaseModelList(response.body);
   }
 
