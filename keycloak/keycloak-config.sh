@@ -11,14 +11,14 @@ function var_to_kc_array() {
 
 kcadm=/opt/keycloak/bin/kcadm.sh
 
-# Setup Client
+# Setup client
 $kcadm config credentials \
     --server http://keycloak:8080 \
     --realm master \
     --user ${KEYCLOAK_ADMIN} \
     --password ${KEYCLOAK_ADMIN_PASSWORD}
 
-# Check if Realm already exists
+# Check if realm already exists
 $kcadm get realms --fields realm | grep -q werkstatt-hub
 if [ $? -eq 0 ]
 then
@@ -26,12 +26,12 @@ then
     exit 0
 fi
 
-# Add Realms
+# Add realms
 $kcadm create realms \
     -s realm=werkstatt-hub \
     -s enabled=true
 
-# Add Roles
+# Add roles
 $kcadm create roles \
 	-r werkstatt-hub \
 	-s name=${WERKSTATT_ANALYST_ROLE} \
@@ -52,7 +52,7 @@ $kcadm create roles \
 	-s name=shared \
 	-s description="Role for API shared Endpoint"
 
-# Add Groups set Roles
+# Add groups and set roles
 $kcadm create groups \
     -r werkstatt-hub \
     -s 'attributes."miniopolicy"=["readonly"]' \
@@ -87,7 +87,7 @@ $kcadm add-roles \
     --rolename workshop \
     --rolename shared \
 
-# Add Users
+# Add users
 $kcadm create users \
     -r werkstatt-hub \
     -s username=${MINIO_ADMIN_WERKSTATTHUB} \
@@ -109,7 +109,7 @@ $kcadm create users \
     -s groups='["Mechanics"]' \
     -s credentials='[{"type":"password","value":"'${WERKSTATT_MECHANIC_PASSWORD}'"}]'
 
-# Add Clients
+# Add clients
 $kcadm create clients \
     -r werkstatt-hub \
     -s clientId=aw40hub-frontend \
@@ -165,7 +165,7 @@ $kcadm create client-scopes/${MINIO_SCOPE_ID}/protocol-mappers/models \
 $kcadm update clients/${MINIO_ID}/default-client-scopes/${MINIO_SCOPE_ID} \
     -r werkstatt-hub
 
-# Create Development Client and User
+# Create development client and user
 if [ "$CREATE_DEV_USER" = true ]
 then
     $kcadm create users \
