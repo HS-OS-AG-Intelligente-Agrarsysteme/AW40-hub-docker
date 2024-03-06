@@ -10,7 +10,6 @@ function var_to_kc_array() {
 }
 
 kcadm=/opt/keycloak/bin/kcadm.sh
-jq=/opt/keycloak/bin/jq
 
 # Setup Client
 $kcadm config credentials \
@@ -19,13 +18,9 @@ $kcadm config credentials \
     --user ${KEYCLOAK_ADMIN} \
     --password ${KEYCLOAK_ADMIN_PASSWORD}
 
-# Check if realm already exists
-REALM_ID=$(
-    $kcadm get realms --fields realm,id | 
-    $jq -r '.[] | select(.realm == "werkstatt-hub") | .id'
-)
-
-if [ ! -z "$REALM_ID" ]
+# Check if Realm already exists
+$kcadm get realms --fields realm | grep -q werkstatt-hub
+if [ $? -eq 0 ]
 then
     echo "Realm already exists. Skipping initialization."
     exit 0
@@ -57,21 +52,42 @@ $kcadm create roles \
 	-s name=shared \
 	-s description="Role for API shared Endpoint"
 
-# Add Client Scopes
-$kcadm create client-scopes \
+# Add Groups
+$kcadm create groups \
     -r werkstatt-hub \
-    -s name=minio-policy-scope \
-    -s protocol=openid-connect \
-    -s 'attributes."include.in.token.scope"=true'
+    -s 'attributes."policy"=["readwrite"]' \
+    -s name="Mechanics"
 
-# Get Scope ID
-SCOPE_ID=$(
-    $kcadm get -x "client-scopes" -r werkstatt-hub |
-    $jq -r '.[] | select(.name == "minio-policy-scope") | .id'
+$kcadm add-roles \
+    -r werkstatt-hub \
+    --gname Mechanics \
+    --rolename workshop \
+    --rolename ${WERKSTATT_MECHANIC_ROLE}
+
+$kcadm create groups \
+    -r werkstatt-hub \
+    -s 'attributes."policy"=["readwrite"]' \
+    -s name="Analysts"
+
+$kcadm add-roles \
+    -r werkstatt-hub \
+    --gname Analysts \
+    --rolename workshop \
+    --rolename shared \
+    --rolename ${WERKSTATT_ANALYST_ROLE}
+
+# Add Client Scopes
+MINIO_SCOPE_ID=$(
+    $kcadm create client-scopes \
+        -i \
+        -r werkstatt-hub \
+        -s name=minio-policy-scope \
+        -s protocol=openid-connect \
+        -s 'attributes."include.in.token.scope"=true'
 )
 
 # Add Mappings
-$kcadm create client-scopes/${SCOPE_ID}/protocol-mappers/models \
+$kcadm create client-scopes/${MINIO_SCOPE_ID}/protocol-mappers/models \
     -r werkstatt-hub \
     -s name=minio-policy-mapper \
     -s protocol=openid-connect \
@@ -89,21 +105,20 @@ $kcadm create users \
     -r werkstatt-hub \
     -s username=${MINIO_ADMIN_WERKSTATTHUB} \
     -s enabled=true \
-    -s attributes.policy=consoleAdmin \
     -s credentials='[{"type":"password","value":"'${MINIO_ADMIN_WERKSTATTHUB_PASSWORD}'"}]'
 
 $kcadm create users \
     -r werkstatt-hub \
     -s username=${WERKSTATT_ANALYST} \
     -s enabled=true \
-    -s attributes.policy=readwrite \
+    -s groups='["Analysts"]' \
     -s credentials='[{"type":"password","value":"'${WERKSTATT_ANALYST_PASSWORD}'"}]'
 
 $kcadm create users \
     -r werkstatt-hub \
     -s username=${WERKSTATT_MECHANIC} \
     -s enabled=true \
-    -s attributes.policy=readwrite \
+    -s groups='["Mechanics"]' \
     -s credentials='[{"type":"password","value":"'${WERKSTATT_MECHANIC_PASSWORD}'"}]'
 
 $kcadm create users \
@@ -111,17 +126,6 @@ $kcadm create users \
     -s username="aw40hub-dev-workshop" \
     -s credentials='[{"type": "password", "value": "dev"}]' \
     -s enabled=true
-
-# Assign Roles
-$kcadm add-roles \
-    -r werkstatt-hub \
-    --uusername ${WERKSTATT_ANALYST} \
-    --rolename ${WERKSTATT_ANALYST_ROLE}
-
-$kcadm add-roles \
-    -r werkstatt-hub \
-    --uusername ${WERKSTATT_MECHANIC} \
-    --rolename ${WERKSTATT_MECHANIC_ROLE}
 
 $kcadm add-roles \
     -r werkstatt-hub \
@@ -155,29 +159,22 @@ $kcadm create clients \
     -s directAccessGrantsEnabled=true \
     -s 'attributes."post.logout.redirect.uris"="+"'
 
-$kcadm create clients \
-    -r werkstatt-hub \
-    -s clientId=minio \
-    -s enabled=true \
-    -s description="Client for MinIO" \
-    -s directAccessGrantsEnabled=true \
-    -s clientAuthenticatorType=client-secret \
-    -s webOrigins='["*"]' \
-    -s redirectUris='["*"]' \
-    -s directAccessGrantsEnabled=true \
-    -s secret=${MINIO_CLIENT_SECRET}
-
-# Add Client Scopes
-SCOPE_ID=$(
-    $kcadm get -x "client-scopes" -r werkstatt-hub |
-    $jq -r '.[] | select(.name == "minio-policy-scope") | .id'
-)
-ID=$(
-    $kcadm get clients -r werkstatt-hub --fields id,clientId |
-    $jq -r '.[] | select(.clientId == "minio") | .id'
+MINIO_ID=$(
+    $kcadm create clients \
+        -i \
+        -r werkstatt-hub \
+        -s clientId=minio \
+        -s enabled=true \
+        -s description="Client for MinIO" \
+        -s directAccessGrantsEnabled=true \
+        -s clientAuthenticatorType=client-secret \
+        -s webOrigins='["*"]' \
+        -s redirectUris='["*"]' \
+        -s directAccessGrantsEnabled=true \
+        -s secret=${MINIO_CLIENT_SECRET}
 )
 
-$kcadm update clients/${ID}/default-client-scopes/${SCOPE_ID} \
+$kcadm update clients/${MINIO_ID}/default-client-scopes/${MINIO_SCOPE_ID} \
     -r werkstatt-hub
 
 exit 0
