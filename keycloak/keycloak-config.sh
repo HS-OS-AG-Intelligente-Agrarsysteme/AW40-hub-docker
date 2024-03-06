@@ -110,32 +110,7 @@ $kcadm create users \
     -s groups='["Mechanics"]' \
     -s credentials='[{"type":"password","value":"'${WERKSTATT_MECHANIC_PASSWORD}'"}]'
 
-$kcadm create users \
-    -r werkstatt-hub \
-    -s username="aw40hub-dev-workshop" \
-    -s credentials='[{"type": "password", "value": "dev"}]' \
-    -s enabled=true
-
-$kcadm add-roles \
-    -r werkstatt-hub \
-    --uusername aw40hub-dev-workshop \
-    --rolename workshop
-
-$kcadm add-roles \
-    -r werkstatt-hub \
-    --uusername aw40hub-dev-workshop \
-    --rolename shared
-
 # Add Clients
-$kcadm create clients \
-    -r werkstatt-hub \
-    -s clientId=aw40hub-dev-client \
-    -s enabled=true \
-    -s description="Client für Developer" \
-    -s secret=N5iImyRP1bzbzXoEYJ6zZMJx0XWiqhCw \
-    -s publicClient=false \
-    -s directAccessGrantsEnabled=true
-
 $kcadm create clients \
     -r werkstatt-hub \
     -s clientId=aw40hub-frontend \
@@ -191,4 +166,28 @@ $kcadm create client-scopes/${MINIO_SCOPE_ID}/protocol-mappers/models \
 $kcadm update clients/${MINIO_ID}/default-client-scopes/${MINIO_SCOPE_ID} \
     -r werkstatt-hub
 
+# Create Development Client and User
+if [ "$CREATE_DEV_USER" = true ]
+then
+    $kcadm create users \
+        -r werkstatt-hub \
+        -s username="aw40hub-dev-workshop" \
+        -s credentials='[{"type": "password", "value": "dev"}]' \
+        -s enabled=true
+
+    $kcadm add-roles \
+        -r werkstatt-hub \
+        --uusername aw40hub-dev-workshop \
+        --rolename workshop \
+        --rolename shared
+
+    $kcadm create clients \
+        -r werkstatt-hub \
+        -s clientId=aw40hub-dev-client \
+        -s enabled=true \
+        -s description="Client für Developer" \
+        -s secret=N5iImyRP1bzbzXoEYJ6zZMJx0XWiqhCw \
+        -s publicClient=false \
+        -s directAccessGrantsEnabled=true
+fi
 exit 0
