@@ -52,10 +52,11 @@ $kcadm create roles \
 	-s name=shared \
 	-s description="Role for API shared Endpoint"
 
-# Add Groups
+# Add Groups set Roles
+
 $kcadm create groups \
     -r werkstatt-hub \
-    -s 'attributes."policy"=["readwrite"]' \
+    -s 'attributes."miniopolicy"=["readonly"]' \
     -s name="Mechanics"
 
 $kcadm add-roles \
@@ -66,7 +67,7 @@ $kcadm add-roles \
 
 $kcadm create groups \
     -r werkstatt-hub \
-    -s 'attributes."policy"=["readwrite"]' \
+    -s 'attributes."miniopolicy"=["readwrite"]' \
     -s name="Analysts"
 
 $kcadm add-roles \
@@ -76,35 +77,23 @@ $kcadm add-roles \
     --rolename shared \
     --rolename ${WERKSTATT_ANALYST_ROLE}
 
-# Add Client Scopes
-MINIO_SCOPE_ID=$(
-    $kcadm create client-scopes \
-        -i \
-        -r werkstatt-hub \
-        -s name=minio-policy-scope \
-        -s protocol=openid-connect \
-        -s 'attributes."include.in.token.scope"=true'
-)
-
-# Add Mappings
-$kcadm create client-scopes/${MINIO_SCOPE_ID}/protocol-mappers/models \
+$kcadm create groups \
     -r werkstatt-hub \
-    -s name=minio-policy-mapper \
-    -s protocol=openid-connect \
-    -s protocolMapper=oidc-usermodel-attribute-mapper \
-    -s 'config."aggregate.attrs"=true' \
-    -s 'config."multivalued"=true' \
-    -s 'config."userinfo.token.claim"=true' \
-    -s 'config."user.attribute"="policy"' \
-    -s 'config."id.token.claim"=true' \
-    -s 'config."access.token.claim"=true' \
-    -s 'config."claim.name"="policy"'
+    -s 'attributes."miniopolicy"=["consoleAdmin"]' \
+    -s name="Admins"
+
+$kcadm add-roles \
+    -r werkstatt-hub \
+    --gname Admins \
+    --rolename workshop \
+    --rolename shared \
 
 # Add Users
 $kcadm create users \
     -r werkstatt-hub \
     -s username=${MINIO_ADMIN_WERKSTATTHUB} \
     -s enabled=true \
+    -s groups='["Admins"]' \
     -s credentials='[{"type":"password","value":"'${MINIO_ADMIN_WERKSTATTHUB_PASSWORD}'"}]'
 
 $kcadm create users \
@@ -174,6 +163,31 @@ MINIO_ID=$(
         -s secret=${MINIO_CLIENT_SECRET}
 )
 
+# Add client scopes
+MINIO_SCOPE_ID=$(
+    $kcadm create client-scopes \
+        -i \
+        -r werkstatt-hub \
+        -s name=minio-policy-scope \
+        -s protocol=openid-connect \
+        -s 'attributes."include.in.token.scope"=true'
+)
+
+# Add mappings
+$kcadm create client-scopes/${MINIO_SCOPE_ID}/protocol-mappers/models \
+    -r werkstatt-hub \
+    -s name=minio-policy-mapper \
+    -s protocol=openid-connect \
+    -s protocolMapper=oidc-usermodel-attribute-mapper \
+    -s 'config."aggregate.attrs"=true' \
+    -s 'config."multivalued"=true' \
+    -s 'config."userinfo.token.claim"=true' \
+    -s 'config."user.attribute"="miniopolicy"' \
+    -s 'config."id.token.claim"=true' \
+    -s 'config."access.token.claim"=true' \
+    -s 'config."claim.name"="miniopolicy"'
+
+# Add scopes to clients
 $kcadm update clients/${MINIO_ID}/default-client-scopes/${MINIO_SCOPE_ID} \
     -r werkstatt-hub
 
