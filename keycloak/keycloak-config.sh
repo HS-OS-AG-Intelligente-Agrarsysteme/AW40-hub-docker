@@ -53,7 +53,6 @@ $kcadm create roles \
 	-s description="Role for API shared Endpoint"
 
 # Add Groups set Roles
-
 $kcadm create groups \
     -r werkstatt-hub \
     -s 'attributes."miniopolicy"=["readonly"]' \
