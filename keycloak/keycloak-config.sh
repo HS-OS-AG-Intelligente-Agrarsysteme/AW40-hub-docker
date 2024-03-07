@@ -45,13 +45,13 @@ $kcadm create roles \
 # Add groups and set roles
 $kcadm create groups \
     -r werkstatt-hub \
-    -s 'attributes."miniopolicy"=["readonly"]' \
     -s name="Mechanics"
 
 $kcadm add-roles \
     -r werkstatt-hub \
     --gname Mechanics \
-    --rolename workshop
+    --rolename workshop \
+    --rolename shared
 
 $kcadm create groups \
     -r werkstatt-hub \
