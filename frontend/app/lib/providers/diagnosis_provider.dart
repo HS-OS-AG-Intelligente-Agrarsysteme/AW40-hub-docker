@@ -94,7 +94,7 @@ class DiagnosisProvider with ChangeNotifier {
     if (response.statusCode == 404) return null;
     final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
-      201,
+      200,
       "Could not get diagnosis. ",
       response,
       _logger,

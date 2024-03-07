@@ -37,7 +37,7 @@ class CaseProvider with ChangeNotifier {
     }
     final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
-      201,
+      200,
       "Could not get ${_showSharedCases ? 'shared ' : ''}cases. "
       "${response.statusCode}: ${response.reasonPhrase}",
       response,
