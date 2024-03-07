@@ -34,16 +34,6 @@ $kcadm create realms \
 # Add roles
 $kcadm create roles \
 	-r werkstatt-hub \
-	-s name=${WERKSTATT_ANALYST_ROLE} \
-	-s description="Role for Data Analysts"
-
-$kcadm create roles \
-	-r werkstatt-hub \
-	-s name=${WERKSTATT_MECHANIC_ROLE} \
-	-s description="Role for Mechanics"
-
-$kcadm create roles \
-	-r werkstatt-hub \
 	-s name=workshop \
 	-s description="Role for basic API Access"
 
@@ -61,8 +51,7 @@ $kcadm create groups \
 $kcadm add-roles \
     -r werkstatt-hub \
     --gname Mechanics \
-    --rolename workshop \
-    --rolename ${WERKSTATT_MECHANIC_ROLE}
+    --rolename workshop
 
 $kcadm create groups \
     -r werkstatt-hub \
@@ -73,8 +62,7 @@ $kcadm add-roles \
     -r werkstatt-hub \
     --gname Analysts \
     --rolename workshop \
-    --rolename shared \
-    --rolename ${WERKSTATT_ANALYST_ROLE}
+    --rolename shared
 
 $kcadm create groups \
     -r werkstatt-hub \
@@ -85,7 +73,7 @@ $kcadm add-roles \
     -r werkstatt-hub \
     --gname Admins \
     --rolename workshop \
-    --rolename shared \
+    --rolename shared
 
 # Add users
 $kcadm create users \
