@@ -35,12 +35,12 @@ $kcadm create realms \
 $kcadm create roles \
 	-r werkstatt-hub \
 	-s name=workshop \
-	-s description="Role for basic API Access"
+	-s description="Role for basic API access"
 
 $kcadm create roles \
 	-r werkstatt-hub \
 	-s name=shared \
-	-s description="Role for API shared Endpoint"
+	-s description="Role for API shared endpoint"
 
 # Add groups and set roles
 $kcadm create groups \
