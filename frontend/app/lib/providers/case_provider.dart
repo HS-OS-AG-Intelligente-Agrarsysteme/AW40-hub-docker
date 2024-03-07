@@ -63,14 +63,14 @@ class CaseProvider with ChangeNotifier {
     final Map<String, dynamic> newCaseJson = newCaseDto.toJson();
     final Response response =
         await _httpService.addCase(authToken, workShopId, newCaseJson);
-    HelperService.verifyStatusCode(
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       201,
       "Could not add case. ",
       response,
       _logger,
     );
-
+    if (!verifyStatusCode) return null;
     notifyListeners();
     return _decodeCaseModelFromResponseBody(response);
   }
@@ -93,13 +93,14 @@ class CaseProvider with ChangeNotifier {
       caseId,
       updateCaseJson,
     );
-    HelperService.verifyStatusCode(
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       200,
       "Could not update case. ",
       response,
       _logger,
     );
+    if (!verifyStatusCode) return null;
     notifyListeners();
     return _decodeCaseModelFromResponseBody(response);
   }
@@ -108,13 +109,14 @@ class CaseProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response =
         await _httpService.deleteCase(authToken, workShopId, caseId);
-    HelperService.verifyStatusCode(
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       200,
       "Could not delete case. ",
       response,
       _logger,
     );
+    if (!verifyStatusCode) return false;
     notifyListeners();
     return true;
   }

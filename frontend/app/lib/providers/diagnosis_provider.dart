@@ -92,14 +92,14 @@ class DiagnosisProvider with ChangeNotifier {
     final Response response =
         await _httpService.getDiagnosis(authToken, workShopId, caseId);
     if (response.statusCode == 404) return null;
-    HelperService.verifyStatusCode(
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       201,
       "Could not get diagnosis. ",
       response,
       _logger,
     );
-
+    if (!verifyStatusCode) return null;
     return _decodeDiagnosisModelFromResponseBody(response);
   }
 
@@ -107,14 +107,14 @@ class DiagnosisProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response =
         await _httpService.startDiagnosis(authToken, workShopId, caseId);
-    HelperService.verifyStatusCode(
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       201,
       "Could not start diagnosis. ",
       response,
       _logger,
     );
-
+    if (!verifyStatusCode) return null;
     notifyListeners();
     return _decodeDiagnosisModelFromResponseBody(response);
   }
@@ -123,14 +123,14 @@ class DiagnosisProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response =
         await _httpService.deleteDiagnosis(authToken, workShopId, caseId);
-    HelperService.verifyStatusCode(
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       200,
       "Could not delete diagnosis. ",
       response,
       _logger,
     );
-
+    if (!verifyStatusCode) return false;
     notifyListeners();
     return true;
   }
@@ -144,14 +144,14 @@ class DiagnosisProvider with ChangeNotifier {
       caseId,
       obdDataJson,
     );
-    HelperService.verifyStatusCode(
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       201,
       "Could not upload obd data. ",
       response,
       _logger,
     );
-
+    if (!verifyStatusCode) return false;
     notifyListeners();
     return true;
   }
@@ -169,14 +169,14 @@ class DiagnosisProvider with ChangeNotifier {
       picoscopeData,
       filename,
     );
-    HelperService.verifyStatusCode(
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       201,
       "Could not upload picoscope data. ",
       response,
       _logger,
     );
-
+    if (!verifyStatusCode) return false;
     notifyListeners();
     return true;
   }
@@ -190,14 +190,14 @@ class DiagnosisProvider with ChangeNotifier {
       caseId,
       symptomDataJson,
     );
-    HelperService.verifyStatusCode(
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       201,
       "Could not upload symptom data. ",
       response,
       _logger,
     );
-
+    if (!verifyStatusCode) return false;
     notifyListeners();
     return true;
   }
