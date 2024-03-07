@@ -1,10 +1,8 @@
 import "dart:async";
 
-import "package:aw40_hub_frontend/components/components.dart";
 import "package:aw40_hub_frontend/dtos/dtos.dart";
 import "package:aw40_hub_frontend/exceptions/exceptions.dart";
 import "package:aw40_hub_frontend/models/case_model.dart";
-import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:enum_to_string/enum_to_string.dart";
@@ -44,49 +42,32 @@ class _UpdateCaseDialogState extends State<UpdateCaseDialog> {
     _statusController.text =
         EnumToString.convertToString(widget.caseModel.status);
 
-    return EnvironmentService().isMobilePlatform
-        ? FullScreenDialog(
-            title: title,
-            trailing: TextButton(
-              onPressed: _submitUpdateCaseForm,
-              child: Text(tr("general.save")),
+    return AlertDialog(
+      title: Text(title),
+      content: UpdateDialogForm(
+        formKey: _formKey,
+        statusController: _statusController,
+        occasionController: _occasionController,
+        timestampController: _timestampController,
+        milageController: _milageController,
+        caseModel: widget.caseModel,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () async => _onCancel(context),
+          child: Text(
+            tr("general.cancel"),
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: theme.colorScheme.error,
             ),
-            onCancel: () async => _onCancel(context),
-            content: UpdateDialogForm(
-              formKey: _formKey,
-              statusController: _statusController,
-              occasionController: _occasionController,
-              timestampController: _timestampController,
-              milageController: _milageController,
-              caseModel: widget.caseModel,
-            ),
-          )
-        : AlertDialog(
-            title: Text(title),
-            content: UpdateDialogForm(
-              formKey: _formKey,
-              statusController: _statusController,
-              occasionController: _occasionController,
-              timestampController: _timestampController,
-              milageController: _milageController,
-              caseModel: widget.caseModel,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () async => _onCancel(context),
-                child: Text(
-                  tr("general.cancel"),
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: theme.colorScheme.error,
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: _submitUpdateCaseForm,
-                child: Text(tr("general.save")),
-              ),
-            ],
-          );
+          ),
+        ),
+        TextButton(
+          onPressed: _submitUpdateCaseForm,
+          child: Text(tr("general.save")),
+        ),
+      ],
+    );
   }
 
   void _submitUpdateCaseForm() {

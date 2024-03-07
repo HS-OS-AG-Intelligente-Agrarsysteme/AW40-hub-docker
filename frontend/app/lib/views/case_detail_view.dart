@@ -4,7 +4,6 @@ import "package:aw40_hub_frontend/dialogs/update_case_dialog.dart";
 import "package:aw40_hub_frontend/dtos/case_update_dto.dart";
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
-import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/extensions.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
@@ -23,24 +22,15 @@ class CaseDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return EnvironmentService().isMobilePlatform
-        ? MobileCaseDetailView(
-            caseModel: caseModel,
-            onDelete: () async => _onDeleteButtonPress(
-              context,
-              Provider.of<AuthProvider>(context, listen: false).loggedInUser,
-              caseModel.id,
-            ),
-          )
-        : DesktopCaseDetailView(
-            caseModel: caseModel,
-            onClose: onClose,
-            onDelete: () async => _onDeleteButtonPress(
-              context,
-              Provider.of<AuthProvider>(context, listen: false).loggedInUser,
-              caseModel.id,
-            ),
-          );
+    return DesktopCaseDetailView(
+      caseModel: caseModel,
+      onClose: onClose,
+      onDelete: () async => _onDeleteButtonPress(
+        context,
+        Provider.of<AuthProvider>(context, listen: false).loggedInUser,
+        caseModel.id,
+      ),
+    );
   }
 
   static Future<bool?> _showConfirmDeleteDialog(BuildContext context) {
@@ -285,40 +275,5 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
       content: Center(child: Text(text)),
     );
     state.showSnackBar(snackBar);
-  }
-}
-
-class MobileCaseDetailView extends StatelessWidget {
-  const MobileCaseDetailView({
-    required this.caseModel,
-    required this.onDelete,
-    super.key,
-  });
-
-  final CaseModel caseModel;
-  final void Function() onDelete;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-
-    return ListTile(
-      tileColor: theme.colorScheme.primaryContainer,
-      title: const Text("Case Detail View"),
-      subtitle: Text("ID: ${caseModel.id}"),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_forever),
-            onPressed: onDelete,
-          ),
-        ],
-      ),
-    );
   }
 }
