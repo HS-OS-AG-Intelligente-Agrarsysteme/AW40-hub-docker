@@ -71,47 +71,31 @@ class _AddCaseDialogState extends State<AddCaseDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return EnvironmentService().isMobilePlatform
-        ? FullScreenDialog(
-            title: title,
-            trailing: TextButton(
-              onPressed: _submitAddCaseForm,
-              child: Text(tr("general.save")),
+    return AlertDialog(
+      title: Text(title),
+      content: AddDialogForm(
+        formKey: _formKey,
+        vinController: _vinController,
+        customerIdController: _customerIdController,
+        occasionController: _occasionController,
+        milageController: _milageController,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () async => _onCancel(context),
+          child: Text(
+            tr("general.cancel"),
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: theme.colorScheme.error,
             ),
-            onCancel: () async => _onCancel(context),
-            content: AddDialogForm(
-              formKey: _formKey,
-              vinController: _vinController,
-              customerIdController: _customerIdController,
-              occasionController: _occasionController,
-              milageController: _milageController,
-            ),
-          )
-        : AlertDialog(
-            title: Text(title),
-            content: AddDialogForm(
-              formKey: _formKey,
-              vinController: _vinController,
-              customerIdController: _customerIdController,
-              occasionController: _occasionController,
-              milageController: _milageController,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () async => _onCancel(context),
-                child: Text(
-                  tr("general.cancel"),
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: theme.colorScheme.error,
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: _submitAddCaseForm,
-                child: Text(tr("general.save")),
-              ),
-            ],
-          );
+          ),
+        ),
+        TextButton(
+          onPressed: _submitAddCaseForm,
+          child: Text(tr("general.save")),
+        ),
+      ],
+    );
   }
 }
 

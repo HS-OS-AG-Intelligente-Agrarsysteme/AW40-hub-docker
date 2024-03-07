@@ -1,6 +1,4 @@
-import "package:aw40_hub_frontend/components/components.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
-import "package:aw40_hub_frontend/services/services.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
@@ -11,22 +9,16 @@ class FilterCasesDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return EnvironmentService().isMobilePlatform
-        ? FullScreenDialog(
-            title: tr("cases.filterDialog.title"),
-            content: const FilterCasesDialogContent(),
-            onCancel: () async => _onCancel(context),
-          )
-        : AlertDialog(
-            title: Text(tr("cases.filterDialog.title")),
-            content: const FilterCasesDialogContent(),
-            actions: [
-              TextButton(
-                child: Text(tr("general.close")),
-                onPressed: () async => _onCancel(context),
-              ),
-            ],
-          );
+    return AlertDialog(
+      title: Text(tr("cases.filterDialog.title")),
+      content: const FilterCasesDialogContent(),
+      actions: [
+        TextButton(
+          child: Text(tr("general.close")),
+          onPressed: () async => _onCancel(context),
+        ),
+      ],
+    );
   }
 
   Future<void> _onCancel(BuildContext context) async {
