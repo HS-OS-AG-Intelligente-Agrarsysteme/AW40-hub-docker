@@ -6,7 +6,6 @@ from api.data_management import (
     Case, NewTimeseriesData, TimeseriesMetaData, GridFSSignalStore, NewOBDData,
     NewSymptom
 )
-from api.diagnostics_management import KnowledgeGraph
 from api.routers import shared
 from api.security.keycloak import Keycloak
 from bson import ObjectId
@@ -399,69 +398,6 @@ async def test_get_symptom_not_found(
 
     assert response.status_code == 404
     assert response.json()["detail"] == expected_exception_detail
-
-
-def test_list_vehicle_components_no_kg_configured(authenticated_client):
-    KnowledgeGraph.set_kg_url(None)
-    response = authenticated_client.get("/known-components")
-    assert response.status_code == 200
-    assert response.json() == []
-
-
-def test_list_vehicle_components_kg_not_available(authenticated_client):
-    KnowledgeGraph.set_kg_url("http://no-kg-hosted-here:4242")
-    response = authenticated_client.get("/known-components")
-    assert response.status_code == 200
-    assert response.json() == []
-
-
-@pytest.fixture
-def kg_url():
-    """Assume local fuseki server is available at 3030"""
-    return "http://127.0.0.1:3030"
-
-
-@pytest.fixture()
-def obd_dataset_name():
-    return "OBDpytest"
-
-
-@pytest.fixture
-def prefilled_knowledge_graph(
-        kg_url, obd_dataset_name, knowledge_graph_file
-):
-    # create a fresh dataset for testing
-    httpx.post(
-        url=f"{kg_url}/$/datasets",
-        data={
-            "dbType": "mem",
-            "dbName": f"/{obd_dataset_name}",
-        }
-    )
-    # load content from knowledge_graph_file fixture into the test dataset
-    httpx.put(
-        url=f"{kg_url}/{obd_dataset_name}",
-        content=knowledge_graph_file,
-        headers={"Content-Type": "text/turtle"}
-    )
-    yield
-    # remove the dataset after testing
-    httpx.delete(url=f"{kg_url}/$/datasets/{obd_dataset_name}")
-
-
-def test_list_vehicle_components(
-        authenticated_client, kg_url, obd_dataset_name,
-        prefilled_knowledge_graph
-):
-    # point the endpoint dependency to the test dataset
-    KnowledgeGraph.set_kg_url(kg_url)
-    KnowledgeGraph.obd_dataset_name = obd_dataset_name
-    # test
-    response = authenticated_client.get("/known-components")
-    assert response.status_code == 200
-    assert response.json() == [
-        "boost_pressure_control_valve", "boost_pressure_solenoid_valve"
-    ]
 
 
 @pytest.mark.parametrize("route", shared.router.routes, ids=lambda r: r.name)

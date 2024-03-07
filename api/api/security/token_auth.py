@@ -78,3 +78,16 @@ async def authorized_shared_access(
     """
     if REQUIRED_SHARED_ROLE not in token_data.roles:
         raise failed_auth_exception
+
+
+async def authorized_knowledge_access(
+        token_data: TokenData = Depends(verify_token)
+) -> None:
+    """
+    Authorized access to knowledge resources if the user is assigned a workshop
+    role or a shared role.
+    """
+    required_roles = set({REQUIRED_SHARED_ROLE, REQUIRED_WORKSHOP_ROLE})
+    assigned_roles = set(token_data.roles)
+    if not required_roles.intersection(assigned_roles):
+        raise failed_auth_exception

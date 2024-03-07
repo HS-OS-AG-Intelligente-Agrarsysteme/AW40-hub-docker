@@ -25,5 +25,5 @@ FROM base as prod
 
 USER api
 
-HEALTHCHECK --interval=30s --timeout=2s --retries=5 \
+HEALTHCHECK --start-period=30s --start-interval=1s --interval=30s --timeout=2s --retries=5 \
   CMD curl -fs http://localhost:8000/v1/health/ping|| exit 1
