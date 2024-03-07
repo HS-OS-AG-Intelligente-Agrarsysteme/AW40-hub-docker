@@ -5,7 +5,6 @@ import "package:aw40_hub_frontend/dtos/dtos.dart";
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/scaffolds/scaffolds.dart";
-import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
@@ -156,20 +155,12 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
     final List<NavigationMenuItemModel> navigationItemModels =
         _getMenuItemModels();
 
-    return EnvironmentService().isMobilePlatform
-        ? MobileScaffold(
-            navItems: navigationItemModels,
-            currentIndex: currentIndex,
-            onNavItemTap: onItemTap,
-            loggedInUserModel: loggedInUserModel,
-            child: widget.child,
-          )
-        : DesktopScaffold(
-            navItems: navigationItemModels,
-            currentIndex: currentIndex,
-            onNavItemTap: onItemTap,
-            loggedInUserModel: loggedInUserModel,
-            child: widget.child,
-          );
+    return DesktopScaffold(
+      navItems: navigationItemModels,
+      currentIndex: currentIndex,
+      onNavItemTap: onItemTap,
+      loggedInUserModel: loggedInUserModel,
+      child: widget.child,
+    );
   }
 }
