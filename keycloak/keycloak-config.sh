@@ -98,17 +98,20 @@ $kcadm create users \
     -s credentials='[{"type":"password","value":"'${WERKSTATT_MECHANIC_PASSWORD}'"}]'
 
 # Add clients
-$kcadm create clients \
-    -r werkstatt-hub \
-    -s clientId=aw40hub-frontend \
-    -s enabled=true \
-    -s description="Client for Frontend" \
-    -s publicClient=true \
-    -s clientAuthenticatorType=client-secret \
-    -s webOrigins='["*"]' \
-    -s redirectUris=$(var_to_kc_array "$FRONTEND_REDIRECT_URIS") \
-    -s directAccessGrantsEnabled=true \
-    -s 'attributes."post.logout.redirect.uris"="+"'
+FRONTEND_ID=$(
+    $kcadm create clients \
+        -i \
+        -r werkstatt-hub \
+        -s clientId=aw40hub-frontend \
+        -s enabled=true \
+        -s description="Client for Frontend" \
+        -s publicClient=true \
+        -s clientAuthenticatorType=client-secret \
+        -s webOrigins='["*"]' \
+        -s redirectUris=$(var_to_kc_array "$FRONTEND_REDIRECT_URIS") \
+        -s directAccessGrantsEnabled=true \
+        -s 'attributes."post.logout.redirect.uris"="+"'
+)
 
 MINIO_ID=$(
     $kcadm create clients \
@@ -135,6 +138,15 @@ MINIO_SCOPE_ID=$(
         -s 'attributes."include.in.token.scope"=true'
 )
 
+FRONTEND_SCOPE_ID=$(
+    $kcadm create client-scopes \
+        -i \
+        -r werkstatt-hub \
+        -s name=frontend-scope \
+        -s protocol=openid-connect \
+        -s 'attributes."include.in.token.scope"=true'
+)
+
 # Add mappings
 $kcadm create client-scopes/${MINIO_SCOPE_ID}/protocol-mappers/models \
     -r werkstatt-hub \
@@ -149,8 +161,22 @@ $kcadm create client-scopes/${MINIO_SCOPE_ID}/protocol-mappers/models \
     -s 'config."access.token.claim"=true' \
     -s 'config."claim.name"="miniopolicy"'
 
+$kcadm create client-scopes/${FRONTEND_SCOPE_ID}/protocol-mappers/models \
+    -r werkstatt-hub \
+    -s name=frontend-group-mapper \
+    -s protocol=openid-connect \
+    -s protocolMapper=oidc-group-membership-mapper \
+    -s 'config."aggregate.attrs"=true' \
+    -s 'config."multivalued"=true' \
+    -s 'config."id.token.claim"=true' \
+    -s 'config."access.token.claim"=true' \
+    -s 'config."claim.name"="groups"'
+
 # Add scopes to clients
 $kcadm update clients/${MINIO_ID}/default-client-scopes/${MINIO_SCOPE_ID} \
+    -r werkstatt-hub
+
+$kcadm update clients/${FRONTEND_ID}/default-client-scopes/${FRONTEND_SCOPE_ID} \
     -r werkstatt-hub
 
 # Create development client and user
