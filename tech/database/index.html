@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Hochschule Osnabrück, 
+Technische Hochschule Georg Agricola, 
+LMIS AG
+" name="author"/>
+<link href="../../img/favicon.ico" rel="shortcut icon"/>
+<title>Datenbank - Autowerkstatt 4.0 - Hub</title>
+<link href="../../css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../../css/font-awesome.min.css" rel="stylesheet"/>
+<link href="../../css/base.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<link href="../../download/aw40-docs.pdf" rel="alternate" title="PDF" type="application/pdf"/></head>
+<body>
+<div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+<div class="container">
+<a class="navbar-brand" href="../..">Autowerkstatt 4.0 - Hub</a>
+<!-- Expander button -->
+<button class="navbar-toggler" data-target="#navbar-collapse" data-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<!-- Expanded navigation -->
+<div class="navbar-collapse collapse" id="navbar-collapse">
+<!-- Main navigation -->
+<ul class="nav navbar-nav">
+<li class="navitem">
+<a class="nav-link" href="../../background/">Hintergrund</a>
+</li>
+<li class="dropdown active">
+<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Technische Umsetzung <b class="caret"></b></a>
+<ul class="dropdown-menu">
+<li>
+<a class="dropdown-item active" href="./">Datenbank</a>
+</li>
+<li>
+<a class="dropdown-item" href="../api/">API</a>
+</li>
+<li>
+<a class="dropdown-item" href="../gaiax/">Gaia-X</a>
+</li>
+<li>
+<a class="dropdown-item" href="../ai/">KI</a>
+</li>
+<li>
+<a class="dropdown-item" href="../device_integration/">Integration heterogener Messgeräte</a>
+</li>
+<li>
+<a class="dropdown-item" href="../federatedcatalog/">Federated Catalog</a>
+</li>
+</ul>
+</li>
+<li class="navitem">
+<a class="nav-link" href="../../download/aw40-docs.pdf">Download</a>
+</li>
+</ul>
+<ul class="nav navbar-nav ml-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../background/" rel="prev">
+<i class="fa fa-arrow-left"></i> Previous
+                                </a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../api/" rel="next">
+                                    Next <i class="fa fa-arrow-right"></i>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="container">
+<div class="row">
+<div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+<div class="navbar-header">
+<button class="navbar-toggler collapsed" data-target="#toc-collapse" data-toggle="collapse" title="Table of Contents" type="button">
+<span class="fa fa-angle-down"></span>
+</button>
+</div>
+<div class="navbar-collapse collapse card bg-secondary" id="toc-collapse">
+<ul class="nav flex-column">
+<li class="nav-item" data-level="1"><a class="nav-link" href="#datenbank">Datenbank</a>
+<ul class="nav flex-column">
+<li class="nav-item" data-level="2"><a class="nav-link" href="#konzeptionelles-datenschema">Konzeptionelles Datenschema</a>
+<ul class="nav flex-column">
+<li class="nav-item" data-level="3"><a class="nav-link" href="#details-zu-den-entitaten">Details zu den Entitäten</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-level="3"><a class="nav-link" href="#anmerkungen-zum-datenmodell">Anmerkungen zum Datenmodell</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+</ul>
+</li>
+<li class="nav-item" data-level="2"><a class="nav-link" href="#technische-umsetzung">Technische Umsetzung</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div></div>
+<div class="col-md-9" role="main">
+<h1 id="datenbank">Datenbank</h1>
+<p>Die Datenbank speichert die zur KI geführten Fehlerdiagnose relevanten Daten
+einer Betreiberfirma in einem standardisierten Schema.</p>
+<h2 id="konzeptionelles-datenschema">Konzeptionelles Datenschema</h2>
+<p>Ein Fall (<code>case</code>) repräsentiert genau einen Aufenthalt genau eines Fahrzeugs
+(<code>vehicle</code>) in genauer einer Werkstatt (<code>workshop</code>).
+Der Fall ist dabei mit genau einem Kunden (<code>customer</code>) assoziiert, also
+beispielsweise der Person oder Firma, die das Fahrzeug in die Werkstatt bringt.</p>
+<p>Während des Werkstattaufenthalts des Fahrzeugs werden diagnostische Daten zu
+dem Fall hinzugefügt. Es werden drei verschiedene Typen von diagnostischen
+Daten in Betracht gezogen:  </p>
+<ul>
+<li>Zeitreihen Daten (<code>timeseries_data</code>)</li>
+<li>OBD Daten (<code>obd_data</code>)</li>
+<li>Symptome (<code>symptom</code>)</li>
+</ul>
+<p>Die untenstehenden Abbildung zeigt ein auf diesen Überlegungen basierendes
+ER Diagramm:</p>
+<p><img alt="" src="../data_model.png"/></p>
+<p>Der nächste Abschnitt enthält eine detailiertere Beschreibung der verschiedenen
+Entitäten.</p>
+<h3 id="details-zu-den-entitaten">Details zu den Entitäten</h3>
+<h4 id="case"><code>case</code></h4>
+<p>Ein Fall repräsentiert genau einen Aufenthalt genau eines Fahrzeugs in genauer
+einer Werkstatt und ist das zentrale organisierende Objekt im Datenmodell.
+Ein Fall beinhaltet die folgenden atomaren Attribute:</p>
+<table>
+<thead>
+<tr>
+<th>Attribut</th>
+<th>Beschreibung</th>
+<th>Beispiele</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>Eindeutiger Identifikator</td>
+<td></td>
+</tr>
+<tr>
+<td><code>timestamp</code></td>
+<td>Zeitpunkt der Erstellung</td>
+<td></td>
+</tr>
+<tr>
+<td><code>occasion</code></td>
+<td>Anlass für den Werkstattaufenthalt</td>
+<td>"Service / Routine", "Problem / Defekt"</td>
+</tr>
+<tr>
+<td><code>milage</code></td>
+<td>Aktueller Kilometerstand</td>
+<td></td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>Status des Falls</td>
+<td>"open", "closed"</td>
+</tr>
+</tbody>
+</table>
+<h4 id="vehicle"><code>vehicle</code></h4>
+<p>Repräsentiert das Fahrzeug als technisches Objekt. Jede Instanz, identifiziert
+durch seine <code>vin</code>, existiert höchstens einmal in der Datenbank. Aktuell werden
+außerdem die Attribute <code>tsn</code> und Baujahr (<code>year_built</code>) verwendet. Theoretisch
+sind auch weitere technische Attribute denkbar, solange diese sich nicht mit
+der Zeit ändern, also beispielsweise <em>Hersteller</em>, <em>Fahrzeugtyp</em> etc.<br/>
+Attribute die den Zustand des Fahrzeugs <em>zu einem bestimmten Zeitpunkt</em>
+beschreiben  werden nicht der Fahrzeug Entität, sondern dem Fall zugeordnet
+(Beispiel: Kilometerstand).</p>
+<h4 id="workshop"><code>workshop</code></h4>
+<p>Repräsentiert eine spezifische Werkstatt. Diese Informationen wird eigentlich 
+nicht für diagnostische oder KI Anwendungen benötigt. Da ein Hub aber zu einer
+<em>Betreiberfirma</em> gehört die wiederum mehrere Werkstätten betreiben könnte,
+ist es innerhalb eines Hubs nötig nachzuhalten, welche Fälle zu welcher
+Werkstatt gehören.
+Theoretisch könnten dieser Entität noch weitere Meta Daten zur Werkstatt
+zugeordnet werden wie z.B. Kontakt Informationen. Der Hub Prototyp beinhaltet
+diese Informationen noch nicht.</p>
+<h4 id="customer"><code>customer</code></h4>
+<p>Repräsentiert diejenige Person / Firma, die das Fahrzeug in die Werkstatt bringt,
+üblicherweise also den/die Besitzer/in des Fahrzeugs zum Zeitpunkt des Falls.
+Auch diese Information wird eigentlich nicht zu Diagnosezwecken oder für KI
+Anwendungen benötigt.
+Die Kundenentität ist im aktuellen Prototypen dennoch enthalten, da so z.B. das
+Durchsuchen von Fällen nach Kunde möglich ist. Es liegt nahe, dass dies in einem
+realistischen Anwendungsszenario eine nützliche Funktionalität ist.</p>
+<p>Mit Blick auf die Gaia-X Storyline im Projekt kann die Berücksichtigung von
+(möglicherweise künstlichen) Kundendaten auzßerdem nützlich sein um verschiedene
+Konzepte zu illustrieren:</p>
+<ul>
+<li>Für die Betreiberfirma ist das Handling von Kundendaten ein normaler
+Bestandteil des eigenen Geschäftsprozesses. Diese Informationen sind zu entfernen,
+bevor Daten mit Partnern im AW4.0 Datenraum geteilt werden</li>
+<li>Transparenz: Der Datensatz ermöglich die Beantwortung von Kundenanfragen wie "Welche Daten liegen über mich vor?"</li>
+</ul>
+<h4 id="timeseries_data"><code>timeseries_data</code></h4>
+<p>Eine Instanz repräsentiert eine einzelne Zeitreihen Messung, also z.B. ein
+Oszilloskop Signal. Attribute sind in der folgenden Tabelle genauer beschrieben.</p>
+<table>
+<thead>
+<tr>
+<th>Attribut</th>
+<th>Beschreibung</th>
+<th>Beispiele</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>timestamp</code></td>
+<td>Zeitpunkt der Erstellung</td>
+<td></td>
+</tr>
+<tr>
+<td><code>signal[]</code></td>
+<td>Das eigentliche Signal, e.g Array mit Floats</td>
+<td></td>
+</tr>
+<tr>
+<td><code>sampling_rate</code></td>
+<td>Abtastrate der Messung in Hz</td>
+<td></td>
+</tr>
+<tr>
+<td><code>duration</code></td>
+<td>Dauer der Messung in Sekunden</td>
+<td></td>
+</tr>
+<tr>
+<td><code>component</code></td>
+<td>Das gemessene Fahrzeugbauteil</td>
+<td>"Batterie"</td>
+</tr>
+<tr>
+<td><code>label</code></td>
+<td>Label des Datensatzes</td>
+<td>"Regelfall / Unauffällig", "Anomalie / Auffälligkeit"</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>Typ des Datensatzes</td>
+<td>"oscillogram", "engine load"</td>
+</tr>
+<tr>
+<td><code>device_specs{}</code></td>
+<td>Technische Spezifikationen des Messgeräts. "<code>{}</code>" bedeutet hier, das dies ein nicht-standardisiertes Objekt mit verschiedenen key-value Paaren sein kann, abhängig vom benutzten Messgerät</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="obd_data"><code>obd_data</code></h4>
+<p>Eine Instanz repräsentiert das einmalige Auslesen des Fahrzeug Fehlerspeichers.
+Attribute sind in der folgenden Tabelle genauer beschrieben.</p>
+<table>
+<thead>
+<tr>
+<th>Attribut</th>
+<th>Beschreibung</th>
+<th>Beispiele</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>timestamp</code></td>
+<td>Zeitpunkt der Erstellung</td>
+<td></td>
+</tr>
+<tr>
+<td><code>dtcs[]</code></td>
+<td>Array mit DTCs</td>
+<td>["P0101", "P0202", "P0303"]</td>
+</tr>
+<tr>
+<td><code>obd_specs{}</code></td>
+<td>Technische Spezifikationen des Messgeräts. "<code>{}</code>" bedeutet hier, das dies ein nicht-standardisiertes Objekt mit verschiedenen key-value Paaren sein kann, abhängig vom benutzten Messgerät</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="symptom"><code>symptom</code></h4>
+<p>Eine Instanz repräsentiert das Ergebnis einer (manuellen / ausführlichen / 
+nicht durch die anderen Datentypen abgedeckten) Überprüfung eines spezifischen
+Bauteils. Attribute sind in der folgenden Tabelle genauer beschrieben.</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Description</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>timestamp</code></td>
+<td>Zeitpunkt der Erstellung</td>
+<td></td>
+</tr>
+<tr>
+<td><code>component</code></td>
+<td>Das untersuchte Fahrzeugbauteil</td>
+<td>"Lichtmaschine"</td>
+</tr>
+<tr>
+<td><code>label</code></td>
+<td>Das Ergebnis der Untersuchung</td>
+<td>"defekt", "nicht defekt"</td>
+</tr>
+</tbody>
+</table>
+<h3 id="anmerkungen-zum-datenmodell">Anmerkungen zum Datenmodell</h3>
+<h4 id="anmerkung-1-customer-vehicle-relation">Anmerkung 1: <code>customer</code> - <code>vehicle</code> Relation</h4>
+<p>Die <em>real-world</em> Relation "besitzt" zwischen Kunde und Fahrzeug wird im hier
+vorgestellten Datenmodell nicht durch eine direkte Verbindung zwischen <code>customer</code>
+und <code>vehicle</code> berücksichtigt. Die Begründung ist wie folgt:<br/>
+Die Relation ist eine <em>many-to-many</em> Beziehung. Ein/Eine Kunde/Kundin besitzt im
+Laufe der Zeit mehrere Fahrzeuge und ein Fahrzeug hat über seine Nutzungsdauer
+mehrere Besitzer. Sowohl für Kunden, als auch für Fahrzeuge sollte jede
+<em>real-world</em> Instanz höchstens einmal in der Hub Datenbank sein, um
+Inkonsistenzen zu vermeiden, z.B. wenn Meta Daten aktualisiert werden.
+Desweiteren ist ein spezifisches (<code>customer</code>, <code>vehicle</code>) Paar nur über eine
+bestimmte Zeit Teil der "besitzt" Relation. Die <em>many-to-many</em> Relation müsste
+also ohnehin durch eine dedizierte Tabelle repräsentiert werden und nicht
+mittels Fremdschlüsseln die direkt von <code>vehicle</code> zu <code>customer</code> (oder andersherum)
+verweisen.
+Die Aufgabe dieser dedizierten Tabelle wird bereits durch die Liste der Fälle
+abgedeckt.</p>
+<h2 id="technische-umsetzung">Technische Umsetzung</h2>
+<p>Die Umsetzung des oben beschriebenen Datenmodells ist mit verschiedenen
+relationalen und nicht-relationalen Datenbanksystemen denkbar.
+Für den Hub Prototypen ist die Entscheidung zunächst auf
+<a href="https://www.mongodb.com/">MongoDB</a> gefallen, da ...
+- ... das flexible Dokumenten-basierte Datenmodell eine einfachere Anpassung
+im Laufe des Projekts ermöglicht
+- ... mit <a href="https://www.mongodb.com/docs/manual/core/gridfs/">GridFS</a> die
+Möglichkeit besteht auch größere Oszilloskop Signale im Binärformat zu speichern</p></div>
+</div>
+</div>
+<footer class="col-md-12">
+<hr/>
+<p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+</footer>
+<script src="../../js/jquery-3.6.0.min.js"></script>
+<script src="../../js/bootstrap.min.js"></script>
+<script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+<script src="../../js/base.js"></script>
+<div aria-hidden="true" aria-labelledby="keyboardModalLabel" class="modal" id="mkdocs_keyboard_modal" role="dialog" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+<button class="close" data-dismiss="modal" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+</div>
+<div class="modal-body">
+<table class="table">
+<thead>
+<tr>
+<th style="width: 20%;">Keys</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="help shortcut"><kbd>?</kbd></td>
+<td>Open this help</td>
+</tr>
+<tr>
+<td class="next shortcut"><kbd>n</kbd></td>
+<td>Next page</td>
+</tr>
+<tr>
+<td class="prev shortcut"><kbd>p</kbd></td>
+<td>Previous page</td>
+</tr>
+<tr>
+<td class="search shortcut"><kbd>s</kbd></td>
+<td>Search</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="modal-footer">
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

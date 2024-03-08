@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Hochschule Osnabrück, 
+Technische Hochschule Georg Agricola, 
+LMIS AG
+" name="author"/>
+<link href="../../img/favicon.ico" rel="shortcut icon"/>
+<title>KI - Autowerkstatt 4.0 - Hub</title>
+<link href="../../css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../../css/font-awesome.min.css" rel="stylesheet"/>
+<link href="../../css/base.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<link href="../../download/aw40-docs.pdf" rel="alternate" title="PDF" type="application/pdf"/></head>
+<body>
+<div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+<div class="container">
+<a class="navbar-brand" href="../..">Autowerkstatt 4.0 - Hub</a>
+<!-- Expander button -->
+<button class="navbar-toggler" data-target="#navbar-collapse" data-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<!-- Expanded navigation -->
+<div class="navbar-collapse collapse" id="navbar-collapse">
+<!-- Main navigation -->
+<ul class="nav navbar-nav">
+<li class="navitem">
+<a class="nav-link" href="../../background/">Hintergrund</a>
+</li>
+<li class="dropdown active">
+<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Technische Umsetzung <b class="caret"></b></a>
+<ul class="dropdown-menu">
+<li>
+<a class="dropdown-item" href="../database/">Datenbank</a>
+</li>
+<li>
+<a class="dropdown-item" href="../api/">API</a>
+</li>
+<li>
+<a class="dropdown-item" href="../gaiax/">Gaia-X</a>
+</li>
+<li>
+<a class="dropdown-item active" href="./">KI</a>
+</li>
+<li>
+<a class="dropdown-item" href="../device_integration/">Integration heterogener Messgeräte</a>
+</li>
+<li>
+<a class="dropdown-item" href="../federatedcatalog/">Federated Catalog</a>
+</li>
+</ul>
+</li>
+<li class="navitem">
+<a class="nav-link" href="../../download/aw40-docs.pdf">Download</a>
+</li>
+</ul>
+<ul class="nav navbar-nav ml-auto">
+<li class="nav-item">
+<a class="nav-link" href="../gaiax/" rel="prev">
+<i class="fa fa-arrow-left"></i> Previous
+                                </a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../device_integration/" rel="next">
+                                    Next <i class="fa fa-arrow-right"></i>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="container">
+<div class="row">
+<div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+<div class="navbar-header">
+<button class="navbar-toggler collapsed" data-target="#toc-collapse" data-toggle="collapse" title="Table of Contents" type="button">
+<span class="fa fa-angle-down"></span>
+</button>
+</div>
+<div class="navbar-collapse collapse card bg-secondary" id="toc-collapse">
+<ul class="nav flex-column">
+<li class="nav-item" data-level="1"><a class="nav-link" href="#ki">KI</a>
+<ul class="nav flex-column">
+<li class="nav-item" data-level="2"><a class="nav-link" href="#voruberlegungen">Vorüberlegungen</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-level="2"><a class="nav-link" href="#state-machine-integration">State Machine Integration</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-level="2"><a class="nav-link" href="#skalierbarkeit">Skalierbarkeit</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div></div>
+<div class="col-md-9" role="main">
+<h1 id="ki">KI</h1>
+<p>In diesem Abschnitt wird beschrieben, wie die Funktionalität zur KI 
+unterstützten Fehlerdiagnose umgesetzt ist.</p>
+<h2 id="voruberlegungen">Vorüberlegungen</h2>
+<p>Kernstück der KI unterstützten Fehlerdiagnose ist die am DFKI entwickelte 
+<strong>State Machine</strong>.<br/>
+Die State Machine nutzt
+- Am Fahrzeug generierte Messdaten, also insbesondere OBD Daten und Oszillogramme
+- Einen Wissensgraph zur Beurteilung der OBD Daten
+- ML Modelle zur Bewertung von Oszillogrammen</p>
+<p>Die State Machine ist ein Agent, der viele komplexe Schritte der Fehlerdiagnose 
+weitgehend autonom durchführt. Insbesondere die Anwendung von Wissensgraph und 
+ML Modellen wird eigenständig gehandhabt.
+Der Nutzer hat lediglich die benötigten Eingabedaten zur Verfügung zu stellen.
+Diese werden zum Teil erst während der Fehlerdiagnose ermittelt. Beispielsweise
+entscheidet die State Machine erst nach Auswertung der Fehlercodes, für welche 
+Bauteile Oszillogramme zu erstellen sind. Entsprechende Anweisungen müssen dann 
+an den Nutzer übermittelt werden.
+Die Diagnose kann fortgesetzt werden, sobald der Nutzer die Daten zur Verfügung 
+gestellt hat.</p>
+<p>Aus Nutzersicht werden die folgenden Anforderungen an das KI gestützte
+Diagnosesystem festgelegt:</p>
+<ul>
+<li>Diagnose Management: Starten, Abbrechen etc.</li>
+<li>Informationen über Zustand und Ergebnisse der Diagnose einsehen</li>
+<li>Benachrichtigt werden, wenn eine eigene Handlung erforderlich ist (z.B. Daten 
+hochladen)</li>
+<li>Es müssen mehrere „offene“ Diagnosen gleichzeitig vorliegen können, e.g. wenn 
+eine Diagnose auf ein bestimmtes Oszillogramm „wartet“, dann sollte es möglich 
+sein, weiter an anderen Fällen zu arbeiten</li>
+<li>Die Diagnose sollte automatisch weitergehen, sobald benötigte Nutzerhandlungen 
+(z.B. Daten hochladen) ausgeführt wurden</li>
+</ul>
+<p>Auch die State Machine als "Rechenkern" des Diagnosesystems stellt eine Reihe
+von Anforderungen an das System, in das sie eingebettet sind. Diese sind:</p>
+<ul>
+<li>Zugriff auf Messdaten / Informationen zum Fall (Fehlercodes und Oszillogramme)</li>
+<li>Nutzerkommunikation ((Zwischen-)Ergebnisse, benötigte Daten etc.)</li>
+<li>Laden von ML Modellen für die Oszillogramme spezifischer Bauteile</li>
+<li>Zugriff auf (zentralen) Wissensgraph</li>
+</ul>
+<p>Es ist auch vorgesehen, dass das Diagnosesystem nicht direkt auf die Datenbank 
+des Hubs zugreift, sondern über eine dedizierte API. Dadurch wird sichergestellt, 
+dass nur die benötigten Messdaten in das Diagnosesystem gelangen und keine anderen 
+Geschäfts- oder Kundendaten.</p>
+<h2 id="state-machine-integration">State Machine Integration</h2>
+<p>Die unten stehende Abbildung skizziert die Integration der State Machine.</p>
+<p><img alt="" src="../ai_integration.png"/></p>
+<p>Beschreibung der Abbildung:<br/>
+AnwenderInnen interagieren über eine Benutzeroberfläche mit dem System. Über 
+diese können die durch die <code>werkstatt.api</code> definierten Datenmanagement 
+Operationen durchgeführt werden. Dies sind u.A. <em>Anlegen</em> und <em>Bearbeiten 
+von Fällen</em>, <em>Hochladen von Fahrzeugdaten</em> (Fehlercodes, Oszillogramme), das
+<em>Starten der Diagnose</em> für einen Fall und der <em>Abruf von Informationen zum
+aktuellen Diagnosezustand</em>.</p>
+<p>Wird mittels der <code>werkstatt.api</code> die Aktionen <em>Starten der Diagnose</em> durchgeführt,
+triggert dies die Erzeugung eines Diagnose Tasks, der vom API Service in einer 
+Task Queue abgelegt wird. </p>
+<p>Diese wird kontinuierlich vom Diagnose Backend Service bearbeitet.
+In diesen ist die State Machine als Softwarebibliothek eingebunden. Die
+State Machine interagiert mit dem Datenkern des Hubs über die <code>diagnose.api</code>.
+Diese ermöglicht den Abruf der relevanten Daten zum Fall, sowie das Senden
+von Zwischenergebnissen und Messaufträgen. Auf diese Informationen können
+Anwender wiederum mittels der <code>werkstatt.api</code> zugreifen.</p>
+<p>Durch diesen <em>asynchronen Dialog</em> zwischen Anwendern und State Machine 
+wird sichergestellt, dass sich auf einem AW4.0 Hub mehrere Diagnosen gleichzeitig
+"in Bearbeitung" befinden können, ohne dass dies die Interaktionsmöglichkeiten
+von Anwendern mit dem Datenkern blockiert oder einschränkt.</p>
+<p>Zur Umsetzung der Task Queue basierten Kommunikation zwischen API und Diagnose
+Backend verwendet der Hub Prototyp <a href="https://docs.celeryq.dev/en/stable/">Celery</a>
+mit <a href="https://redis.io/">Redis</a> als Broker verwendet.</p>
+<h2 id="skalierbarkeit">Skalierbarkeit</h2>
+<p>Der Prototyp beinhaltet derzeit jeden Service einmal. Im Szenario einer sehr
+großen Betreiberfirma mit vielen Werkstätten ist es denkbar, dass viele offene
+Diagnosen gleichzeitig vorliegen. Aufgrund der potenziell rechenintensiven Ausführung
+der State Machine ist nicht auszuschließen, dass es dabei zu 
+längeren Wartezeiten kommt, falls die Task Queue nur von einem Diagnose Backend 
+bearbeitet wird. 
+Der im vorherigen Abschnitt vorgestellte Integrationsansatz kann horizontal
+Skaliert werden, indem Replikate des Diagnose Backends die Task Queue parallel
+bearbeiten.</p></div>
+</div>
+</div>
+<footer class="col-md-12">
+<hr/>
+<p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+</footer>
+<script src="../../js/jquery-3.6.0.min.js"></script>
+<script src="../../js/bootstrap.min.js"></script>
+<script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+<script src="../../js/base.js"></script>
+<div aria-hidden="true" aria-labelledby="keyboardModalLabel" class="modal" id="mkdocs_keyboard_modal" role="dialog" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+<button class="close" data-dismiss="modal" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+</div>
+<div class="modal-body">
+<table class="table">
+<thead>
+<tr>
+<th style="width: 20%;">Keys</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="help shortcut"><kbd>?</kbd></td>
+<td>Open this help</td>
+</tr>
+<tr>
+<td class="next shortcut"><kbd>n</kbd></td>
+<td>Next page</td>
+</tr>
+<tr>
+<td class="prev shortcut"><kbd>p</kbd></td>
+<td>Previous page</td>
+</tr>
+<tr>
+<td class="search shortcut"><kbd>s</kbd></td>
+<td>Search</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="modal-footer">
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Hochschule Osnabrück, 
+Technische Hochschule Georg Agricola, 
+LMIS AG
+" name="author"/>
+<link href="../../img/favicon.ico" rel="shortcut icon"/>
+<title>Federated Catalog - Autowerkstatt 4.0 - Hub</title>
+<link href="../../css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../../css/font-awesome.min.css" rel="stylesheet"/>
+<link href="../../css/base.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<link href="../../download/aw40-docs.pdf" rel="alternate" title="PDF" type="application/pdf"/></head>
+<body>
+<div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+<div class="container">
+<a class="navbar-brand" href="../..">Autowerkstatt 4.0 - Hub</a>
+<!-- Expander button -->
+<button class="navbar-toggler" data-target="#navbar-collapse" data-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<!-- Expanded navigation -->
+<div class="navbar-collapse collapse" id="navbar-collapse">
+<!-- Main navigation -->
+<ul class="nav navbar-nav">
+<li class="navitem">
+<a class="nav-link" href="../../background/">Hintergrund</a>
+</li>
+<li class="dropdown active">
+<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Technische Umsetzung <b class="caret"></b></a>
+<ul class="dropdown-menu">
+<li>
+<a class="dropdown-item" href="../database/">Datenbank</a>
+</li>
+<li>
+<a class="dropdown-item" href="../api/">API</a>
+</li>
+<li>
+<a class="dropdown-item" href="../gaiax/">Gaia-X</a>
+</li>
+<li>
+<a class="dropdown-item" href="../ai/">KI</a>
+</li>
+<li>
+<a class="dropdown-item" href="../device_integration/">Integration heterogener Messgeräte</a>
+</li>
+<li>
+<a class="dropdown-item active" href="./">Federated Catalog</a>
+</li>
+</ul>
+</li>
+<li class="navitem">
+<a class="nav-link" href="../../download/aw40-docs.pdf">Download</a>
+</li>
+</ul>
+<ul class="nav navbar-nav ml-auto">
+<li class="nav-item">
+<a class="nav-link" href="../device_integration/" rel="prev">
+<i class="fa fa-arrow-left"></i> Previous
+                                </a>
+</li>
+<li class="nav-item">
+<a class="nav-link disabled" rel="next">
+                                    Next <i class="fa fa-arrow-right"></i>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="container">
+<div class="row">
+<div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+<div class="navbar-header">
+<button class="navbar-toggler collapsed" data-target="#toc-collapse" data-toggle="collapse" title="Table of Contents" type="button">
+<span class="fa fa-angle-down"></span>
+</button>
+</div>
+<div class="navbar-collapse collapse card bg-secondary" id="toc-collapse">
+<ul class="nav flex-column">
+<li class="nav-item" data-level="1"><a class="nav-link" href="#federated-catalog">Federated Catalog</a>
+<ul class="nav flex-column">
+<li class="nav-item" data-level="2"><a class="nav-link" href="#federatedcatalog">/federatedcatalog</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-level="2"><a class="nav-link" href="#insert">/insert</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-level="2"><a class="nav-link" href="#participants">/participants</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-level="2"><a class="nav-link" href="#konfigurationsmoglichkeiten">Konfigurationsmöglichkeiten</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div></div>
+<div class="col-md-9" role="main">
+<h1 id="federated-catalog">Federated Catalog</h1>
+<p>Der Federated Catalog (FC) entspricht einer Liste sämtlicher Teilnehmer eines Datenraumes mitsamt ihrer angebotenen Services und Assets. Die FC-Implementierung des AW4.0-EDC
+sieht vor, dass jeder Teilnehmer im Datenraum einen eigenen FC enthält, dieser also dezentral organisiert ist. In einem Datenraum mit <code>n</code> Teilnehmern gibt es also
+<code>n</code> FCs. Das Gegenstück zu diesem Konzept wäre ein zentral-organisierter FC, <code>n</code> Teilnehmer greifen also auf <code>1</code> FC zu.</p>
+<p><img alt="img_1.png" src="../fc.png"/></p>
+<p>Der FederatedCatalogApiController der FC-Extension liefert drei weitere Endpunkte zu den bereits vorhandenen. Die Beispiele sind aus Sicht eines hypothetischen Datenraumteilnehmers "LMIS" beschrieben:</p>
+<h2 id="federatedcatalog">/federatedcatalog</h2>
+<p>Dieser Endpunkt gibt die zuvor beschriebene Liste sämtlicher Datenraumteilnehmer mitsamt ihrer angebotenen Services und Assets zurück. Der EDC erwartet hierbei eine explizite Query im JSON-Body.</p>
+<p>Beispiel:</p>
+<pre><code>POST http://&lt;LMIS-Adresse&gt;/management/federatedcatalog/
+</code></pre>
+<p>mit Body</p>
+<pre><code>{
+    "@context": {
+    "edc": "https://w3id.org/edc/v0.0.1/ns/"
+    },
+    "querySpec": {
+    "offset": 0,
+    "limit": 50,
+    "sortOrder": "DESC",
+    "sortField": "fieldName",
+    "filterExpression": []
+    }
+}
+</code></pre>
+<p>Unmittelbar nach dem Start des EDC ist der FC leer, der Post-Request liefert also eine leere Liste zurück.</p>
+<h2 id="insert">/insert</h2>
+<p>Mithilfe dieses Endpunkts könnten erste beziehungsweise weitere Datenraumteilnehmer in dem jeweils eigenen FC registriert werden.</p>
+<p>Beispiel:</p>
+<p>Ein neuer Datenraumteilnehmer "HSOS" ist im Besitz des EDC_2, der Datenraumteilnehmer "LMIS" mit EDC_1 möchte diesen abfragen.</p>
+<pre><code>POST http://&lt;LMIS-Adresse&gt;/management/federatedcatalog/insert
+</code></pre>
+<p>mit Body</p>
+<pre><code>{
+    "name": "HSOS",
+    "url": "http://&lt;HSOS-Adresse&gt;:8282/protocol",
+    "supportedProtocols": [
+        "dataspace-protocol-http"
+    ]
+}
+</code></pre>
+<p>"LMIS" kann nun seinen eigenen /federatedcatalog-Endpunkt mit der im vorherigen Beispiel gezeigten Query ansprechen und erhält den folgenden Eintrag:</p>
+<pre><code>[
+    {
+        "@id": "e3f5436b-ee50-4ea9-ad7d-2cc46f164105",
+        "@type": "dcat:Catalog",
+        "dcat:dataset": [],
+        "dcat:service": {
+            "@id": "135543b0-2aa1-49e8-9079-bd307020fea0",
+            "@type": "dcat:DataService",
+            "dct:terms": "connector",
+            "dct:endpointUrl": "http://&lt;HSOS-Adresse&gt;:8282/protocol"
+        },
+        "edc:originator": "http://&lt;HSOS-Adresse&gt;:8282/protocol",
+        "edc:participantId": "provider",
+        "@context": {
+            "dct": "https://purl.org/dc/terms/",
+            "edc": "https://w3id.org/edc/v0.0.1/ns/",
+            "dcat": "https://www.w3.org/ns/dcat/",
+            "odrl": "http://www.w3.org/ns/odrl/2/",
+            "dspace": "https://w3id.org/dspace/v0.8/"
+        }
+    }
+]
+</code></pre>
+<p>Falls "HSOS" zusätzlich ein Asset mit ID "Messergebnis" bei sich registriert, erweitert sich der Eintrag zu:</p>
+<pre><code>[
+    {
+        "@id": "3d2e3930-7454-4974-82ea-8f8f2e0dc665",
+        "@type": "dcat:Catalog",
+        "dcat:dataset": {
+            "@id": "Messergebnis",
+            "@type": "dcat:Dataset",
+            "odrl:hasPolicy": {
+                "@id": "MQ==:TWVzc2VyZ2Vibmlz:MjBhZGM5MGMtNTdjYi00MzlmLWE3ZWMtZjlmMWQ4NzhkMTQ3",
+                "@type": "odrl:Set",
+                "odrl:permission": [],
+                "odrl:prohibition": [],
+                "odrl:obligation": [],
+                "odrl:target": "Messergebnis"
+            },
+            "dcat:distribution": [
+                {
+                    "@type": "dcat:Distribution",
+                    "dct:format": {
+                        "@id": "HttpProxy"
+                    },
+                    "dcat:accessService": "135543b0-2aa1-49e8-9079-bd307020fea0"
+                },
+                {
+                    "@type": "dcat:Distribution",
+                    "dct:format": {
+                        "@id": "HttpData"
+                    },
+                    "dcat:accessService": "135543b0-2aa1-49e8-9079-bd307020fea0"
+                }
+            ],
+            "edc:name": "product description",
+            "edc:id": "Messergebnis",
+            "edc:contenttype": "application/json"
+        },
+        "dcat:service": {
+            "@id": "135543b0-2aa1-49e8-9079-bd307020fea0",
+            "@type": "dcat:DataService",
+            "dct:terms": "connector",
+            "dct:endpointUrl": "http://&lt;HSOS-Adresse&gt;:8282/protocol"
+        },
+        "edc:originator": "http://&lt;HSOS-Adresse&gt;:8282/protocol",
+        "edc:participantId": "provider",
+        "@context": {
+            "dct": "https://purl.org/dc/terms/",
+            "edc": "https://w3id.org/edc/v0.0.1/ns/",
+            "dcat": "https://www.w3.org/ns/dcat/",
+            "odrl": "http://www.w3.org/ns/odrl/2/",
+            "dspace": "https://w3id.org/dspace/v0.8/"
+        }
+    }
+]
+</code></pre>
+<p>Beachte, dass mit der Registrierung eines ersten Assets durch "HSOS" auch Informationen über dessen unterstützte Dataplanes bezüglich eben jenes Assets im FC auftauchen. Hat "HSOS" keine Dataplanes bei sich registriert, wirft der "LMIS"-EDC nach Aufruf des Endpunkts eine Fehlermeldung,</p>
+<h2 id="participants">/participants</h2>
+<p>Dieser Endpunkt liefert eine Liste aller Datenraumteilnehmer gemäß der Attribute Name, Connector-Url und Protokoll-Spezifikation zurück, die beim Registrieren gesetzt worden sind.</p>
+<p>Beispiel:</p>
+<pre><code>GET http://&lt;LMIS-Adresse&gt;/management/federatedcatalog/participants
+</code></pre>
+<p>mit den Datenraumteilnehmern "HSOS" und "THGA":</p>
+<pre><code>[
+    {
+        "name": "HSOS",
+        "url": "http://&lt;HSOS-Adresse&gt;:8282/protocol",
+        "supportedProtocols": [
+            "dataspace-protocol-http"
+        ]
+    },
+    {
+        "name": "THGA",
+        "url": "http://&lt;THGA-Adresse&gt;:8282/protocol",
+        "supportedProtocols": [
+            "dataspace-protocol-http"
+        ]
+    }
+]
+</code></pre>
+<h2 id="konfigurationsmoglichkeiten">Konfigurationsmöglichkeiten</h2>
+<p>Es gibt insgesamt drei Eigenschaften, die in der properties-Datei des EDC bezüglich des FC gesetzt werden können:</p>
+<p><em>edc.catalog.cache.execution.delay.seconds</em></p>
+<p>Anzahl an Sekunden, bis der EDC initial den ersten Abfrage-Vorgang startet.</p>
+<p>Beispiel:</p>
+<pre><code>edc.catalog.cache.execution.delay.seconds=10
+</code></pre>
+<p>bedeutet, dass der FC das erste Mal 10 Sekunden nach Start des EDC aktualisiert wird.</p>
+<p><em>edc.catalog.cache.execution.period.seconds</em></p>
+<p>Häufigkeit des Abfrage-Prozesses in Sekunden.</p>
+<p>Beispiel:</p>
+<pre><code>edc.catalog.cache.execution.period.seconds=5
+</code></pre>
+<p>bedeutet, dass sich der FC alle 5 Sekunden aktualisiert (nach dem initalen Abfrage-Vorgang, s. vorheriger Absatz).</p>
+<p><em>edc.catalog.cache.partition.num.crawlers</em></p>
+<p>Anzahl an <code>Crawler</code>-Objekten, die die sogenannten "Work Items" (also das Tripel aus Name, Connector-Url und supportedProtocols-Liste) verarbeiten.</p>
+<p>Beispiel:</p>
+<pre><code>edc.catalog.cache.partition.num.crawlers=2
+</code></pre>
+<p>bedeutet, dass im Falle von 10 Work Items jeder <code>Crawler</code> 5 Work Items abfragt.</p></div>
+</div>
+</div>
+<footer class="col-md-12">
+<hr/>
+<p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+</footer>
+<script src="../../js/jquery-3.6.0.min.js"></script>
+<script src="../../js/bootstrap.min.js"></script>
+<script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+<script src="../../js/base.js"></script>
+<div aria-hidden="true" aria-labelledby="keyboardModalLabel" class="modal" id="mkdocs_keyboard_modal" role="dialog" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+<button class="close" data-dismiss="modal" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+</div>
+<div class="modal-body">
+<table class="table">
+<thead>
+<tr>
+<th style="width: 20%;">Keys</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="help shortcut"><kbd>?</kbd></td>
+<td>Open this help</td>
+</tr>
+<tr>
+<td class="next shortcut"><kbd>n</kbd></td>
+<td>Next page</td>
+</tr>
+<tr>
+<td class="prev shortcut"><kbd>p</kbd></td>
+<td>Previous page</td>
+</tr>
+<tr>
+<td class="search shortcut"><kbd>s</kbd></td>
+<td>Search</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="modal-footer">
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Hochschule Osnabrück, 
+Technische Hochschule Georg Agricola, 
+LMIS AG
+" name="author"/>
+<link href="../img/favicon.ico" rel="shortcut icon"/>
+<title>Hintergrund - Autowerkstatt 4.0 - Hub</title>
+<link href="../css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../css/font-awesome.min.css" rel="stylesheet"/>
+<link href="../css/base.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<link href="../download/aw40-docs.pdf" rel="alternate" title="PDF" type="application/pdf"/></head>
+<body>
+<div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+<div class="container">
+<a class="navbar-brand" href="..">Autowerkstatt 4.0 - Hub</a>
+<!-- Expander button -->
+<button class="navbar-toggler" data-target="#navbar-collapse" data-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<!-- Expanded navigation -->
+<div class="navbar-collapse collapse" id="navbar-collapse">
+<!-- Main navigation -->
+<ul class="nav navbar-nav">
+<li class="navitem active">
+<a class="nav-link" href="./">Hintergrund</a>
+</li>
+<li class="dropdown">
+<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Technische Umsetzung <b class="caret"></b></a>
+<ul class="dropdown-menu">
+<li>
+<a class="dropdown-item" href="../tech/database/">Datenbank</a>
+</li>
+<li>
+<a class="dropdown-item" href="../tech/api/">API</a>
+</li>
+<li>
+<a class="dropdown-item" href="../tech/gaiax/">Gaia-X</a>
+</li>
+<li>
+<a class="dropdown-item" href="../tech/ai/">KI</a>
+</li>
+<li>
+<a class="dropdown-item" href="../tech/device_integration/">Integration heterogener Messgeräte</a>
+</li>
+<li>
+<a class="dropdown-item" href="../tech/federatedcatalog/">Federated Catalog</a>
+</li>
+</ul>
+</li>
+<li class="navitem">
+<a class="nav-link" href="../download/aw40-docs.pdf">Download</a>
+</li>
+</ul>
+<ul class="nav navbar-nav ml-auto">
+<li class="nav-item">
+<a class="nav-link disabled" rel="prev">
+<i class="fa fa-arrow-left"></i> Previous
+                                </a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../tech/database/" rel="next">
+                                    Next <i class="fa fa-arrow-right"></i>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="container">
+<div class="row">
+<div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+<div class="navbar-header">
+<button class="navbar-toggler collapsed" data-target="#toc-collapse" data-toggle="collapse" title="Table of Contents" type="button">
+<span class="fa fa-angle-down"></span>
+</button>
+</div>
+<div class="navbar-collapse collapse card bg-secondary" id="toc-collapse">
+<ul class="nav flex-column">
+<li class="nav-item" data-level="1"><a class="nav-link" href="#hintergrund">Hintergrund</a>
+<ul class="nav flex-column">
+<li class="nav-item" data-level="2"><a class="nav-link" href="#szenarien">Szenarien</a>
+<ul class="nav flex-column">
+<li class="nav-item" data-level="3"><a class="nav-link" href="#szenario-1-kauf-von-assets">Szenario 1: Kauf von Assets</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+</ul>
+</li>
+<li class="nav-item" data-level="2"><a class="nav-link" href="#szenario-2-verkauf-von-assets">Szenario 2: Verkauf von Assets</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-level="2"><a class="nav-link" href="#szenario-3-diagnose">Szenario 3: Diagnose</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-level="2"><a class="nav-link" href="#szenario-4-onboarding">Szenario 4: Onboarding</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-level="2"><a class="nav-link" href="#anforderungsanalyse">Anforderungsanalyse</a>
+<ul class="nav flex-column">
+<li class="nav-item" data-level="3"><a class="nav-link" href="#teilnahme-am-aw-40-datenraum">Teilnahme am AW 4.0 Datenraum</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+</ul>
+</li>
+<li class="nav-item" data-level="2"><a class="nav-link" href="#losungsansatz">Lösungsansatz</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div></div>
+<div class="col-md-9" role="main">
+<h1 id="hintergrund">Hintergrund</h1>
+<p>Im Projekt gibt es drei Hauptthemen:</p>
+<ul>
+<li>Innovative Messtechnik</li>
+<li>KI gestützte Fehlerdiagnose</li>
+<li>Gaia-X</li>
+</ul>
+<p>Im Rahmen der 2022 durchgeführten Arbeiten und Gespräche wurden verschiedene 
+Anforderungen in diesen Bereichen identifiziert, also Aufgaben / Probleme, 
+die durch das <strong>System Autowerkstatt 4.0</strong> gelöst werden sollen.</p>
+<p>Um die Anforderungen Ableiten zu können wurden in Abschnitt <a href="#Szenarien">Szenarien</a> vier Szenarien formuliert. Die daraus resultierenden Aufgaben/Probleme werden im Abschnitt <a href="#anforderungsanalyse">Anforderungsanalyse</a> genauer beschrieben. Darauf aufbauend wird im Abschnitt <a href="#losungsansatz">Lösungsansatz</a> eine Übersicht des AW4.0 Hub präsentiert.</p>
+<h2 id="szenarien">Szenarien</h2>
+<p>Ein Szenario ist eine Situation, die mögliche Ereignisse, Bedingungen und Folgen beschreibt.</p>
+<h3 id="szenario-1-kauf-von-assets">Szenario 1: Kauf von Assets</h3>
+<p>Die Werkstatt hat bisher nur ältere Modelle zur Diagnose von Fahrzeugen, die nicht mehr alle Funktionen abdecken können. Sie möchte daher ein neues Modell erwerben, das auf dem neuesten Stand der Technik ist und alle relevanten Daten auswerten kann. Um ein solches Modell zu finden, nutzt sie die Datenraum-Oberfläche des Werkstatt-Hubs, der einen Markt für den Austausch von Daten und Dienstleistungen zwischen Werkstätten und anderen Akteuren bietet. Dort kann sie nach verschiedenen Kriterien nach passenden Modellen suchen, wie z.B. Preis, Leistung, Bewertung oder Verfügbarkeit.</p>
+<p>Nach einer kurzen Suche findet sie ein Modell, das ihren Anforderungen entspricht. Sie entscheidet sich, das Modell zu kaufen und schließt einen Vertrag mit dem Anbieter ab. Der Vertrag regelt die Bedingungen für die Nutzung des Modells, wie z.B. die Laufzeit, den Umfang, die Kosten oder die Haftung. Nachdem der Vertrag abgeschlossen ist, wird das Modell entweder auf den Werkstatt-Hub geladen oder der Zugriff auf das Modell wird über den Datenraum gewährt. Die Werkstatt kann nun das Modell zur Diagnose von Fahrzeugen verwenden.</p>
+<h2 id="szenario-2-verkauf-von-assets">Szenario 2: Verkauf von Assets</h2>
+<p>Um ihre Wettbewerbsfähigkeit zu erhöhen, plant die Werkstatt, ihre gesammelten Fahrzeugdaten als Asset zu vermarkten. Die Werkstatt hat bereits mehrere Fahrzeuge über den Werkstatt-Hub diagnostiziert und dabei Daten erzeugt. Die Werkstatt möchte diese Daten nutzen, um in Zukunft bessere Diagnosemodelle anwenden zu können. Mit Hilfe der Datentraum Oberfläche kann die Werkstatt, die von ihr gewünschten Daten auswählen und zu einem Asset bündeln. Die Werkstatt legt die Vertragsbedingungen fest und erstellt eine Asset-Beschreibung. Die Werkstatt-Daten werden anonymisiert und als Asset-Angebot auf den Markt gebracht.</p>
+<h2 id="szenario-3-diagnose">Szenario 3: Diagnose</h2>
+<p>Die Werkstatt führt eine Diagnose am Fahrzeug mittels des AW 4.0 Werkstatt-Hubs durch. In diesem Szenario beschreiben wir die Diagnose anhand von Oszilloskop Daten.</p>
+<p>Eine Werkstatt erhält ein Fahrzeug zur Diagnose, das einen Fehler aufweist. Um die Ursache des Fehlers zu ermitteln, nutzt die Werkstatt den AW 4.0 Werkstatt-Hub und legt einen Fall für die Diagnose an. Der Werkstatt-Hub liest die OBD-Daten des Fahrzeugs aus und vergleicht sie mit dem Wissensgraphen, um das wahrscheinlichste defekte Bauteil zu bestimmen. Anschließend ruft der Werkstatt-Hub die entsprechende Diagnose für das Bauteil auf und gibt der Werkstatt die Anforderungen und Anweisungen für eine OszilloskopMessung. Die Werkstatt führt die Messung gemäß den Vorgaben durch und leitet die Messdaten an den Werkstatt-Hub weiter. Der Werkstatt-Hub interpretiert die Messdaten und identifiziert das defekte Bauteil. Nachdem die Werkstatt das Bauteil ausgetauscht hat, markiert sie den Fall im Werkstatt-Hub als abgeschlossen.</p>
+<h2 id="szenario-4-onboarding">Szenario 4: Onboarding</h2>
+<p>Um die Sicherheit und Integrität der Daten im Datenraum zu gewährleisten, müssen neue Teilnehmer einen standardisierten Onboarding-Prozess durchlaufen. Dieser Prozess besteht aus folgenden Schritten:</p>
+<ol>
+<li>Der neue Teilnehmer bekundet sein Interesse an dem Datenraum und erklärt seine Bereitschaft, die Regeln und Anforderungen des Datenraums einzuhalten.</li>
+<li>Der neue Teilnehmer füllt ein Formular aus, in dem er seine Identität, seine Ziele und seine Datenbedarfe angibt. Dieses Formular wird an den Föderator des Datenraums gesendet, der die Rolle eines Vermittlers und Vertrauenswürdigen Dritten hat.</li>
+<li>Der Föderator prüft die Angaben des neuen Teilnehmers und vergleicht sie mit den Kriterien und Erwartungen des Datenraums. Der Föderator kann auch zusätzliche Informationen oder Nachweise vom neuen Teilnehmer anfordern, um seine Eignung zu bestätigen.</li>
+<li>Wenn der Föderator den neuen Teilnehmer für geeignet hält, stellt er ihm ein digitales Zertifikat aus, das seine Identität und seine Berechtigung zur Teilnahme am Datenraum bestätigt. Das Zertifikat enthält auch die Zugangsdaten und die technischen Spezifikationen für den Datenraum.</li>
+<li>Der neue Teilnehmer wird in den Datenraum aufgenommen und kann auf die verfügbaren Daten zugreifen oder eigene Daten bereitstellen. Die anderen Mitglieder des Datenraums werden über den neuen Teilnehmer informiert und können mit ihm kommunizieren oder kooperieren.</li>
+</ol>
+<h2 id="anforderungsanalyse">Anforderungsanalyse</h2>
+<p>Im AW4.0 Universum gibt es verschiedene <em>Rollen</em>, also Benutzer- / Anwenderebenen
+die mit dem System interagieren. Diese sind:</p>
+<ul>
+<li>Werkstatt</li>
+<li>Betreiberfirma</li>
+<li>Datenraum</li>
+<li>Fahrzeug</li>
+<li>Messsystem</li>
+</ul>
+<p>Diese Rollen sind mit ihren jeweiligen Beziehungen im untenstehenden Diagramm dargestellt.</p>
+<p><img alt="" src="../aw40-universe.png"/></p>
+<p>Aufbauend auf diesen Überlegungen zur Struktur des AW4.0 Universums lassen sich 
+vielfältige Anforderungen identifizieren, also konkrete Funktionalitäten, die das 
+System haben soll. Diese werden im Folgenden beschrieben.</p>
+<p>Neben der Durchführung von Messungen muss im Umfeld der Werkstatt ein einfaches 
+<em>Datenmanagement</em> vorausgesetzt werden.
+Es sollte dabei möglich sein, neue "Fälle" anzulegen, wenn ein Auto in die Werkstatt kommt.
+Diese Fälle sollten z.B. bearbeitet, durchsucht und gelöscht werden können.</p>
+<p>Mitarbeiter in Werkstätten sollten außerdem die Möglichkeit haben, KI unterstützte
+Fehlerdiagnose durchzuführen, also die am DFKI entwickelte State Machine anzuwenden.
+Dabei soll die Integration gängiger Messsysteme von verschiedenen Herstellern 
+berücksichtigt werden, d.h. es sollte möglich sein, die Daten unterschiedlicher Messsysteme
+zu einem Fall hinzuzufügen, damit diese von der KI verwertet werden können.</p>
+<p>Autowerkstatt 4.0 soll außerdem Anforderungen auf der höher gelagerten Ebene der 
+Betreiberfirma erfüllen. Hier sollte es möglich sein, die eigenen Geschäftsdaten sicher zu 
+verwalten, wobei insbesondere der Schutz personenbezogener Informationen von Mitarbeitern
+und Kunden sicherzustellen ist.</p>
+<p>Eine weitere Anforderung im Umfeld der Betreiberfirma ist die <em>Teilnahme am AW4.0 
+Datenraum</em>.</p>
+<h3 id="teilnahme-am-aw-40-datenraum">Teilnahme am AW 4.0 Datenraum</h3>
+<p>Der Werkstatt-Hub muss einen nach der Gaia-X 10.23 Architektur konformen Zugriff auf den Datenraum gewährleisten. Dabei fungiert der Hub jeweils in der Rolle des Consumers (Kauf von Assets, wie KI-Modellen)) und Providers (Verkauf von Assets wie Daten). Daraus ergeben sich folgende Anforderungen:</p>
+<ul>
+<li>Erwerb/Integration eines Gaia-X Credentials, mit welchem man sich als self sovereign identity ausweisen kann. </li>
+<li>Identifikation im Datenraum mit einem (erweiterten) Gaia-X Credential</li>
+<li>Vertragsabwicklung für den Kauf von Assets, sowie das Aufsetzen eigener Verträge (Policies) für den Verkauf von Assets.</li>
+<li>Selbstbestimmter Erwerb von Assets aus dem Datenraum für eine effizientere Diagnose.</li>
+<li>Selbstbestimmter Verkauf von Assets im Datenraum, hierbei muss sichergestellt werden, dass keine personenbeziehbaren Daten veräußert werden können.</li>
+<li>Empfang von Assets als Consumer, Weitergabe von Assets als Provider</li>
+</ul>
+<h2 id="losungsansatz">Lösungsansatz</h2>
+<p>Das auf dieser Website beschriebene System ist ein Prototyp für den <em>Autowerkstatt 4.0
+Hub</em>. Dieser ist ein IT-System, mit dem die im vorherigen Abschnitt beschriebenen 
+Anforderungen erfüllt werden sollen. </p>
+<p>Die wichtigsten Ideen sind:</p>
+<p><em>Eine Betreiberfirma hat einen AW4.0 Hub.</em></p>
+<ul>
+<li>Dieser ist ein Firmen-eigenes IT-System, auf dem nur die eigenen Geschäftsdaten verwaltet
+werden.</li>
+<li>Nur die eigenen Mitarbeiter (in Werkstätten oder Zentrale) interagieren mit diesem
+System.</li>
+</ul>
+<p><em>Ein Hub besteht aus verschiedenen Services / Komponenten.</em></p>
+<ul>
+<li>Diese stellen für die Mitarbeiter in den Werkstätten die benötigten Funktionalitäten 
+zur Verwaltung von Fällen und zur KI gestützten Fehlerdiagnose bereit.</li>
+<li>Weitere Services ermöglichen der Betreiberfirma die selbstbestimmte Verwaltung und 
+Weitergabe der eigenen Geschäftsdaten.</li>
+</ul>
+<p>Damit ist der Hub wie in der folgenden Abbildung dargestellt in das AW4.0 Universum 
+einzuordnen:
+<img alt="" src="../aw40-universe-with-hub.png"/></p>
+<p>Im Gegensatz zu früheren Ideen gibt es im AW4.0 Universum also hier nicht <em>eine 
+Datenpipeline</em> und <em>einen Server</em>. Dieses Grundgerüst erscheint nicht sinnvoll, da die
+selbstbestimmte Verwaltung und Weitergabe der eigenen Geschäftsdaten eine essenzielle
+Anforderung an das System ist.</p>
+<p>Weitere Kernaspekte des AW4.0 Hubs sind:</p>
+<p><em>Separation of Concerns</em></p>
+<ul>
+<li>Messsysteme mit denen Daten am Fahrzeug generiert werden, sind nicht Teil des Hubs. Die 
+Interfaces des Hubs sind jedoch so gestaltet, dass die Integration verschiedener 
+Messsysteme gewährleistet ist.</li>
+<li>KI (e.g. die State Machine) wird auf dem Hub ausgeführt und nicht auf einem Messgerät,
+da dies die Integration verschiedener propriäterer Messsysteme deutlich erschweren würde.</li>
+</ul>
+<p><em>Flexible Interaktionsmöglichkeiten</em></p>
+<ul>
+<li>Über eine Weboberfläche können die Fälle der eigenen Werkstatt eingesehen und verwaltet 
+werden sowie Daten unterschiedlicher Messsysteme
+hochgeladen werden.</li>
+<li>Alternativ können spezialisierter Messsysteme direkt über eine API mit dem Hub 
+kommunizieren.</li>
+</ul>
+<p><em>Flexible physische Ausgestaltung</em></p>
+<ul>
+<li>On-premise vs. Cloud</li>
+<li>Single-host vs. Verteiltes System</li>
+</ul>
+<p>Die folgende Abbildung zeigt eine Architektur Skizze des Hub Prototypen:</p>
+<p><img alt="" src="../hub-sketch.png"/></p>
+<p><strong>Anmerkungen</strong></p>
+<p>Es gibt noch weitere Anforderungen und daraus abgeleitete Services, die hier nicht 
+dargestellt wurden, aber berücksichtigt werden müssen. Dazu zählt beispielsweise die 
+Anforderung <em>Authentifizierung und Autorisierung</em>.</p>
+<p>Die Architekturskizze soll nur eine Grundidee basierend auf den vorgestellten Rollen und 
+Anforderungen illustrieren.</p>
+<p>Alle Komponenten in der Skizze erfordern weitere spezifische Anforderungsanalysen und 
+daraus abgeleitete Designs. Insbesondere die Komponenten <em>KI</em> und
+<em>souveräner Datenaustausch</em> setzen sich wiederum aus mehreren Services zusammensetzen.</p></div>
+</div>
+</div>
+<footer class="col-md-12">
+<hr/>
+<p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+</footer>
+<script src="../js/jquery-3.6.0.min.js"></script>
+<script src="../js/bootstrap.min.js"></script>
+<script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+<script src="../js/base.js"></script>
+<div aria-hidden="true" aria-labelledby="keyboardModalLabel" class="modal" id="mkdocs_keyboard_modal" role="dialog" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+<button class="close" data-dismiss="modal" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+</div>
+<div class="modal-body">
+<table class="table">
+<thead>
+<tr>
+<th style="width: 20%;">Keys</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="help shortcut"><kbd>?</kbd></td>
+<td>Open this help</td>
+</tr>
+<tr>
+<td class="next shortcut"><kbd>n</kbd></td>
+<td>Next page</td>
+</tr>
+<tr>
+<td class="prev shortcut"><kbd>p</kbd></td>
+<td>Previous page</td>
+</tr>
+<tr>
+<td class="search shortcut"><kbd>s</kbd></td>
+<td>Search</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="modal-footer">
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
