@@ -3,9 +3,9 @@ name: Build and publish docs
 on:
   push:
     branches:
-      - feature/deploy-docs
-    #paths:
-    #  - "docs/de/**"
+      - main
+    paths:
+      - "docs/de/**"
 jobs:
   build-docs:
     timeout-minutes: 10
