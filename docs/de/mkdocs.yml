@@ -2,7 +2,7 @@ site_name: Autowerkstatt 4.0 - Hub
 site_author: | 
         Hochschule Osnabrück, 
         Technische Hochschule Georg Agricola, 
-        LMIS AG 
+        LMIS AG
 nav:
   - Hintergrund: 'background.md'
   - Technische Umsetzung:
