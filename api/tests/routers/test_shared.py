@@ -502,6 +502,32 @@ async def test_list_customers(
         "One customer in data context expected."
 
 
+@pytest.mark.asyncio
+async def test_get_customer(
+        authenticated_async_client, initialized_beanie_context, data_context,
+        customer_id
+):
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            f"/customers/{customer_id}"
+        )
+    assert response.status_code == 200
+    assert response.json() == {"_id": customer_id}
+
+
+@pytest.mark.asyncio
+async def test_get_customer_not_found(
+        authenticated_async_client, initialized_beanie_context, data_context,
+        customer_id
+):
+    async with initialized_beanie_context, data_context:
+        # Request the 'unknown' id not in the data context
+        response = await authenticated_async_client.get(
+            "/customers/unknown"
+        )
+    assert response.status_code == 404
+
+
 @pytest.mark.parametrize("route", shared.router.routes, ids=lambda r: r.name)
 def test_missing_bearer_token(route, unauthenticated_client):
     """Endpoints should not be accessible without a bearer token."""
