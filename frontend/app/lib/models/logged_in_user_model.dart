@@ -2,13 +2,13 @@ import "package:aw40_hub_frontend/utils/utils.dart";
 
 class LoggedInUserModel {
   LoggedInUserModel(
-    this.roles,
+    this.groups,
     this.fullName,
     this.userName,
     this.mailAddress,
     this.workShopId,
   );
-  final List<AuthorizedRole> roles;
+  final List<AuthorizedGroup> groups;
   final String fullName;
   final String userName;
   final String mailAddress;

@@ -1,4 +1,4 @@
-enum AuthorizedRole {
+enum AuthorizedGroup {
   analyst,
   mechanic,
 }

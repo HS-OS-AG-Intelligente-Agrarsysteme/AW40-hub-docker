@@ -49,30 +49,30 @@ class AuthProvider with ChangeNotifier {
   /// Returns true if the user is logged in, false otherwise.
   bool isLoggedIn() => _jwt != null;
 
-  /// Returns `true` if logged in user has >=1 of the `AuthorizedRole`s.
+  /// Returns `true` if logged in user has >=1 of the `AuthorizedGroup`s.
   bool get isAuthorized {
     final jwt = _jwt;
     if (jwt == null) return false;
-    final List<String> roles = jwt.roles;
-    if (roles.isEmpty) return false;
-    return AuthorizedRole.values.any(
-      (authRole) => roles.contains(
-        EnumToString.convertToString(authRole).toLowerCase(),
+    final List<String> groups = jwt.groups;
+    if (groups.isEmpty) return false;
+    return AuthorizedGroup.values.any(
+      (authGroup) => groups.contains(
+        EnumToString.convertToString(authGroup).toLowerCase(),
       ),
     );
   }
 
-  List<AuthorizedRole> get getUserRoles {
+  List<AuthorizedGroup> get getUserGroups {
     final jwt = _jwt;
     if (jwt == null) return [];
-    return EnumToString.fromList(AuthorizedRole.values, jwt.roles)
-        .whereType<AuthorizedRole>()
+    return EnumToString.fromList(AuthorizedGroup.values, jwt.groups)
+        .whereType<AuthorizedGroup>()
         .toList();
   }
 
   LoggedInUserModel get loggedInUser {
     return LoggedInUserModel(
-      getUserRoles,
+      getUserGroups,
       _jwt?.name ?? tr("general.unnamed"),
       _jwt?.preferredUsername ?? tr("general.unnamed"),
       _jwt?.email ?? "",

@@ -115,7 +115,7 @@ void main() {
   group("JwtModel primary constructor", () {
     const jwt = "some_jwt_string";
     final exp = DateTime.now();
-    const roles = <String>["some_role"];
+    const groups = <String>["some_group"];
     final iat = DateTime.now();
     final authTime = DateTime.now();
     const jti = "some_jti";
@@ -136,7 +136,7 @@ void main() {
     final jwtModel = JwtModel(
       jwt: jwt,
       exp: exp,
-      roles: roles,
+      groups: groups,
       iat: iat,
       authTime: authTime,
       jti: jti,
@@ -161,8 +161,8 @@ void main() {
     test("correctly assigns exp", () {
       expect(jwtModel.exp, exp);
     });
-    test("correctly assigns roles", () {
-      expect(jwtModel.roles, roles);
+    test("correctly assigns groups", () {
+      expect(jwtModel.groups, groups);
     });
     test("correctly assigns iat", () {
       expect(jwtModel.iat, iat);
@@ -214,9 +214,9 @@ void main() {
     });
   });
   group("LoggedInUserModel", () {
-    const roles = <AuthorizedRole>[
-      AuthorizedRole.analyst,
-      AuthorizedRole.mechanic,
+    const groups = <AuthorizedGroup>[
+      AuthorizedGroup.analyst,
+      AuthorizedGroup.mechanic,
     ];
     const fullName = "John Doe";
     const userName = "jdoe";
@@ -224,15 +224,15 @@ void main() {
     const workShopId = "some_workshop_id";
 
     final loggedInUserModel = LoggedInUserModel(
-      roles,
+      groups,
       fullName,
       userName,
       mailAddress,
       workShopId,
     );
 
-    test("correctly assigns roles", () {
-      expect(loggedInUserModel.roles, roles);
+    test("correctly assigns groups", () {
+      expect(loggedInUserModel.groups, groups);
     });
     test("correctly assigns fullName", () {
       expect(loggedInUserModel.fullName, fullName);
