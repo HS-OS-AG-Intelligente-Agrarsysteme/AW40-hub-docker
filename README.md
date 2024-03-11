@@ -2,10 +2,11 @@
 
 ## Requirements
 
-- Docker v25.0 or later
-- Docker buildx v0.12.5 or later
+- Docker v25.0 or later (run `docker --version`)
+- Docker buildx v0.12.5 or later (run `docker buildx version`)
 
-Please refer to the [official docs](https://docs.docker.com/engine/install/) for directions.
+Please refer to the [official docs](https://docs.docker.com/engine/install/) for instructions on installing Docker.
+If you just need to update buildx, see [this section](#updating-docker-buildx-builder).
 
 ## Overview
 
