@@ -490,6 +490,18 @@ async def test_get_symptom_not_found(
     assert response.json()["detail"] == expected_exception_detail
 
 
+@pytest.mark.asyncio
+async def test_list_customers(
+        authenticated_async_client, initialized_beanie_context, data_context,
+        customer_id
+):
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get("/customers")
+    assert response.status_code == 200
+    assert response.json() == [{"_id": customer_id}], \
+        "One customer in data context expected."
+
+
 @pytest.mark.parametrize("route", shared.router.routes, ids=lambda r: r.name)
 def test_missing_bearer_token(route, unauthenticated_client):
     """Endpoints should not be accessible without a bearer token."""
