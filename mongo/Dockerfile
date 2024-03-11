@@ -4,5 +4,5 @@ FROM mongo:6.0.2
 COPY ./init-users.sh /docker-entrypoint-initdb.d
 
 HEALTHCHECK --start-period=30s --start-interval=1s --interval=30s --timeout=2s --retries=5 \
-  CMD mongosh --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'
-  
+  CMD grep -q '00000000:6989 00000000:0000' /proc/net/tcp && \
+      mongosh --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'
