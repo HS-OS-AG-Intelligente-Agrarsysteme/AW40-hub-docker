@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_dynamic_calls
 
 import "package:aw40_hub_frontend/services/services.dart";
-import "package:logging/logging.dart";
 
 class JwtModel {
   JwtModel({
