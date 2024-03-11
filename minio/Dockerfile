@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7.0
 ARG MINIO_VER
 FROM quay.io/minio/minio:$MINIO_VER
 

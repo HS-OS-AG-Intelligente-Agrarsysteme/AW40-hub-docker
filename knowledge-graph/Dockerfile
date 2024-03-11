@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7.0
 FROM eclipse-temurin:11 AS fuseki-server
 
 RUN apt-get update && apt-get install curl -y

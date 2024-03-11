@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7.0
 FROM ubuntu:20.04 AS base
 
 RUN apt-get update \
