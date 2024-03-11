@@ -2,7 +2,10 @@
 
 ## Requirements
 
-Docker 25.0 or later is required to build the images. Please refer to the [official docs](https://docs.docker.com/engine/install/) for directions.
+- Docker v25.0 or later
+- Docker buildx v0.12.5 or later
+
+Please refer to the [official docs](https://docs.docker.com/engine/install/) for directions.
 
 ## Overview
 
