@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_dynamic_calls
 
 import "package:aw40_hub_frontend/services/services.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:logging/logging.dart";
 
 class JwtModel {
   JwtModel({
@@ -32,11 +32,9 @@ class JwtModel {
     dynamic jsonData;
     jsonData = TokenService().decodeBodyFromJWT(jwt);
     exp = DateTime.fromMillisecondsSinceEpoch(jsonData["exp"] * 1000 as int);
-    final String kcClient =
-        ConfigService().getConfigValue(ConfigKey.keyCloakClient);
-    groups = jsonData["resource_access"]?[kcClient]?["groups"].cast<String>()
-            as List<String>? ??
-        [];
+    groups = jsonData?["groups"].cast<String>() as List<String>? ?? [];
+
+    Logger("jwtModel").shout(groups);
     return JwtModel(
       jwt: jwt,
       exp: exp,
