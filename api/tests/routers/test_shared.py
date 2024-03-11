@@ -541,6 +541,30 @@ async def test_list_vehicles(
     assert response_data[0]["vin"] == vin
 
 
+@pytest.mark.asyncio
+async def test_get_vehicle(
+        authenticated_async_client, initialized_beanie_context, data_context,
+        vin
+):
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            f"/vehicles/{vin}"
+        )
+    assert response.status_code == 200
+    assert response.json()["vin"] == vin
+
+
+@pytest.mark.asyncio
+async def test_get_vehicle_not_found(
+        authenticated_async_client, initialized_beanie_context, data_context,
+):
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            "/vehicles/VIN_NOT_IN_DATA_CONTEXT"
+        )
+    assert response.status_code == 404
+
+
 @pytest.mark.parametrize("route", shared.router.routes, ids=lambda r: r.name)
 def test_missing_bearer_token(route, unauthenticated_client):
     """Endpoints should not be accessible without a bearer token."""
