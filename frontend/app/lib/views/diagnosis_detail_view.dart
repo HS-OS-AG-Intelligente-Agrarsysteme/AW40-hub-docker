@@ -214,6 +214,9 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     }
   }
 
+//***
+// ab hier ist doppelt
+//***
   static Future<bool?> _showConfirmDeleteDialog(BuildContext context) {
     return showDialog<bool>(
       context: context,
