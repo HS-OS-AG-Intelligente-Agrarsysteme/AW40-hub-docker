@@ -517,8 +517,7 @@ async def test_get_customer(
 
 @pytest.mark.asyncio
 async def test_get_customer_not_found(
-        authenticated_async_client, initialized_beanie_context, data_context,
-        customer_id
+        authenticated_async_client, initialized_beanie_context, data_context
 ):
     async with initialized_beanie_context, data_context:
         # Request the 'unknown' id not in the data context
