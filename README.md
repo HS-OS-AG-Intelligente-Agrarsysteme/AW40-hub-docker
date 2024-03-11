@@ -40,6 +40,13 @@ http://api.werkstatthub.docker.localhost/v1/docs.
 The Hub documentation website is accessible via
 http://docs.werkstatthub.docker.localhost.
 
+#### Updating docker buildx builder
+
+You may need to update your buildx builder for the `--start-interval` flag to be recognised.
+
+1. Create a new builder with `docker buildx create`. This returns the name of the new builder.
+2. Use the new builder with `docker buildx use <BUILDER_NAME>`.
+3. If you want/need to save space, you can clean your old builder's cache with `docker buildx prune`.
 
 ### Access services of developement HUB
 The services of the developement HUB are locally reachable via Webbrowser:
