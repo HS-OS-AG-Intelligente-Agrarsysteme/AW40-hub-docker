@@ -93,12 +93,28 @@ def case_id():
 
 
 @pytest.fixture
-def case_data(case_id):
+def customer_id():
+    return "anonymous"
+
+
+@pytest.fixture
+def vin():
+    return "test-vin"
+
+
+@pytest.fixture
+def workshop_id():
+    return "test-workshop-id"
+
+
+@pytest.fixture
+def case_data(case_id, customer_id, vin, workshop_id):
     """Valid minimal case data."""
     return {
         "_id": case_id,
-        "vehicle_vin": "test-vin",
-        "workshop_id": "test-workshop-id",
+        "customer_id": customer_id,
+        "vehicle_vin": vin,
+        "workshop_id": workshop_id,
     }
 
 
@@ -178,6 +194,80 @@ def data_context(motor_db, case_data, timeseries_data, obd_data, symptom_data):
     signal_files.drop_indexes()
     signal_chunks.drop()
     signal_chunks.drop_indexes()
+
+
+@pytest.mark.asyncio
+async def test_list_cases_in_empty_db(
+        authenticated_async_client, initialized_beanie_context
+):
+    async with initialized_beanie_context:
+        response = await authenticated_async_client.get("/cases")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+@pytest.mark.asyncio
+async def test_list_cases(
+        authenticated_async_client, initialized_beanie_context, data_context,
+        case_id
+):
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get("/cases")
+    assert response.status_code == 200
+    response_data = response.json()
+    assert len(response_data) == 1, "All cases in data_context expected"
+    assert response_data[0]["_id"] == case_id
+
+
+@pytest.mark.parametrize("query_param", ["customer_id", "vin", "workshop_id"])
+@pytest.mark.asyncio
+async def test_list_cases_with_single_filter(
+        authenticated_async_client, initialized_beanie_context, data_context,
+        case_id, query_param, request
+):
+    """Test filtering by a single query param."""
+    query_param_value = request.getfixturevalue(query_param)
+    query_string = f"?{query_param}={query_param_value}"
+    url = f"/cases{query_string}"
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(url)
+        assert response.status_code == 200
+        response_data = response.json()
+        assert len(response_data) == 1, "All cases in data_context expected"
+        assert response_data[0]["_id"] == case_id
+
+
+@pytest.mark.asyncio
+async def test_list_cases_with_multiple_filters(
+        authenticated_async_client, initialized_beanie_context, data_context,
+        case_id, customer_id, vin, workshop_id
+):
+    """Test filtering by multiple query params."""
+    query_string = f"?customer_id={customer_id}&" \
+                   f"vin={vin}&" \
+                   f"workshop_id={workshop_id}"
+    url = f"/cases{query_string}"
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(url)
+        assert response.status_code == 200
+        response_data = response.json()
+        assert len(response_data) == 1, "All cases in data_context expected"
+        assert response_data[0]["_id"] == case_id
+
+
+@pytest.mark.parametrize("query_param", ["customer_id", "vin", "workshop_id"])
+@pytest.mark.asyncio
+async def test_list_cases_with_unmatched_filters(
+        authenticated_async_client, initialized_beanie_context, data_context,
+        query_param
+):
+    """Test filtering using query params not in test data_context."""
+    query_string = f"?{query_param}=VALUE_NOT_IN_DATA_CONTEXT"
+    url = f"/cases{query_string}"
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(url)
+        assert response.status_code == 200
+        assert response.json() == []
 
 
 def test_get_case_invalid_id(authenticated_client):
@@ -398,6 +488,80 @@ async def test_get_symptom_not_found(
 
     assert response.status_code == 404
     assert response.json()["detail"] == expected_exception_detail
+
+
+@pytest.mark.asyncio
+async def test_list_customers(
+        authenticated_async_client, initialized_beanie_context, data_context,
+        customer_id
+):
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get("/customers")
+    assert response.status_code == 200
+    assert response.json() == [{"_id": customer_id}], \
+        "One customer in data context expected."
+
+
+@pytest.mark.asyncio
+async def test_get_customer(
+        authenticated_async_client, initialized_beanie_context, data_context,
+        customer_id
+):
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            f"/customers/{customer_id}"
+        )
+    assert response.status_code == 200
+    assert response.json() == {"_id": customer_id}
+
+
+@pytest.mark.asyncio
+async def test_get_customer_not_found(
+        authenticated_async_client, initialized_beanie_context, data_context
+):
+    async with initialized_beanie_context, data_context:
+        # Request the 'unknown' id not in the data context
+        response = await authenticated_async_client.get(
+            "/customers/unknown"
+        )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_list_vehicles(
+        authenticated_async_client, initialized_beanie_context, data_context,
+        vin
+):
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get("/vehicles")
+    assert response.status_code == 200
+    response_data = response.json()
+    assert len(response_data) == 1, "One vehicle in data context expected."
+    assert response_data[0]["vin"] == vin
+
+
+@pytest.mark.asyncio
+async def test_get_vehicle(
+        authenticated_async_client, initialized_beanie_context, data_context,
+        vin
+):
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            f"/vehicles/{vin}"
+        )
+    assert response.status_code == 200
+    assert response.json()["vin"] == vin
+
+
+@pytest.mark.asyncio
+async def test_get_vehicle_not_found(
+        authenticated_async_client, initialized_beanie_context, data_context,
+):
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            "/vehicles/VIN_NOT_IN_DATA_CONTEXT"
+        )
+    assert response.status_code == 404
 
 
 @pytest.mark.parametrize("route", shared.router.routes, ids=lambda r: r.name)
