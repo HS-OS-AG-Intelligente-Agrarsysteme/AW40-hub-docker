@@ -47,6 +47,7 @@ http://docs.werkstatthub.docker.localhost.
 #### Updating docker buildx builder
 
 You may need to update your buildx builder for the `--start-interval` flag to be recognised.
+Versions below 0.12.5 _may_ still work, but the `--start-interval` flag will be ignored.
 
 1. Create a new builder with `docker buildx create`. This returns the name of the new builder.
 2. Use the new builder with `docker buildx use <BUILDER_NAME>`.
