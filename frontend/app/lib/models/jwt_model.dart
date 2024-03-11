@@ -34,7 +34,6 @@ class JwtModel {
     exp = DateTime.fromMillisecondsSinceEpoch(jsonData["exp"] * 1000 as int);
     groups = jsonData?["groups"].cast<String>() as List<String>? ?? [];
 
-    Logger("jwtModel").shout(groups);
     return JwtModel(
       jwt: jwt,
       exp: exp,
