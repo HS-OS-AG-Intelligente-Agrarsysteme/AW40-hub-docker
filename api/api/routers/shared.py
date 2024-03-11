@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import NonNegativeInt
 
 from ..data_management import (
-    Case, Customer, Vehicle, Workshop, TimeseriesData, OBDData, Symptom
+    Case, Customer, Vehicle, TimeseriesData, OBDData, Symptom
 )
 from ..security.token_auth import authorized_shared_access
 
@@ -228,25 +228,4 @@ async def get_vehicle(vin: str) -> Vehicle:
         return vehicle
     else:
         exception_detail = f"No vehicle with vin `{vin}`"
-        raise HTTPException(status_code=404, detail=exception_detail)
-
-
-@router.get("/workshops", status_code=200, response_model=List[Workshop])
-async def list_workshops() -> List[Workshop]:
-    """
-    Get all workshops in Hub.
-    """
-    workshops = await Workshop.find_all().to_list()
-    return workshops
-
-
-@router.get(
-    "/workshops/{workshop_id}", status_code=200, response_model=Workshop
-)
-async def get_workshop(workshop_id: str) -> Workshop:
-    workshop = await Workshop.get(workshop_id)
-    if workshop is not None:
-        return workshop
-    else:
-        exception_detail = f"No workshop with id `{workshop_id}`"
         raise HTTPException(status_code=404, detail=exception_detail)
