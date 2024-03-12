@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7.0
 FROM mongo:6.0.2
 
 # init-users will create a non-root db user for the api on mongo startup

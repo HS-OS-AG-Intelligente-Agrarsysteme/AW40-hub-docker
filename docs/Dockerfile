@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7.0
 FROM python:bookworm AS build
 # build the documentation
 

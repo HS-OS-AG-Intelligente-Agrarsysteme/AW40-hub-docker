@@ -2,7 +2,11 @@
 
 ## Requirements
 
-Docker 25.0 or later is required to build the images. Please refer to the [official docs](https://docs.docker.com/engine/install/) for directions.
+- Docker v25.0 or later (run `docker --version`)
+- Docker buildx v0.12.5 or later (run `docker buildx version`)
+
+Please refer to the [official docs](https://docs.docker.com/engine/install/) for instructions on installing Docker.
+If you just need to update buildx, see [this section](#updating-docker-buildx-builder).
 
 ## Overview
 
@@ -43,6 +47,7 @@ http://docs.werkstatthub.docker.localhost.
 #### Updating docker buildx builder
 
 You may need to update your buildx builder for the `--start-interval` flag to be recognised.
+Versions below 0.12.5 _may_ still work, but the `--start-interval` flag will be ignored.
 
 1. Create a new builder with `docker buildx create`. This returns the name of the new builder.
 2. Use the new builder with `docker buildx use <BUILDER_NAME>`.

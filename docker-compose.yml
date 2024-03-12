@@ -330,7 +330,8 @@ services:
     networks:
       - hubnet
 
-  redis:  # broker for communication between api and diagnostics
+  # broker for communication between api and diagnostics
+  redis:
     image: redis:alpine
     <<: *default_restart_policy
     profiles:
@@ -345,7 +346,8 @@ services:
       timeout: 2s
       retries: 5
 
-  diagnostics:  # background service that integrates the dfki state machine
+  # background service that integrates the dfki state machine
+  diagnostics:
     build:
       context: ./diagnostics
     <<: *default_restart_policy
@@ -361,7 +363,8 @@ services:
       - ./diagnostics/diagnostics:/home/runtime/diagnostics
       - ./diagnostics/models:/home/runtime/models
 
-  knowledge-graph:  # utilized by the diagnostics service
+  # utilized by the diagnostics service
+  knowledge-graph:
     build: 
       context: ./knowledge-graph
     <<: *default_restart_policy

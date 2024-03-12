@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.7.0
+
 # Stage 1: Build stage
 FROM gradle:8.0.0 AS builder
 
