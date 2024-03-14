@@ -26,5 +26,5 @@ FROM base as prod
 
 USER demo-ui
 
-HEALTHCHECK --start-period=30s --start-interval=1s --interval=30s --timeout=2s --retries=5 \
+HEALTHCHECK --start-period=30s --start-interval=1s --interval=30s --timeout=5s --retries=5 \
   CMD curl -fs http://localhost:8002/ui exit 1

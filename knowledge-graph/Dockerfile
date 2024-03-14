@@ -12,5 +12,5 @@ ENV FUSEKI_BASE=/apache-jena-fuseki-4.9.0
 
 ENTRYPOINT ./apache-jena-fuseki-4.9.0/fuseki-server
 
-HEALTHCHECK --start-period=30s --start-interval=1s --interval=30s --timeout=2s --retries=5 \
+HEALTHCHECK --start-period=30s --start-interval=1s --interval=30s --timeout=5s --retries=5 \
   CMD curl -fs http://localhost:3030 || exit 1
