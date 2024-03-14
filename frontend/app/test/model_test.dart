@@ -271,8 +271,8 @@ void main() {
   });
   group("LoggedInUserModel", () {
     const groups = <AuthorizedGroup>[
-      AuthorizedGroup.analyst,
-      AuthorizedGroup.mechanic,
+      AuthorizedGroup.Analysts,
+      AuthorizedGroup.Mechanics,
     ];
     const fullName = "John Doe";
     const userName = "jdoe";
