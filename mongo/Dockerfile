@@ -9,6 +9,6 @@ COPY ./init-users.sh /docker-entrypoint-initdb.d
 # for local port listening on all interfaces:
 # 00000000:<local port hex> 00000000:0000
 # Source: https://www.kernel.org/doc/Documentation/networking/proc_net_tcp.txt
-HEALTHCHECK --start-period=30s --start-interval=1s --interval=30s --timeout=2s --retries=5 \
+HEALTHCHECK --start-period=30s --start-interval=1s --interval=30s --timeout=5s --retries=5 \
   CMD grep -q '00000000:6989 00000000:0000' /proc/net/tcp && \
       mongosh --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'
