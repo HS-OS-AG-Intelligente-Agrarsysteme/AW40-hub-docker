@@ -1,6 +1,6 @@
 enum AuthorizedGroup {
-  analyst,
-  mechanic,
+  analysts,
+  mechanics,
 }
 
 enum ExceptionType {
