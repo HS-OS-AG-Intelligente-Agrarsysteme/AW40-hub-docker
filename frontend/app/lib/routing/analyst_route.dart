@@ -10,6 +10,7 @@ class AnalystRoute {
     return false;
   }
 
+  //hier zuweisung von den Routes
   static Map<String, PageBuilder> analystRoute() {
     return {
       "/": (RouteData info) {

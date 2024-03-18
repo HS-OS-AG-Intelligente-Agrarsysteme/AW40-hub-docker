@@ -34,6 +34,7 @@ RouteMap getRouteMap(AuthProvider authProvider) {
       onUnknownRoute = (String route) {
         return const MaterialPage<Widget>(
           child: ScaffoldWrapper(
+            currentIndex: 0, //welchen Index und wofür ist der?
             child: NoAuthorizationScreen(),
           ),
         );

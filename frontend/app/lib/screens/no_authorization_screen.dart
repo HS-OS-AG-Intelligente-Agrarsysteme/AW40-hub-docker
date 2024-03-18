@@ -8,7 +8,7 @@ class NoAuthorizationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Text(
-        tr("No Authorizations.title"),
+        tr("no_authorizations.title"),
         style: Theme.of(context).textTheme.displaySmall,
       ),
     );
