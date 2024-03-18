@@ -1,7 +1,8 @@
+import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
+import "package:aw40_hub_frontend/routing/routes.dart";
 import "package:aw40_hub_frontend/scaffolds/scaffolds.dart";
 import "package:aw40_hub_frontend/screens/screens.dart";
-import "package:aw40_hub_frontend/utils/constants.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:logging/logging.dart";
@@ -27,7 +28,33 @@ RouteMap getRouteMap(AuthProvider authProvider) {
       );
     };
   } else {
-    routes.addAll(_basicRoutes);
+    //add screen 'keine Berechtigungen', was soll da genau passieren?
+    if (!authProvider.isAuthorized) {
+      logger.config("No authorization, User cannot access any routes.");
+      onUnknownRoute = (String route) {
+        return const MaterialPage<Widget>(
+          child: ScaffoldWrapper(
+            child: NoAuthorizationScreen(),
+          ),
+        );
+      };
+    } else {
+      if (MechanicRoute.isMechanic(authProvider.getUserGroups)) {
+        logger.config(
+            "User is authorized as Mechanic, access to MechanicRoutes.");
+        routes.addAll(MechanicRoute.mechanicRoute());
+      }
+      if (AnalystRoute.isAnalyst(authProvider.getUserGroups)) {
+        logger
+            .config("User is authorized as Analyst, access to AnalystsRoutes.");
+        routes.addAll(AnalystRoute.analystRoute());
+        //route Analyst
+      }
+    }
+
+    //brauch man das oder wird das ersetzt, was genau soll in basic routes passieren?
+    routes.addAll(BasicRoute.basicRoutes());
+
     onUnknownRoute = (String route) {
       return const MaterialPage<Widget>(
         child: ScaffoldWrapper(
@@ -37,12 +64,40 @@ RouteMap getRouteMap(AuthProvider authProvider) {
       );
     };
   }
-
   final RouteMap routeMap = RouteMap(
     routes: routes,
     onUnknownRoute: onUnknownRoute,
   );
   return routeMap;
+}
+
+/*  if (!authProvider.isAuthorized) {
+    //print("Sie sind keiner gruppe zugewiesen.");
+    //add screen 'keine Berechtigungen'
+    onUnknownRoute = (String route) {
+      return const MaterialPage<Widget>(
+        child: NoAuthorizationScreen(),
+      );
+    }
+  } else if {
+    if (isMechanic(authProvider.getUserGroups)) {
+      //route Mechanic
+    }
+    if (isAnalyst(authProvider.getUserGroups)) {
+      //route Analyst
+    }
+  }
+
+// in dieser file lassen oder woanders hin
+bool isMechanic(List<AuthorizedGroup> groups) {
+  // in dieser file lassen oder woanders hin
+  if (groups.contains(AuthorizedGroup.Mechanics)) return true;
+  return false;
+}
+
+bool isAnalyst(List<AuthorizedGroup> groups) {
+  if (groups.contains(AuthorizedGroup.Analysts)) return true;
+  return false;
 }
 
 Map<String, PageBuilder> _basicRoutes = {
@@ -90,4 +145,4 @@ Map<String, PageBuilder> _basicRoutes = {
       ),
     );
   },
-};
+};*/
