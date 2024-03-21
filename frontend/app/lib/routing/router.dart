@@ -47,7 +47,6 @@ RouteMap getRouteMap(AuthProvider authProvider) {
     if (groups.contains(AuthorizedGroup.Analysts)) {
       logger.config("User is authorized as Analyst, access to AnalystsRoutes.");
       routes.addAll(_analystsRoutes);
-      //route Analyst
     }
   }
 
