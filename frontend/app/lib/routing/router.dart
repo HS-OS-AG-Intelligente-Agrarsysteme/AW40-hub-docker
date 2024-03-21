@@ -1,8 +1,8 @@
 import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
-import "package:aw40_hub_frontend/routing/routes.dart";
 import "package:aw40_hub_frontend/scaffolds/scaffolds.dart";
 import "package:aw40_hub_frontend/screens/screens.dart";
+import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:logging/logging.dart";
@@ -28,34 +28,8 @@ RouteMap getRouteMap(AuthProvider authProvider) {
       );
     };
   } else {
-    //add screen 'keine Berechtigungen', was soll da genau passieren?
-    if (!authProvider.isAuthorized) {
-      logger.config("No authorization, User cannot access any routes.");
-      onUnknownRoute = (String route) {
-        return const MaterialPage<Widget>(
-          child: ScaffoldWrapper(
-            currentIndex: 0, //welchen Index und wofür ist der?
-            child: NoAuthorizationScreen(),
-          ),
-        );
-      };
-    } else {
-      if (MechanicRoute.isMechanic(authProvider.getUserGroups)) {
-        logger.config(
-            "User is authorized as Mechanic, access to MechanicRoutes.");
-        routes.addAll(MechanicRoute.mechanicRoute());
-      }
-      if (AnalystRoute.isAnalyst(authProvider.getUserGroups)) {
-        logger
-            .config("User is authorized as Analyst, access to AnalystsRoutes.");
-        routes.addAll(AnalystRoute.analystRoute());
-        //route Analyst
-      }
-    }
-
-    //brauch man das oder wird das ersetzt, was genau soll in basic routes passieren?
-    routes.addAll(BasicRoute.basicRoutes());
-
+    //User is logged in, add the basic Routes
+    routes.addAll(_basicRoutes);
     onUnknownRoute = (String route) {
       return const MaterialPage<Widget>(
         child: ScaffoldWrapper(
@@ -64,7 +38,19 @@ RouteMap getRouteMap(AuthProvider authProvider) {
         ),
       );
     };
+    final groups = authProvider.getUserGroups;
+    if (groups.contains(AuthorizedGroup.Mechanics)) {
+      logger
+          .config("User is authorized as Mechanic, access to MechanicRoutes.");
+      routes.addAll(_mechanicsRoutes);
+    }
+    if (groups.contains(AuthorizedGroup.Analysts)) {
+      logger.config("User is authorized as Analyst, access to AnalystsRoutes.");
+      routes.addAll(_analystsRoutes);
+      //route Analyst
+    }
   }
+
   final RouteMap routeMap = RouteMap(
     routes: routes,
     onUnknownRoute: onUnknownRoute,
@@ -99,7 +85,7 @@ bool isMechanic(List<AuthorizedGroup> groups) {
 bool isAnalyst(List<AuthorizedGroup> groups) {
   if (groups.contains(AuthorizedGroup.Analysts)) return true;
   return false;
-}
+}*/
 
 Map<String, PageBuilder> _basicRoutes = {
   "/": (RouteData info) {
@@ -146,4 +132,16 @@ Map<String, PageBuilder> _basicRoutes = {
       ),
     );
   },
-};*/
+};
+
+Map<String, PageBuilder> _mechanicsRoutes = {
+  "/": (RouteData info) {
+    return const Redirect(kRouteCases);
+  },
+};
+
+Map<String, PageBuilder> _analystsRoutes = {
+  "/": (RouteData info) {
+    return const Redirect(kRouteCases);
+  },
+};
