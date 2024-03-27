@@ -288,9 +288,10 @@ services:
     build:
       context: ./frontend
       args:
-        - API_ADDRESS=${API_ADDRESS:?error}
-        - FRONTEND_ADDRESS=${FRONTEND_ADDRESS:?error}
-        - KEYCLOAK_ADDRESS=${KEYCLOAK_ADDRESS:?error}
+        - API_ADDRESS=${API_ADDRESS:?error}${API_PATH:-}
+        - FRONTEND_ADDRESS=${FRONTEND_ADDRESS:?error}${FRONTEND_PATH:-}
+        - FRONTEND_PATH=${FRONTEND_PATH:-}
+        - KEYCLOAK_ADDRESS=${KEYCLOAK_ADDRESS:?error}${KEYCLOAK_PATH:-}
         - KEYCLOAK_FRONTEND_CLIENT=${KEYCLOAK_FRONTEND_CLIENT:?error}
         - KEYCLOAK_REALM=${KEYCLOAK_REALM:?error}
         - FRONTEND_LOG_LEVEL=${FRONTEND_LOG_LEVEL:?error}
@@ -307,8 +308,10 @@ services:
       - traefik.enable=true
       - traefik.docker.network=hubnet
 
-      - traefik.http.routers.frontend.rule=Host(`${FRONTEND_ADDRESS:?error}`)
+      - traefik.http.routers.frontend.rule=Host(`${FRONTEND_ADDRESS:?error}`) && PathPrefix(`${FRONTEND_PATH:-/}`)
       - traefik.http.routers.frontend.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
+      - traefik.http.middlewares.frontend-remove-prefix.stripprefix.prefixes=${FRONTEND_PATH:-/}
+      - traefik.http.routers.frontend.middlewares=frontend-remove-prefix@docker
       - traefik.http.routers.frontend.service=frontend
       - traefik.http.services.frontend.loadbalancer.server.port=80
     networks:
