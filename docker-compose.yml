@@ -80,8 +80,10 @@ services:
       - traefik.enable=true
       - traefik.docker.network=hubnet
 
-      - traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_ADDRESS:?error}`)
+      - traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_ADDRESS:?error}`) && PathPrefix(`${KEYCLOAK_PATH:-/}`)
       - traefik.http.routers.keycloak.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
+      - traefik.http.middlewares.keycloak-remove-prefix.stripprefix.prefixes=${KEYCLOAK_PATH:-/}
+      - traefik.http.routers.keycloak.middlewares=keycloak-remove-prefix@docker
       - traefik.http.routers.keycloak.service=keycloak
       - traefik.http.services.keycloak.loadbalancer.server.port=8080
     networks:
