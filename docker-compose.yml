@@ -327,8 +327,10 @@ services:
       - traefik.enable=true
       - traefik.docker.network=hubnet
 
-      - traefik.http.routers.docs.rule=Host(`${DOCS_ADDRESS:?error}`)
+      - traefik.http.routers.docs.rule=Host(`${DOCS_ADDRESS:?error}`) && PathPrefix(`${DOCS_PATH:-/}`)
       - traefik.http.routers.docs.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
+      - traefik.http.middlewares.docs-remove-prefix.stripprefix.prefixes=${DOCS_PATH:-/}
+      - traefik.http.routers.docs.middlewares=docs-remove-prefix@docker
       - traefik.http.routers.docs.service=docs
       - traefik.http.services.docs.loadbalancer.server.port=80
     networks:
