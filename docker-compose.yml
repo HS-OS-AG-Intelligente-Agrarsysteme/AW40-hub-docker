@@ -251,7 +251,7 @@ services:
       context: ./api
     <<: *default_restart_policy
     # DEVELOPMENT: run with reload and mount api package code
-    command: uvicorn --host 0.0.0.0 --reload api.main:app
+    command: uvicorn --host 0.0.0.0 --root-path ${API_PATH:-""} --reload api.main:app
     profiles:
       - full
       - rollout1
@@ -269,8 +269,10 @@ services:
       - traefik.enable=true
       - traefik.docker.network=hubnet
 
-      - traefik.http.routers.api.rule=Host(`${API_ADDRESS:?error}`)
+      - traefik.http.routers.api.rule=Host(`${API_ADDRESS:?error}`) && PathPrefix(`${API_PATH:-/}`)
       - traefik.http.routers.api.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
+      - traefik.http.middlewares.api-remove-prefix.stripprefix.prefixes=${API_PATH:-/}
+      - traefik.http.routers.api.middlewares=api-remove-prefix@docker
       - traefik.http.routers.api.service=api
       - traefik.http.services.api.loadbalancer.server.port=8000
     networks:
