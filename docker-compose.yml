@@ -39,6 +39,7 @@ services:
     ports:
       - 80:80
       - 443:443
+      - 9000:9000
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock:ro
     - ./proxy/proxy-config.yml:/etc/traefik/traefik.yml:ro
@@ -146,13 +147,15 @@ services:
       - traefik.enable=true
       - traefik.docker.network=hubnet
 
-      - traefik.http.routers.minio.rule=Host(`${MINIO_ADDRESS:?error}`)
+      - traefik.http.routers.minio.rule=Host(`${MINIO_ADDRESS:?error}`) && PathPrefix(`${MINIO_PATH:-/}`)
       - traefik.http.routers.minio.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
+      - traefik.http.middlewares.minio-remove-prefix.stripprefix.prefixes=${MINIO_PATH:-/}
+      - traefik.http.routers.minio.middlewares=minio-remove-prefix@docker
       - traefik.http.routers.minio.service=minio
       - traefik.http.services.minio.loadbalancer.server.port=9090
 
       - traefik.http.routers.minio_api.rule=Host(`${MINIO_API_ADDRESS:?error}`)
-      - traefik.http.routers.minio_api.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
+      - traefik.http.routers.minio_api.entrypoints=minio
       - traefik.http.routers.minio_api.service=minio_api
       - traefik.http.services.minio_api.loadbalancer.server.port=9000
     hostname: "minio"

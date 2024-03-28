@@ -10,6 +10,8 @@ entrypoints:
     http:
       tls:
         options: default
+  minio:
+    address: :9000
 tls:
   options:
     default:
