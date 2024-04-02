@@ -23,8 +23,10 @@ services:
       - traefik.enable=true
       - traefik.docker.network=hubnet
 
-      - traefik.http.routers.traefik.rule=Host(`${TRAEFIK_ADDRESS:?error}`)
+      - traefik.http.routers.traefik.rule=Host(`${TRAEFIK_ADDRESS:?error}`) && PathPrefix(`/api`, `/dashboard`)
       - traefik.http.routers.traefik.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
+      - traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:?error}
+      - traefik.http.routers.traefik.middlewares=traefik-auth@docker
       - traefik.http.routers.traefik.service=api@internal
     networks:
       hubnet:
