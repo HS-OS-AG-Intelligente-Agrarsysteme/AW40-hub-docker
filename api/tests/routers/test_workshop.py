@@ -596,6 +596,72 @@ def test_upload_picoscope_data_wrong_file(
     assert response.status_code == 400
 
 
+@mock.patch("api.routers.workshop.Case.add_obd_data", autospec=True)
+def test_upload_vcds_data(
+        add_obd_data, case_data, obd_data, vcds_txt_file, authenticated_client
+):
+    workshop_id = case_data["workshop_id"]
+    case_id = case_data["_id"]
+
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
+
+    # patch Case.add_obd_data to use mock
+    add_obd_data.side_effect = mock_add_obd_data()
+
+    with authenticated_client as client:
+        response = client.post(
+            f"/{workshop_id}/cases/{case_id}/obd_data/upload/vcds",
+            files={"upload": ("filename", vcds_txt_file)}
+        )
+
+    # confirm expected status code and response shape
+    assert response.status_code == 201
+    assert len(response.json()["obd_data"]) == 1
+
+
+@mock.patch("api.routers.workshop.Case.add_timeseries_data", autospec=True)
+def test_upload_omniview_data(
+        add_timeseries_data,
+        omniview_csv_file,
+        case_data,
+        authenticated_client,
+        timeseries_signal_id
+):
+    workshop_id = case_data["workshop_id"]
+    case_id = case_data["_id"]
+
+    authenticated_client.app.dependency_overrides[
+        case_from_workshop
+    ] = lambda case_id, workshop_id: Case(**case_data)
+
+    # patch Case.add_timeseries_data to call mock instead
+    add_timeseries_data.side_effect = mock_add_timeseries_data(
+        signal_id=timeseries_signal_id
+    )
+
+    # upload file and only specify component for one channel
+    component = "maf_sensor"
+    with authenticated_client as client:
+        response = client.post(
+            f"/{workshop_id}/cases/{case_id}/timeseries_data/upload/omniview",
+            files={"upload": ("filename", omniview_csv_file)},
+            data={
+                "component": component, "sampling_rate": 1, "duration": 654119
+            }
+        )
+
+    # confirm expected status code and response data
+    assert response.status_code == 201
+    timeseries_data = response.json()["timeseries_data"]
+    assert len(timeseries_data) == 1
+    assert timeseries_data[0]["device_specs"]["type"] == "omniview"
+    assert timeseries_data[0]["device_specs"]["export_file_header"] == \
+           "Omniscope-E46920935F320D2D"
+    assert timeseries_data[0]["component"] == component
+
+
 def test_get_timeseries_data_not_found(case_data, authenticated_client):
     workshop_id = case_data["workshop_id"]
     case_id = case_data["_id"]
@@ -887,31 +953,6 @@ def test_add_obd_data(save, case_data, obd_data, authenticated_client):
     assert len(saved_cases) == 1
     # confirm response data represents case after saving
     assert Case(**response.json()) == saved_cases[0]
-
-
-@mock.patch("api.routers.workshop.Case.add_obd_data", autospec=True)
-def test_upload_vcds_data(
-        add_obd_data, case_data, obd_data, vcds_txt_file, authenticated_client
-):
-    workshop_id = case_data["workshop_id"]
-    case_id = case_data["_id"]
-
-    authenticated_client.app.dependency_overrides[
-        case_from_workshop
-    ] = lambda case_id, workshop_id: Case(**case_data)
-
-    # patch Case.add_obd_data to use mock
-    add_obd_data.side_effect = mock_add_obd_data()
-
-    with authenticated_client as client:
-        response = client.post(
-            f"/{workshop_id}/cases/{case_id}/obd_data/upload/vcds",
-            files={"upload": ("filename", vcds_txt_file)}
-        )
-
-    # confirm expected status code and response shape
-    assert response.status_code == 201
-    assert len(response.json()["obd_data"]) == 1
 
 
 def test_upload_vcds_data_wrong_file(
