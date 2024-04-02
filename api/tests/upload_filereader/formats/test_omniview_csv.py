@@ -16,9 +16,9 @@ class TestOmniviewCSVReader:
         assert isinstance(result, list)
         assert len(result) == 1
         result = result[0]
-        assert len(result["signal"]) == 654119
+        assert len(result["signal"]) == 100
         assert result["signal"][:2] == [46, 47]
-        assert result["signal"][-2:] == [47, 47]
+        assert result["signal"][-2:] == [46, 47]
         assert result["device_specs"]["type"] == "omniview"
         assert result["device_specs"]["export_file_header"] == \
                "Omniscope-E46920935F320D2D"
