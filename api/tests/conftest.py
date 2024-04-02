@@ -202,6 +202,14 @@ def vcds_no_milage_txt_file(files_dir):
 
 
 @pytest.fixture
+def omniview_csv_file(files_dir):
+    path = os.path.join(files_dir, "omniview.csv")
+    f = open(path, "rb")
+    yield f
+    f.close()
+
+
+@pytest.fixture
 def kg_url():
     """Assume local knowledge graph is available at 3030"""
     return "http://127.0.0.1:3030"
