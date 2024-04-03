@@ -20,8 +20,8 @@ class TestOmniviewCSVReader:
         assert result["signal"][:2] == [46, 47]
         assert result["signal"][-2:] == [46, 47]
         assert result["device_specs"]["type"] == "omniview"
-        assert result["device_specs"]["export_file_header"] == \
-               "Omniscope-E46920935F320D2D"
+        assert result["device_specs"]["device_id"] == \
+               "E46920935F320D2D"
 
     @pytest.mark.parametrize(
         "file",
