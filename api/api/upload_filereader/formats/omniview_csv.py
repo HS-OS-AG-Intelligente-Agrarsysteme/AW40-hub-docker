@@ -17,7 +17,7 @@ class OmniviewCSVReader(FileReader):
         header_check = HEADER_CHECK.match(header)
         if not header_check:
             raise FileReaderException(
-                    f"File header does not match Omniview File header but got"
+                    f"File header does not match Omniview file header but got"
                     f" {header}"
                 )
         signal = []
