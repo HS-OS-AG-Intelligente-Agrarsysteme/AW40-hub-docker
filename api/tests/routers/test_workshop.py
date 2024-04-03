@@ -657,8 +657,8 @@ def test_upload_omniview_data(
     timeseries_data = response.json()["timeseries_data"]
     assert len(timeseries_data) == 1
     assert timeseries_data[0]["device_specs"]["type"] == "omniview"
-    assert timeseries_data[0]["device_specs"]["export_file_header"] == \
-           "Omniscope-E46920935F320D2D"
+    assert timeseries_data[0]["device_specs"]["device_id"] == \
+           "E46920935F320D2D"
     assert timeseries_data[0]["component"] == component
 
 

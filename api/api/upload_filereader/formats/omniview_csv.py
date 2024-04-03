@@ -41,7 +41,7 @@ class OmniviewCSVReader(FileReader):
                 "signal": signal,
                 "device_specs": {
                     "type": "omniview",
-                    "export_file_header": header
+                    "device_id": header_check["device_id"]
                 }
             }
         ]
