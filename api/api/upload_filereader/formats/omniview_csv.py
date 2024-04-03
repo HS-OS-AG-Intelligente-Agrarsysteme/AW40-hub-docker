@@ -1,8 +1,12 @@
 import codecs
 import csv
+import re
 from typing import BinaryIO, List
 
 from ..filereader import FileReader, FileReaderException
+
+HEADER_CHECK = re.compile(
+    r"^Omniscope-(?P<device_id>[A-Z0-9]+)$")
 
 
 class OmniviewCSVReader(FileReader):
@@ -10,6 +14,12 @@ class OmniviewCSVReader(FileReader):
     def read_file(self, file: BinaryIO) -> List[dict]:
         reader = csv.reader(codecs.iterdecode(file, 'utf-8'), delimiter=",")
         header = next(reader)[0]
+        header_check = HEADER_CHECK.match(header)
+        if not header_check:
+            raise FileReaderException(
+                    f"File header does not match Omniview File header but got"
+                    f" {header}"
+                )
         signal = []
         for i, row in enumerate(reader):
             if len(row) == 0:
