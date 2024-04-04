@@ -113,14 +113,6 @@ Map<String, PageBuilder> _basicRoutes = {
   },
 };
 
-Map<String, PageBuilder> _mechanicsRoutes = {
-  "/": (RouteData info) {
-    return const Redirect(kRouteCases);
-  },
-};
+Map<String, PageBuilder> _mechanicsRoutes = {};
 
-Map<String, PageBuilder> _analystsRoutes = {
-  "/": (RouteData info) {
-    return const Redirect(kRouteCases);
-  },
-};
+Map<String, PageBuilder> _analystsRoutes = {};
