@@ -1,5 +1,3 @@
-// ignore_for_file: require_trailing_commas
-
 import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/scaffolds/scaffolds.dart";
@@ -29,35 +27,35 @@ RouteMap getRouteMap(AuthProvider authProvider) {
         child: LoginScreen(currentBrowserUrl: currentBrowserUrl),
       );
     };
-  } else {
-    if (!authProvider.isAuthorized) {
-      onUnknownRoute = (String route) {
-        logger.config("User is not authorized.");
-        return const MaterialPage<Widget>(
+  } else if (!authProvider.isAuthorized) {
+    onUnknownRoute = (String route) {
+      logger.config("User is not authorized.");
+      return const MaterialPage<Widget>(
+        child: ScaffoldWrapper(
           child: NoAuthorizationScreen(),
-        );
-      };
-    } else {
-      routes.addAll(_basicRoutes);
-      onUnknownRoute = (String route) {
-        return const MaterialPage<Widget>(
-          child: ScaffoldWrapper(
-            currentIndex: -1, // No nav item selected.
-            child: PageNotFoundScreen(),
-          ),
-        );
-      };
-      final groups = authProvider.getUserGroups;
-      if (groups.contains(AuthorizedGroup.Mechanics)) {
-        logger.config(
-            "User is authorized as Mechanic, access to MechanicRoutes.");
-        routes.addAll(_mechanicsRoutes);
-      }
-      if (groups.contains(AuthorizedGroup.Analysts)) {
-        logger
-            .config("User is authorized as Analyst, access to AnalystsRoutes.");
-        routes.addAll(_analystsRoutes);
-      }
+        ),
+      );
+    };
+  } else {
+    routes.addAll(_basicRoutes);
+    onUnknownRoute = (String route) {
+      return const MaterialPage<Widget>(
+        child: ScaffoldWrapper(
+          currentIndex: -1, // No nav item selected.
+          child: PageNotFoundScreen(),
+        ),
+      );
+    };
+    final groups = authProvider.getUserGroups;
+    if (groups.contains(AuthorizedGroup.Mechanics)) {
+      logger.config(
+        "User is authorized as Mechanic, access to MechanicRoutes.",
+      );
+      routes.addAll(_mechanicsRoutes);
+    }
+    if (groups.contains(AuthorizedGroup.Analysts)) {
+      logger.config("User is authorized as Analyst, access to AnalystsRoutes.");
+      routes.addAll(_analystsRoutes);
     }
   }
 
