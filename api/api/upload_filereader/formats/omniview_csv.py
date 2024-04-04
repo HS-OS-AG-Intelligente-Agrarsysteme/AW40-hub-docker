@@ -35,12 +35,17 @@ class OmniviewCSVReader(FileReader):
                     f" {row[0]} != {str(i)}."
                 )
             else:
+                raw_value = row[1]
+                if raw_value == "":
+                    value = 0
+                else:
+                    value = raw_value
                 try:
-                    signal.append(float(row[1]))
+                    signal.append(float(value))
                 except ValueError:
                     raise FileReaderException(
                         f"Expected second column to be float value but got"
-                        f" {row[1]}"
+                        f" {raw_value}"
                     )
         return [
             {
