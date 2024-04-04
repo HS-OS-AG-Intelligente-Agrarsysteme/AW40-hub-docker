@@ -20,6 +20,12 @@ body {
 	background-color: #1f124d;
 }
 
+#sidebar img {
+    display: block;
+    padding: 5px;
+    margin: auto;
+}
+
 #sidebar a {
 	display: block;
 	padding: 5px;
