@@ -23,6 +23,24 @@ class TestOmniviewCSVReader:
         assert result["device_specs"]["device_id"] == \
                "E46920935F320D2D"
 
+    def test_read_sin_file(
+            self, omniview_sin_csv_file
+    ):
+        # convert file
+        reader = OmniviewCSVReader()
+        result = reader.read_file(omniview_sin_csv_file)
+
+        # assert expectations
+        assert isinstance(result, list)
+        assert len(result) == 1
+        result = result[0]
+        assert len(result["signal"]) == 705
+        assert result["signal"][:2] == [115, 115]
+        assert result["signal"][-4:] == [2, 0, -2, -3]
+        assert result["device_specs"]["type"] == "omniscope"
+        assert result["device_specs"]["device_id"] == \
+               "E46228B163272D25"
+
     @pytest.mark.parametrize(
         "file",
         [
