@@ -34,6 +34,7 @@ general:
     customerId: "No customer id"
     vehiclevin: "No vehicle vin"
     workshopid: "No workshop id"
+    diagnoses: "There is currently no information about ongoing diagnoses."
 diagnoses:
   title: "Diagnosis"
   actions:

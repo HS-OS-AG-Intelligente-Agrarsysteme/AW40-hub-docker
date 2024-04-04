@@ -9,6 +9,9 @@ import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 
+import "../scaffolds/scaffold_wrapper.dart";
+import "../screens/screens.dart";
+
 class DiagnosesView extends StatelessWidget {
   const DiagnosesView({super.key, this.diagnosisId});
   final String? diagnosisId;
@@ -88,54 +91,60 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
   @override
   Widget build(BuildContext context) {
     currentDiagnosisIndex ??= widget.initialDiagnosisIndex;
-    return Row(
-      children: [
-        Expanded(
-          flex: 3,
-          child: SingleChildScrollView(
-            child: PaginatedDataTable(
-              source: DiagnosisDataTableSource(
-                themeData: Theme.of(context),
-                currentIndex: currentDiagnosisIndex,
-                diagnosisModels: widget.diagnosisModels,
-                onPressedRow: (int i) =>
-                    setState(() => currentDiagnosisIndex = i),
-              ),
-              showCheckboxColumn: false,
-              rowsPerPage: 50,
-              columns: [
-                DataColumn(
-                  label: Expanded(
-                    child: Text(tr("general.id")),
-                  ),
-                ),
-                DataColumn(
-                  label: Expanded(
-                    child: Text(tr("general.status")),
-                  ),
-                ),
-                DataColumn(
-                  label: Expanded(
-                    child: Text(tr("general.case")),
-                  ),
-                ),
-                DataColumn(
-                  label: Expanded(
-                    child: Text(tr("general.date")),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (widget.diagnosisModels.isNotEmpty)
+    if (widget.diagnosisModels.isEmpty) {
+      return const ScaffoldWrapper(
+        child: NoDiagnosesScreen(),
+      );
+    } else {
+      return Row(
+        children: [
           Expanded(
-            flex: 2,
-            child: DiagnosisDetailView(
-              diagnosisModel: widget.diagnosisModels[currentDiagnosisIndex!],
+            flex: 3,
+            child: SingleChildScrollView(
+              child: PaginatedDataTable(
+                source: DiagnosisDataTableSource(
+                  themeData: Theme.of(context),
+                  currentIndex: currentDiagnosisIndex,
+                  diagnosisModels: widget.diagnosisModels,
+                  onPressedRow: (int i) =>
+                      setState(() => currentDiagnosisIndex = i),
+                ),
+                showCheckboxColumn: false,
+                rowsPerPage: 50,
+                columns: [
+                  DataColumn(
+                    label: Expanded(
+                      child: Text(tr("general.id")),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Expanded(
+                      child: Text(tr("general.status")),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Expanded(
+                      child: Text(tr("general.case")),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Expanded(
+                      child: Text(tr("general.date")),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-      ],
-    );
+          if (widget.diagnosisModels.isNotEmpty)
+            Expanded(
+              flex: 2,
+              child: DiagnosisDetailView(
+                diagnosisModel: widget.diagnosisModels[currentDiagnosisIndex!],
+              ),
+            ),
+        ],
+      );
+    }
   }
 }
