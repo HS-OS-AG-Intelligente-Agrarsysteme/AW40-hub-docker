@@ -104,3 +104,5 @@ training:
   title: "Schulung"
 pageNotFound:
   title: "Seite @:general.notFound"
+noAuthorization :
+  title: "Keine Autorisierung"

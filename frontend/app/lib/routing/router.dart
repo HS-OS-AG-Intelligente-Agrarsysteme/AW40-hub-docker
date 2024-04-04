@@ -1,3 +1,5 @@
+// ignore_for_file: require_trailing_commas
+
 import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/scaffolds/scaffolds.dart";
@@ -28,25 +30,34 @@ RouteMap getRouteMap(AuthProvider authProvider) {
       );
     };
   } else {
-    //User is logged in, add the basic Routes
-    routes.addAll(_basicRoutes);
-    onUnknownRoute = (String route) {
-      return const MaterialPage<Widget>(
-        child: ScaffoldWrapper(
-          currentIndex: -1, // No nav item selected.
-          child: PageNotFoundScreen(),
-        ),
-      );
-    };
-    final groups = authProvider.getUserGroups;
-    if (groups.contains(AuthorizedGroup.Mechanics)) {
-      logger
-          .config("User is authorized as Mechanic, access to MechanicRoutes.");
-      routes.addAll(_mechanicsRoutes);
-    }
-    if (groups.contains(AuthorizedGroup.Analysts)) {
-      logger.config("User is authorized as Analyst, access to AnalystsRoutes.");
-      routes.addAll(_analystsRoutes);
+    if (!authProvider.isAuthorized) {
+      onUnknownRoute = (String route) {
+        logger.config("User is not authorized.");
+        return const MaterialPage<Widget>(
+          child: NoAuthorizationScreen(),
+        );
+      };
+    } else {
+      routes.addAll(_basicRoutes);
+      onUnknownRoute = (String route) {
+        return const MaterialPage<Widget>(
+          child: ScaffoldWrapper(
+            currentIndex: -1, // No nav item selected.
+            child: PageNotFoundScreen(),
+          ),
+        );
+      };
+      final groups = authProvider.getUserGroups;
+      if (groups.contains(AuthorizedGroup.Mechanics)) {
+        logger.config(
+            "User is authorized as Mechanic, access to MechanicRoutes.");
+        routes.addAll(_mechanicsRoutes);
+      }
+      if (groups.contains(AuthorizedGroup.Analysts)) {
+        logger
+            .config("User is authorized as Analyst, access to AnalystsRoutes.");
+        routes.addAll(_analystsRoutes);
+      }
     }
   }
 
@@ -56,35 +67,6 @@ RouteMap getRouteMap(AuthProvider authProvider) {
   );
   return routeMap;
 }
-
-/*  if (!authProvider.isAuthorized) {
-    //print("Sie sind keiner gruppe zugewiesen.");
-    //add screen 'keine Berechtigungen'
-    onUnknownRoute = (String route) {
-      return const MaterialPage<Widget>(
-        child: NoAuthorizationScreen(),
-      );
-    }
-  } else if {
-    if (isMechanic(authProvider.getUserGroups)) {
-      //route Mechanic
-    }
-    if (isAnalyst(authProvider.getUserGroups)) {
-      //route Analyst
-    }
-  }
-
-// in dieser file lassen oder woanders hin
-bool isMechanic(List<AuthorizedGroup> groups) {
-  // in dieser file lassen oder woanders hin
-  if (groups.contains(AuthorizedGroup.Mechanics)) return true;
-  return false;
-}
-
-bool isAnalyst(List<AuthorizedGroup> groups) {
-  if (groups.contains(AuthorizedGroup.Analysts)) return true;
-  return false;
-}*/
 
 Map<String, PageBuilder> _basicRoutes = {
   "/": (RouteData info) {
