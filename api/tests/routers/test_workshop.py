@@ -621,10 +621,17 @@ def test_upload_vcds_data(
     assert len(response.json()["obd_data"]) == 1
 
 
+@pytest.mark.parametrize(
+    "file,device_id",
+    [
+        ("omniview_csv_file", "E46920935F320D2D"),
+        ("omniview_sin_csv_file", "E46228B163272D25")
+    ]
+)
 @mock.patch("api.routers.workshop.Case.add_timeseries_data", autospec=True)
 def test_upload_omniview_data(
         add_timeseries_data,
-        omniview_csv_file,
+        file, device_id, request,
         case_data,
         authenticated_client,
         timeseries_signal_id
@@ -643,10 +650,11 @@ def test_upload_omniview_data(
 
     # upload file and only specify component for one channel
     component = "maf_sensor"
+    file = request.getfixturevalue(file)
     with authenticated_client as client:
         response = client.post(
             f"/{workshop_id}/cases/{case_id}/timeseries_data/upload/omniview",
-            files={"upload": ("filename", omniview_csv_file)},
+            files={"upload": ("filename", file)},
             data={
                 "component": component, "sampling_rate": 1, "duration": 654119
             }
@@ -657,8 +665,7 @@ def test_upload_omniview_data(
     timeseries_data = response.json()["timeseries_data"]
     assert len(timeseries_data) == 1
     assert timeseries_data[0]["device_specs"]["type"] == "omniscope"
-    assert timeseries_data[0]["device_specs"]["device_id"] == \
-           "E46920935F320D2D"
+    assert timeseries_data[0]["device_specs"]["device_id"] == device_id
     assert timeseries_data[0]["component"] == component
 
 
