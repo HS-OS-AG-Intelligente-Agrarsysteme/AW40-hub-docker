@@ -397,11 +397,43 @@ def new_timeseries_data_get(
 
 
 @app.post(
-    "/ui/{workshop_id}/cases/{case_id}/timeseries_data/new",
+    "/ui/{workshop_id}/cases/{case_id}/timeseries_data/new/omniview",
     response_class=RedirectResponse,
     status_code=303
 )
-async def new_timeseries_data_post(
+async def new_timeseries_data_upload_omniview(
+        request: Request,
+        access_token: str = Depends(get_session_token),
+        ressource_url: str = Depends(get_timeseries_data_url)
+):
+    form = await request.form()
+    form = dict(form)
+    form["file_format"] = "Omniview CSV"
+    omniview_file = form.pop("omniview_file")
+    ressource_url = f"{ressource_url}/upload/omniview"
+    case = await post_to_api(
+        ressource_url,
+        access_token,
+        files={"upload": (omniview_file.filename, omniview_file.file)},
+        data=form
+    )
+
+    new_data_id = case["timeseries_data"][-1]["data_id"]
+    redirect_url = app.url_path_for(
+        "timeseries_data",
+        workshop_id=case["workshop_id"],
+        case_id=case["_id"],
+        data_id=new_data_id
+    )
+    return redirect_url
+
+
+@app.post(
+    "/ui/{workshop_id}/cases/{case_id}/timeseries_data/new/picoscope",
+    response_class=RedirectResponse,
+    status_code=303
+)
+async def new_timeseries_data_upload_picoscope(
         request: Request,
         access_token: str = Depends(get_session_token),
         ressource_url: str = Depends(get_timeseries_data_url)

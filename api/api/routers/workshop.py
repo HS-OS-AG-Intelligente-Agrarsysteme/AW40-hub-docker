@@ -323,6 +323,42 @@ async def upload_picoscope_data(
     return case
 
 
+@router.post(
+    "/{workshop_id}/cases/{case_id}/timeseries_data/upload/omniview",
+    status_code=201,
+    response_model=Case,
+    tags=["Workshop - Data Management"]
+)
+async def upload_omniview_data(
+        upload: UploadFile = File(description="Omniview Data File"),
+        file_format: Literal["Omniview CSV"] = Form(default="Omniview CSV"),
+        component: str = Form(
+            description="The investigated vehicle component"
+        ),
+        sampling_rate: NonNegativeInt = Form(
+            description="Sampling rate of measurement [Hz]"
+        ),
+        duration: NonNegativeInt = Form(
+            description="Duration of measurement [s]"
+        ),
+        label: TimeseriesDataLabel = Form(
+            default=TimeseriesDataLabel.unknown,
+            description="Label for the oscillogram"
+        ),
+        case: Case = Depends(case_from_workshop)
+):
+    """Upload an Omniview csv export to a case."""
+    data = read_file_or_400(upload, file_format)[0]
+    data["component"] = component
+    data["sampling_rate"] = sampling_rate
+    data["duration"] = duration
+    data["label"] = label
+    case = await case.add_timeseries_data(
+        NewTimeseriesData(**data)
+    )
+    return case
+
+
 @router.get(
     "/{workshop_id}/cases/{case_id}/timeseries_data/{data_id}",
     status_code=200,
