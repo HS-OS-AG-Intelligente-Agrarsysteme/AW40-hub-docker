@@ -1,5 +1,6 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from .settings import settings
 
 """
 Custom Jinja2 Filters to format raw values obtained via the API.
@@ -42,7 +43,7 @@ def schema_format(value, map_key):
 
 def timestamp_format(value):
     ts = datetime.fromisoformat(value)
-    ts = ts.astimezone(ZoneInfo("Europe/Berlin"))
+    ts = ts.astimezone(ZoneInfo(settings.timezone))
     return ts.strftime(
         "%d.%m.%Y %H:%M:%S"
     )
