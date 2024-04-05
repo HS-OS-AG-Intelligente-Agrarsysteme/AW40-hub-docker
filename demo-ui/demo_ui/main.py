@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import keycloak
+from .keycloak import Keycloak
 from . import template_filters
 from .messages import get_flashed_messages, flash_message
 from .settings import settings
@@ -25,6 +25,14 @@ templates = Jinja2Templates(directory="demo_ui/templates")
 templates.env.filters["schema_format"] = template_filters.schema_format
 templates.env.filters["timestamp_format"] = template_filters.timestamp_format
 templates.env.globals["get_flashed_messages"] = get_flashed_messages
+
+
+keycloak = Keycloak(
+    keycloak_url=settings.keycloak_url,
+    realm=settings.keycloak_workshop_realm,
+    client_id=settings.keycloak_client_id,
+    client_secret=settings.keycloak_client_secret
+)
 
 
 @app.exception_handler(httpx.HTTPStatusError)
@@ -45,13 +53,36 @@ async def http_status_error_handler(request, exc):
 
 
 def get_session_token(request: Request) -> str:
-    access_token = request.session.get("access_token", None)
-    if access_token is None:
+    """
+    Renew tokens for the current session and get access token for data exchange
+    via Hub API.
+    """
+    # No token in session. User has to login.
+    refresh_token = request.session.get("refresh_token", None)
+    if refresh_token is None:
         flash_message(request, "Bitte anmelden!")
         raise HTTPException(
             status_code=303,
             headers={'Location': '/ui'}
         )
+    # Try to renew the tokens with the current refresh token
+    access_token, refresh_token = keycloak.refresh_tokens(
+        refresh_token=refresh_token
+    )
+    # Renewal failed due to token expiration. Clean up session and ask user
+    # to re-login.
+    if not access_token:
+        request.session.pop("access_token", None)
+        request.session.pop("refresh_token", None)
+        flash_message(request, "Sitzung abgelaufen. Bitte neu anmelden!")
+        raise HTTPException(
+            status_code=303,
+            headers={'Location': '/ui'}
+        )
+    # Tokens are still valid. Session is renewed and access token returned
+    # to endpoint handler
+    request.session["access_token"] = access_token
+    request.session["refresh_token"] = refresh_token
     return access_token
 
 
@@ -173,10 +204,6 @@ def login_post(
         request: Request, workshop_id: str = Form(), password: str = Form()
 ):
     access_token, refresh_token = keycloak.get_tokens(
-        keycloak_url=settings.keycloak_url,
-        realm=settings.keycloak_workshop_realm,
-        client_id=settings.keycloak_client_id,
-        client_secret=settings.keycloak_client_secret,
         username=workshop_id,
         password=password
     )
@@ -643,5 +670,6 @@ def diagnosis_delete_get(
 @app.get("/ui/logout", response_class=RedirectResponse)
 def logout(request: Request):
     request.session.pop("access_token", None)
+    request.session.pop("refresh_token", None)
     flash_message(request, "Sie wurden erfolgreich ausgeloggt.")
     return RedirectResponse("/ui", status_code=303)
