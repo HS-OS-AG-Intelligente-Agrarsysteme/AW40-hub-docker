@@ -57,8 +57,8 @@ def get_session_token(request: Request) -> str:
     Renew tokens for the current session and get access token for data exchange
     via Hub API.
     """
-    # No token in session. User has to login.
     refresh_token = request.session.get("refresh_token", None)
+    # No token in session. User has to login.
     if refresh_token is None:
         flash_message(request, "Bitte anmelden!")
         raise HTTPException(
