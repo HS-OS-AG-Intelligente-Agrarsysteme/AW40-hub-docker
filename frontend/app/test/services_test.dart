@@ -102,8 +102,8 @@ void main() {
         );
         expect(request.body, isEmpty, reason: "Request body is not empty");
         expect(
-          request.url.toString().endsWith("/health/ping"),
-          isTrue,
+          request.url.toString(),
+          endsWith("/health/ping"),
           reason: "Request URL does not end with /health/ping",
         );
         return http.Response('{"status": "success"}', 200);
@@ -127,8 +127,8 @@ void main() {
         );
         expect(request.body, isEmpty, reason: "Request body is not empty");
         expect(
-          request.url.toString().endsWith("/shared/cases"),
-          isTrue,
+          request.url.toString(),
+          endsWith("/shared/cases"),
           reason: "Request URL does not end with /shared/cases",
         );
         return http.Response('{"status": "success"}', 200);
@@ -153,8 +153,8 @@ void main() {
         );
         expect(request.body, isEmpty, reason: "Request body is not empty");
         expect(
-          request.url.toString().endsWith("/$workshopId/cases"),
-          isTrue,
+          request.url.toString(),
+          endsWith("/$workshopId/cases"),
           reason: "Request URL does not end with /{workshopId}/cases",
         );
         return http.Response('{"status": "success"}', 200);
@@ -184,8 +184,8 @@ void main() {
           reason: "Request body is not correct",
         );
         expect(
-          request.url.toString().endsWith("/$workshopId/cases"),
-          isTrue,
+          request.url.toString(),
+          endsWith("/$workshopId/cases"),
           reason: "Request URL does not end with /{workshopId}/cases",
         );
         return http.Response('{"status": "success"}', 200);
@@ -216,8 +216,8 @@ void main() {
           reason: "Request body is not correct",
         );
         expect(
-          request.url.toString().endsWith("/$workshopId/cases/$caseId"),
-          isTrue,
+          request.url.toString(),
+          endsWith("/$workshopId/cases/$caseId"),
           reason: "Request URL does not end with /{workshopId}/cases/{caseId}",
         );
         return http.Response('{"status": "success"}', 200);
@@ -248,8 +248,8 @@ void main() {
         );
         expect(request.body, isEmpty, reason: "Request body is not empty");
         expect(
-          request.url.toString().endsWith("/$workshopId/cases/$caseId"),
-          isTrue,
+          request.url.toString(),
+          endsWith("/$workshopId/cases/$caseId"),
           reason: "Request URL does not end with /{workshopId}/cases/{caseId}",
         );
         return http.Response('{"status": "success"}', 200);
@@ -275,8 +275,8 @@ void main() {
         );
         expect(request.body, isEmpty, reason: "Request body is not empty");
         expect(
-          request.url.toString().endsWith("/$workshopId/cases/$caseId/diag"),
-          isTrue,
+          request.url.toString(),
+          endsWith("/$workshopId/cases/$caseId/diag"),
           reason:
               "Request URL does not end with /{workshopId}/cases/{caseId}/diag",
         );
@@ -303,8 +303,8 @@ void main() {
         );
         expect(request.body, isEmpty, reason: "Request body is not empty");
         expect(
-          request.url.toString().endsWith("/$workshopId/cases/$caseId/diag"),
-          isTrue,
+          request.url.toString(),
+          endsWith("/$workshopId/cases/$caseId/diag"),
           reason:
               "Request URL does not end with /{workshopId}/cases/{caseId}/diag",
         );
@@ -331,8 +331,8 @@ void main() {
         );
         expect(request.body, isEmpty, reason: "Request body is not empty");
         expect(
-          request.url.toString().endsWith("/$workshopId/cases/$caseId/diag"),
-          isTrue,
+          request.url.toString(),
+          endsWith("/$workshopId/cases/$caseId/diag"),
           reason:
               "Request URL does not end with /{workshopId}/cases/{caseId}/diag",
         );
@@ -364,10 +364,8 @@ void main() {
           reason: "Request body is not correct",
         );
         expect(
-          request.url
-              .toString()
-              .endsWith("/$workshopId/cases/$caseId/obd_data"),
-          isTrue,
+          request.url.toString(),
+          endsWith("/$workshopId/cases/$caseId/obd_data"),
           reason:
               "Request URL does not end with /{workshopId}/cases/{caseId}/obd_data",
         );
