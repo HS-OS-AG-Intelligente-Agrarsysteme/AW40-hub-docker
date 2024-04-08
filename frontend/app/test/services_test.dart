@@ -19,7 +19,7 @@ void main() {
         final String verifier = authService.createVerifier();
         expect(verifier.length, 128);
       });
-      test("has no url unsave characters", () async {
+      test("has no url unsafe characters", () async {
         final String verifier = authService.createVerifier();
         final RegExp reg = RegExp("[^A-Za-z0-9-._~]");
         expect(reg.hasMatch(verifier), false);
