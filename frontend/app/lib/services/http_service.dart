@@ -30,7 +30,7 @@ class HttpService {
   }
 
   Future<http.Response> getSharedCases(String token) {
-    return http.get(
+    return _client.get(
       Uri.parse("$backendUrl/shared/cases"),
       headers: getAuthHeaderWith(token),
     );

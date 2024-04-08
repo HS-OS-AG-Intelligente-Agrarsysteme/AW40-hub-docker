@@ -86,31 +86,56 @@ void main() {
         expect(actual, expected);
       });
     });
-      test("verify checkBackendHealth request", () async {
-        bool sentRequest = false;
-        final client = MockClient((request) async {
-          sentRequest = true;
-          expect(
-            request.method,
-            equals("GET"),
-            reason: "Request method is not GET",
-          );
-          expect(
-            request.headers["content-type"],
-            isNull,
-            reason: "Request has content-type header",
-          );
-          expect(request.body, isEmpty, reason: "Request body is not empty");
-          expect(
-            request.url.toString().endsWith("/health/ping"),
-            isTrue,
-            reason: "Request URL does not end with /health/ping",
-          );
-          return http.Response('{"status": "success"}', 200);
-        });
-        await HttpService(client).checkBackendHealth();
-        expect(sentRequest, true, reason: "Request was not sent");
+    test("verify checkBackendHealth request", () async {
+      bool sentRequest = false;
+      final client = MockClient((request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("GET"),
+          reason: "Request method is not GET",
+        );
+        expect(
+          request.headers["content-type"],
+          isNull,
+          reason: "Request has content-type header",
+        );
+        expect(request.body, isEmpty, reason: "Request body is not empty");
+        expect(
+          request.url.toString().endsWith("/health/ping"),
+          isTrue,
+          reason: "Request URL does not end with /health/ping",
+        );
+        return http.Response('{"status": "success"}', 200);
       });
+      await HttpService(client).checkBackendHealth();
+      expect(sentRequest, true, reason: "Request was not sent");
+    });
+    test("verify getSharedCases", () async {
+      bool sentRequest = false;
+      final client = MockClient((request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("GET"),
+          reason: "Request method is not GET",
+        );
+        expect(
+          request.headers["content-type"],
+          isNull,
+          reason: "Request has content-type header",
+        );
+        expect(request.body, isEmpty, reason: "Request body is not empty");
+        expect(
+          request.url.toString().endsWith("/shared/cases"),
+          isTrue,
+          reason: "Request URL does not end with /shared/cases",
+        );
+        return http.Response('{"status": "success"}', 200);
+      });
+      await HttpService(client).getSharedCases("some-token");
+      expect(sentRequest, true, reason: "Request was not sent");
+    });
   });
   group("HelperService", () {
     group("stringToLogLevel", () {
