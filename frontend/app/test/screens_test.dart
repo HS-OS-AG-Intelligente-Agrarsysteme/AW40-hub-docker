@@ -4,6 +4,7 @@ import "package:aw40_hub_frontend/services/http_service.dart";
 import "package:aw40_hub_frontend/views/views.dart";
 import "package:flutter/widgets.dart";
 import "package:flutter_test/flutter_test.dart";
+import "package:http/http.dart" as http;
 import "package:provider/provider.dart";
 
 void main() {
@@ -11,7 +12,7 @@ void main() {
     testWidgets("Returns one CasesView", (widgetTester) async {
       await widgetTester.pumpWidget(
         ChangeNotifierProvider<CaseProvider>(
-          create: (_) => CaseProvider(HttpService()),
+          create: (_) => CaseProvider(HttpService(http.Client())),
           child: const CasesScreen(),
         ),
       );

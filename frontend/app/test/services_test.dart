@@ -62,7 +62,10 @@ void main() {
 
   group("HttpService", () {
     late HttpService httpService;
-    setUp(() => httpService = HttpService());
+    setUp(() async {
+      await ConfigService().initialize();
+      return httpService = HttpService(http.Client());
+    });
     group("_getAuthHeaderWith", () {
       test("returns only auth header if `otherHeaders` is null", () {
         const String token = "some-token";
@@ -72,7 +75,6 @@ void main() {
         final Map<String, String> actual = httpService.getAuthHeaderWith(token);
         expect(actual, expected);
       });
-
       test("returns map of all headers if `otherHeaders` is not null", () {
         const String token = "some-token";
         const Map<String, String> otherHeaders = {"another": "header"};

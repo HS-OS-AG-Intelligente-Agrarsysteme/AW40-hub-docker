@@ -6,7 +6,9 @@ import "package:collection/collection.dart";
 import "package:http/http.dart" as http;
 
 class HttpService {
-  static final http.Client _client = http.Client();
+  HttpService(this._client);
+  final http.Client _client;
+
   static final String backendUrl =
       "${ConfigService().getConfigValue(ConfigKey.proxyDefaultScheme)}"
       "://"
