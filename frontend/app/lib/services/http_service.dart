@@ -161,7 +161,7 @@ class HttpService {
     return http.Response.fromStream(await request.send());
   }
 
-  Future<http.Response> uploadSymtomData(
+  Future<http.Response> uploadSymptomData(
     String token,
     String workshopId,
     String caseId,
