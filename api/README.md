@@ -126,9 +126,9 @@ curl -H "Authorization: Bearer $ACCESS_TOKEN" http://api.werkstatthub.docker.loc
 ### Refresh tokens
 
 The access tokens described in the previous two sections are only valid
-for a limited timer period (300 s by default). However, the `TOKEN_RESPONSE`
+for a limited time period (300 s by default). However, the `TOKEN_RESPONSE`
 also contains a refresh token with a longer expiration time (1800 s by default).
-A client can use this refresh token, to obtain a new access token. Based on the
+A client can use this refresh token to obtain a new access token. Based on the
 previous example this can be achieved as follows.
 First, the `REFRESH_TOKEN` is obtained from the original `TOKEN_RESPONSE`:
 ```
