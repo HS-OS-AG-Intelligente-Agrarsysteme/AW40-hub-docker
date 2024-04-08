@@ -8,7 +8,6 @@ import "package:logging/logging.dart";
 void main() {
   //do not print to console
   debugPrint = (String? message, {int? wrapWidth}) {};
-  TestWidgetsFlutterBinding.ensureInitialized();
 
   group("AuthService", () {
     late AuthService authService;
