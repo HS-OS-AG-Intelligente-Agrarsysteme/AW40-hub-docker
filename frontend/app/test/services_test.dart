@@ -442,7 +442,7 @@ void main() {
           request.url.toString(),
           endsWith("/$workshopId/cases/$caseId/symptoms"),
           reason:
-          "Request URL does not end with /{workshopId}/cases/{caseId}/symptoms",
+              "Request URL does not end with /{workshopId}/cases/{caseId}/symptoms",
         );
         return http.Response('{"status": "success"}', 200);
       });
@@ -451,6 +451,55 @@ void main() {
         workshopId,
         caseId,
         requestBody,
+      );
+      expect(sentRequest, isTrue, reason: "Request was not sent");
+    });
+    test("verify uploadOmniviewData", () async {
+      const workshopId = "some-workshop-id";
+      const caseId = "some-case-id";
+      const component = "some-random";
+      const samplingRate = 1000;
+      const duration = 20000;
+      const omniviewData = [1, 2, 3];
+      const filename = "some-filename";
+      bool sentRequest = false;
+      final client = MockClient((request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("POST"),
+          reason: "Request method is not POST",
+        );
+        expect(
+          request.headers["content-type"],
+          startsWith("multipart/form-data"),
+          reason: "Request has wrong content-type header",
+        );
+        final body = request.body;
+        expect(body, contains('name="component"'));
+        expect(body, contains(component));
+        expect(body, contains('name="sampling_rate"'));
+        expect(body, contains(samplingRate.toString()));
+        expect(body, contains('name="duration"'));
+        expect(body, contains(duration.toString()));
+        expect(
+          request.url.toString(),
+          endsWith(
+              "/$workshopId/cases/$caseId/timeseries_data/upload/omniview"),
+          reason:
+              "Request URL does not end with /{workshopId}/cases/{caseId}/timeseries_data/upload/omniview",
+        );
+        return http.Response('{"status": "success"}', 200);
+      });
+      await HttpService(client).uploadOmniviewData(
+        "token",
+        workshopId,
+        caseId,
+        component,
+        samplingRate,
+        duration,
+        omniviewData,
+        filename,
       );
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });

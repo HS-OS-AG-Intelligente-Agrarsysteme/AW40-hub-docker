@@ -7,6 +7,7 @@ import "package:http/http.dart" as http;
 
 class HttpService {
   HttpService(this._client);
+
   final http.Client _client;
 
   static final String backendUrl =
@@ -175,5 +176,42 @@ class HttpService {
       }),
       body: jsonEncode(requestBody),
     );
+  }
+
+  Future<http.Response> uploadOmniviewData(
+    String token,
+    String workshopId,
+    String caseId,
+    String component,
+    int samplingRate,
+    int duration,
+    List<int> omniviewData,
+    String filename,
+  ) async {
+    final request = http.MultipartRequest(
+      "POST",
+      Uri.parse(
+        "$backendUrl/$workshopId/cases/$caseId/timeseries_data/upload/omniview",
+      ),
+    );
+
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        "upload",
+        omniviewData,
+        filename: filename,
+      ),
+    );
+
+    request.fields["component"] = component;
+    request.fields["sampling_rate"] = samplingRate.toString();
+    request.fields["duration"] = duration.toString();
+
+    final Map<String, String> authHeader = getAuthHeaderWith(token);
+    assert(authHeader.length == 1);
+    request.headers[authHeader.keys.first] = authHeader.values.first;
+
+    final response = await _client.send(request);
+    return http.Response.fromStream(response);
   }
 }
