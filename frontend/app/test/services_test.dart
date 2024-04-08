@@ -277,11 +277,108 @@ void main() {
         expect(
           request.url.toString().endsWith("/$workshopId/cases/$caseId/diag"),
           isTrue,
-          reason: "Request URL does not end with /{workshopId}/cases/{caseId}/diag",
+          reason:
+              "Request URL does not end with /{workshopId}/cases/{caseId}/diag",
         );
         return http.Response('{"status": "success"}', 200);
       });
       await HttpService(client).getDiagnosis("token", workshopId, caseId);
+      expect(sentRequest, isTrue, reason: "Request was not sent");
+    });
+    test("verify startDiagnosis", () async {
+      const workshopId = "some-workshop-id";
+      const caseId = "some-case-id";
+      bool sentRequest = false;
+      final client = MockClient((request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("POST"),
+          reason: "Request method is not POST",
+        );
+        expect(
+          request.headers["content-type"],
+          isNull,
+          reason: "Request has content-type header",
+        );
+        expect(request.body, isEmpty, reason: "Request body is not empty");
+        expect(
+          request.url.toString().endsWith("/$workshopId/cases/$caseId/diag"),
+          isTrue,
+          reason:
+              "Request URL does not end with /{workshopId}/cases/{caseId}/diag",
+        );
+        return http.Response('{"status": "success"}', 200);
+      });
+      await HttpService(client).startDiagnosis("token", workshopId, caseId);
+      expect(sentRequest, isTrue, reason: "Request was not sent");
+    });
+    test("verify deleteDiagnosis", () async {
+      const workshopId = "some-workshop-id";
+      const caseId = "some-case-id";
+      bool sentRequest = false;
+      final client = MockClient((request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("DELETE"),
+          reason: "Request method is not DELETE",
+        );
+        expect(
+          request.headers["content-type"],
+          isNull,
+          reason: "Request has content-type header",
+        );
+        expect(request.body, isEmpty, reason: "Request body is not empty");
+        expect(
+          request.url.toString().endsWith("/$workshopId/cases/$caseId/diag"),
+          isTrue,
+          reason:
+              "Request URL does not end with /{workshopId}/cases/{caseId}/diag",
+        );
+        return http.Response('{"status": "success"}', 200);
+      });
+      await HttpService(client).deleteDiagnosis("token", workshopId, caseId);
+      expect(sentRequest, isTrue, reason: "Request was not sent");
+    });
+    test("verify uploadObdData", () async {
+      const workshopId = "some-workshop-id";
+      const caseId = "some-case-id";
+      const requestBody = {"key": "value"};
+      bool sentRequest = false;
+      final client = MockClient((request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("POST"),
+          reason: "Request method is not POST",
+        );
+        expect(
+          request.headers["content-type"],
+          equals("application/json; charset=UTF-8"),
+          reason: "Request has wrong content-type header",
+        );
+        expect(
+          request.body,
+          equals('{"${requestBody.keys.first}":"${requestBody.values.first}"}'),
+          reason: "Request body is not correct",
+        );
+        expect(
+          request.url
+              .toString()
+              .endsWith("/$workshopId/cases/$caseId/obd_data"),
+          isTrue,
+          reason:
+              "Request URL does not end with /{workshopId}/cases/{caseId}/obd_data",
+        );
+        return http.Response('{"status": "success"}', 200);
+      });
+      await HttpService(client).uploadObdData(
+        "token",
+        workshopId,
+        caseId,
+        requestBody,
+      );
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
   });
