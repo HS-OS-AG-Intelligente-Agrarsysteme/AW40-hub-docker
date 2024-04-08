@@ -180,7 +180,7 @@ void main() {
         );
         expect(
           request.body,
-          equals('{"key":"value"}'),
+          equals('{"${requestBody.keys.first}":"${requestBody.values.first}"}'),
           reason: "Request body is not correct",
         );
         expect(
@@ -191,6 +191,43 @@ void main() {
         return http.Response('{"status": "success"}', 200);
       });
       await HttpService(client).addCase("token", workshopId, requestBody);
+      expect(sentRequest, isTrue, reason: "Request was not sent");
+    });
+    test("verify updateCase", () async {
+      const workshopId = "some-workshop-id";
+      const caseId = "some-case-id";
+      const requestBody = {"key": "value"};
+      bool sentRequest = false;
+      final client = MockClient((request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("PUT"),
+          reason: "Request method is not PUT",
+        );
+        expect(
+          request.headers["content-type"],
+          equals("application/json; charset=UTF-8"),
+          reason: "Request has wrong content-type header",
+        );
+        expect(
+          request.body,
+          equals('{"${requestBody.keys.first}":"${requestBody.values.first}"}'),
+          reason: "Request body is not correct",
+        );
+        expect(
+          request.url.toString().endsWith("/$workshopId/cases/$caseId"),
+          isTrue,
+          reason: "Request URL does not end with /{workshopId}/cases/{caseId}",
+        );
+        return http.Response('{"status": "success"}', 200);
+      });
+      await HttpService(client).updateCase(
+        "token",
+        workshopId,
+        caseId,
+        requestBody,
+      );
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
   });
