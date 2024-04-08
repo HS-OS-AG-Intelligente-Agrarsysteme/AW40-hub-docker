@@ -8,11 +8,17 @@ import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 
-class CasesView extends StatelessWidget {
+class CasesView extends StatefulWidget {
   const CasesView({
     super.key,
   });
 
+  @override
+  State<CasesView> createState() => _CasesViewState();
+}
+
+class _CasesViewState extends State<CasesView> {
+  int? currentCaseIndex;
   @override
   Widget build(BuildContext context) {
     final caseProvider = Provider.of<CaseProvider>(context);
@@ -29,7 +35,6 @@ class CasesView extends StatelessWidget {
               exceptionMessage: "Received no case data.",
             );
           }
-          int? currentCaseIndex;
           return Row(
             children: [
               Expanded(
@@ -40,7 +45,9 @@ class CasesView extends StatelessWidget {
                       themeData: Theme.of(context),
                       currentIndex: currentCaseIndex,
                       caseModels: caseModels,
-                      onPressedRow: (int i) => currentCaseIndex = i,
+                      onPressedRow: (int i) {
+                        setState(() => currentCaseIndex = i);
+                      },
                     ),
                     showCheckboxColumn: false,
                     rowsPerPage: 50,
@@ -60,6 +67,7 @@ class CasesView extends StatelessWidget {
                   ),
                 ),
               ),
+              // Show detail view if a case is selected.
               if (currentCaseIndex != null)
                 Expanded(
                   flex: 2,
