@@ -26,7 +26,7 @@ class HttpService {
   }
 
   Future<http.Response> checkBackendHealth() {
-    return http.get(Uri.parse("$backendUrl/health/ping"));
+    return _client.get(Uri.parse("$backendUrl/health/ping"));
   }
 
   Future<http.Response> getSharedCases(String token) {
