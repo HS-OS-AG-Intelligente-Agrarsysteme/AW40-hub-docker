@@ -37,7 +37,7 @@ class HttpService {
   }
 
   Future<http.Response> getCases(String token, String workshopId) {
-    return http.get(
+    return _client.get(
       Uri.parse("$backendUrl/$workshopId/cases"),
       headers: getAuthHeaderWith(token),
     );

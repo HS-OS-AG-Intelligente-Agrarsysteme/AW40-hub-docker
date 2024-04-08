@@ -109,7 +109,7 @@ void main() {
         return http.Response('{"status": "success"}', 200);
       });
       await HttpService(client).checkBackendHealth();
-      expect(sentRequest, true, reason: "Request was not sent");
+      expect(sentRequest, isTrue, reason: "Request was not sent");
     });
     test("verify getSharedCases", () async {
       bool sentRequest = false;
@@ -134,7 +134,34 @@ void main() {
         return http.Response('{"status": "success"}', 200);
       });
       await HttpService(client).getSharedCases("some-token");
-      expect(sentRequest, true, reason: "Request was not sent");
+      expect(sentRequest, isTrue, reason: "Request was not sent");
+    });
+    test("verify getCases", () async {
+      const workShopId = "some-workshop-id";
+      bool sentRequest = false;
+      final client = MockClient((request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("GET"),
+          reason: "Request method is not GET",
+        );
+        expect(
+          request.headers["content-type"],
+          isNull,
+          reason: "Request has content-type header",
+        );
+        expect(request.body, isEmpty, reason: "Request body is not empty");
+        expect(
+          request.url.toString().endsWith("/$workShopId/cases"),
+          isTrue,
+          reason: "Request URL does not end with /{workShopId}/cases",
+        );
+        return http.Response('{"status": "success"}', 200);
+      });
+      await HttpService(client).getCases("some-token", workShopId);
+      expect(sentRequest, isTrue, reason: "Request was not sent");
+
     });
   });
   group("HelperService", () {
