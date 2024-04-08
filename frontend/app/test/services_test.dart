@@ -137,7 +137,7 @@ void main() {
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
     test("verify getCases", () async {
-      const workShopId = "some-workshop-id";
+      const workshopId = "some-workshop-id";
       bool sentRequest = false;
       final client = MockClient((request) async {
         sentRequest = true;
@@ -153,15 +153,45 @@ void main() {
         );
         expect(request.body, isEmpty, reason: "Request body is not empty");
         expect(
-          request.url.toString().endsWith("/$workShopId/cases"),
+          request.url.toString().endsWith("/$workshopId/cases"),
           isTrue,
-          reason: "Request URL does not end with /{workShopId}/cases",
+          reason: "Request URL does not end with /{workshopId}/cases",
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).getCases("some-token", workShopId);
+      await HttpService(client).getCases("some-token", workshopId);
       expect(sentRequest, isTrue, reason: "Request was not sent");
-
+    });
+    test("verify addCase", () async {
+      const workshopId = "some-workshop-id";
+      const requestBody = {"key": "value"};
+      bool sentRequest = false;
+      final client = MockClient((request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("POST"),
+          reason: "Request method is not POST",
+        );
+        expect(
+          request.headers["content-type"],
+          equals("application/json; charset=UTF-8"),
+          reason: "Request has wrong content-type header",
+        );
+        expect(
+          request.body,
+          equals('{"key":"value"}'),
+          reason: "Request body is not correct",
+        );
+        expect(
+          request.url.toString().endsWith("/$workshopId/cases"),
+          isTrue,
+          reason: "Request URL does not end with /{workshopId}/cases",
+        );
+        return http.Response('{"status": "success"}', 200);
+      });
+      await HttpService(client).addCase("token", workshopId, requestBody);
+      expect(sentRequest, isTrue, reason: "Request was not sent");
     });
   });
   group("HelperService", () {
