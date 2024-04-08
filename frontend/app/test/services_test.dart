@@ -1,6 +1,8 @@
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter_test/flutter_test.dart";
+import "package:http/http.dart" as http;
+import "package:http/testing.dart";
 import "package:logging/logging.dart";
 
 void main() {
@@ -59,12 +61,9 @@ void main() {
       });
     });
   });
-
   group("HttpService", () {
-    late HttpService httpService;
     setUp(() async {
       await ConfigService().initialize();
-      return httpService = HttpService(http.Client());
     });
     group("_getAuthHeaderWith", () {
       test("returns only auth header if `otherHeaders` is null", () {
@@ -72,7 +71,8 @@ void main() {
         final Map<String, String> expected = {
           "Authorization": "Bearer some-token==",
         };
-        final Map<String, String> actual = httpService.getAuthHeaderWith(token);
+        final Map<String, String> actual =
+            HttpService(http.Client()).getAuthHeaderWith(token);
         expect(actual, expected);
       });
       test("returns map of all headers if `otherHeaders` is not null", () {
@@ -83,7 +83,7 @@ void main() {
           "another": "header",
         };
         final Map<String, String> actual =
-            httpService.getAuthHeaderWith(token, otherHeaders);
+            HttpService(http.Client()).getAuthHeaderWith(token, otherHeaders);
         expect(actual, expected);
       });
     });
