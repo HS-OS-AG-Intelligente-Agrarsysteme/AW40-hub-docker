@@ -168,7 +168,7 @@ class HttpService {
     String caseId,
     Map<String, dynamic> requestBody,
   ) {
-    return http.post(
+    return _client.post(
       Uri.parse("$backendUrl/$workshopId/cases/$caseId/symptoms"),
       headers: getAuthHeaderWith(token, {
         "Content-Type": "application/json; charset=UTF-8",

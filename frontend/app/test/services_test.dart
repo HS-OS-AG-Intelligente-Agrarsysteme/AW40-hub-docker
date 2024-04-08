@@ -416,6 +416,44 @@ void main() {
       );
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
+    test("verify uploadSymptomData", () async {
+      const workshopId = "some-workshop-id";
+      const caseId = "some-case-id";
+      const requestBody = {"key": "value"};
+      bool sentRequest = false;
+      final client = MockClient((request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("POST"),
+          reason: "Request method is not POST",
+        );
+        expect(
+          request.headers["content-type"],
+          equals("application/json; charset=UTF-8"),
+          reason: "Request has wrong content-type header",
+        );
+        expect(
+          request.body,
+          equals('{"${requestBody.keys.first}":"${requestBody.values.first}"}'),
+          reason: "Request body is not correct",
+        );
+        expect(
+          request.url.toString(),
+          endsWith("/$workshopId/cases/$caseId/symptoms"),
+          reason:
+          "Request URL does not end with /{workshopId}/cases/{caseId}/symptoms",
+        );
+        return http.Response('{"status": "success"}', 200);
+      });
+      await HttpService(client).uploadSymptomData(
+        "token",
+        workshopId,
+        caseId,
+        requestBody,
+      );
+      expect(sentRequest, isTrue, reason: "Request was not sent");
+    });
   });
   group("HelperService", () {
     group("stringToLogLevel", () {
