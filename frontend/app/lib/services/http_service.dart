@@ -88,7 +88,7 @@ class HttpService {
     String workshopId,
     String caseId,
   ) {
-    return http.get(
+    return _client.get(
       Uri.parse("$backendUrl/$workshopId/cases/$caseId/diag"),
       headers: getAuthHeaderWith(token),
     );

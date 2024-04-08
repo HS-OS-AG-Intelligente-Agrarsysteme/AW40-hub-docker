@@ -257,6 +257,33 @@ void main() {
       await HttpService(client).deleteCase("token", workshopId, caseId);
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
+    test("verify getDiagnosis", () async {
+      const workshopId = "some-workshop-id";
+      const caseId = "some-case-id";
+      bool sentRequest = false;
+      final client = MockClient((request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("GET"),
+          reason: "Request method is not GET",
+        );
+        expect(
+          request.headers["content-type"],
+          isNull,
+          reason: "Request has content-type header",
+        );
+        expect(request.body, isEmpty, reason: "Request body is not empty");
+        expect(
+          request.url.toString().endsWith("/$workshopId/cases/$caseId/diag"),
+          isTrue,
+          reason: "Request URL does not end with /{workshopId}/cases/{caseId}/diag",
+        );
+        return http.Response('{"status": "success"}', 200);
+      });
+      await HttpService(client).getDiagnosis("token", workshopId, caseId);
+      expect(sentRequest, isTrue, reason: "Request was not sent");
+    });
   });
   group("HelperService", () {
     group("stringToLogLevel", () {
