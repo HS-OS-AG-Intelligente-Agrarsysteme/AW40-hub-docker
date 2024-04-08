@@ -158,7 +158,8 @@ class HttpService {
     assert(authHeader.length == 1);
     request.headers[authHeader.keys.first] = authHeader.values.first;
 
-    return http.Response.fromStream(await request.send());
+    final response = await _client.send(request);
+    return http.Response.fromStream(response);
   }
 
   Future<http.Response> uploadSymptomData(

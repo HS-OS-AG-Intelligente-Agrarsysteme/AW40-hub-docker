@@ -379,6 +379,43 @@ void main() {
       );
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
+    test("verify uploadPicoscopeData", () async {
+      const workshopId = "some-workshop-id";
+      const caseId = "some-case-id";
+      const picoscopeData = [1, 2, 3];
+      const filename = "some-filename";
+      bool sentRequest = false;
+      final client = MockClient((http.Request request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("POST"),
+          reason: "Request method is not POST",
+        );
+        expect(
+          request.headers["content-type"],
+          startsWith("multipart/form-data"),
+          reason: "Request has wrong content-type header",
+        );
+        expect(
+          request.url.toString(),
+          endsWith(
+            "/$workshopId/cases/$caseId/timeseries_data/upload/picoscope",
+          ),
+          reason:
+              "Request URL does not end with /{workshopId}/cases/{caseId}/timeseries_data/upload/picoscope",
+        );
+        return http.Response('{"status": "success"}', 200);
+      });
+      await HttpService(client).uploadPicoscopeData(
+        "token",
+        workshopId,
+        caseId,
+        picoscopeData,
+        filename,
+      );
+      expect(sentRequest, isTrue, reason: "Request was not sent");
+    });
   });
   group("HelperService", () {
     group("stringToLogLevel", () {
