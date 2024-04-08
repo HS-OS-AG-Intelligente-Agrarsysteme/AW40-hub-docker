@@ -77,7 +77,7 @@ class HttpService {
     String workshopId,
     String caseId,
   ) {
-    return http.delete(
+    return _client.delete(
       Uri.parse("$backendUrl/$workshopId/cases/$caseId"),
       headers: getAuthHeaderWith(token),
     );
