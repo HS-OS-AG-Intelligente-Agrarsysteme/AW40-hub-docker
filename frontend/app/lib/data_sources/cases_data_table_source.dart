@@ -1,5 +1,3 @@
-import "dart:math";
-
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:easy_localization/easy_localization.dart";
@@ -13,7 +11,6 @@ class CasesDataTableSource extends DataTableSource {
     required this.onPressedRow,
   });
   List<CaseModel> caseModels;
-  final rng = Random();
   final void Function(int) onPressedRow;
   final ThemeData themeData;
   int? currentIndex;
