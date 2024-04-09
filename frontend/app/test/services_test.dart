@@ -485,7 +485,8 @@ void main() {
         expect(
           request.url.toString(),
           endsWith(
-              "/$workshopId/cases/$caseId/timeseries_data/upload/omniview"),
+            "/$workshopId/cases/$caseId/timeseries_data/upload/omniview",
+          ),
           reason:
               "Request URL does not end with /{workshopId}/cases/{caseId}/timeseries_data/upload/omniview",
         );
