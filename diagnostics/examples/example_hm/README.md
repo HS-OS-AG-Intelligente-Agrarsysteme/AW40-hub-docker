@@ -16,7 +16,7 @@
 
 1. Services starten:
 ```
-alias dc='docker compose -f docker-compose.yml -f demo_ui.yml --env-file dev.env'
+alias dc='docker compose -f docker-compose.yml -f demo_ui.yml --env-file dev.env --profile full'
 dc up -d proxy mongo keycloak keycloak-config keycloak-db api docs redis diagnostics knowledge-graph demo-ui
 ```
 
