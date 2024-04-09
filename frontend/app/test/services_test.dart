@@ -1,4 +1,6 @@
 import "package:aw40_hub_frontend/services/services.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:enum_to_string/enum_to_string.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:http/http.dart" as http;
@@ -384,6 +386,10 @@ void main() {
       const caseId = "some-case-id";
       const picoscopeData = [1, 2, 3];
       const filename = "some-filename";
+      const componentA = "inueh";
+      const labelA = PicoscopeLabel.anomaly;
+      const componentC = "ragonu";
+      const labelC = PicoscopeLabel.norm;
       bool sentRequest = false;
       final client = MockClient((http.Request request) async {
         sentRequest = true;
@@ -397,6 +403,20 @@ void main() {
           startsWith("multipart/form-data"),
           reason: "Request has wrong content-type header",
         );
+        final body = request.body;
+        expect(body, contains('name="component_A"'));
+        expect(body, contains(componentA));
+        expect(body, contains('name="label_A"'));
+        expect(body, contains(EnumToString.convertToString(labelA)));
+        expect(body, contains('name="component_C"'));
+        expect(body, contains(componentC));
+        expect(body, contains('name="label_C"'));
+        expect(body, contains(EnumToString.convertToString(labelC)));
+        expect(body, contains('name="upload"'));
+        expect(body, isNot(contains('name="component_B"')));
+        expect(body, isNot(contains('name="label_B"')));
+        expect(body, isNot(contains('name="component_D"')));
+        expect(body, isNot(contains('name="label_D"')));
         expect(
           request.url.toString(),
           endsWith(
@@ -413,6 +433,10 @@ void main() {
         caseId,
         picoscopeData,
         filename,
+        componentA: componentA,
+        labelA: labelA,
+        componentC: componentC,
+        labelC: labelC,
       );
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });

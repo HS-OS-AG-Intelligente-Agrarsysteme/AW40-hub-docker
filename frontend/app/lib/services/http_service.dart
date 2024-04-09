@@ -3,6 +3,7 @@ import "dart:convert";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:collection/collection.dart";
+import "package:enum_to_string/enum_to_string.dart";
 import "package:http/http.dart" as http;
 
 class HttpService {
@@ -137,8 +138,16 @@ class HttpService {
     String workshopId,
     String caseId,
     List<int> picoscopeData,
-    String filename,
-  ) async {
+    String filename, {
+    String? componentA,
+    String? componentB,
+    String? componentC,
+    String? componentD,
+    PicoscopeLabel? labelA,
+    PicoscopeLabel? labelB,
+    PicoscopeLabel? labelC,
+    PicoscopeLabel? labelD,
+  }) async {
     final request = http.MultipartRequest(
       "POST",
       Uri.parse(
@@ -147,14 +156,27 @@ class HttpService {
     );
 
     request.files.add(
-      http.MultipartFile.fromBytes(
-        "upload",
-        picoscopeData,
-        filename: filename,
-      ),
+      http.MultipartFile.fromBytes("upload", picoscopeData, filename: filename),
     );
 
     request.fields["file_format"] = "Picoscope CSV";
+    final components = {
+      "A": componentA,
+      "B": componentB,
+      "C": componentC,
+      "D": componentD,
+    };
+    final labels = {"A": labelA, "B": labelB, "C": labelC, "D": labelD};
+
+    components.forEach((k, v) {
+      if (v != null) request.fields["component_$k"] = v;
+    });
+    labels.forEach((k, v) {
+      if (v != null) {
+        request.fields["label_$k"] = EnumToString.convertToString(v);
+      }
+    });
+
     final Map<String, String> authHeader = getAuthHeaderWith(token);
     assert(authHeader.length == 1);
     request.headers[authHeader.keys.first] = authHeader.values.first;
@@ -196,11 +218,7 @@ class HttpService {
     );
 
     request.files.add(
-      http.MultipartFile.fromBytes(
-        "upload",
-        omniviewData,
-        filename: filename,
-      ),
+      http.MultipartFile.fromBytes("upload", omniviewData, filename: filename),
     );
 
     request.fields["component"] = component;
