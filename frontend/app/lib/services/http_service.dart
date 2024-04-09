@@ -189,6 +189,10 @@ class HttpService {
     String token,
     String workshopId,
     String caseId,
+    // TODO: Change param structure.
+    // Add 2 String params `component` and `label`
+    // Remove requestBody param
+    // Create JSON object from `component` and `label` params inside function
     Map<String, dynamic> requestBody,
   ) {
     return _client.post(

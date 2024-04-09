@@ -186,6 +186,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             newSymptomDto,
           );
           break;
+        // TODO: Add case for omniview data.
         default:
           throw AppException(
             exceptionType: ExceptionType.unexpectedNullValue,
@@ -196,12 +197,8 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
 
       _showMessage(
         result
-            ? tr(
-                "diagnoses.details.uploadDataSuccessMessage",
-              )
-            : tr(
-                "diagnoses.details.uploadDataErrorMessage",
-              ),
+            ? tr("diagnoses.details.uploadDataSuccessMessage")
+            : tr("diagnoses.details.uploadDataErrorMessage"),
         scaffoldMessengerState,
       );
       // ignore: avoid_catches_without_on_clauses
