@@ -188,9 +188,21 @@ then
         -s credentials='[{"type": "password", "value": "dev"}]' \
         -s enabled=true
 
+    $kcadm create users \
+        -r werkstatt-hub \
+        -s username="autowerkstatt" \
+        -s credentials='[{"type": "password", "value": "aw40"}]' \
+        -s enabled=true
+
     $kcadm add-roles \
         -r werkstatt-hub \
         --uusername aw40hub-dev-workshop \
+        --rolename workshop \
+        --rolename shared
+
+    $kcadm add-roles \
+        -r werkstatt-hub \
+        --uusername autowerkstatt \
         --rolename workshop \
         --rolename shared
 
