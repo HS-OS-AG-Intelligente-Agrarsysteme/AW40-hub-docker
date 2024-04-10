@@ -1,7 +1,8 @@
+import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/scaffolds/scaffolds.dart";
 import "package:aw40_hub_frontend/screens/screens.dart";
-import "package:aw40_hub_frontend/utils/constants.dart";
+import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:logging/logging.dart";
@@ -26,6 +27,15 @@ RouteMap getRouteMap(AuthProvider authProvider) {
         child: LoginScreen(currentBrowserUrl: currentBrowserUrl),
       );
     };
+  } else if (!authProvider.isAuthorized) {
+    onUnknownRoute = (String route) {
+      logger.config("User is not authorized.");
+      return const MaterialPage<Widget>(
+        child: ScaffoldWrapper(
+          child: NoAuthorizationScreen(),
+        ),
+      );
+    };
   } else {
     routes.addAll(_basicRoutes);
     onUnknownRoute = (String route) {
@@ -36,6 +46,17 @@ RouteMap getRouteMap(AuthProvider authProvider) {
         ),
       );
     };
+    final groups = authProvider.getUserGroups;
+    if (groups.contains(AuthorizedGroup.Mechanics)) {
+      logger.config(
+        "User is authorized as Mechanic, access to MechanicRoutes.",
+      );
+      routes.addAll(_mechanicsRoutes);
+    }
+    if (groups.contains(AuthorizedGroup.Analysts)) {
+      logger.config("User is authorized as Analyst, access to AnalystsRoutes.");
+      routes.addAll(_analystsRoutes);
+    }
   }
 
   final RouteMap routeMap = RouteMap(
@@ -91,3 +112,7 @@ Map<String, PageBuilder> _basicRoutes = {
     );
   },
 };
+
+Map<String, PageBuilder> _mechanicsRoutes = {};
+
+Map<String, PageBuilder> _analystsRoutes = {};

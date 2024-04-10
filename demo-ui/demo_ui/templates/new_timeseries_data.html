@@ -8,9 +8,73 @@
 {% endblock %}
 {% block content %}
 <h1> Neues Oszillogramm hochladen <a class="linkbutton" href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ request.path_params['case_id'] }}">Abbrechen</a></h1>
-<div>
-    <h2> Option 1: Picoscope CSV Export </h2>
-    <form method="post" enctype="multipart/form-data">
+<label for="file_format">Datei Format</label>
+<select id="file_format", name="file_format">
+    <option value="omniview_csv">Omniview (.csv)</option>
+    <option value="picoscope_csv">Picoscope (.csv)</option>
+</select>
+<script>
+// Form is choosen based on selected file format
+var file_format = document.getElementById("file_format");
+file_format.onchange = function() {
+    var omniview_csv_div = document.getElementById("omniview_csv_div");
+    var picoscope_csv_div = document.getElementById("picoscope_csv_div");
+    if (this.selectedIndex == 0) {
+        omniview_csv_div.style.display = "block";
+        picoscope_csv_div.style.display = "none";
+    }
+    else {
+        omniview_csv_div.style.display = "none";
+        picoscope_csv_div.style.display = "block";
+    }
+}
+</script>
+<div id="omniview_csv_div" style="display: block;">
+    <h2> Upload Omniview CSV Export </h2>
+    <form method="post" enctype="multipart/form-data" action="new/omniview">
+        <p>
+            <label for="component">Komponente</label><br>
+            <input list="components" id="component" name="component" style="width:30%" required>
+            <datalist id="components">
+                {% for component in components %}
+                <option value="{{ component }}">
+                {% endfor %}
+            </datalist>
+        </p>
+        <p>
+            <label for="label">Bewertung</label><br>
+            <select id="label", name="label">
+                <option value="unknown">Unbekannt</option>
+                <option value="norm">Normalbild</option>
+                <option value="anomaly">Anomalie</option>
+            </select>
+        </p>
+        <p>
+            <label for="sampling_rate">Abtastrate [Hz]</label><br>
+            <input type="number" min="0" id="sampling_rate" name="sampling_rate" required>
+        </p>
+        <p>
+            <label for="duration">Messdauer [s]</label><br>
+            <input type="number" min="0" id="duration" name="duration" required>
+        </p>
+        <script>
+        // If query param suggested_component was specified, prefill input with it
+        const input = document.getElementById("component")
+        input.setAttribute("value", "{{ suggested_component }}")
+        </script>
+        <p>
+            <label for="omniview_file"><b>Omniview Datei</b></label><br>
+            <input type="file" id="omniview_file" name="omniview_file" style="margin: 10px" required><br>
+        </p>
+        <p>
+            <input type="submit" value="Daten hochladen">
+            <input type="reset">
+        </p>
+    </form>
+</div>
+<div id="picoscope_csv_div" style="display: none;">
+    <h2> Upload Picoscope CSV Export </h2>
+    <form method="post" enctype="multipart/form-data" action="new/picoscope">
         {% for channel in ["A", "B", "C", "D"] %}
         <p>
             <label><b>Kanal {{ channel }}</b></label><br>
@@ -43,6 +107,5 @@
             <input type="reset">
         </p>
     </form>
-</div>
 </div>
 {% endblock %}

@@ -122,3 +122,27 @@ the shared router can be retrieved via
 ```
 curl -H "Authorization: Bearer $ACCESS_TOKEN" http://api.werkstatthub.docker.localhost/v1/shared/cases
 ```
+
+### Refresh tokens
+
+The access tokens described in the previous two sections are only valid
+for a limited time period (300 s by default). However, the `TOKEN_RESPONSE`
+also contains a refresh token with a longer expiration time (1800 s by default).
+A client can use this refresh token to obtain a new access token. Based on the
+previous example this can be achieved as follows.
+First, the `REFRESH_TOKEN` is obtained from the original `TOKEN_RESPONSE`:
+```
+REFRESH_TOKEN=$(echo $TOKEN_RESPONSE | jq -r .refresh_token)
+```
+The refresh token is used in a new token request to keycloak like so:
+```
+NEW_TOKEN_RESPONSE=$( \
+    curl http://keycloak.werkstatthub.docker.localhost/realms/werkstatt-hub/protocol/openid-connect/token \
+            -X POST \
+            -H "Content-Type=application/x-www-form-urlencoded" \
+            -d "client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&refresh_token=$REFRESH_TOKEN&grant_type=refresh_token"
+)
+```
+Note that this second token request issued by the client does not require the
+user credentials. The `NEW_TOKEN_RESPOSNE` contains a fresh access token that
+can be used to access the Hub API for another 300 s.

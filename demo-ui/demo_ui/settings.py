@@ -14,5 +14,7 @@ class Settings(BaseSettings):
 
     session_secret: str = "demo-ui-session-secret"
 
+    timezone: str = "Europe/Berlin"
+
 
 settings = Settings()

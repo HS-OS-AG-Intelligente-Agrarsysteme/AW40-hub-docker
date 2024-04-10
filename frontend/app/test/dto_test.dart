@@ -675,17 +675,12 @@ void main() {
     });
   });
   group("NewOBDDataDto primary constructor", () {
-    final timestamp = DateTime.utc(2021).toIso8601String();
     final obdSpecs = <dynamic>[1, 2, 3];
     final dtcs = <String>["some_component"];
     final NewOBDDataDto newOBDDataDto = NewOBDDataDto(
-      timestamp,
       obdSpecs,
       dtcs,
     );
-    test("correctly assigns timestamp", () {
-      expect(newOBDDataDto.timestamp, timestamp);
-    });
     test("correctly assigns obdSpecs", () {
       expect(newOBDDataDto.obdSpecs, obdSpecs);
     });
@@ -703,9 +698,6 @@ void main() {
       "dtcs": dtcs,
     };
     final NewOBDDataDto newOBDDataDto = NewOBDDataDto.fromJson(json);
-    test("correctly assigns timestamp", () {
-      expect(newOBDDataDto.timestamp, timestamp);
-    });
     test("correctly assigns obdSpecs", () {
       expect(newOBDDataDto.obdSpecs, obdSpecs);
     });
@@ -714,18 +706,13 @@ void main() {
     });
   });
   group("NewOBDDataDto toJson method", () {
-    final timestamp = DateTime.utc(2021).toIso8601String();
     final obdSpecs = <dynamic>[1, 2, 3];
     final dtcs = <String>["some_component"];
     final NewOBDDataDto newOBDDataDto = NewOBDDataDto(
-      timestamp,
       obdSpecs,
       dtcs,
     );
     final Map<String, dynamic> json = newOBDDataDto.toJson();
-    test("correctly assigns timestamp", () {
-      expect(json["timestamp"], timestamp);
-    });
     test("correctly assigns dtcs", () {
       expect(json["obd_specs"], obdSpecs);
     });
