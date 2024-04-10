@@ -90,6 +90,7 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
   @override
   Widget build(BuildContext context) {
     currentDiagnosisIndex ??= widget.initialDiagnosisIndex;
+
     if (widget.diagnosisModels.isEmpty) {
       return Center(
         child: Text(
