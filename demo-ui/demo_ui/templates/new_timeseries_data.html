@@ -50,12 +50,12 @@ file_format.onchange = function() {
             </select>
         </p>
         <p>
-            <label for="sampling_rate">Abtastrate [Hz]</label><br>
-            <input type="number" min="0" id="sampling_rate" name="sampling_rate" required>
+            <label for="sampling_rate">Abtastrate [kHz]</label><br>
+            <input type="number" min="0" id="sampling_rate" name="sampling_rate" value="100" required>
         </p>
         <p>
             <label for="duration">Messdauer [s]</label><br>
-            <input type="number" min="0" id="duration" name="duration" required>
+            <input type="number" min="0" id="duration" name="duration" value="1" required>
         </p>
         <script>
         // If query param suggested_component was specified, prefill input with it
