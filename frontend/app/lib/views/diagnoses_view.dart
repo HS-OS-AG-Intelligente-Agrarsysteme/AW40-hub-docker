@@ -3,8 +3,6 @@ import "package:aw40_hub_frontend/exceptions/exceptions.dart";
 import "package:aw40_hub_frontend/models/case_model.dart";
 import "package:aw40_hub_frontend/models/diagnosis_model.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
-import "package:aw40_hub_frontend/scaffolds/scaffold_wrapper.dart";
-import "package:aw40_hub_frontend/screens/screens.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:aw40_hub_frontend/views/diagnosis_detail_view.dart";
 import "package:easy_localization/easy_localization.dart";
@@ -94,7 +92,7 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
     if (widget.diagnosisModels.isEmpty) {
       return Center(
         child: Text(
-          tr("no.diagnoses"),
+          tr("general.no.diagnoses"),
           style: Theme.of(context).textTheme.displaySmall,
         ),
       );
