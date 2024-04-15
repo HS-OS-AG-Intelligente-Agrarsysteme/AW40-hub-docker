@@ -18,7 +18,15 @@ class CasesView extends StatefulWidget {
 }
 
 class _CasesViewState extends State<CasesView> {
-  int? currentCaseIndex;
+  //int? currentCaseIndex;
+  ValueNotifier<int?> currentCaseIndex = ValueNotifier<int?>(null);
+
+  @override
+  void dispose() {
+    currentCaseIndex.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final caseProvider = Provider.of<CaseProvider>(context);
@@ -43,10 +51,10 @@ class _CasesViewState extends State<CasesView> {
                   child: PaginatedDataTable(
                     source: CasesDataTableSource(
                       themeData: Theme.of(context),
-                      currentIndex: currentCaseIndex,
+                      currentIndexNotifier: currentCaseIndex,
                       caseModels: caseModels,
                       onPressedRow: (int i) {
-                        setState(() => currentCaseIndex = i);
+                        setState(() => currentCaseIndex.value = i);
                       },
                     ),
                     showCheckboxColumn: false,
@@ -68,12 +76,13 @@ class _CasesViewState extends State<CasesView> {
                 ),
               ),
               // Show detail view if a case is selected.
-              if (currentCaseIndex != null)
+
+              if (currentCaseIndex.value != null)
                 Expanded(
                   flex: 2,
                   child: CaseDetailView(
-                    caseModel: caseModels[currentCaseIndex!],
-                    onClose: () => currentCaseIndex = null,
+                    caseModel: caseModels[currentCaseIndex.value!],
+                    onClose: () => currentCaseIndex.value = null,
                   ),
                 ),
             ],

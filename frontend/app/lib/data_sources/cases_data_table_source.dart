@@ -6,14 +6,15 @@ import "package:flutter/material.dart";
 class CasesDataTableSource extends DataTableSource {
   CasesDataTableSource({
     required this.themeData,
-    required this.currentIndex,
+    required this.currentIndexNotifier,
     required this.caseModels,
     required this.onPressedRow,
   });
   List<CaseModel> caseModels;
   final void Function(int) onPressedRow;
   final ThemeData themeData;
-  int? currentIndex;
+  //int? currentIndex;
+  final ValueNotifier<int?> currentIndexNotifier;
   final Map<CaseStatus, IconData> caseStatusIcons = {
     CaseStatus.open: Icons.cached,
     CaseStatus.closed: Icons.done,
@@ -36,7 +37,7 @@ class CasesDataTableSource extends DataTableSource {
     final caseModel = caseModels[index];
     return DataRow(
       onSelectChanged: (_) => onPressedRow(index),
-      selected: currentIndex == index,
+      selected: currentIndexNotifier.value == index,
       color: MaterialStateProperty.resolveWith<Color?>(
           (Set<MaterialState> states) {
         if (states.contains(MaterialState.selected)) {
