@@ -168,6 +168,7 @@ class DiagnosisProvider with ChangeNotifier {
       caseId,
       picoscopeData,
       filename,
+      // TODO: Add optional parameters.
     );
     final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
@@ -184,7 +185,7 @@ class DiagnosisProvider with ChangeNotifier {
   Future<bool> uploadSymtomData(String caseId, NewSymptomDto symptomDto) async {
     final String authToken = _getAuthToken();
     final Map<String, dynamic> symptomDataJson = symptomDto.toJson();
-    final Response response = await _httpService.uploadSymtomData(
+    final Response response = await _httpService.uploadSymptomData(
       authToken,
       workShopId,
       caseId,

@@ -5,27 +5,11 @@ enum AuthorizedGroup {
   Mechanics,
 }
 
-enum ExceptionType {
-  notFound,
-  unexpectedNullValue,
-  other,
-  unknown,
-}
+enum ExceptionType { notFound, unexpectedNullValue, other, unknown }
 
-enum HostPlatform {
-  web,
-  android,
-  ios,
-  windows,
-  linux,
-  macos,
-}
+enum HostPlatform { web, android, ios, windows, linux, macos }
 
-enum TokenType {
-  jwt,
-  refresh,
-  id,
-}
+enum TokenType { jwt, refresh, id }
 
 enum ConfigKey {
   apiAddress,
@@ -38,11 +22,7 @@ enum ConfigKey {
   proxyDefaultScheme,
 }
 
-enum LocalStorageKey {
-  verifier,
-  redirectUri,
-  refreshToken,
-}
+enum LocalStorageKey { verifier, redirectUri, refreshToken }
 
 enum CaseOccasion {
   unknown,
@@ -52,10 +32,7 @@ enum CaseOccasion {
   problem_defect,
 }
 
-enum CaseStatus {
-  open,
-  closed,
-}
+enum CaseStatus { open, closed }
 
 // Order determines sort order ascending from action required onwards
 enum DiagnosisStatus {
@@ -67,13 +44,8 @@ enum DiagnosisStatus {
   failed,
 }
 
-enum NavigationType {
-  internal,
-  external,
-}
+enum NavigationType { internal, external }
 
-enum SymptomLabel {
-  unknown,
-  ok,
-  defect,
-}
+enum SymptomLabel { unknown, ok, defect }
+
+enum PicoscopeLabel { unknown, norm, anomaly }

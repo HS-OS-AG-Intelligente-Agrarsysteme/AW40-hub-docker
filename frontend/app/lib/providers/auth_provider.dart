@@ -54,8 +54,8 @@ class AuthProvider with ChangeNotifier {
     final jwt = _jwt;
     if (jwt == null) return false;
     List<String> groups = jwt.groups;
-    groups = groups.map((e) => e.toLowerCase()).toList();
     if (groups.isEmpty) return false;
+    groups = groups.map((e) => e.toLowerCase()).toList();
     return AuthorizedGroup.values.any(
       (authGroup) => groups.contains(
         authGroup.name.toLowerCase(),

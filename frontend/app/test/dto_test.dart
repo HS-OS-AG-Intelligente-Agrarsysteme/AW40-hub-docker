@@ -616,17 +616,12 @@ void main() {
     });
   });
   group("NewSymptomDto primary constructor", () {
-    final timestamp = DateTime.utc(2021).toIso8601String();
     const String component = "some_component";
     const SymptomLabel label = SymptomLabel.ok;
     final NewSymptomDto newSymptomDto = NewSymptomDto(
-      timestamp,
       component,
       label,
     );
-    test("correctly assigns timestamp", () {
-      expect(newSymptomDto.timestamp, timestamp);
-    });
     test("correctly assigns component", () {
       expect(newSymptomDto.component, component);
     });
@@ -644,9 +639,6 @@ void main() {
       "label": label.name,
     };
     final NewSymptomDto newSymptomDto = NewSymptomDto.fromJson(json);
-    test("correctly assigns timestamp", () {
-      expect(newSymptomDto.timestamp, timestamp);
-    });
     test("correctly assigns component", () {
       expect(newSymptomDto.component, component);
     });
@@ -655,18 +647,13 @@ void main() {
     });
   });
   group("NewSymptomDto toJson method", () {
-    final timestamp = DateTime.utc(2021).toIso8601String();
     const String component = "some_component";
     const SymptomLabel label = SymptomLabel.ok;
     final NewSymptomDto newSymptomDto = NewSymptomDto(
-      timestamp,
       component,
       label,
     );
     final Map<String, dynamic> json = newSymptomDto.toJson();
-    test("correctly assigns timestamp", () {
-      expect(json["timestamp"], timestamp);
-    });
     test("correctly assigns component", () {
       expect(json["component"], component);
     });
