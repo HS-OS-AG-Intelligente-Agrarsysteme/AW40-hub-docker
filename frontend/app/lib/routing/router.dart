@@ -78,20 +78,12 @@ Map<String, PageBuilder> _basicRoutes = {
       ),
     );
   },
-  kRouteDiagnosisDetails: (RouteData info) {
+  kRouteDiagnosis: (RouteData info) {
     final String? diagnosisId = info.pathParameters["diagnosisId"];
     return MaterialPage<Widget>(
       child: ScaffoldWrapper(
         currentIndex: 1,
         child: DiagnosesScreen(diagnosisId: diagnosisId),
-      ),
-    );
-  },
-  kRouteDiagnosis: (RouteData info) {
-    return const MaterialPage<Widget>(
-      child: ScaffoldWrapper(
-        currentIndex: 1,
-        child: DiagnosesScreen(),
       ),
     );
   },
