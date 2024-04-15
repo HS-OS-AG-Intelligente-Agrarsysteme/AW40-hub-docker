@@ -57,11 +57,11 @@ class _CasesViewState extends State<CasesView> {
               ValueListenableBuilder(
                 valueListenable: currentCaseIndexNotifier,
                 builder: (context, value, child) {
-                  if (currentCaseIndexNotifier.value != null) {
+                  if (value != null) {
                     return Expanded(
                       flex: 2,
                       child: CaseDetailView(
-                        caseModel: caseModels[value!],
+                        caseModel: caseModels[value],
                         onClose: () => currentCaseIndexNotifier.value = null,
                       ),
                     );
