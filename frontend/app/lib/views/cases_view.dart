@@ -19,11 +19,11 @@ class CasesView extends StatefulWidget {
 
 class _CasesViewState extends State<CasesView> {
   //int? currentCaseIndex;
-  ValueNotifier<int?> currentCaseIndex = ValueNotifier<int?>(null);
+  ValueNotifier<int?> currentCaseIndexNotifier = ValueNotifier<int?>(null);
 
   @override
   void dispose() {
-    currentCaseIndex.dispose();
+    currentCaseIndexNotifier.dispose();
     super.dispose();
   }
 
@@ -47,50 +47,77 @@ class _CasesViewState extends State<CasesView> {
             children: [
               Expanded(
                 flex: 3,
-                child: SingleChildScrollView(
-                  child: PaginatedDataTable(
-                    source: CasesDataTableSource(
-                      themeData: Theme.of(context),
-                      currentIndexNotifier: currentCaseIndex,
-                      caseModels: caseModels,
-                      onPressedRow: (int i) {
-                        setState(() => currentCaseIndex.value = i);
-                      },
-                    ),
-                    showCheckboxColumn: false,
-                    rowsPerPage: 50,
-                    columns: [
-                      DataColumn(
-                        label: Text(tr("general.date")),
-                        numeric: true,
-                      ),
-                      DataColumn(label: Text(tr("general.status"))),
-                      DataColumn(label: Text(tr("general.customer"))),
-                      DataColumn(label: Text("${tr('general.vehicle')} VIN")),
-                      DataColumn(
-                        label: Text(tr("general.workshop")),
-                        numeric: true,
-                      ),
-                    ],
-                  ),
+                child: CasesTable(
+                  caseIndexNotifier: currentCaseIndexNotifier,
+                  caseModel: caseModels,
                 ),
               ),
-              // Show detail view if a case is selected.
 
-              if (currentCaseIndex.value != null)
-                Expanded(
-                  flex: 2,
-                  child: CaseDetailView(
-                    caseModel: caseModels[currentCaseIndex.value!],
-                    onClose: () => currentCaseIndex.value = null,
-                  ),
-                ),
+              // Show detail view if a case is selected.
+              ValueListenableBuilder(
+                valueListenable: currentCaseIndexNotifier,
+                builder: (context, value, child) {
+                  if (currentCaseIndexNotifier.value != null) {
+                    return Expanded(
+                      flex: 2,
+                      child: CaseDetailView(
+                        caseModel: caseModels[value!],
+                        onClose: () => currentCaseIndexNotifier.value = null,
+                      ),
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                },
+              )
             ],
           );
         } else {
           return const Center(child: CircularProgressIndicator());
         }
       },
+    );
+  }
+}
+
+class CasesTable extends StatelessWidget {
+  const CasesTable({
+    required this.caseModel,
+    required this.caseIndexNotifier,
+    super.key,
+  });
+
+  final List<CaseModel> caseModel;
+  final ValueNotifier<int?> caseIndexNotifier;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: PaginatedDataTable(
+        source: CasesDataTableSource(
+          themeData: Theme.of(context),
+          currentIndexNotifier: caseIndexNotifier,
+          caseModels: caseModel,
+          onPressedRow: (int i) {
+            caseIndexNotifier.value = i;
+          },
+        ),
+        showCheckboxColumn: false,
+        rowsPerPage: 50,
+        columns: [
+          DataColumn(
+            label: Text(tr("general.date")),
+            numeric: true,
+          ),
+          DataColumn(label: Text(tr("general.status"))),
+          DataColumn(label: Text(tr("general.customer"))),
+          DataColumn(label: Text("${tr('general.vehicle')} VIN")),
+          DataColumn(
+            label: Text(tr("general.workshop")),
+            numeric: true,
+          ),
+        ],
+      ),
     );
   }
 }
