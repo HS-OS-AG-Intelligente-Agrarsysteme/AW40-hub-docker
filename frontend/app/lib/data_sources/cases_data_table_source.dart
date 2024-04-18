@@ -13,7 +13,6 @@ class CasesDataTableSource extends DataTableSource {
   List<CaseModel> caseModels;
   final void Function(int) onPressedRow;
   final ThemeData themeData;
-  //int? currentIndex;
   final ValueNotifier<int?> currentIndexNotifier;
   final Map<CaseStatus, IconData> caseStatusIcons = {
     CaseStatus.open: Icons.cached,
