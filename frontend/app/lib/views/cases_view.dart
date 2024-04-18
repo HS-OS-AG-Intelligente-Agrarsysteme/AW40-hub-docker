@@ -33,7 +33,7 @@ class _CasesViewState extends State<CasesView> {
       // ignore: discarded_futures
       future: caseProvider.getCurrentCases(),
       builder: (BuildContext context, AsyncSnapshot<List<CaseModel>> snapshot) {
-        if (snapshot.connectionState != ConnectionState.done &&
+        if (snapshot.connectionState != ConnectionState.done ||
             !snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
