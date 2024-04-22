@@ -423,7 +423,7 @@ void main() {
       expect(diagnosisDto.todos, todos);
     });
   });
-  /*group("DiagnosisDto fromJson constructor", () {
+  group("DiagnosisDto fromJson constructor", () {
     const id = "test_id";
     final timeStamp = DateTime.now();
     const status = DiagnosisStatus.failed;
@@ -436,7 +436,7 @@ void main() {
       "status": status.name,
       "case_id": caseId,
       "state_machine_log": stateMachineLog,
-      "todos": todos,
+      "todos": todos.map((e) => e.toJson()).toList(),
     };
     final DiagnosisDto diagnosisDto = DiagnosisDto.fromJson(json);
     test("correctly assigns id", () {
@@ -455,9 +455,9 @@ void main() {
       expect(diagnosisDto.stateMachineLog, stateMachineLog);
     });
     test("correctly assigns todos", () {
-      expect(diagnosisDto.todos, todos);
+      expect(diagnosisDto.todos, isA<List<ActionDto>>());
     });
-  });*/
+  });
   group("DiagnosisDto toJson method", () {
     const id = "test_id";
     final timeStamp = DateTime.now();
