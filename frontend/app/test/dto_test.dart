@@ -826,4 +826,116 @@ void main() {
       expect(actionModel.component, component);
     });
   });
+
+  //Test ObdData
+  group("ObdDataDto fromJson constructor", () {
+    //const String id = "some_id";
+
+    final Map<String, dynamic> json = <String, dynamic>{
+      //"id": id,
+    };
+    final ObdDataDto obdDataDto = ObdDataDto.fromJson(json);
+    test("correctly assigns id", () {
+      expect(obdDataDto.id, id);
+    });
+  });
+  group("ObdDataDto toJson method", () {
+    //const String id = "some_id";
+
+    final ObdDataDto obdDataDto = obdDataDto(
+        //id,
+
+        );
+    final Map<String, dynamic> json = obdDataDto.toJson();
+    test("correctly assigns id", () {
+      expect(json["id"], id);
+    });
+  });
+  group("ObdDataDto toModel method", () {
+    //const String id = "some_id";
+
+    final ObdDataDto actionDto = ObdDataDto(
+        //id,
+
+        );
+    final ObdDataDto obdDataDto = obdDataDto.toModel();
+    test("correctly assigns id", () {
+      expect(obdDataDto.id, id);
+    });
+  });
+
+  //Test Timeseries
+  group("TimeseriesDataDto fromJson constructor", () {
+    //const String id = "some_id";
+
+    final Map<String, dynamic> json = <String, dynamic>{
+      //"id": id,
+    };
+    final TimeseriesDataDto timeseriesDataDto =
+        TimeseriesDataDto.fromJson(json);
+    test("correctly assigns id", () {
+      expect(obdDataDto.id, id);
+    });
+  });
+  group("ObdDataDto toJson method", () {
+    //const String id = "some_id";
+
+    final TimeseriesDataDto timeseriesDataDto = TimeseriesDataDto(
+        //id,
+
+        );
+    final Map<String, dynamic> json = timeseriesDataDto.toJson();
+    test("correctly assigns id", () {
+      expect(json["id"], id);
+    });
+  });
+  group("TimeseriesDataDto toModel method", () {
+    //const String id = "some_id";
+
+    final TimeseriesDataDto timeseriesDataDto = TimeseriesDataDto(
+        //id,
+
+        );
+    final TimeseriesDataDto timeseriesDataDto = timeseriesDataDto.toModel();
+    test("correctly assigns id", () {
+      expect(timeseriesDataDto.id, id);
+    });
+  });
+
+  //Test Symptoms
+  group("SymptomsDto fromJson constructor", () {
+    //const String id = "some_id";
+
+    final Map<String, dynamic> json = <String, dynamic>{
+      //"id": id,
+    };
+    final SymptomsDto symptomsDto = SymptomsDto.fromJson(json);
+    test("correctly assigns id", () {
+      expect(symptomsDto.id, id);
+    });
+  });
+  group("ObdDataDto toJson method", () {
+    //const String id = "some_id";
+
+    final SymptomsDto symptomsDto = SymptomsDto(
+        //id,
+
+        );
+    final Map<String, dynamic> json = symptomsDto.toJson();
+    test("correctly assigns id", () {
+      expect(json["id"], id);
+    });
+  });
+  group("SymptomsDto toModel method", () {
+    //const String id = "some_id";
+
+    final SymptomsDto symptomsDto = SymptomsDto(
+        //id,
+
+        );
+    final SymptomsDto symptomsDto = symptomsDto.toModel();
+    test("correctly assigns id", () {
+      expect(symptomsDto.id, id);
+    });
+  });
 }

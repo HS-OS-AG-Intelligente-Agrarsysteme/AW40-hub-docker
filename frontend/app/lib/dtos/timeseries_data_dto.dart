@@ -1,6 +1,4 @@
-import "package:aw40_hub_frontend/dtos/action_dto.dart";
-import "package:aw40_hub_frontend/models/diagnosis_model.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/models/timeseries_data_model.dart";
 import "package:json_annotation/json_annotation.dart";
 
 part "timeseries_data_dto.g.dart";
@@ -8,37 +6,40 @@ part "timeseries_data_dto.g.dart";
 @JsonSerializable()
 class TimeseriesDataDto {
   TimeseriesDataDto(
-    this.id,
     this.timestamp,
-    this.status,
-    this.caseId,
-    this.stateMachineLog,
-    this.todos,
+    this.component,
+    this.label,
+    this.sampling_rate,
+    this.duration,
+    this.type,
+    this.data_id,
+    this.signal_id,
   );
 
-  factory DiagnosisDto.fromJson(Map<String, dynamic> json) {
+  factory TimeseriesDataDto.fromJson(Map<String, dynamic> json) {
     return _$TimeseriesDataDtoFromJson(json);
   }
   Map<String, dynamic> toJson() => _$TimeseriesDataDtoToJson(this);
 
   TimeseriesDataModel toModel() {
     return TimeseriesDataModel(
-      id: id,
       timestamp: timestamp,
-      status: status,
-      stateMachineLog: stateMachineLog,
-      todos: todos.map((e) => e.toModel()).toList(),
-      caseId: caseId,
+      component: component,
+      label: label,
+      sampling_rate: sampling_rate,
+      duration: duration,
+      type: type,
+      data_id: data_id,
+      signal_id: signal_id,
     );
   }
 
-  @JsonKey(name: "_id")
-  String id;
   DateTime timestamp;
-  DiagnosisStatus status;
-  @JsonKey(name: "case_id")
-  String caseId;
-  @JsonKey(name: "state_machine_log")
-  List<dynamic> stateMachineLog;
-  List<ActionDto> todos;
+  String component;
+  String label;
+  int sampling_rate;
+  int duration;
+  String type;
+  int data_id;
+  String signal_id;
 }

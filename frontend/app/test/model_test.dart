@@ -368,4 +368,57 @@ void main() {
       expect(actionModel.component, component);
     });
   });
+
+  //Test ObdData
+  group("ObdDataModel", () {
+    //const String id = "some_id";
+
+    final obdDataModel = ObdDataModel();
+
+    test(" ", () {
+      expect(obdDataModel.id, id);
+    });
+  });
+
+  //Test Timeseries)
+  group("TimeseriesDataModel", () {
+    //const String id = "some_id";
+
+    final timeseriesDataModel = TimeseriesDataModel();
+
+    test(" ", () {
+      expect(timeseriesDataModel.id, id);
+    });
+  });
+
+  group("TimeseriesDataModel", () {
+    //const String id = "some_id";
+
+    final timeseriesDataModel = TimeseriesDataModel();
+
+    test(" ", () {
+      expect(timeseriesDataModel.id, id);
+    });
+  });
+
+  //Test Symptoms)
+  group("SymptomsModel", () {
+    //const String id = "some_id";
+
+    final symptomsModel = SymptomsModel();
+
+    test(" ", () {
+      expect(symptomsModel.id, id);
+    });
+  });
+
+  group("SymptomsModel", () {
+    //const String id = "some_id";
+
+    final symptomsModel = SymptomsModel();
+
+    test(" ", () {
+      expect(symptomsModel.id, id);
+    });
+  });
 }
