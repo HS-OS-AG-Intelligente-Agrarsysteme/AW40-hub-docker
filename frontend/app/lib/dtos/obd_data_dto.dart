@@ -1,0 +1,44 @@
+import "package:aw40_hub_frontend/dtos/action_dto.dart";
+import "package:aw40_hub_frontend/models/diagnosis_model.dart";
+import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:json_annotation/json_annotation.dart";
+
+part "obd_data_dto.g.dart";
+
+@JsonSerializable()
+class DiagnosisDto {
+  DiagnosisDto(
+    this.id,
+    this.timestamp,
+    this.status,
+    this.caseId,
+    this.stateMachineLog,
+    this.todos,
+  );
+
+  factory DiagnosisDto.fromJson(Map<String, dynamic> json) {
+    return _$ObdDataDtoFromJson(json);
+  }
+  Map<String, dynamic> toJson() => _$ObdDataDtoToJson(this);
+
+  ObdDataModel toModel() {
+    return ObdDataModel(
+      id: id,
+      timestamp: timestamp,
+      status: status,
+      stateMachineLog: stateMachineLog,
+      todos: todos.map((e) => e.toModel()).toList(),
+      caseId: caseId,
+    );
+  }
+
+  @JsonKey(name: "_id")
+  String id;
+  DateTime timestamp;
+  DiagnosisStatus status;
+  @JsonKey(name: "case_id")
+  String caseId;
+  @JsonKey(name: "state_machine_log")
+  List<dynamic> stateMachineLog;
+  List<ActionDto> todos;
+}
