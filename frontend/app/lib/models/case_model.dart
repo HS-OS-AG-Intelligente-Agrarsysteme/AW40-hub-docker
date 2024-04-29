@@ -1,3 +1,6 @@
+import "package:aw40_hub_frontend/models/obd_data_model.dart";
+import "package:aw40_hub_frontend/models/symptom_model.dart";
+import "package:aw40_hub_frontend/models/timeseries_data_model.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 
 class CaseModel {
@@ -25,7 +28,7 @@ class CaseModel {
   String vehicleVin;
   String workshopId;
   String? diagnosisId;
-  List<dynamic> timeseriesData;
-  List<dynamic> obdData;
-  List<dynamic> symptoms;
+  List<TimeseriesDataModel> timeseriesData;
+  List<ObdDataModel> obdData;
+  List<SymptomModel> symptoms;
 }

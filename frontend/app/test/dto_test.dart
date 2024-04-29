@@ -254,9 +254,34 @@ void main() {
     const vehicleVin = "12345678901234567";
     const workshopId = "some_workshop_id";
     const diagnosisId = "some_diagnosis_id";
-    const timeseriesData = <dynamic>[1, 2, 3];
-    const obdData = <dynamic>["a", 5, false];
-    const symptoms = <dynamic>[true, false];
+    final timeseriesData = <TimeseriesDataDto>[
+      TimeseriesDataDto(
+        DateTime.utc(2021).toIso8601String(),
+        "some_component",
+        TimeseriesDataLabel.norm,
+        1,
+        3,
+        "some_type",
+        2,
+        <int>[1],
+      )
+    ];
+    final obdData = <ObdDataDto>[
+      ObdDataDto(
+        DateTime.utc(2021).toIso8601String(),
+        <dynamic>[1, 2, 3],
+        <String>["some_component"],
+        0,
+      )
+    ];
+    final symptoms = <SymptomDto>[
+      SymptomDto(
+        DateTime.utc(2021).toIso8601String(),
+        component,
+        label,
+        dataId,
+      )
+    ];
     const timeseriesDataAdded = 8;
     const obdDataAdded = 5;
     const symptomsAdded = 9;
@@ -913,7 +938,7 @@ void main() {
     const int duration = 3;
     const String type = "some_type";
     const int dataId = 5;
-    const String signalId = "some_signalId";
+    const signal = <int>[1];
     final Map<String, dynamic> json = <String, dynamic>{
       "timestamp": timestamp.toIso8601String(),
       "component": component,
@@ -922,7 +947,7 @@ void main() {
       "duration": duration,
       "type": type,
       "dataId": dataId,
-      "signalId": signalId,
+      "signalId": signal,
     };
     final TimeseriesDataDto timeseriesDataDto =
         TimeseriesDataDto.fromJson(json);
@@ -947,8 +972,8 @@ void main() {
     test("correctly assigns dataId", () {
       expect(timeseriesDataDto.dataId, dataId);
     });
-    test("correctly assigns signalId", () {
-      expect(timeseriesDataDto.signalId, signalId);
+    test("correctly assigns signal", () {
+      expect(timeseriesDataDto.signal, signal);
     });
   });
   group("TimeseriesDataDto toJson method", () {
@@ -959,7 +984,7 @@ void main() {
     const int duration = 3;
     const String type = "some_type";
     const int dataId = 5;
-    const String signalId = "some_signalId";
+    const signal = <int>[1];
     final TimeseriesDataDto timeseriesDataDto = TimeseriesDataDto(
       timestamp,
       component,
@@ -968,7 +993,7 @@ void main() {
       duration,
       type,
       dataId,
-      signalId,
+      signal,
     );
     final Map<String, dynamic> json = timeseriesDataDto.toJson();
     test("correctly assigns timestamp", () {
@@ -993,7 +1018,7 @@ void main() {
       expect(json["dataId"], dataId);
     });
     test("correctly assigns signalId", () {
-      expect(json["signalId"], signalId);
+      expect(json["signal"], signal);
     });
   });
 
@@ -1005,7 +1030,7 @@ void main() {
     const int duration = 3;
     const String type = "some_type";
     const int dataId = 5;
-    const String signalId = "some_signalId";
+    const signal = <int>[1];
     final TimeseriesDataDto timeseriesDataDto = TimeseriesDataDto(
       timestamp,
       component,
@@ -1014,7 +1039,7 @@ void main() {
       duration,
       type,
       dataId,
-      signalId,
+      signal,
     );
     final TimeseriesDataModel timeseriesDataModel = timeseriesDataDto.toModel();
     test("correctly assigns timestamp", () {
@@ -1039,7 +1064,7 @@ void main() {
       expect(timeseriesDataModel.dataId, dataId);
     });
     test("correctly assigns signalId", () {
-      expect(timeseriesDataModel.signalId, signalId);
+      expect(timeseriesDataModel.signal, signal);
     });
   });
 
