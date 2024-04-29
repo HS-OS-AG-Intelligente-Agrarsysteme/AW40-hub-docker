@@ -12,9 +12,9 @@ class ObdDataDto {
     this.dataId,
   );
 
-  factory ObdDataDto.fromJson(Map<String, dynamic> json) {
-    return _$ObdDataDtoFromJson(json);
-  }
+  factory ObdDataDto.fromJson(Map<String, dynamic> json) =>
+      _$ObdDataDtoFromJson(json);
+
   Map<String, dynamic> toJson() => _$ObdDataDtoToJson(this);
 
   ObdDataModel toModel() {
@@ -26,8 +26,8 @@ class ObdDataDto {
     );
   }
 
-  DateTime timestamp;
+  DateTime? timestamp;
   List<dynamic>? obdSpecs;
-  List<String>? dtcs; //Length 5
-  int dataId;
+  List<String> dtcs;
+  int? dataId;
 }

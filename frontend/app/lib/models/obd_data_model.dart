@@ -6,8 +6,8 @@ class ObdDataModel {
     required this.dataId,
   });
 
-  DateTime timestamp;
+  DateTime? timestamp;
   List<dynamic>? obdSpecs;
-  List<String>? dtcs; //Length 5
-  int dataId;
+  List<String> dtcs;
+  int? dataId;
 }

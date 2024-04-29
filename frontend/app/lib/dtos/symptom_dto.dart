@@ -13,9 +13,9 @@ class SymptomDto {
     this.dataId,
   );
 
-  factory SymptomDto.fromJson(Map<String, dynamic> json) {
-    return _$SymptomDtoFromJson(json);
-  }
+  factory SymptomDto.fromJson(Map<String, dynamic> json) =>
+      _$SymptomDtoFromJson(json);
+
   Map<String, dynamic> toJson() => _$SymptomDtoToJson(this);
 
   SymptomModel toModel() {
@@ -27,8 +27,8 @@ class SymptomDto {
     );
   }
 
-  DateTime timestamp;
+  DateTime? timestamp;
   String component;
   SymptomLabel label;
-  int dataId;
+  int? dataId;
 }

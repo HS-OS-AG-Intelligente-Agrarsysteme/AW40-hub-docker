@@ -8,8 +8,8 @@ class SymptomModel {
     required this.dataId,
   });
 
-  DateTime timestamp;
+  DateTime? timestamp;
   String component;
   SymptomLabel label;
-  int dataId;
+  int? dataId;
 }

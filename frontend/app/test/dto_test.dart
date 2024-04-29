@@ -915,7 +915,7 @@ void main() {
     const int dataId = 5;
     const String signalId = "some_signalId";
     final Map<String, dynamic> json = <String, dynamic>{
-      "timestamp": timestamp,
+      "timestamp": timestamp.toIso8601String(),
       "component": component,
       "label": label,
       "samplingRate": samplingRate,
@@ -1050,7 +1050,7 @@ void main() {
     const SymptomLabel label = SymptomLabel.unknown;
     const int dataId = 2;
     final Map<String, dynamic> json = <String, dynamic>{
-      "timestamp": timestamp,
+      "timestamp": timestamp.toIso8601String(),
       "component": component,
       "label": label,
       "dataId": dataId,

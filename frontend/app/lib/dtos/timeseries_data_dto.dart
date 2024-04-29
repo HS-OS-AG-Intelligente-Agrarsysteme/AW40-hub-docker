@@ -35,12 +35,12 @@ class TimeseriesDataDto {
     );
   }
 
-  DateTime timestamp;
+  DateTime? timestamp;
   String component;
   TimeseriesDataLabel label;
   int samplingRate;
   int duration;
-  String type;
-  int dataId;
+  String? type;
+  int? dataId;
   String signalId;
 }
