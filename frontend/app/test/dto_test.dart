@@ -834,7 +834,7 @@ void main() {
     final dtcs = <String>["some_component"];
     const int dataId = 0;
     final Map<String, dynamic> json = <String, dynamic>{
-      "timestamp": timestamp,
+      "timestamp": timestamp.toIso8601String(),
       "obdSpecs": obdSpecs,
       "dtcs": dtcs,
       "dataId": dataId,
@@ -866,7 +866,7 @@ void main() {
     );
     final Map<String, dynamic> json = obdDataDto.toJson();
     test("correctly assigns timestamp", () {
-      expect(json["timestamp"], timestamp);
+      expect(json["timestamp"], timestamp.toIso8601String());
     });
     test("correctly assigns obdSpecs", () {
       expect(json["obdSpecs"], obdSpecs);
@@ -917,7 +917,7 @@ void main() {
     final Map<String, dynamic> json = <String, dynamic>{
       "timestamp": timestamp.toIso8601String(),
       "component": component,
-      "label": label,
+      "label": label.name,
       "samplingRate": samplingRate,
       "duration": duration,
       "type": type,
@@ -951,7 +951,7 @@ void main() {
       expect(timeseriesDataDto.signalId, signalId);
     });
   });
-  group("ObdDataDto toJson method", () {
+  group("TimeseriesDataDto toJson method", () {
     final timestamp = DateTime.now();
     const String component = "some_component";
     const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
@@ -972,13 +972,13 @@ void main() {
     );
     final Map<String, dynamic> json = timeseriesDataDto.toJson();
     test("correctly assigns timestamp", () {
-      expect(json["timestamp"], timestamp);
+      expect(json["timestamp"], timestamp.toIso8601String());
     });
     test("correctly assigns component", () {
       expect(json["component"], component);
     });
     test("correctly assigns label", () {
-      expect(json["label"], label);
+      expect(json["label"], label.name);
     });
     test("correctly assigns samplingRate", () {
       expect(json["samplingRate"], samplingRate);
@@ -1052,7 +1052,7 @@ void main() {
     final Map<String, dynamic> json = <String, dynamic>{
       "timestamp": timestamp.toIso8601String(),
       "component": component,
-      "label": label,
+      "label": label.name,
       "dataId": dataId,
     };
     final SymptomDto symptomDto = SymptomDto.fromJson(json);
@@ -1069,7 +1069,7 @@ void main() {
       expect(symptomDto.dataId, dataId);
     });
   });
-  group("ObdDataDto toJson method", () {
+  group("SymptomDto toJson method", () {
     final timestamp = DateTime.now();
     const String component = "some_component";
     const SymptomLabel label = SymptomLabel.unknown;
@@ -1082,13 +1082,13 @@ void main() {
     );
     final Map<String, dynamic> json = symptomDto.toJson();
     test("correctly assigns timestamp", () {
-      expect(json["timestamp"], timestamp);
+      expect(json["timestamp"], timestamp.toIso8601String());
     });
     test("correctly assigns component", () {
       expect(json["component"], component);
     });
     test("correctly assigns label", () {
-      expect(json["label"], label);
+      expect(json["label"], label.name);
     });
     test("correctly assigns dataId", () {
       expect(json["dataId"], dataId);
