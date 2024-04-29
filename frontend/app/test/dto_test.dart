@@ -1,6 +1,9 @@
 import "package:aw40_hub_frontend/dtos/action_dto.dart";
 import "package:aw40_hub_frontend/dtos/dtos.dart";
 import "package:aw40_hub_frontend/models/models.dart";
+import "package:aw40_hub_frontend/models/obd_data_model.dart";
+import "package:aw40_hub_frontend/models/symptom_model.dart";
+import "package:aw40_hub_frontend/models/timeseries_data_model.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:flutter_test/flutter_test.dart";
 
@@ -829,113 +832,294 @@ void main() {
 
   //Test ObdData
   group("ObdDataDto fromJson constructor", () {
-    //const String id = "some_id";
-
+    final timestamp = DateTime.now();
+    final obdSpecs = <dynamic>[1, 2, 3];
+    final dtcs = <String>["some_component"];
+    const int dataId = 0;
     final Map<String, dynamic> json = <String, dynamic>{
-      //"id": id,
+      "timestamp": timestamp,
+      "obdSpecs": obdSpecs,
+      "dtcs": dtcs,
+      "dataId": dataId,
     };
     final ObdDataDto obdDataDto = ObdDataDto.fromJson(json);
-    test("correctly assigns id", () {
-      expect(obdDataDto.id, id);
+    test("correctly assigns timestamp", () {
+      expect(obdDataDto.timestamp, timestamp);
+    });
+    test("correctly assigns obdSpecs", () {
+      expect(obdDataDto.obdSpecs, obdSpecs);
+    });
+    test("correctly assigns dtcs", () {
+      expect(obdDataDto.dtcs, dtcs);
+    });
+    test("correctly assigns dataId", () {
+      expect(obdDataDto.dataId, dataId);
     });
   });
   group("ObdDataDto toJson method", () {
-    //const String id = "some_id";
-
-    final ObdDataDto obdDataDto = obdDataDto(
-        //id,
-
-        );
+    final timestamp = DateTime.now();
+    final obdSpecs = <dynamic>[1, 2, 3];
+    final dtcs = <String>["some_component"];
+    const int dataId = 0;
+    final ObdDataDto obdDataDto = ObdDataDto(
+      timestamp,
+      obdSpecs,
+      dtcs,
+      dataId,
+    );
     final Map<String, dynamic> json = obdDataDto.toJson();
-    test("correctly assigns id", () {
-      expect(json["id"], id);
+    test("correctly assigns timestamp", () {
+      expect(json["timestamp"], timestamp);
+    });
+    test("correctly assigns obdSpecs", () {
+      expect(json["obdSpecs"], obdSpecs);
+    });
+    test("correctly assigns dtcs", () {
+      expect(json["dtcs"], dtcs);
+    });
+    test("correctly assigns dataId", () {
+      expect(json["dataId"], dataId);
     });
   });
   group("ObdDataDto toModel method", () {
-    //const String id = "some_id";
-
-    final ObdDataDto actionDto = ObdDataDto(
-        //id,
-
-        );
-    final ObdDataDto obdDataDto = obdDataDto.toModel();
-    test("correctly assigns id", () {
-      expect(obdDataDto.id, id);
+    final timestamp = DateTime.now();
+    final obdSpecs = <dynamic>[1, 2, 3];
+    final dtcs = <String>["some_component"];
+    const int dataId = 0;
+    final ObdDataDto obdDataDto = ObdDataDto(
+      timestamp,
+      obdSpecs,
+      dtcs,
+      dataId,
+    );
+    final ObdDataModel obdDataModel = obdDataDto.toModel();
+    test("correctly assigns timestamp", () {
+      expect(obdDataModel.timestamp, timestamp);
+    });
+    test("correctly assigns obdSpecs", () {
+      expect(obdDataModel.obdSpecs, obdSpecs);
+    });
+    test("correctly assigns dtcs", () {
+      expect(obdDataModel.dtcs, dtcs);
+    });
+    test("correctly assigns dataId", () {
+      expect(obdDataModel.dataId, dataId);
     });
   });
 
   //Test Timeseries
   group("TimeseriesDataDto fromJson constructor", () {
-    //const String id = "some_id";
-
+    final timestamp = DateTime.now();
+    const String component = "some_component";
+    const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
+    const int samplingRate = 1;
+    const int duration = 3;
+    const String type = "some_type";
+    const int dataId = 5;
+    const String signalId = "some_signalId";
     final Map<String, dynamic> json = <String, dynamic>{
-      //"id": id,
+      "timestamp": timestamp,
+      "component": component,
+      "label": label,
+      "samplingRate": samplingRate,
+      "duration": duration,
+      "type": type,
+      "dataId": dataId,
+      "signalId": signalId,
     };
     final TimeseriesDataDto timeseriesDataDto =
         TimeseriesDataDto.fromJson(json);
-    test("correctly assigns id", () {
-      expect(obdDataDto.id, id);
+    test("correctly assigns timestamp", () {
+      expect(timeseriesDataDto.timestamp, timestamp);
+    });
+    test("correctly assigns component", () {
+      expect(timeseriesDataDto.component, component);
+    });
+    test("correctly assigns label", () {
+      expect(timeseriesDataDto.label, label);
+    });
+    test("correctly assigns samplingRate", () {
+      expect(timeseriesDataDto.samplingRate, samplingRate);
+    });
+    test("correctly assigns duration", () {
+      expect(timeseriesDataDto.duration, duration);
+    });
+    test("correctly assigns type", () {
+      expect(timeseriesDataDto.type, type);
+    });
+    test("correctly assigns dataId", () {
+      expect(timeseriesDataDto.dataId, dataId);
+    });
+    test("correctly assigns signalId", () {
+      expect(timeseriesDataDto.signalId, signalId);
     });
   });
   group("ObdDataDto toJson method", () {
-    //const String id = "some_id";
-
+    final timestamp = DateTime.now();
+    const String component = "some_component";
+    const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
+    const int samplingRate = 1;
+    const int duration = 3;
+    const String type = "some_type";
+    const int dataId = 5;
+    const String signalId = "some_signalId";
     final TimeseriesDataDto timeseriesDataDto = TimeseriesDataDto(
-        //id,
-
-        );
+      timestamp,
+      component,
+      label,
+      samplingRate,
+      duration,
+      type,
+      dataId,
+      signalId,
+    );
     final Map<String, dynamic> json = timeseriesDataDto.toJson();
-    test("correctly assigns id", () {
-      expect(json["id"], id);
+    test("correctly assigns timestamp", () {
+      expect(json["timestamp"], timestamp);
+    });
+    test("correctly assigns component", () {
+      expect(json["component"], component);
+    });
+    test("correctly assigns label", () {
+      expect(json["label"], label);
+    });
+    test("correctly assigns samplingRate", () {
+      expect(json["samplingRate"], samplingRate);
+    });
+    test("correctly assigns duration", () {
+      expect(json["duration"], duration);
+    });
+    test("correctly assigns type", () {
+      expect(json["type"], type);
+    });
+    test("correctly assigns dataId", () {
+      expect(json["dataId"], dataId);
+    });
+    test("correctly assigns signalId", () {
+      expect(json["signalId"], signalId);
     });
   });
+
   group("TimeseriesDataDto toModel method", () {
-    //const String id = "some_id";
-
+    final timestamp = DateTime.now();
+    const String component = "some_component";
+    const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
+    const int samplingRate = 1;
+    const int duration = 3;
+    const String type = "some_type";
+    const int dataId = 5;
+    const String signalId = "some_signalId";
     final TimeseriesDataDto timeseriesDataDto = TimeseriesDataDto(
-        //id,
-
-        );
-    final TimeseriesDataDto timeseriesDataDto = timeseriesDataDto.toModel();
-    test("correctly assigns id", () {
-      expect(timeseriesDataDto.id, id);
+      timestamp,
+      component,
+      label,
+      samplingRate,
+      duration,
+      type,
+      dataId,
+      signalId,
+    );
+    final TimeseriesDataModel timeseriesDataModel = timeseriesDataDto.toModel();
+    test("correctly assigns timestamp", () {
+      expect(timeseriesDataModel.timestamp, timestamp);
+    });
+    test("correctly assigns component", () {
+      expect(timeseriesDataModel.component, component);
+    });
+    test("correctly assigns label", () {
+      expect(timeseriesDataModel.label, label);
+    });
+    test("correctly assigns samplingRate", () {
+      expect(timeseriesDataModel.samplingRate, samplingRate);
+    });
+    test("correctly assigns duration", () {
+      expect(timeseriesDataModel.duration, duration);
+    });
+    test("correctly assigns type", () {
+      expect(timeseriesDataModel.type, type);
+    });
+    test("correctly assigns dataId", () {
+      expect(timeseriesDataModel.dataId, dataId);
+    });
+    test("correctly assigns signalId", () {
+      expect(timeseriesDataModel.signalId, signalId);
     });
   });
 
   //Test Symptoms
-  group("SymptomsDto fromJson constructor", () {
-    //const String id = "some_id";
-
+  group("SymptomDto fromJson constructor", () {
+    final timestamp = DateTime.now();
+    const String component = "some_component";
+    const SymptomLabel label = SymptomLabel.unknown;
+    const int dataId = 2;
     final Map<String, dynamic> json = <String, dynamic>{
-      //"id": id,
+      "timestamp": timestamp,
+      "component": component,
+      "label": label,
+      "dataId": dataId,
     };
-    final SymptomsDto symptomsDto = SymptomsDto.fromJson(json);
-    test("correctly assigns id", () {
-      expect(symptomsDto.id, id);
+    final SymptomDto symptomDto = SymptomDto.fromJson(json);
+    test("correctly assigns timestamp", () {
+      expect(symptomDto.timestamp, timestamp);
+    });
+    test("correctly assigns component", () {
+      expect(symptomDto.component, component);
+    });
+    test("correctly assigns label", () {
+      expect(symptomDto.label, label);
+    });
+    test("correctly assigns dataId", () {
+      expect(symptomDto.dataId, dataId);
     });
   });
   group("ObdDataDto toJson method", () {
-    //const String id = "some_id";
-
-    final SymptomsDto symptomsDto = SymptomsDto(
-        //id,
-
-        );
-    final Map<String, dynamic> json = symptomsDto.toJson();
-    test("correctly assigns id", () {
-      expect(json["id"], id);
+    final timestamp = DateTime.now();
+    const String component = "some_component";
+    const SymptomLabel label = SymptomLabel.unknown;
+    const int dataId = 2;
+    final SymptomDto symptomDto = SymptomDto(
+      timestamp,
+      component,
+      label,
+      dataId,
+    );
+    final Map<String, dynamic> json = symptomDto.toJson();
+    test("correctly assigns timestamp", () {
+      expect(json["timestamp"], timestamp);
+    });
+    test("correctly assigns component", () {
+      expect(json["component"], component);
+    });
+    test("correctly assigns label", () {
+      expect(json["label"], label);
+    });
+    test("correctly assigns dataId", () {
+      expect(json["dataId"], dataId);
     });
   });
-  group("SymptomsDto toModel method", () {
-    //const String id = "some_id";
-
-    final SymptomsDto symptomsDto = SymptomsDto(
-        //id,
-
-        );
-    final SymptomsDto symptomsDto = symptomsDto.toModel();
-    test("correctly assigns id", () {
-      expect(symptomsDto.id, id);
+  group("SymptomDto toModel method", () {
+    final timestamp = DateTime.now();
+    const String component = "some_component";
+    const SymptomLabel label = SymptomLabel.unknown;
+    const int dataId = 2;
+    final SymptomDto symptomDto = SymptomDto(
+      timestamp,
+      component,
+      label,
+      dataId,
+    );
+    final SymptomModel symptomModel = symptomDto.toModel();
+    test("correctly assigns timestamp", () {
+      expect(symptomModel.timestamp, timestamp);
+    });
+    test("correctly assigns component", () {
+      expect(symptomModel.component, component);
+    });
+    test("correctly assigns label", () {
+      expect(symptomModel.label, label);
+    });
+    test("correctly assigns dataId", () {
+      expect(symptomModel.dataId, dataId);
     });
   });
 }
