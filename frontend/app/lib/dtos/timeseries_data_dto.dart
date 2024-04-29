@@ -1,4 +1,5 @@
 import "package:aw40_hub_frontend/models/timeseries_data_model.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:json_annotation/json_annotation.dart";
 
 part "timeseries_data_dto.g.dart";
@@ -9,11 +10,11 @@ class TimeseriesDataDto {
     this.timestamp,
     this.component,
     this.label,
-    this.sampling_rate,
+    this.samplingRate,
     this.duration,
     this.type,
-    this.data_id,
-    this.signal_id,
+    this.dataId,
+    this.signalId,
   );
 
   factory TimeseriesDataDto.fromJson(Map<String, dynamic> json) {
@@ -26,20 +27,20 @@ class TimeseriesDataDto {
       timestamp: timestamp,
       component: component,
       label: label,
-      sampling_rate: sampling_rate,
+      samplingRate: samplingRate,
       duration: duration,
       type: type,
-      data_id: data_id,
-      signal_id: signal_id,
+      dataId: dataId,
+      signalId: signalId,
     );
   }
 
   DateTime timestamp;
   String component;
-  String label;
-  int sampling_rate;
+  TimeseriesDataLabel label;
+  int samplingRate;
   int duration;
   String type;
-  int data_id;
-  String signal_id;
+  int dataId;
+  String signalId;
 }

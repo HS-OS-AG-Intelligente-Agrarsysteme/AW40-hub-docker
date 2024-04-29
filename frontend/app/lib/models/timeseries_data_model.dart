@@ -5,19 +5,19 @@ class TimeseriesDataModel {
     required this.timestamp,
     required this.component,
     required this.label,
-    required this.sampling_rate,
+    required this.samplingRate,
     required this.duration,
     required this.type,
-    required this.data_id,
-    required this.signal_id,
+    required this.dataId,
+    required this.signalId,
   });
 
   DateTime timestamp;
   String component;
-  String label;
-  int sampling_rate;
+  TimeseriesDataLabel label;
+  int samplingRate;
   int duration;
   String type;
-  int data_id;
-  String signal_id;
+  int dataId;
+  String signalId;
 }

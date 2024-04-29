@@ -1,6 +1,5 @@
-import "package:aw40_hub_frontend/dtos/action_dto.dart";
 import "package:aw40_hub_frontend/models/symptom_model.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:json_annotation/json_annotation.dart";
 
 part "symptom_dto.g.dart";
@@ -8,28 +7,28 @@ part "symptom_dto.g.dart";
 @JsonSerializable()
 class SymptomDto {
   SymptomDto(
-    this.timestamp;
-    this.component;
-    this.label;
-    this.data_id;
+    this.timestamp,
+    this.component,
+    this.label,
+    this.dataId,
   );
 
   factory SymptomDto.fromJson(Map<String, dynamic> json) {
     return _$SymptomDtoFromJson(json);
   }
-  Map<String, dynamic> toJson() => _$SymptomDtotoToJson(this);
+  Map<String, dynamic> toJson() => _$SymptomDtoToJson(this);
 
-  SymptomDto toModel() {
-    return SymptomDto(
-    timestamp: timestamp,
-    component: component,
-    label: label,
-    data_id: data_id,
-  );
+  SymptomModel toModel() {
+    return SymptomModel(
+      timestamp: timestamp,
+      component: component,
+      label: label,
+      dataId: dataId,
+    );
   }
 
   DateTime timestamp;
   String component;
-  String label;
-  int data_id;
+  SymptomLabel label;
+  int dataId;
 }
