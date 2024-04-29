@@ -27,6 +27,7 @@ class ObdDataDto {
   }
 
   DateTime? timestamp;
+  @JsonKey(name: "obd_specs")
   List<dynamic>? obdSpecs;
   List<String> dtcs;
   int? dataId;

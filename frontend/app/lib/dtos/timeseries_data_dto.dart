@@ -14,7 +14,7 @@ class TimeseriesDataDto {
     this.duration,
     this.type,
     this.dataId,
-    this.signalId,
+    this.signal,
   );
 
   factory TimeseriesDataDto.fromJson(Map<String, dynamic> json) {
@@ -31,7 +31,7 @@ class TimeseriesDataDto {
       duration: duration,
       type: type,
       dataId: dataId,
-      signalId: signalId,
+      signal: signal,
     );
   }
 
@@ -42,5 +42,5 @@ class TimeseriesDataDto {
   int duration;
   String? type;
   int? dataId;
-  String signalId;
+  List<int> signal;
 }

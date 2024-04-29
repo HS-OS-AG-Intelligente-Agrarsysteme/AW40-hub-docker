@@ -9,7 +9,7 @@ class TimeseriesDataModel {
     required this.duration,
     required this.type,
     required this.dataId,
-    required this.signalId,
+    required this.signal,
   });
 
   DateTime? timestamp;
@@ -19,5 +19,5 @@ class TimeseriesDataModel {
   int duration;
   String? type;
   int? dataId;
-  String signalId;
+  List<int> signal;
 }
