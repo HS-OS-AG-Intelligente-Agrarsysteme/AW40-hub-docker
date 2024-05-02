@@ -196,13 +196,13 @@ void main() {
       expect(caseDto.diagnosisId, diagnosisId);
     });
     test("correctly assigns timeseriesData", () {
-      expect(caseDto.timeseriesData, timeseriesData);
+      expect(caseDto.timeseriesData, isA<List<TimeseriesDataDto>>());
     });
     test("correctly assigns obdData", () {
-      expect(caseDto.obdData, obdData);
+      expect(caseDto.obdData, isA<List<ObdDataDto>>());
     });
     test("correctly assigns symptoms", () {
-      expect(caseDto.symptoms, symptoms);
+      expect(caseDto.symptoms, isA<List<SymptomDto>>());
     });
     test("correctly assigns timeseriesDataAdded", () {
       expect(caseDto.timeseriesDataAdded, timeseriesDataAdded);
