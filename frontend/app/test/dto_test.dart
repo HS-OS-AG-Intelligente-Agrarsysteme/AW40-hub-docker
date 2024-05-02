@@ -407,15 +407,15 @@ void main() {
     });
     test("correctly assigns timeseriesData", () {
       expect(
-        timeseriesData,
-        isA<List<TimeseriesDataDto>>(),
+        caseModel.timeseriesData,
+        isA<List<TimeseriesDataModel>>(),
       );
     });
     test("correctly assigns obdData", () {
-      expect(obdData, isA<List<ObdDataDto>>());
+      expect(caseModel.obdData, isA<List<ObdDataModel>>());
     });
     test("correctly assigns symptoms", () {
-      expect(symptoms, isA<List<SymptomDto>>());
+      expect(caseModel.symptoms, isA<List<SymptomModel>>());
     });
   });
   group("CaseUpdateDto primary constructor", () {
