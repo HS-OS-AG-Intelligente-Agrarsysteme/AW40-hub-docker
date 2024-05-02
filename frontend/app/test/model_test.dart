@@ -14,9 +14,34 @@ void main() {
     const vehicleVin = "12345678901234567";
     const workshopId = "some_workshop_id";
     const diagnosisId = "some_diagnosis_id";
-    final List<dynamic> timeseriesData = <dynamic>[1, 2, 3];
-    final List<dynamic> obdData = <dynamic>["a", 5, false];
-    final List<dynamic> symptoms = <dynamic>[true, false];
+    final timeseriesData = <TimeseriesDataModel>[
+      TimeseriesDataModel(
+        timestamp: DateTime.utc(2021),
+        component: "some_component",
+        label: TimeseriesDataLabel.norm,
+        samplingRate: 1,
+        duration: 3,
+        type: "some_type",
+        dataId: 2,
+        signal: <int>[1],
+      )
+    ];
+    final obdData = <ObdDataModel>[
+      ObdDataModel(
+        timestamp: DateTime.utc(2021),
+        obdSpecs: <dynamic>[1, 2, 3],
+        dtcs: <String>["some_component"],
+        dataId: 0,
+      )
+    ];
+    final symptoms = <SymptomModel>[
+      SymptomModel(
+        timestamp: DateTime.utc(2021),
+        component: "some_component",
+        label: SymptomLabel.unknown,
+        dataId: 2,
+      )
+    ];
 
     final caseModel = CaseModel(
       id: id,
@@ -404,7 +429,7 @@ void main() {
     const int duration = 3;
     const String type = "some_type";
     const int dataId = 5;
-    const String signalId = "some_signalId";
+    const signal = <int>[1];
     final TimeseriesDataModel timeseriesDataModel = TimeseriesDataModel(
       timestamp: timestamp,
       component: component,
@@ -413,7 +438,7 @@ void main() {
       duration: duration,
       type: type,
       dataId: dataId,
-      signalId: signalId,
+      signal: signal,
     );
     test("correctly assigns timestamp", () {
       expect(timeseriesDataModel.timestamp, timestamp);
@@ -436,8 +461,8 @@ void main() {
     test("correctly assigns dataId", () {
       expect(timeseriesDataModel.dataId, dataId);
     });
-    test("correctly assigns signalId", () {
-      expect(timeseriesDataModel.signalId, signalId);
+    test("correctly assigns signal", () {
+      expect(timeseriesDataModel.signal, signal);
     });
   });
 

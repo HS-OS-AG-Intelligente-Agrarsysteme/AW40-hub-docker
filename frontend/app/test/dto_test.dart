@@ -7,7 +7,7 @@ import "package:flutter_test/flutter_test.dart";
 void main() {
   group("CaseDto primary constructor", () {
     const id = "test_id";
-    final timeStamp = DateTime.now();
+    final timeStamp = DateTime.utc(2021);
     const occasion = CaseOccasion.unknown;
     const milage = 100;
     const status = CaseStatus.closed;
@@ -15,9 +15,34 @@ void main() {
     const vehicleVin = "12345678901234567";
     const workshopId = "some_workshop_id";
     const diagnosisId = "some_diagnosis_id";
-    const timeseriesData = <dynamic>[1, 2, 3];
-    const obdData = <dynamic>["a", 5, false];
-    const symptoms = <dynamic>[true, false];
+    final timeseriesData = <TimeseriesDataDto>[
+      TimeseriesDataDto(
+        DateTime.utc(2021),
+        "some_component",
+        TimeseriesDataLabel.norm,
+        1,
+        3,
+        "some_type",
+        2,
+        <int>[1],
+      )
+    ];
+    final obdData = <ObdDataDto>[
+      ObdDataDto(
+        DateTime.utc(2021),
+        <dynamic>[1, 2, 3],
+        <String>["some_component"],
+        0,
+      )
+    ];
+    final symptoms = <SymptomDto>[
+      SymptomDto(
+        DateTime.utc(2021),
+        "some_component",
+        SymptomLabel.unknown,
+        2,
+      )
+    ];
     const timeseriesDataAdded = 8;
     const obdDataAdded = 5;
     const symptomsAdded = 9;
@@ -86,7 +111,7 @@ void main() {
   });
   group("CaseDto fromJson constructor", () {
     const id = "test_id";
-    final timeStamp = DateTime.now();
+    final timeStamp = DateTime.utc(2021);
     const occasion = CaseOccasion.unknown;
     const milage = 100;
     const status = CaseStatus.closed;
@@ -94,9 +119,34 @@ void main() {
     const vehicleVin = "12345678901234567";
     const workshopId = "some_workshop_id";
     const diagnosisId = "some_diagnosis_id";
-    const timeseriesData = <dynamic>[1, 2, 3];
-    const obdData = <dynamic>["a", 5, false];
-    const symptoms = <dynamic>[true, false];
+    final timeseriesData = <TimeseriesDataDto>[
+      TimeseriesDataDto(
+        DateTime.utc(2021),
+        "some_component",
+        TimeseriesDataLabel.norm,
+        1,
+        3,
+        "some_type",
+        2,
+        <int>[1],
+      )
+    ];
+    final obdData = <ObdDataDto>[
+      ObdDataDto(
+        DateTime.utc(2021),
+        <dynamic>[1, 2, 3],
+        <String>["some_component"],
+        0,
+      )
+    ];
+    final symptoms = <SymptomDto>[
+      SymptomDto(
+        DateTime.utc(2021),
+        "some_component",
+        SymptomLabel.unknown,
+        2,
+      )
+    ];
     const timeseriesDataAdded = 8;
     const obdDataAdded = 5;
     const symptomsAdded = 9;
@@ -166,7 +216,7 @@ void main() {
   });
   group("CaseDto toJson method", () {
     const id = "test_id";
-    final timeStamp = DateTime.now();
+    final timeStamp = DateTime.utc(2021);
     const occasion = CaseOccasion.unknown;
     const milage = 100;
     const status = CaseStatus.closed;
@@ -174,9 +224,34 @@ void main() {
     const vehicleVin = "12345678901234567";
     const workshopId = "some_workshop_id";
     const diagnosisId = "some_diagnosis_id";
-    const timeseriesData = <dynamic>[1, 2, 3];
-    const obdData = <dynamic>["a", 5, false];
-    const symptoms = <dynamic>[true, false];
+    final timeseriesData = <TimeseriesDataDto>[
+      TimeseriesDataDto(
+        DateTime.utc(2021),
+        "some_component",
+        TimeseriesDataLabel.norm,
+        1,
+        3,
+        "some_type",
+        2,
+        <int>[1],
+      )
+    ];
+    final obdData = <ObdDataDto>[
+      ObdDataDto(
+        DateTime.utc(2021),
+        <dynamic>[1, 2, 3],
+        <String>["some_component"],
+        0,
+      )
+    ];
+    final symptoms = <SymptomDto>[
+      SymptomDto(
+        DateTime.utc(2021),
+        "some_component",
+        SymptomLabel.unknown,
+        2,
+      )
+    ];
     const timeseriesDataAdded = 8;
     const obdDataAdded = 5;
     const symptomsAdded = 9;
@@ -246,7 +321,7 @@ void main() {
   });
   group("CaseDto toModel method", () {
     const id = "test_id";
-    final timeStamp = DateTime.now();
+    final timeStamp = DateTime.utc(2021);
     const occasion = CaseOccasion.unknown;
     const milage = 100;
     const status = CaseStatus.closed;
@@ -256,7 +331,7 @@ void main() {
     const diagnosisId = "some_diagnosis_id";
     final timeseriesData = <TimeseriesDataDto>[
       TimeseriesDataDto(
-        DateTime.utc(2021).toIso8601String(),
+        DateTime.utc(2021),
         "some_component",
         TimeseriesDataLabel.norm,
         1,
@@ -268,7 +343,7 @@ void main() {
     ];
     final obdData = <ObdDataDto>[
       ObdDataDto(
-        DateTime.utc(2021).toIso8601String(),
+        DateTime.utc(2021),
         <dynamic>[1, 2, 3],
         <String>["some_component"],
         0,
@@ -276,10 +351,10 @@ void main() {
     ];
     final symptoms = <SymptomDto>[
       SymptomDto(
-        DateTime.utc(2021).toIso8601String(),
-        component,
-        label,
-        dataId,
+        DateTime.utc(2021),
+        "some_component",
+        SymptomLabel.unknown,
+        2,
       )
     ];
     const timeseriesDataAdded = 8;
@@ -341,7 +416,7 @@ void main() {
     });
   });
   group("CaseUpdateDto primary constructor", () {
-    final DateTime timeStamp = DateTime.now();
+    final DateTime timeStamp = DateTime.utc(2021);
     const CaseOccasion occasion = CaseOccasion.unknown;
     const int milage = 100;
     const CaseStatus status = CaseStatus.closed;
@@ -365,7 +440,7 @@ void main() {
     });
   });
   group("CaseUpdateDto fromJson constructor", () {
-    final DateTime timeStamp = DateTime.now();
+    final DateTime timeStamp = DateTime.utc(2021);
     const CaseOccasion occasion = CaseOccasion.unknown;
     const int milage = 200;
     const CaseStatus status = CaseStatus.closed;
@@ -390,7 +465,7 @@ void main() {
     });
   });
   group("CaseUpdateDto toJson method", () {
-    final DateTime timeStamp = DateTime.now();
+    final DateTime timeStamp = DateTime.utc(2021);
     const CaseOccasion occasion = CaseOccasion.unknown;
     const int milage = 300;
     const CaseStatus status = CaseStatus.open;
@@ -416,7 +491,7 @@ void main() {
   });
   group("DiagnosisDto primary constructor", () {
     const id = "test_id";
-    final timeStamp = DateTime.now();
+    final timeStamp = DateTime.utc(2021);
     const status = DiagnosisStatus.failed;
     const caseId = "some_case_id";
     const stateMachineLog = <dynamic>[1, 2, 3];
@@ -450,7 +525,7 @@ void main() {
   });
   group("DiagnosisDto fromJson constructor", () {
     const id = "test_id";
-    final timeStamp = DateTime.now();
+    final timeStamp = DateTime.utc(2021);
     const status = DiagnosisStatus.failed;
     const caseId = "some_case_id";
     const stateMachineLog = <dynamic>[1, 2, 3];
@@ -485,7 +560,7 @@ void main() {
   });
   group("DiagnosisDto toJson method", () {
     const id = "test_id";
-    final timeStamp = DateTime.now();
+    final timeStamp = DateTime.utc(2021);
     const status = DiagnosisStatus.failed;
     const caseId = "some_case_id";
     const stateMachineLog = <dynamic>[1, 2, 3];
@@ -520,7 +595,7 @@ void main() {
   });
   group("DiagnosisDto toModel method", () {
     const id = "test_id";
-    final timeStamp = DateTime.now();
+    final timeStamp = DateTime.utc(2021);
     const status = DiagnosisStatus.failed;
     const caseId = "some_case_id";
     const stateMachineLog = <dynamic>[1, 2, 3];
@@ -854,7 +929,7 @@ void main() {
 
   //Test ObdData
   group("ObdDataDto fromJson constructor", () {
-    final timestamp = DateTime.now();
+    final timestamp = DateTime.utc(2021);
     final obdSpecs = <dynamic>[1, 2, 3];
     final dtcs = <String>["some_component"];
     const int dataId = 0;
@@ -879,7 +954,7 @@ void main() {
     });
   });
   group("ObdDataDto toJson method", () {
-    final timestamp = DateTime.now();
+    final timestamp = DateTime.utc(2021);
     final obdSpecs = <dynamic>[1, 2, 3];
     final dtcs = <String>["some_component"];
     const int dataId = 0;
@@ -904,7 +979,7 @@ void main() {
     });
   });
   group("ObdDataDto toModel method", () {
-    final timestamp = DateTime.now();
+    final timestamp = DateTime.utc(2021);
     final obdSpecs = <dynamic>[1, 2, 3];
     final dtcs = <String>["some_component"];
     const int dataId = 0;
@@ -931,7 +1006,7 @@ void main() {
 
   //Test Timeseries
   group("TimeseriesDataDto fromJson constructor", () {
-    final timestamp = DateTime.now();
+    final timestamp = DateTime.utc(2021);
     const String component = "some_component";
     const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
     const int samplingRate = 1;
@@ -947,7 +1022,7 @@ void main() {
       "duration": duration,
       "type": type,
       "dataId": dataId,
-      "signalId": signal,
+      "signal": signal,
     };
     final TimeseriesDataDto timeseriesDataDto =
         TimeseriesDataDto.fromJson(json);
@@ -977,7 +1052,7 @@ void main() {
     });
   });
   group("TimeseriesDataDto toJson method", () {
-    final timestamp = DateTime.now();
+    final timestamp = DateTime.utc(2021);
     const String component = "some_component";
     const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
     const int samplingRate = 1;
@@ -1017,13 +1092,13 @@ void main() {
     test("correctly assigns dataId", () {
       expect(json["dataId"], dataId);
     });
-    test("correctly assigns signalId", () {
+    test("correctly assigns signal", () {
       expect(json["signal"], signal);
     });
   });
 
   group("TimeseriesDataDto toModel method", () {
-    final timestamp = DateTime.now();
+    final timestamp = DateTime.utc(2021);
     const String component = "some_component";
     const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
     const int samplingRate = 1;
@@ -1063,14 +1138,14 @@ void main() {
     test("correctly assigns dataId", () {
       expect(timeseriesDataModel.dataId, dataId);
     });
-    test("correctly assigns signalId", () {
+    test("correctly assigns signal", () {
       expect(timeseriesDataModel.signal, signal);
     });
   });
 
   //Test Symptoms
   group("SymptomDto fromJson constructor", () {
-    final timestamp = DateTime.now();
+    final timestamp = DateTime.utc(2021);
     const String component = "some_component";
     const SymptomLabel label = SymptomLabel.unknown;
     const int dataId = 2;
@@ -1095,7 +1170,7 @@ void main() {
     });
   });
   group("SymptomDto toJson method", () {
-    final timestamp = DateTime.now();
+    final timestamp = DateTime.utc(2021);
     const String component = "some_component";
     const SymptomLabel label = SymptomLabel.unknown;
     const int dataId = 2;
@@ -1120,7 +1195,7 @@ void main() {
     });
   });
   group("SymptomDto toModel method", () {
-    final timestamp = DateTime.now();
+    final timestamp = DateTime.utc(2021);
     const String component = "some_component";
     const SymptomLabel label = SymptomLabel.unknown;
     const int dataId = 2;
