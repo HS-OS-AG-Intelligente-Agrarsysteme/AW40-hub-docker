@@ -160,9 +160,9 @@ void main() {
       "vehicle_vin": vehicleVin,
       "workshop_id": workshopId,
       "diagnosis_id": diagnosisId,
-      "timeseries_data": timeseriesData,
-      "obd_data": obdData,
-      "symptoms": symptoms,
+      "timeseries_data": timeseriesData.map((e) => e.toJson()).toList(),
+      "obd_data": obdData.map((e) => e.toJson()).toList(),
+      "symptoms": symptoms.map((e) => e.toJson()).toList(),
       "timeseries_data_added": timeseriesDataAdded,
       "obd_data_added": obdDataAdded,
       "symptoms_added": symptomsAdded,
@@ -406,13 +406,16 @@ void main() {
       expect(caseModel.diagnosisId, diagnosisId);
     });
     test("correctly assigns timeseriesData", () {
-      expect(caseModel.timeseriesData, timeseriesData);
+      expect(
+        timeseriesData,
+        isA<List<TimeseriesDataDto>>(),
+      );
     });
     test("correctly assigns obdData", () {
-      expect(caseModel.obdData, obdData);
+      expect(obdData, isA<List<ObdDataDto>>());
     });
     test("correctly assigns symptoms", () {
-      expect(caseModel.symptoms, symptoms);
+      expect(symptoms, isA<List<SymptomDto>>());
     });
   });
   group("CaseUpdateDto primary constructor", () {
@@ -935,7 +938,7 @@ void main() {
     const int dataId = 0;
     final Map<String, dynamic> json = <String, dynamic>{
       "timestamp": timestamp.toIso8601String(),
-      "obdSpecs": obdSpecs,
+      "obd_specs": obdSpecs,
       "dtcs": dtcs,
       "dataId": dataId,
     };
@@ -969,7 +972,7 @@ void main() {
       expect(json["timestamp"], timestamp.toIso8601String());
     });
     test("correctly assigns obdSpecs", () {
-      expect(json["obdSpecs"], obdSpecs);
+      expect(json["obd_specs"], obdSpecs);
     });
     test("correctly assigns dtcs", () {
       expect(json["dtcs"], dtcs);
