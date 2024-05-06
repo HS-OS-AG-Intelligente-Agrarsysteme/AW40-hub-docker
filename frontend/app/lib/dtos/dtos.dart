@@ -1,3 +1,4 @@
+export "action_dto.dart";
 export "case_dto.dart";
 export "case_update_dto.dart";
 export "diagnosis_dto.dart";
