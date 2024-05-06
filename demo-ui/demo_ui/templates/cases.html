@@ -12,6 +12,7 @@
     <th>ID</th>
     <th>Zeitstempel</th>
     <th>Anlass</th>
+    <th>Fahrzeug (VIN)</th>
     <th>Kilometerstand</th>
     <th>Kunde</th>
     <th>Diagnose</th>
@@ -21,6 +22,7 @@
     <td>{{ entry["_id"] }}</td>
     <td>{{ entry["timestamp"]|timestamp_format }}</td>
     <td>{{ entry["occasion"]|schema_format("occasion") }}</td>
+    <td>{{ entry["vehicle_vin"] }}</td>
     <td>{{ entry["milage"] }}</td>
     <td>{{ entry["customer_id"] }}</td>
     <td>{{ entry["diagnosis"]["status"]|schema_format("diagnosis_status") }}</td>

@@ -423,7 +423,7 @@ void main() {
       expect(diagnosisDto.todos, todos);
     });
   });
-  /*group("DiagnosisDto fromJson constructor", () {
+  group("DiagnosisDto fromJson constructor", () {
     const id = "test_id";
     final timeStamp = DateTime.now();
     const status = DiagnosisStatus.failed;
@@ -436,7 +436,7 @@ void main() {
       "status": status.name,
       "case_id": caseId,
       "state_machine_log": stateMachineLog,
-      "todos": todos,
+      "todos": todos.map((e) => e.toJson()).toList(),
     };
     final DiagnosisDto diagnosisDto = DiagnosisDto.fromJson(json);
     test("correctly assigns id", () {
@@ -455,9 +455,9 @@ void main() {
       expect(diagnosisDto.stateMachineLog, stateMachineLog);
     });
     test("correctly assigns todos", () {
-      expect(diagnosisDto.todos, todos);
+      expect(diagnosisDto.todos, isA<List<ActionDto>>());
     });
-  });*/
+  });
   group("DiagnosisDto toJson method", () {
     const id = "test_id";
     final timeStamp = DateTime.now();
@@ -616,17 +616,12 @@ void main() {
     });
   });
   group("NewSymptomDto primary constructor", () {
-    final timestamp = DateTime.utc(2021).toIso8601String();
     const String component = "some_component";
     const SymptomLabel label = SymptomLabel.ok;
     final NewSymptomDto newSymptomDto = NewSymptomDto(
-      timestamp,
       component,
       label,
     );
-    test("correctly assigns timestamp", () {
-      expect(newSymptomDto.timestamp, timestamp);
-    });
     test("correctly assigns component", () {
       expect(newSymptomDto.component, component);
     });
@@ -644,9 +639,6 @@ void main() {
       "label": label.name,
     };
     final NewSymptomDto newSymptomDto = NewSymptomDto.fromJson(json);
-    test("correctly assigns timestamp", () {
-      expect(newSymptomDto.timestamp, timestamp);
-    });
     test("correctly assigns component", () {
       expect(newSymptomDto.component, component);
     });
@@ -655,18 +647,13 @@ void main() {
     });
   });
   group("NewSymptomDto toJson method", () {
-    final timestamp = DateTime.utc(2021).toIso8601String();
     const String component = "some_component";
     const SymptomLabel label = SymptomLabel.ok;
     final NewSymptomDto newSymptomDto = NewSymptomDto(
-      timestamp,
       component,
       label,
     );
     final Map<String, dynamic> json = newSymptomDto.toJson();
-    test("correctly assigns timestamp", () {
-      expect(json["timestamp"], timestamp);
-    });
     test("correctly assigns component", () {
       expect(json["component"], component);
     });
@@ -675,17 +662,12 @@ void main() {
     });
   });
   group("NewOBDDataDto primary constructor", () {
-    final timestamp = DateTime.utc(2021).toIso8601String();
     final obdSpecs = <dynamic>[1, 2, 3];
     final dtcs = <String>["some_component"];
     final NewOBDDataDto newOBDDataDto = NewOBDDataDto(
-      timestamp,
       obdSpecs,
       dtcs,
     );
-    test("correctly assigns timestamp", () {
-      expect(newOBDDataDto.timestamp, timestamp);
-    });
     test("correctly assigns obdSpecs", () {
       expect(newOBDDataDto.obdSpecs, obdSpecs);
     });
@@ -703,9 +685,6 @@ void main() {
       "dtcs": dtcs,
     };
     final NewOBDDataDto newOBDDataDto = NewOBDDataDto.fromJson(json);
-    test("correctly assigns timestamp", () {
-      expect(newOBDDataDto.timestamp, timestamp);
-    });
     test("correctly assigns obdSpecs", () {
       expect(newOBDDataDto.obdSpecs, obdSpecs);
     });
@@ -714,18 +693,13 @@ void main() {
     });
   });
   group("NewOBDDataDto toJson method", () {
-    final timestamp = DateTime.utc(2021).toIso8601String();
     final obdSpecs = <dynamic>[1, 2, 3];
     final dtcs = <String>["some_component"];
     final NewOBDDataDto newOBDDataDto = NewOBDDataDto(
-      timestamp,
       obdSpecs,
       dtcs,
     );
     final Map<String, dynamic> json = newOBDDataDto.toJson();
-    test("correctly assigns timestamp", () {
-      expect(json["timestamp"], timestamp);
-    });
     test("correctly assigns dtcs", () {
       expect(json["obd_specs"], obdSpecs);
     });

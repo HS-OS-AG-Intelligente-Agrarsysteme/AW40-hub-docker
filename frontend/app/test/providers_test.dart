@@ -43,7 +43,7 @@ void main() {
       "symptoms_added": 1,
     };
     test("showSharedCases inits to true", () {
-      final caseProvider = CaseProvider(HttpService());
+      final caseProvider = CaseProvider(HttpService(http.Client()));
       expect(caseProvider.showSharedCases, true);
     });
     test("toggleShowSharedCases toggles showSharedCases", () async {

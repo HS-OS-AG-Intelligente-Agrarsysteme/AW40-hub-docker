@@ -34,6 +34,7 @@ general:
     customerId: "Keine Kunden ID"
     vehicleVin: "Keine @:general.vehicleVin"
     workshopId: "Keine @:general.workshop ID"
+    diagnoses: "Aktuell sind keine Informationen zu laufenden Diagnosen vorhanden."
 diagnoses:
   title: "Diagnosen"
   actions:
@@ -104,3 +105,5 @@ training:
   title: "Schulung"
 pageNotFound:
   title: "Seite @:general.notFound"
+noAuthorization :
+  title: "Keine Autorisierung"

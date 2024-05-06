@@ -1,5 +1,3 @@
-import "dart:math";
-
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:easy_localization/easy_localization.dart";
@@ -8,15 +6,14 @@ import "package:flutter/material.dart";
 class CasesDataTableSource extends DataTableSource {
   CasesDataTableSource({
     required this.themeData,
-    required this.currentIndex,
+    required this.currentIndexNotifier,
     required this.caseModels,
     required this.onPressedRow,
   });
   List<CaseModel> caseModels;
-  final rng = Random();
   final void Function(int) onPressedRow;
   final ThemeData themeData;
-  int? currentIndex;
+  final ValueNotifier<int?> currentIndexNotifier;
   final Map<CaseStatus, IconData> caseStatusIcons = {
     CaseStatus.open: Icons.cached,
     CaseStatus.closed: Icons.done,
@@ -39,7 +36,7 @@ class CasesDataTableSource extends DataTableSource {
     final caseModel = caseModels[index];
     return DataRow(
       onSelectChanged: (_) => onPressedRow(index),
-      selected: currentIndex == index,
+      selected: currentIndexNotifier.value == index,
       color: MaterialStateProperty.resolveWith<Color?>(
           (Set<MaterialState> states) {
         if (states.contains(MaterialState.selected)) {

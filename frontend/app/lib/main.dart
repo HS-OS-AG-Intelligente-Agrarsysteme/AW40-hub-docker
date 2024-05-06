@@ -5,6 +5,7 @@ import "package:easy_logger/easy_logger.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:flutter_web_plugins/url_strategy.dart";
+import "package:http/http.dart" as http;
 import "package:logging/logging.dart";
 
 final GlobalKey<NavigatorState> globalNavKey =
@@ -33,7 +34,7 @@ Future<void> _initialize() async {
 }
 
 Future<void> _checkBackendHealth() async {
-  await HttpService().checkBackendHealth().then((response) {
+  await HttpService(http.Client()).checkBackendHealth().then((response) {
     response.statusCode == 200
         ? _logger.info("Backend healthcheck passed.")
         : _logger.severe(

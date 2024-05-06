@@ -88,54 +88,64 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
   @override
   Widget build(BuildContext context) {
     currentDiagnosisIndex ??= widget.initialDiagnosisIndex;
-    return Row(
-      children: [
-        Expanded(
-          flex: 3,
-          child: SingleChildScrollView(
-            child: PaginatedDataTable(
-              source: DiagnosisDataTableSource(
-                themeData: Theme.of(context),
-                currentIndex: currentDiagnosisIndex,
-                diagnosisModels: widget.diagnosisModels,
-                onPressedRow: (int i) =>
-                    setState(() => currentDiagnosisIndex = i),
-              ),
-              showCheckboxColumn: false,
-              rowsPerPage: 50,
-              columns: [
-                DataColumn(
-                  label: Expanded(
-                    child: Text(tr("general.id")),
-                  ),
-                ),
-                DataColumn(
-                  label: Expanded(
-                    child: Text(tr("general.status")),
-                  ),
-                ),
-                DataColumn(
-                  label: Expanded(
-                    child: Text(tr("general.case")),
-                  ),
-                ),
-                DataColumn(
-                  label: Expanded(
-                    child: Text(tr("general.date")),
-                  ),
-                ),
-              ],
-            ),
-          ),
+
+    if (widget.diagnosisModels.isEmpty) {
+      return Center(
+        child: Text(
+          tr("general.no.diagnoses"),
+          style: Theme.of(context).textTheme.displaySmall,
         ),
-        if (widget.diagnosisModels.isNotEmpty)
+      );
+    } else {
+      return Row(
+        children: [
           Expanded(
-            flex: 2,
-            child: DiagnosisDetailView(
-              diagnosisModel: widget.diagnosisModels[currentDiagnosisIndex!],
+            flex: 3,
+            child: SingleChildScrollView(
+              child: PaginatedDataTable(
+                source: DiagnosisDataTableSource(
+                  themeData: Theme.of(context),
+                  currentIndex: currentDiagnosisIndex,
+                  diagnosisModels: widget.diagnosisModels,
+                  onPressedRow: (int i) =>
+                      setState(() => currentDiagnosisIndex = i),
+                ),
+                showCheckboxColumn: false,
+                rowsPerPage: 50,
+                columns: [
+                  DataColumn(
+                    label: Expanded(
+                      child: Text(tr("general.id")),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Expanded(
+                      child: Text(tr("general.status")),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Expanded(
+                      child: Text(tr("general.case")),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Expanded(
+                      child: Text(tr("general.date")),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-      ],
-    );
+          if (widget.diagnosisModels.isNotEmpty)
+            Expanded(
+              flex: 2,
+              child: DiagnosisDetailView(
+                diagnosisModel: widget.diagnosisModels[currentDiagnosisIndex!],
+              ),
+            ),
+        ],
+      );
+    }
   }
 }

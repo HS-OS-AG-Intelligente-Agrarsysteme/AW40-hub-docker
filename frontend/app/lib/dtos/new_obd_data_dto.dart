@@ -5,7 +5,6 @@ part "new_obd_data_dto.g.dart";
 @JsonSerializable()
 class NewOBDDataDto {
   NewOBDDataDto(
-    this.timestamp,
     this.obdSpecs,
     this.dtcs,
   );
@@ -14,7 +13,6 @@ class NewOBDDataDto {
       _$NewOBDDataDtoFromJson(json);
   Map<String, dynamic> toJson() => _$NewOBDDataDtoToJson(this);
 
-  String? timestamp;
   @JsonKey(name: "obd_specs")
   List<dynamic>? obdSpecs;
   List<String> dtcs;

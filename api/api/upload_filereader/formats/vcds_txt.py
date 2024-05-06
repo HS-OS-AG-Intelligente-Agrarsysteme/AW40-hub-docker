@@ -3,9 +3,9 @@ import logging as log
 import re
 from typing import BinaryIO, List
 
-import cchardet as chardet
-
 from ..filereader import FileReader, FileReaderException
+
+DEFAULT_FILE_ENCODING = 'cp1252'
 
 OBD_ERROR = re.compile(
     r"^\s*(?P<error_code>[BCPU][01][0-7][0-9A-Z]{2})\s"
@@ -20,12 +20,12 @@ VCDS_INFO = re.compile(
 
 
 class VCDSTXTReader(FileReader):
-    def read_file(self, file: BinaryIO) -> List[dict]:
-        enc = self.__determine_encoding(file)
+    def read_file(self,
+                  file: BinaryIO,
+                  enc: str = DEFAULT_FILE_ENCODING) -> List[dict]:
         return self.__read_vcds_txt(file, enc)
 
-    def probe(self, file: BinaryIO):
-        enc = self.__determine_encoding(file)
+    def probe(self, file: BinaryIO, enc: str = DEFAULT_FILE_ENCODING):
         validated = self.__get_obd_specs(file, enc)
         file.seek(0)
         return validated
@@ -53,11 +53,6 @@ class VCDSTXTReader(FileReader):
             raise FileReaderException(
                 "conversion failed: Failed to read filehead"
             )
-
-    def __determine_encoding(self, file: BinaryIO):
-        encoding = chardet.detect(file.read())['encoding']
-        file.seek(0)
-        return encoding
 
     def __read_vcds_txt(self, file: BinaryIO, enc: str):
         obd_specs = self.__get_obd_specs(file, enc)

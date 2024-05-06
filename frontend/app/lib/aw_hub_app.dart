@@ -18,6 +18,7 @@ class AWHubApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final httpService = HttpService(http.Client());
     return EasyLocalization(
       path: kLocalesPath,
       supportedLocales: kSupportedLocales.values.toList(),
@@ -36,13 +37,13 @@ class AWHubApp extends StatelessWidget {
             ),
           ),
           ChangeNotifierProxyProvider<AuthProvider, CaseProvider>(
-            create: (_) => CaseProvider(HttpService()),
+            create: (_) => CaseProvider(httpService),
             update: (_, authProvider, caseProvider) =>
                 // ignore: discarded_futures
                 caseProvider!..fetchAndSetAuthToken(authProvider),
           ),
           ChangeNotifierProxyProvider<AuthProvider, DiagnosisProvider>(
-            create: (_) => DiagnosisProvider(HttpService()),
+            create: (_) => DiagnosisProvider(httpService),
             update: (_, authProvider, caseProvider) =>
                 // ignore: discarded_futures
                 caseProvider!..fetchAndSetAuthToken(authProvider),
