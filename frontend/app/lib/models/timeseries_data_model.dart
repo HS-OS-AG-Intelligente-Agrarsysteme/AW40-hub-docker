@@ -10,7 +10,7 @@ class TimeseriesDataModel {
     required this.type,
     required this.deviceSpecs,
     required this.dataId,
-    required this.signal,
+    required this.signalId,
   });
 
   DateTime? timestamp;
@@ -18,8 +18,8 @@ class TimeseriesDataModel {
   TimeseriesDataLabel label;
   int samplingRate;
   int duration;
-  Type? type;
+  TimeseriesType? type;
   dynamic deviceSpecs;
   int? dataId;
-  List<String> signal;
+  List<String> signalId;
 }

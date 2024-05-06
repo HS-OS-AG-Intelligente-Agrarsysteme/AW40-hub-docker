@@ -15,7 +15,7 @@ class TimeseriesDataDto {
     this.type,
     this.deviceSpecs,
     this.dataId,
-    this.signal,
+    this.signalId,
   );
 
   factory TimeseriesDataDto.fromJson(Map<String, dynamic> json) {
@@ -33,17 +33,21 @@ class TimeseriesDataDto {
       type: type,
       deviceSpecs: deviceSpecs,
       dataId: dataId,
-      signal: signal,
+      signalId: signalId,
     );
   }
 
   DateTime? timestamp;
   String component;
   TimeseriesDataLabel label;
+  @JsonKey(name: "sampling_rate")
   int samplingRate;
   int duration;
-  Type? type;
+  TimeseriesType? type;
+  @JsonKey(name: "device_specs")
   dynamic deviceSpecs;
+  @JsonKey(name: "data_id")
   int? dataId;
-  List<String> signal;
+  @JsonKey(name: "signal_id")
+  List<String> signalId;
 }

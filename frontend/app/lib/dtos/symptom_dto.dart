@@ -30,5 +30,6 @@ class SymptomDto {
   DateTime? timestamp;
   String component;
   SymptomLabel label;
+  @JsonKey(name: "data_id")
   int? dataId;
 }

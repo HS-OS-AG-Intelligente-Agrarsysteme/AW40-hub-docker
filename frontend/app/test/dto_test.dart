@@ -21,7 +21,7 @@ void main() {
         TimeseriesDataLabel.norm,
         1,
         3,
-        Type.oscillogram,
+        TimeseriesType.oscillogram,
         0,
         2,
         <String>["some_String", "3"],
@@ -126,7 +126,7 @@ void main() {
         TimeseriesDataLabel.norm,
         1,
         3,
-        Type.oscillogram,
+        TimeseriesType.oscillogram,
         0,
         2,
         <String>["some_String", "3"],
@@ -232,7 +232,7 @@ void main() {
         TimeseriesDataLabel.norm,
         1,
         3,
-        Type.oscillogram,
+        TimeseriesType.oscillogram,
         0,
         2,
         <String>["some_String", "3"],
@@ -338,7 +338,7 @@ void main() {
         TimeseriesDataLabel.norm,
         1,
         3,
-        Type.oscillogram,
+        TimeseriesType.oscillogram,
         0,
         2,
         <String>["some_String", "3"],
@@ -1010,7 +1010,7 @@ void main() {
     const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
     const int samplingRate = 1;
     const int duration = 3;
-    const Type type = Type.oscillogram;
+    const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
     const int dataId = 5;
     const signal = <String>["some_String", "3"];
@@ -1020,7 +1020,7 @@ void main() {
       "label": label.name,
       "samplingRate": samplingRate,
       "duration": duration,
-      "type": type,
+      "type": type.name,
       "deviceSpecs": deviceSpecs,
       "dataId": dataId,
       "signal": signal,
@@ -1052,7 +1052,7 @@ void main() {
       expect(timeseriesDataDto.dataId, dataId);
     });
     test("correctly assigns signal", () {
-      expect(timeseriesDataDto.signal, signal);
+      expect(timeseriesDataDto.signalId, signal);
     });
   });
   group("TimeseriesDataDto toJson method", () {
@@ -1061,7 +1061,7 @@ void main() {
     const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
     const int samplingRate = 1;
     const int duration = 3;
-    const Type type = Type.oscillogram;
+    const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
     const int dataId = 5;
     const signal = <String>["some_String", "3"];
@@ -1093,7 +1093,7 @@ void main() {
       expect(json["duration"], duration);
     });
     test("correctly assigns type", () {
-      expect(json["type"], type);
+      expect(json["type"], type.name);
     });
     test("correctly assigns deviceSpecs", () {
       expect(json["deviceSpecs"], deviceSpecs);
@@ -1111,7 +1111,7 @@ void main() {
     const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
     const int samplingRate = 1;
     const int duration = 3;
-    const Type type = Type.oscillogram;
+    const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
     const int dataId = 5;
     const signal = <String>["some_String", "3"];
@@ -1152,7 +1152,7 @@ void main() {
       expect(timeseriesDataModel.dataId, dataId);
     });
     test("correctly assigns signal", () {
-      expect(timeseriesDataModel.signal, signal);
+      expect(timeseriesDataModel.signalId, signal);
     });
   });
   group("SymptomDto fromJson constructor", () {

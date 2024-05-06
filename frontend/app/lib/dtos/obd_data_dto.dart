@@ -30,5 +30,6 @@ class ObdDataDto {
   @JsonKey(name: "obd_specs")
   List<dynamic>? obdSpecs;
   List<String> dtcs;
+  @JsonKey(name: "data_id")
   int? dataId;
 }

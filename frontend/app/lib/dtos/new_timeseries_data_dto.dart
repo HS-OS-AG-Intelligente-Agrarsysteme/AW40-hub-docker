@@ -21,9 +21,11 @@ class NewTimeseriesDataDto {
 
   String component;
   TimeseriesDataLabel label;
+  @JsonKey(name: "sampling_rate")
   int samplingRate;
   int duration;
   Type? type;
+  @JsonKey(name: "device_specs")
   dynamic deviceSpecs;
   List<String> signal;
 }

@@ -21,10 +21,10 @@ void main() {
         label: TimeseriesDataLabel.norm,
         samplingRate: 1,
         duration: 3,
-        type: Type.oscillogram,
+        type: TimeseriesType.oscillogram,
         deviceSpecs: 0,
         dataId: 2,
-        signal: <String>["some_String", "3"],
+        signalId: <String>["some_String", "3"],
       )
     ];
     final obdData = <ObdDataModel>[
@@ -438,7 +438,7 @@ void main() {
     const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
     const int samplingRate = 1;
     const int duration = 3;
-    const Type type = Type.oscillogram;
+    const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
     const int dataId = 5;
     const signal = <String>["some_String", "3"];
@@ -451,7 +451,7 @@ void main() {
       type: type,
       deviceSpecs: deviceSpecs,
       dataId: dataId,
-      signal: signal,
+      signalId: signal,
     );
     test("correctly assigns timestamp", () {
       expect(timeseriesDataModel.timestamp, timestamp);
@@ -475,7 +475,7 @@ void main() {
       expect(timeseriesDataModel.dataId, dataId);
     });
     test("correctly assigns signal", () {
-      expect(timeseriesDataModel.signal, signal);
+      expect(timeseriesDataModel.signalId, signal);
     });
   });
   group("SymptomModel", () {
