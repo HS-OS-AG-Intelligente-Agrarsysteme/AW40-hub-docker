@@ -789,10 +789,10 @@ void main() {
     final Map<String, dynamic> json = <String, dynamic>{
       "component": component,
       "label": label.name,
-      "samplingRate": samplingRate,
+      "sampling_rate": samplingRate,
       "duration": duration,
       "type": type.name,
-      "deviceSpecs": deviceSpecs,
+      "device_specs": deviceSpecs,
       "signal": signal,
     };
     final NewTimeseriesDataDto newTimeseriesDataDto =
@@ -826,7 +826,7 @@ void main() {
     const int duration = 3;
     const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
-    const signalId = <String>["some_String", "3"];
+    const signal = <String>["some_String", "3"];
     final NewTimeseriesDataDto newTimeseriesDataDto = NewTimeseriesDataDto(
       component,
       label,
@@ -834,7 +834,7 @@ void main() {
       duration,
       type,
       deviceSpecs,
-      signalId,
+      signal,
     );
     final Map<String, dynamic> json = newTimeseriesDataDto.toJson();
     test("correctly assigns component", () {
@@ -844,7 +844,7 @@ void main() {
       expect(json["label"], label.name);
     });
     test("correctly assigns samplingRate", () {
-      expect(json["samplingRate"], samplingRate);
+      expect(json["sampling_rate"], samplingRate);
     });
     test("correctly assigns duration", () {
       expect(json["duration"], duration);
@@ -853,10 +853,10 @@ void main() {
       expect(json["type"], type.name);
     });
     test("correctly assigns deviceSpecs", () {
-      expect(json["deviceSpecs"], deviceSpecs);
+      expect(json["device_specs"], deviceSpecs);
     });
-    test("correctly assigns signalId", () {
-      expect(json["signalId"], signalId);
+    test("correctly assigns signal", () {
+      expect(json["signal"], signal);
     });
   });
   group("NewOBDDataDto fromJson constructor", () {
@@ -1019,7 +1019,7 @@ void main() {
       "timestamp": timestamp.toIso8601String(),
       "obd_specs": obdSpecs,
       "dtcs": dtcs,
-      "dataId": dataId,
+      "data_id": dataId,
     };
     final ObdDataDto obdDataDto = ObdDataDto.fromJson(json);
     test("correctly assigns timestamp", () {
@@ -1057,7 +1057,7 @@ void main() {
       expect(json["dtcs"], dtcs);
     });
     test("correctly assigns dataId", () {
-      expect(json["dataId"], dataId);
+      expect(json["data_id"], dataId);
     });
   });
   group("ObdDataDto toModel method", () {
@@ -1099,12 +1099,12 @@ void main() {
       "timestamp": timestamp.toIso8601String(),
       "component": component,
       "label": label.name,
-      "samplingRate": samplingRate,
+      "sampling_rate": samplingRate,
       "duration": duration,
       "type": type.name,
-      "deviceSpecs": deviceSpecs,
-      "dataId": dataId,
-      "signalId": signalId,
+      "device_specs": deviceSpecs,
+      "data_id": dataId,
+      "signal_id": signalId,
     };
     final TimeseriesDataDto timeseriesDataDto =
         TimeseriesDataDto.fromJson(json);
@@ -1168,7 +1168,7 @@ void main() {
       expect(json["label"], label.name);
     });
     test("correctly assigns samplingRate", () {
-      expect(json["samplingRate"], samplingRate);
+      expect(json["sampling_rate"], samplingRate);
     });
     test("correctly assigns duration", () {
       expect(json["duration"], duration);
@@ -1177,13 +1177,13 @@ void main() {
       expect(json["type"], type.name);
     });
     test("correctly assigns deviceSpecs", () {
-      expect(json["deviceSpecs"], deviceSpecs);
+      expect(json["device_specs"], deviceSpecs);
     });
     test("correctly assigns dataId", () {
-      expect(json["dataId"], dataId);
+      expect(json["data_id"], dataId);
     });
     test("correctly assigns signalId", () {
-      expect(json["signalId"], signalId);
+      expect(json["signal_id"], signalId);
     });
   });
   group("TimeseriesDataDto toModel method", () {
@@ -1245,7 +1245,7 @@ void main() {
       "timestamp": timestamp.toIso8601String(),
       "component": component,
       "label": label.name,
-      "dataId": dataId,
+      "data_id": dataId,
     };
     final SymptomDto symptomDto = SymptomDto.fromJson(json);
     test("correctly assigns timestamp", () {
@@ -1283,7 +1283,7 @@ void main() {
       expect(json["label"], label.name);
     });
     test("correctly assigns dataId", () {
-      expect(json["dataId"], dataId);
+      expect(json["data_id"], dataId);
     });
   });
   group("SymptomDto toModel method", () {
