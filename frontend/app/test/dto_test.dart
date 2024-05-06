@@ -785,7 +785,7 @@ void main() {
     const int duration = 3;
     const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
-    const signalId = <String>["some_String", "3"];
+    const signal = <String>["some_String", "3"];
     final Map<String, dynamic> json = <String, dynamic>{
       "component": component,
       "label": label.name,
@@ -793,30 +793,30 @@ void main() {
       "duration": duration,
       "type": type.name,
       "deviceSpecs": deviceSpecs,
-      "signalId": signalId,
+      "signal": signal,
     };
-    final TimeseriesDataDto timeseriesDataDto =
-        TimeseriesDataDto.fromJson(json);
+    final NewTimeseriesDataDto newTimeseriesDataDto =
+        NewTimeseriesDataDto.fromJson(json);
     test("correctly assigns component", () {
-      expect(timeseriesDataDto.component, component);
+      expect(newTimeseriesDataDto.component, component);
     });
     test("correctly assigns label", () {
-      expect(timeseriesDataDto.label, label);
+      expect(newTimeseriesDataDto.label, label);
     });
     test("correctly assigns samplingRate", () {
-      expect(timeseriesDataDto.samplingRate, samplingRate);
+      expect(newTimeseriesDataDto.samplingRate, samplingRate);
     });
     test("correctly assigns duration", () {
-      expect(timeseriesDataDto.duration, duration);
+      expect(newTimeseriesDataDto.duration, duration);
     });
     test("correctly assigns type", () {
-      expect(timeseriesDataDto.type, type);
+      expect(newTimeseriesDataDto.type, type);
     });
     test("correctly assigns deviceSpecs", () {
-      expect(timeseriesDataDto.deviceSpecs, deviceSpecs);
+      expect(newTimeseriesDataDto.deviceSpecs, deviceSpecs);
     });
     test("correctly assigns signalId", () {
-      expect(timeseriesDataDto.signalId, signalId);
+      expect(newTimeseriesDataDto.signal, signal);
     });
   });
   group("NewTimeseriesDataDto toJson method", () {
