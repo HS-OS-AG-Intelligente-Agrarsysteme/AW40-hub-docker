@@ -778,6 +778,87 @@ void main() {
       expect(newOBDDataDto.dtcs, dtcs);
     });
   });
+  group("NewTimeseriesDataDto fromJson constructor", () {
+    const String component = "some_component";
+    const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
+    const int samplingRate = 1;
+    const int duration = 3;
+    const TimeseriesType type = TimeseriesType.oscillogram;
+    const dynamic deviceSpecs = 0;
+    const signalId = <String>["some_String", "3"];
+    final Map<String, dynamic> json = <String, dynamic>{
+      "component": component,
+      "label": label.name,
+      "samplingRate": samplingRate,
+      "duration": duration,
+      "type": type.name,
+      "deviceSpecs": deviceSpecs,
+      "signalId": signalId,
+    };
+    final TimeseriesDataDto timeseriesDataDto =
+        TimeseriesDataDto.fromJson(json);
+    test("correctly assigns component", () {
+      expect(timeseriesDataDto.component, component);
+    });
+    test("correctly assigns label", () {
+      expect(timeseriesDataDto.label, label);
+    });
+    test("correctly assigns samplingRate", () {
+      expect(timeseriesDataDto.samplingRate, samplingRate);
+    });
+    test("correctly assigns duration", () {
+      expect(timeseriesDataDto.duration, duration);
+    });
+    test("correctly assigns type", () {
+      expect(timeseriesDataDto.type, type);
+    });
+    test("correctly assigns deviceSpecs", () {
+      expect(timeseriesDataDto.deviceSpecs, deviceSpecs);
+    });
+    test("correctly assigns signalId", () {
+      expect(timeseriesDataDto.signalId, signalId);
+    });
+  });
+  group("NewTimeseriesDataDto toJson method", () {
+    const String component = "some_component";
+    const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
+    const int samplingRate = 1;
+    const int duration = 3;
+    const TimeseriesType type = TimeseriesType.oscillogram;
+    const dynamic deviceSpecs = 0;
+    const signalId = <String>["some_String", "3"];
+    final NewTimeseriesDataDto newTimeseriesDataDto = NewTimeseriesDataDto(
+      component,
+      label,
+      samplingRate,
+      duration,
+      type,
+      deviceSpecs,
+      signalId,
+    );
+    final Map<String, dynamic> json = newTimeseriesDataDto.toJson();
+    test("correctly assigns component", () {
+      expect(json["component"], component);
+    });
+    test("correctly assigns label", () {
+      expect(json["label"], label.name);
+    });
+    test("correctly assigns samplingRate", () {
+      expect(json["samplingRate"], samplingRate);
+    });
+    test("correctly assigns duration", () {
+      expect(json["duration"], duration);
+    });
+    test("correctly assigns type", () {
+      expect(json["type"], type.name);
+    });
+    test("correctly assigns deviceSpecs", () {
+      expect(json["deviceSpecs"], deviceSpecs);
+    });
+    test("correctly assigns signalId", () {
+      expect(json["signalId"], signalId);
+    });
+  });
   group("NewOBDDataDto fromJson constructor", () {
     final timestamp = DateTime.utc(2021).toIso8601String();
     final obdSpecs = <dynamic>[1, 2, 3];
@@ -1013,7 +1094,7 @@ void main() {
     const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
     const int dataId = 5;
-    const signal = <String>["some_String", "3"];
+    const signalId = <String>["some_String", "3"];
     final Map<String, dynamic> json = <String, dynamic>{
       "timestamp": timestamp.toIso8601String(),
       "component": component,
@@ -1023,7 +1104,7 @@ void main() {
       "type": type.name,
       "deviceSpecs": deviceSpecs,
       "dataId": dataId,
-      "signal": signal,
+      "signalId": signalId,
     };
     final TimeseriesDataDto timeseriesDataDto =
         TimeseriesDataDto.fromJson(json);
@@ -1051,8 +1132,8 @@ void main() {
     test("correctly assigns dataId", () {
       expect(timeseriesDataDto.dataId, dataId);
     });
-    test("correctly assigns signal", () {
-      expect(timeseriesDataDto.signalId, signal);
+    test("correctly assigns signalId", () {
+      expect(timeseriesDataDto.signalId, signalId);
     });
   });
   group("TimeseriesDataDto toJson method", () {
@@ -1064,7 +1145,7 @@ void main() {
     const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
     const int dataId = 5;
-    const signal = <String>["some_String", "3"];
+    const signalId = <String>["some_String", "3"];
     final TimeseriesDataDto timeseriesDataDto = TimeseriesDataDto(
       timestamp,
       component,
@@ -1074,7 +1155,7 @@ void main() {
       type,
       deviceSpecs,
       dataId,
-      signal,
+      signalId,
     );
     final Map<String, dynamic> json = timeseriesDataDto.toJson();
     test("correctly assigns timestamp", () {
@@ -1101,8 +1182,8 @@ void main() {
     test("correctly assigns dataId", () {
       expect(json["dataId"], dataId);
     });
-    test("correctly assigns signal", () {
-      expect(json["signal"], signal);
+    test("correctly assigns signalId", () {
+      expect(json["signalId"], signalId);
     });
   });
   group("TimeseriesDataDto toModel method", () {
@@ -1114,7 +1195,7 @@ void main() {
     const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
     const int dataId = 5;
-    const signal = <String>["some_String", "3"];
+    const signalId = <String>["some_String", "3"];
     final TimeseriesDataDto timeseriesDataDto = TimeseriesDataDto(
       timestamp,
       component,
@@ -1124,7 +1205,7 @@ void main() {
       type,
       deviceSpecs,
       dataId,
-      signal,
+      signalId,
     );
     final TimeseriesDataModel timeseriesDataModel = timeseriesDataDto.toModel();
     test("correctly assigns timestamp", () {
@@ -1151,8 +1232,8 @@ void main() {
     test("correctly assigns dataId", () {
       expect(timeseriesDataModel.dataId, dataId);
     });
-    test("correctly assigns signal", () {
-      expect(timeseriesDataModel.signalId, signal);
+    test("correctly assigns signalId", () {
+      expect(timeseriesDataModel.signalId, signalId);
     });
   });
   group("SymptomDto fromJson constructor", () {

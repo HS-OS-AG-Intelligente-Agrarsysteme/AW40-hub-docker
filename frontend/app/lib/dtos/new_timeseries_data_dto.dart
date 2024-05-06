@@ -24,7 +24,7 @@ class NewTimeseriesDataDto {
   @JsonKey(name: "sampling_rate")
   int samplingRate;
   int duration;
-  Type? type;
+  TimeseriesType? type;
   @JsonKey(name: "device_specs")
   dynamic deviceSpecs;
   List<String> signal;

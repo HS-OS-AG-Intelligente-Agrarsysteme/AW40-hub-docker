@@ -441,7 +441,7 @@ void main() {
     const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
     const int dataId = 5;
-    const signal = <String>["some_String", "3"];
+    const signalId = <String>["some_String", "3"];
     final TimeseriesDataModel timeseriesDataModel = TimeseriesDataModel(
       timestamp: timestamp,
       component: component,
@@ -451,7 +451,7 @@ void main() {
       type: type,
       deviceSpecs: deviceSpecs,
       dataId: dataId,
-      signalId: signal,
+      signalId: signalId,
     );
     test("correctly assigns timestamp", () {
       expect(timeseriesDataModel.timestamp, timestamp);
@@ -474,8 +474,8 @@ void main() {
     test("correctly assigns dataId", () {
       expect(timeseriesDataModel.dataId, dataId);
     });
-    test("correctly assigns signal", () {
-      expect(timeseriesDataModel.signalId, signal);
+    test("correctly assigns signalId", () {
+      expect(timeseriesDataModel.signalId, signalId);
     });
   });
   group("SymptomModel", () {
