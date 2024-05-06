@@ -51,3 +51,5 @@ enum SymptomLabel { unknown, ok, defect }
 enum TimeseriesDataLabel { unknown, norm, anomaly }
 
 enum PicoscopeLabel { unknown, norm, anomaly }
+
+enum Type { oscillogram }

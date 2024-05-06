@@ -17,6 +17,9 @@ class CaseModel {
     required this.timeseriesData,
     required this.obdData,
     required this.symptoms,
+    required this.timeseriesDataAdded,
+    required this.obdDataAdded,
+    required this.symptomsAdded,
   });
 
   String id;
@@ -31,4 +34,7 @@ class CaseModel {
   List<TimeseriesDataModel> timeseriesData;
   List<ObdDataModel> obdData;
   List<SymptomModel> symptoms;
+  int? timeseriesDataAdded;
+  int? obdDataAdded;
+  int? symptomsAdded;
 }

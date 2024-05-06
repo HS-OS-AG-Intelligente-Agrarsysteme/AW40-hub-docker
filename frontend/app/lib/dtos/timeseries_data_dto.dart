@@ -13,6 +13,7 @@ class TimeseriesDataDto {
     this.samplingRate,
     this.duration,
     this.type,
+    this.deviceSpecs,
     this.dataId,
     this.signal,
   );
@@ -30,6 +31,7 @@ class TimeseriesDataDto {
       samplingRate: samplingRate,
       duration: duration,
       type: type,
+      deviceSpecs: deviceSpecs,
       dataId: dataId,
       signal: signal,
     );
@@ -40,7 +42,8 @@ class TimeseriesDataDto {
   TimeseriesDataLabel label;
   int samplingRate;
   int duration;
-  String? type;
+  Type? type;
+  dynamic deviceSpecs;
   int? dataId;
-  List<int> signal;
+  List<String> signal;
 }

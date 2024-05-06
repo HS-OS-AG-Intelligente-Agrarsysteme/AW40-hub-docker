@@ -21,9 +21,10 @@ void main() {
         label: TimeseriesDataLabel.norm,
         samplingRate: 1,
         duration: 3,
-        type: "some_type",
+        type: Type.oscillogram,
+        deviceSpecs: 0,
         dataId: 2,
-        signal: <int>[1],
+        signal: <String>["some_String", "3"],
       )
     ];
     final obdData = <ObdDataModel>[
@@ -42,6 +43,9 @@ void main() {
         dataId: 2,
       )
     ];
+    const timeseriesDataAdded = 3;
+    const obdDataAdded = 5;
+    const symptomsAdded = 4;
 
     final caseModel = CaseModel(
       id: id,
@@ -56,6 +60,9 @@ void main() {
       timeseriesData: timeseriesData,
       obdData: obdData,
       symptoms: symptoms,
+      timeseriesDataAdded: timeseriesDataAdded,
+      obdDataAdded: obdDataAdded,
+      symptomsAdded: symptomsAdded,
     );
     test("correctly assigns id", () {
       expect(caseModel.id, id);
@@ -92,6 +99,15 @@ void main() {
     });
     test("correctly assigns symptoms", () {
       expect(caseModel.symptoms, symptoms);
+    });
+    test("correctly assigns timeseriesDataAdded", () {
+      expect(caseModel.timeseriesDataAdded, timeseriesDataAdded);
+    });
+    test("correctly assigns obdDataAdded", () {
+      expect(caseModel.obdDataAdded, obdDataAdded);
+    });
+    test("correctly assigns symptomsAdded", () {
+      expect(caseModel.symptomsAdded, symptomsAdded);
     });
   });
   group("DiagnosisModel", () {
@@ -180,7 +196,6 @@ void main() {
         email: email,
         locale: locale,
       );
-
       test("correctly assigns jwt", () {
         expect(jwtModel.jwt, jwt);
       });
@@ -393,8 +408,6 @@ void main() {
       expect(actionModel.component, component);
     });
   });
-
-  //Test ObdData
   group("ObdDataModel", () {
     final timestamp = DateTime.now();
     final obdSpecs = <dynamic>[1, 2, 3];
@@ -419,17 +432,16 @@ void main() {
       expect(obdDataModel.dataId, dataId);
     });
   });
-
-  //Test Timeseries)
   group("TimeseriesDataModel", () {
     final timestamp = DateTime.now();
     const String component = "some_component";
     const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
     const int samplingRate = 1;
     const int duration = 3;
-    const String type = "some_type";
+    const Type type = Type.oscillogram;
+    const dynamic deviceSpecs = 0;
     const int dataId = 5;
-    const signal = <int>[1];
+    const signal = <String>["some_String", "3"];
     final TimeseriesDataModel timeseriesDataModel = TimeseriesDataModel(
       timestamp: timestamp,
       component: component,
@@ -437,6 +449,7 @@ void main() {
       samplingRate: samplingRate,
       duration: duration,
       type: type,
+      deviceSpecs: deviceSpecs,
       dataId: dataId,
       signal: signal,
     );
@@ -465,9 +478,6 @@ void main() {
       expect(timeseriesDataModel.signal, signal);
     });
   });
-
-  //Test Symptoms)
-
   group("SymptomModel", () {
     final timestamp = DateTime.now();
     const String component = "some_component";
