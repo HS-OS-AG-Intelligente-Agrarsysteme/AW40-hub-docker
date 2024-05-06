@@ -815,7 +815,7 @@ void main() {
     test("correctly assigns deviceSpecs", () {
       expect(newTimeseriesDataDto.deviceSpecs, deviceSpecs);
     });
-    test("correctly assigns signalId", () {
+    test("correctly assigns signal", () {
       expect(newTimeseriesDataDto.signal, signal);
     });
   });
