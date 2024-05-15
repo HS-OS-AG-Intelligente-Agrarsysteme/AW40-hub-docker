@@ -1,5 +1,6 @@
 import "dart:async";
 
+import "package:aw40_hub_frontend/data_sources/detail_view_sources.dart";
 import "package:aw40_hub_frontend/dialogs/update_case_dialog.dart";
 import "package:aw40_hub_frontend/dtos/case_update_dto.dart";
 import "package:aw40_hub_frontend/models/models.dart";
@@ -117,7 +118,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
         Provider.of<DiagnosisProvider>(context, listen: false);
     final Routemaster routemaster = Routemaster.of(context);
 
-    final List<String> attributes = [
+    final List<String> attributesCase = [
       tr("general.id"),
       tr("general.status"),
       tr("general.occasion"),
@@ -127,7 +128,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
       tr("general.vehicleVin"),
       tr("general.workshopId"),
     ];
-    final List<String> values = [
+    final List<String> valuesCase = [
       widget.caseModel.id,
       tr("cases.details.status.${widget.caseModel.status.name}"),
       tr("cases.details.occasion.${widget.caseModel.occasion.name}"),
@@ -139,122 +140,193 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
     ];
 
     return SizedBox.expand(
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.keyboard_double_arrow_right),
-                    iconSize: 28,
-                    onPressed: widget.onClose,
-                    style: IconButton.styleFrom(
-                      foregroundColor: colorScheme.primary,
+      child: SingleChildScrollView(
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.keyboard_double_arrow_right),
+                      iconSize: 28,
+                      onPressed: widget.onClose,
+                      style: IconButton.styleFrom(
+                        foregroundColor: colorScheme.primary,
+                      ),
+                    ),
+                    // const SizedBox(width: 16),
+                    Text(
+                      tr("cases.details.headline"),
+                      style: textTheme.displaySmall,
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.delete_forever),
+                      iconSize: 28,
+                      style: IconButton.styleFrom(
+                        foregroundColor: colorScheme.error,
+                      ),
+                      onPressed:
+                          caseProvider.workShopId == widget.caseModel.workshopId
+                              ? widget.onDelete
+                              : null,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Table(
+                  columnWidths: const {0: IntrinsicColumnWidth()},
+                  children: List.generate(
+                    attributesCase.length,
+                    (i) => TableRow(
+                      children: [
+                        const SizedBox(height: 32),
+                        Text(attributesCase[i]),
+                        Text(valuesCase[i]),
+                      ],
                     ),
                   ),
-                  // const SizedBox(width: 16),
-                  Text(
-                    tr("cases.details.headline"),
-                    style: textTheme.displaySmall,
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.delete_forever),
-                    iconSize: 28,
-                    style: IconButton.styleFrom(
-                      foregroundColor: colorScheme.error,
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    FilledButton.icon(
+                      icon: const Icon(Icons.edit),
+                      label: Text(tr("general.edit")),
+                      onPressed: caseProvider.workShopId ==
+                              widget.caseModel.workshopId
+                          ? () async {
+                              final CaseUpdateDto? caseUpdateDto =
+                                  await _showUpdateCaseDialog(widget.caseModel);
+                              if (caseUpdateDto == null) return;
+                              await caseProvider.updateCase(
+                                widget.caseModel.id,
+                                caseUpdateDto,
+                              );
+                            }
+                          : null,
                     ),
-                    onPressed:
-                        caseProvider.workShopId == widget.caseModel.workshopId
-                            ? widget.onDelete
-                            : null,
+                    const SizedBox(width: 16),
+                    FilledButton.icon(
+                      icon: const Icon(Icons.tab),
+                      onPressed: caseProvider.workShopId ==
+                              widget.caseModel.workshopId
+                          ? () async {
+                              if (widget.caseModel.diagnosisId == null) {
+                                String message;
+                                final ScaffoldMessengerState
+                                    scaffoldMessengerState =
+                                    ScaffoldMessenger.of(context);
+                                final DiagnosisModel? createdDiagnosis =
+                                    await diagnosisProvider
+                                        .startDiagnosis(widget.caseModel.id);
+
+                                if (createdDiagnosis != null) {
+                                  message = tr(
+                                    // ignore: lines_longer_than_80_chars
+                                    "diagnoses.details.startDiagnosisSuccessMessage",
+                                  );
+
+                                  routemaster.push(
+                                      "/diagnoses/${createdDiagnosis.id}");
+                                } else {
+                                  message = tr(
+                                    // ignore: lines_longer_than_80_chars
+                                    "diagnoses.details.startDiagnosisFailureMessage",
+                                  );
+                                }
+                                _showMessage(message, scaffoldMessengerState);
+                              } else {
+                                routemaster.push(
+                                  "/diagnoses/${widget.caseModel.diagnosisId}",
+                                );
+                              }
+                            }
+                          : null,
+                      label: Text(
+                        tr(
+                          widget.caseModel.diagnosisId == null
+                              ? "cases.details.startDiagnosis"
+                              : "cases.details.showDiagnosis",
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                //const SizedBox(height: 16),
+                const Divider(height: 32, thickness: .1, color: Colors.white),
+                //const SizedBox(height: 16),
+
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: PaginatedDataTable(
+                        source: CaseDetailDataTableSource(
+                          themeData: Theme.of(context),
+                          caseModels: widget.caseModel,
+                          dataType:
+                              "OBD", // => hier Liste mit den 3 Types die dann durchgelaufen werden
+                        ),
+                        showCheckboxColumn: false,
+                        rowsPerPage: 12,
+                        columns: [
+                          DataColumn(label: Text(tr("general.id"))),
+                          DataColumn(label: Text(tr("general.date"))),
+                          const DataColumn(label: Text("DataType")),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+
+                /*SingleChildScrollView(
+                scrollDirection: Axis
+                    .horizontal, // Allows horizontal scrolling for wider tables
+                child: DataTable(
+                  columnSpacing: 56,
+                  columns: [
+                    DataColumn(label: Text(tr("general.id"))),
+                    DataColumn(label: Text(tr("general.date"))),
+                    DataColumn(label: Text(tr("general.type"))),
+                  ],
+                  rows: List.generate(
+                    attributesID.length,
+                    (i) => DataRow(
+                      cells: [
+                        DataCell(Text(
+                          attributesID[i],
+                        )), // Example, adjust according to your data structure
+                        DataCell(Text(attributesTimestamp[
+                            i])), // Example, adjust according to your data structure
+                        DataCell(Text(attributesType[
+                            i])), // Example, adjust according to your data structure
+                      ],
+                    ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Table(
+                ),
+              )
+
+
+             //table Data
+             Table(
                 columnWidths: const {0: IntrinsicColumnWidth()},
                 children: List.generate(
-                  attributes.length,
+                  attributesData.length,
                   (i) => TableRow(
                     children: [
                       const SizedBox(height: 32),
-                      Text(attributes[i]),
-                      Text(values[i]),
+                      Text(attributesData[i]),
+                      //Text(valuesData[i]),
                     ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  FilledButton.icon(
-                    icon: const Icon(Icons.edit),
-                    label: Text(tr("general.edit")),
-                    onPressed: caseProvider.workShopId ==
-                            widget.caseModel.workshopId
-                        ? () async {
-                            final CaseUpdateDto? caseUpdateDto =
-                                await _showUpdateCaseDialog(widget.caseModel);
-                            if (caseUpdateDto == null) return;
-                            await caseProvider.updateCase(
-                              widget.caseModel.id,
-                              caseUpdateDto,
-                            );
-                          }
-                        : null,
-                  ),
-                  const SizedBox(width: 16),
-                  FilledButton.icon(
-                    icon: const Icon(Icons.tab),
-                    onPressed: caseProvider.workShopId ==
-                            widget.caseModel.workshopId
-                        ? () async {
-                            if (widget.caseModel.diagnosisId == null) {
-                              String message;
-                              final ScaffoldMessengerState
-                                  scaffoldMessengerState =
-                                  ScaffoldMessenger.of(context);
-                              final DiagnosisModel? createdDiagnosis =
-                                  await diagnosisProvider
-                                      .startDiagnosis(widget.caseModel.id);
-
-                              if (createdDiagnosis != null) {
-                                message = tr(
-                                  // ignore: lines_longer_than_80_chars
-                                  "diagnoses.details.startDiagnosisSuccessMessage",
-                                );
-
-                                routemaster
-                                    .push("/diagnoses/${createdDiagnosis.id}");
-                              } else {
-                                message = tr(
-                                  // ignore: lines_longer_than_80_chars
-                                  "diagnoses.details.startDiagnosisFailureMessage",
-                                );
-                              }
-                              _showMessage(message, scaffoldMessengerState);
-                            } else {
-                              routemaster.push(
-                                "/diagnoses/${widget.caseModel.diagnosisId}",
-                              );
-                            }
-                          }
-                        : null,
-                    label: Text(
-                      tr(
-                        widget.caseModel.diagnosisId == null
-                            ? "cases.details.startDiagnosis"
-                            : "cases.details.showDiagnosis",
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+              ),*/
+              ],
+            ),
           ),
         ),
       ),
