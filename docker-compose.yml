@@ -12,13 +12,30 @@ services:
       - full
       - rollout1
     command:
+      # Basic Configuration
+      - "--log.level=ERROR"
+      - "--api=true"
+      - "--providers.docker=true"
+      - "--providers.docker.network=hubnet"
+      - "--providers.docker.exposedByDefault=false"
+
+      # EntryPoints
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls=true"
+
+      - "--entrypoints.minio.address=:9000"
+
       # Let's Encrypt
-      - '--certificatesresolvers.letsencrypt.acme.email=${ROOT_EMAIL:?error}'
-      - '--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web'
-      - '--certificatesresolvers.letsencrypt.acme.httpchallenge=true'
-      - '--certificatesresolvers.letsencrypt.acme.storage=/certs/acme.json'
+      - "--certificatesResolvers.letsencrypt.acme.email=${ROOT_EMAIL:?error}"
+      - "--certificatesResolvers.letsencrypt.acme.httpChallenge.entryPoint=web"
+      - "--certificatesResolvers.letsencrypt.acme.httpChallenge=true"
+      - "--certificatesResolvers.letsencrypt.acme.storage=/certs/acme.json"
+
       # Global Certificate Resolver
-      - '--entrypoints.websecure.http.tls.certresolver=${PROXY_DEFAULT_CERTIFICATE_RESOLVER:-}'
+      - "--entrypoints.websecure.http.tls.certresolver=${PROXY_DEFAULT_CERTIFICATE_RESOLVER:-}"
     labels:
       - traefik.enable=true
       - traefik.docker.network=hubnet
@@ -44,7 +61,6 @@ services:
       - 9000:9000
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock:ro
-    - ./proxy/proxy-config.yml:/etc/traefik/traefik.yml:ro
     - proxy-certs:/certs
 
   mongo:
