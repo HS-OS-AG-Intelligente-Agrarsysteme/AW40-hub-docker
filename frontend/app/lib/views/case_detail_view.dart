@@ -268,8 +268,11 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                         source: CaseDetailDataTableSource(
                           themeData: Theme.of(context),
                           caseModels: widget.caseModel,
-                          dataType:
-                              "OBD", // => hier Liste mit den 3 Types die dann durchgelaufen werden
+                          dataType: [
+                            "OBD",
+                            "",
+                            ""
+                          ], // => hier Liste mit den 3 Types die dann durchgelaufen werden
                         ),
                         showCheckboxColumn: false,
                         rowsPerPage: 12,
