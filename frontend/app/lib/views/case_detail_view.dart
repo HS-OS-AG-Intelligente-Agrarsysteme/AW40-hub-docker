@@ -256,78 +256,30 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                     ),
                   ],
                 ),
-                //const SizedBox(height: 16),
-                const Divider(height: 32, thickness: .1, color: Colors.white),
-                //const SizedBox(height: 16),
-
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: PaginatedDataTable(
-                        source: CaseDetailDataTableSource(
-                          themeData: Theme.of(context),
-                          caseModels: widget.caseModel,
-                          dataType: [
-                            "OBD",
-                            "",
-                            ""
-                          ], // => hier Liste mit den 3 Types die dann durchgelaufen werden
-                        ),
-                        showCheckboxColumn: false,
-                        rowsPerPage: 12,
-                        columns: [
-                          DataColumn(label: Text(tr("general.id"))),
-                          DataColumn(label: Text(tr("general.date"))),
-                          const DataColumn(label: Text("DataType")),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-
-                /*SingleChildScrollView(
-                scrollDirection: Axis
-                    .horizontal, // Allows horizontal scrolling for wider tables
-                child: DataTable(
-                  columnSpacing: 56,
-                  columns: [
-                    DataColumn(label: Text(tr("general.id"))),
-                    DataColumn(label: Text(tr("general.date"))),
-                    DataColumn(label: Text(tr("general.type"))),
-                  ],
-                  rows: List.generate(
-                    attributesID.length,
-                    (i) => DataRow(
-                      cells: [
-                        DataCell(Text(
-                          attributesID[i],
-                        )), // Example, adjust according to your data structure
-                        DataCell(Text(attributesTimestamp[
-                            i])), // Example, adjust according to your data structure
-                        DataCell(Text(attributesType[
-                            i])), // Example, adjust according to your data structure
-                      ],
-                    ),
-                  ),
-                ),
-              )
-
-
-             //table Data
-             Table(
-                columnWidths: const {0: IntrinsicColumnWidth()},
-                children: List.generate(
-                  attributesData.length,
-                  (i) => TableRow(
+                Container(height: 16),
+                Card(
+                  color: const Color.fromARGB(255, 126, 138, 145),
+                  child: Row(
                     children: [
-                      const SizedBox(height: 32),
-                      Text(attributesData[i]),
-                      //Text(valuesData[i]),
+                      Expanded(
+                        flex: 3,
+                        child: PaginatedDataTable(
+                          source: CaseDetailDataTableSource(
+                            themeData: Theme.of(context),
+                            caseModel: widget.caseModel,
+                          ),
+                          showCheckboxColumn: false,
+                          rowsPerPage: 8,
+                          columns: [
+                            DataColumn(label: Text(tr("general.id"))),
+                            DataColumn(label: Text(tr("general.date"))),
+                            DataColumn(label: Text(tr("general.dataType"))),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
-                ),
-              ),*/
+                )
               ],
             ),
           ),

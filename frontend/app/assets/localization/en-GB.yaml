@@ -4,6 +4,7 @@ general:
   close: "Close"
   customer: "Customer"
   customerId: "Customer id"
+  dataType: "Data Type"
   date: "Date"
   delete: "Delete"
   edit: "Edit"
@@ -30,6 +31,7 @@ general:
   workshopId: "Workshop id"
   yes: "Yes"
   no:
+    data: "No data available"
     date: "No Date"
     customerId: "No customer id"
     vehiclevin: "No vehicle vin"
@@ -97,6 +99,10 @@ cases:
     status:
       open: "Open"
       closed: "Closed"
+    dataTypes:
+      obdData: "OBD Data"
+      symptoms: "Symptoms"
+      timeseriesData: "Timeseries Data"
 customers:
   title: "Customers"
 vehicles:
