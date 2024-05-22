@@ -231,7 +231,8 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                                   );
 
                                   routemaster.push(
-                                      "/diagnoses/${createdDiagnosis.id}");
+                                    "/diagnoses/${createdDiagnosis.id}",
+                                  );
                                 } else {
                                   message = tr(
                                     // ignore: lines_longer_than_80_chars
