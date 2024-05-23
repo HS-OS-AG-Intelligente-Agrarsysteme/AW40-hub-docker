@@ -10,11 +10,13 @@ class DiagnosisDragAndDropArea extends StatefulWidget {
     required this.onDragDone,
     required this.onUploadFile,
     required this.fileName,
+    required this.dataType,
     super.key,
   });
   final String? fileName;
   final void Function(DropDoneDetails) onDragDone;
   final void Function() onUploadFile;
+  final String dataType;
 
   @override
   State<DiagnosisDragAndDropArea> createState() =>
@@ -77,7 +79,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
                 padding: const EdgeInsets.all(16),
                 child: Center(
                   child: Text(
-                    tr("diagnoses.details.dragAndDrop"),
+                    tr("diagnoses.details.dragAndDrop.${widget.dataType}"),
                     style: TextStyle(
                       color: diagnosisStatusOnContainerColor,
                     ),

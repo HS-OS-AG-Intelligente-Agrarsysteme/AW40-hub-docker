@@ -58,7 +58,11 @@ diagnoses:
     obdUpload: "OBD-Daten hochladen"
     uploadFile: "Laden Sie eine Datei hoch"
     uploadFileTooltip: "Datei hochladen"
-    dragAndDrop: "Datei per Drag & Drop hier ablegen"
+    dragAndDrop: 
+      obd: "OBD Daten per Drag & Drop hier ablegen"
+      oscillogram: "Picoscope Daten per Drag & Drop hier ablegen"
+      symptom: "Symptoms per Drag & Drop hier ablegen"
+      ominview: "Omniview Daten per Drag & Drop hier ablegen"
     uploadDataSuccessMessage: "Die Daten wurden erfolgreich hochgeladen."
     uploadDataErrorMessage: "Die Daten konnten nicht hochgeladen werden."
 cases:

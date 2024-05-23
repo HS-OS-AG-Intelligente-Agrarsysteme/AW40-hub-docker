@@ -189,12 +189,20 @@ class HttpService {
     String token,
     String workshopId,
     String caseId,
+    //String component,
+    //String label,
     // TODO: Change param structure.
     // Add 2 String params `component` and `label`
     // Remove requestBody param
     // Create JSON object from `component` and `label` params inside function
     Map<String, dynamic> requestBody,
   ) {
+    /*final Map<String, dynamic> requestBody = {
+      "component": component,
+      "label": label,
+    };
+    final String jsonRequestBody = jsonEncode(requestBody);*/
+
     return _client.post(
       Uri.parse("$backendUrl/$workshopId/cases/$caseId/symptoms"),
       headers: getAuthHeaderWith(token, {

@@ -102,10 +102,12 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                       iconColor: diagnosisStatusOnContainerColor,
                     ),
                     if (status == DiagnosisStatus.action_required)
+                      //hier rüber iterieren (über die dataTypes -> im Moment nur der erste?)
                       DiagnosisDragAndDropArea(
                         fileName: _file?.name,
                         onUploadFile: _uploadFile,
                         onDragDone: _onDragDone,
+                        dataType: widget.diagnosisModel.todos.first.dataType,
                       ),
                   ],
                 ),
@@ -163,7 +165,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
         case "obd":
           final Map<String, dynamic> jsonMap = jsonDecode(fileContent);
           final NewOBDDataDto newOBDDataDto = NewOBDDataDto.fromJson(jsonMap);
-
           result = await diagnosisProvider.uploadObdData(
             widget.diagnosisModel.caseId,
             newOBDDataDto,
@@ -186,6 +187,22 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             newSymptomDto,
           );
           break;
+        case "ominview":
+          final List<int> byteData = utf8.encode(fileContent);
+          //TODO change parameters!
+          String component = "";
+          int samplingRate = 2;
+          int duration = 2;
+          result = await diagnosisProvider.uploadOmniviewData(
+            widget.diagnosisModel.caseId,
+            byteData,
+            file.name,
+            component,
+            samplingRate,
+            duration,
+          );
+          break;
+
         // TODO: Add case for omniview data.
         default:
           throw AppException(
