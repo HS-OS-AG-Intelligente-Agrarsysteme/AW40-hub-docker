@@ -411,7 +411,7 @@ services:
       - full
       - rollout1
     ports:
-      - 3030:3030
+      - 127.0.0.1:3030:3030
     hostname: "knowledge-graph"
     networks:
       - hubintranet
