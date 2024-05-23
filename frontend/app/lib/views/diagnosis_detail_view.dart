@@ -103,12 +103,14 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                     ),
                     if (status == DiagnosisStatus.action_required)
                       //hier rüber iterieren (über die dataTypes -> im Moment nur der erste?)
-                      DiagnosisDragAndDropArea(
-                        fileName: _file?.name,
-                        onUploadFile: _uploadFile,
-                        onDragDone: _onDragDone,
-                        dataType: widget.diagnosisModel.todos.first.dataType,
-                      ),
+                      for (var action in widget.diagnosisModel.todos) ...[
+                        DiagnosisDragAndDropArea(
+                          fileName: _file?.name,
+                          onUploadFile: _uploadFile,
+                          onDragDone: _onDragDone,
+                          dataType: action.dataType,
+                        ),
+                      ]
                   ],
                 ),
               ),
