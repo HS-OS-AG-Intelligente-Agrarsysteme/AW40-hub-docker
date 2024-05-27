@@ -116,14 +116,11 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                   ],
                 ),
               ),
-              const SizedBox(height: 32,)
+              const SizedBox(height: 32),
               // TBD: State Machine Log
               const Expanded(child: Placeholder()),
-          ),
             ],
           ),
-          
-            
         ),
       ),
     );

@@ -44,6 +44,8 @@ enum DiagnosisStatus {
   failed,
 }
 
+enum Datatype { obd, oscillogram, symptom, omniview }
+
 enum NavigationType { internal, external }
 
 enum SymptomLabel { unknown, ok, defect }

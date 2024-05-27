@@ -33,19 +33,43 @@ class DiagnosisProvider with ChangeNotifier {
           ActionModel(
             id: "1",
             instruction: "Laden Sie OBD-Daten hoch",
-            actionType: "",
-            dataType: "",
-            component: "",
+            actionType: "add_obd",
+            dataType: "obd",
+            component: "null",
           )
         ],
       ),
       DiagnosisModel(
         id: "2",
         timestamp: DateTime.now(),
-        status: DiagnosisStatus.scheduled,
+        status: DiagnosisStatus.action_required,
         caseId: "2",
         stateMachineLog: [],
-        todos: [],
+        todos: [
+          ActionModel(
+            id: "2",
+            instruction: "Bitte ein Oszillogramm erstellen und hochladen.",
+            actionType: "add_data",
+            dataType: "oscillogram",
+            component: "boost_pressure_control_valve",
+          )
+        ],
+      ),
+      DiagnosisModel(
+        id: "8",
+        timestamp: DateTime.now(),
+        status: DiagnosisStatus.action_required,
+        caseId: "8",
+        stateMachineLog: [],
+        todos: [
+          ActionModel(
+            id: "8",
+            instruction: "Bitte ein Symptome bereitstellen.",
+            actionType: "add_data",
+            dataType: "symptom",
+            component: "boost_pressure_control_valve",
+          )
+        ],
       ),
       DiagnosisModel(
         id: "3",
