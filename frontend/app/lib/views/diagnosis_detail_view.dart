@@ -52,6 +52,8 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       status,
     );
 
+    _logger.info(widget.diagnosisModel.todos[0].dataType);
+
     return SizedBox.expand(
       child: Card(
         child: Padding(
@@ -88,6 +90,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
               ),
               const SizedBox(height: 16),
               // Coloured card for current State
+
               Card(
                 color: diagnosisStatusContainerColor,
                 child: Column(
@@ -103,22 +106,24 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                     ),
                     if (status == DiagnosisStatus.action_required)
                       //hier rüber iterieren (über die dataTypes -> im Moment nur der erste?)
-                      for (var action in widget.diagnosisModel.todos) ...[
-                        DiagnosisDragAndDropArea(
-                          fileName: _file?.name,
-                          onUploadFile: _uploadFile,
-                          onDragDone: _onDragDone,
-                          dataType: action.dataType,
-                        ),
-                      ]
+                      //for (var action in widget.diagnosisModel.todos) ...[
+                      DiagnosisDragAndDropArea(
+                        fileName: _file?.name,
+                        onUploadFile: _uploadFile,
+                        onDragDone: _onDragDone,
+                        dataType: widget.diagnosisModel.todos[0].dataType,
+                      ),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 32,)
               // TBD: State Machine Log
               const Expanded(child: Placeholder()),
+          ),
             ],
           ),
+          
+            
         ),
       ),
     );
@@ -144,6 +149,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     return Text(
       HelperService.convertIso88591ToUtf8(
         widget.diagnosisModel.todos[0].instruction,
+        //action.instruction,
       ),
       softWrap: true,
       overflow: TextOverflow.ellipsis,
