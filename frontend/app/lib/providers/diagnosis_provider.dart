@@ -64,9 +64,9 @@ class DiagnosisProvider with ChangeNotifier {
         todos: [
           ActionModel(
             id: "8",
-            instruction: "Bitte ein Symptome bereitstellen.",
+            instruction: "Bitte ein Omniview erstellen.",
             actionType: "add_data",
-            dataType: "symptom",
+            dataType: "omniview",
             component: "boost_pressure_control_valve",
           )
         ],
