@@ -258,29 +258,37 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                   ],
                 ),
                 Container(height: 16),
-                Card(
+                /*Card(
                   color: const Color.fromARGB(255, 126, 138, 145),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: PaginatedDataTable(
-                          source: CaseDetailDataTableSource(
-                            themeData: Theme.of(context),
-                            caseModel: widget.caseModel,
+                  child: */
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Table(
+                        columnWidths: const {0: IntrinsicColumnWidth()},
+                        children: [
+                          TableRow(
+                            children: [
+                              const SizedBox(height: 32),
+                              Text(tr("general.id")),
+                              Text(tr("general.date")),
+                              Text(tr("general.dataType")),
+                            ],
                           ),
-                          showCheckboxColumn: false,
-                          rowsPerPage: 8,
-                          columns: [
-                            DataColumn(label: Text(tr("general.id"))),
-                            DataColumn(label: Text(tr("general.date"))),
-                            DataColumn(label: Text(tr("general.dataType"))),
-                          ],
-                        ),
+                          ...widget.caseModel.timeseriesData.map(
+                            (TimeseriesDataModel e) =>
+                                buildTimeseriesDataRow(e),
+                          ),
+                          ...widget.caseModel.obdData
+                              .map((ObdDataModel e) => buildObdDataRow(e)),
+                          ...widget.caseModel.symptoms
+                              .map((SymptomModel e) => buildSymptomsDataRow(e)),
+                        ],
                       ),
-                    ],
-                  ),
-                )
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -288,6 +296,53 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
       ),
     );
   }
+
+  TableRow buildTimeseriesDataRow(TimeseriesDataModel e) {
+    return TableRow(
+      children: [
+        const SizedBox(height: 32),
+        Text(e.dataId.toString()),
+        Text(e.timestamp.toString()),
+        Text(e.toString()),
+      ],
+    );
+  }
+
+  TableRow buildObdDataRow(ObdDataModel e) {
+    return TableRow(
+      children: [
+        const SizedBox(height: 32),
+        Text(e.dataId.toString()),
+        Text(e.timestamp.toString()),
+        Text(e.toString()),
+      ],
+    );
+  }
+
+  TableRow buildSymptomsDataRow(SymptomModel e) {
+    return TableRow(
+      children: [
+        const SizedBox(height: 32),
+        Text(e.dataId.toString()),
+        Text(e.timestamp.toString()),
+        Text(e.toString()),
+      ],
+    );
+  }
+
+/*PaginatedDataTable(
+  source: CaseDetailDataTableSource(
+    themeData: Theme.of(context),
+    caseModel: widget.caseModel,
+  ),
+  showCheckboxColumn: false,
+  rowsPerPage: 8,
+  columns: [
+    DataColumn(label: Text(tr("general.id"))),
+    DataColumn(label: Text(tr("general.date"))),
+    DataColumn(label: Text(tr("general.dataType"))),
+  ],
+),*/
 
   Future<CaseUpdateDto?> _showUpdateCaseDialog(CaseModel caseModel) async {
     return showDialog<CaseUpdateDto>(
