@@ -1,6 +1,4 @@
 import "dart:async";
-
-import "package:aw40_hub_frontend/data_sources/detail_view_sources.dart";
 import "package:aw40_hub_frontend/dialogs/update_case_dialog.dart";
 import "package:aw40_hub_frontend/dtos/case_update_dto.dart";
 import "package:aw40_hub_frontend/models/models.dart";
@@ -257,10 +255,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                     ),
                   ],
                 ),
-                Container(height: 16),
-                /*Card(
-                  color: const Color.fromARGB(255, 126, 138, 145),
-                  child: */
+                Container(height: 32),
                 Row(
                   children: [
                     Expanded(
@@ -276,14 +271,24 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                               Text(tr("general.dataType")),
                             ],
                           ),
-                          ...widget.caseModel.timeseriesData.map(
-                            (TimeseriesDataModel e) =>
-                                buildTimeseriesDataRow(e),
-                          ),
-                          ...widget.caseModel.obdData
-                              .map((ObdDataModel e) => buildObdDataRow(e)),
-                          ...widget.caseModel.symptoms
-                              .map((SymptomModel e) => buildSymptomsDataRow(e)),
+                          if (widget.caseModel.symptoms.isEmpty ||
+                              widget.caseModel.timeseriesData.isEmpty ||
+                              widget.caseModel.obdData.isEmpty)
+                            TableRow(
+                              children: [
+                                const SizedBox(height: 32),
+                                Text(tr("general.no.data")),
+                                const Text(""),
+                                const Text(""),
+                              ],
+                            )
+                          else ...[
+                            ...widget.caseModel.timeseriesData
+                                .map(buildTimeseriesDataRow),
+                            ...widget.caseModel.obdData.map(buildObdDataRow),
+                            ...widget.caseModel.symptoms
+                                .map(buildSymptomsDataRow),
+                          ],
                         ],
                       ),
                     ),
