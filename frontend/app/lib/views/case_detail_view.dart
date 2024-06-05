@@ -335,20 +335,6 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
     );
   }
 
-/*PaginatedDataTable(
-  source: CaseDetailDataTableSource(
-    themeData: Theme.of(context),
-    caseModel: widget.caseModel,
-  ),
-  showCheckboxColumn: false,
-  rowsPerPage: 8,
-  columns: [
-    DataColumn(label: Text(tr("general.id"))),
-    DataColumn(label: Text(tr("general.date"))),
-    DataColumn(label: Text(tr("general.dataType"))),
-  ],
-),*/
-
   Future<CaseUpdateDto?> _showUpdateCaseDialog(CaseModel caseModel) async {
     return showDialog<CaseUpdateDto>(
       context: context,
