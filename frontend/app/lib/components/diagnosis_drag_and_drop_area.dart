@@ -122,19 +122,6 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
                 ),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.upload),
-                  style: IconButton.styleFrom(
-                    foregroundColor: diagnosisStatusOnContainerColor,
-                  ),
-                  onPressed: widget.onUploadFile,
-                  tooltip: tr("diagnoses.details.uploadFileTooltip"),
-                ),
-              ],
-            ),
           ],
         );
       default:
@@ -179,7 +166,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
     String description,
     TextEditingController fieldController,
   ) {
-    return /*DecoratedBox(
+    return DecoratedBox(
       decoration: BoxDecoration(
         border: Border.all(style: BorderStyle.none),
         borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -193,44 +180,42 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
         radius: const Radius.circular(10),
         padding: const EdgeInsets.only(left: 16, right: 16),
         child: Center(
-            child:*/
-        TextFormField(
-      decoration: InputDecoration(
-        labelText: ("general.$description"),
-        labelStyle: TextStyle(
-          color: diagnosisStatusOnContainerColor,
+          child: TextFormField(
+            decoration: InputDecoration(
+              labelText: ("general.$description"),
+              labelStyle: TextStyle(
+                color: diagnosisStatusOnContainerColor,
+              ),
+              floatingLabelStyle: TextStyle(
+                color: diagnosisStatusOnContainerColor,
+              ),
+              border: InputBorder.none,
+            ),
+            controller: fieldController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return tr("general.obligatoryField");
+              }
+              return null;
+            },
+            onSaved: (description) {
+              if (description == null) {
+                throw AppException(
+                  exceptionType: ExceptionType.unexpectedNullValue,
+                  exceptionMessage: "$description was null, validation failed.",
+                );
+              }
+              if (description.isEmpty) {
+                throw AppException(
+                  exceptionType: ExceptionType.unexpectedNullValue,
+                  exceptionMessage:
+                      "$description was empty, validation failed.",
+                );
+              }
+            },
+          ),
         ),
-        floatingLabelStyle: TextStyle(
-          color: diagnosisStatusOnContainerColor,
-        ),
-        border: InputBorder.none,
       ),
-      controller: fieldController,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return tr("general.obligatoryField");
-        }
-        return null;
-      },
-      onSaved: (description) {
-        if (description == null) {
-          throw AppException(
-            exceptionType: ExceptionType.unexpectedNullValue,
-            exceptionMessage: "$description was null, validation failed.",
-          );
-        }
-        if (description.isEmpty) {
-          throw AppException(
-            exceptionType: ExceptionType.unexpectedNullValue,
-            exceptionMessage: "$description was empty, validation failed.",
-          );
-        }
-      },
     );
   }
-  /*       )),
-      ),
-    );
-  }
-}*/
 }

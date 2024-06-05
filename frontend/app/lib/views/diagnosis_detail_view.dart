@@ -52,6 +52,8 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       status,
     );
 
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
     return SizedBox.expand(
       child: Card(
         child: Padding(
@@ -90,25 +92,39 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
               // Coloured card for current State
               Card(
                 color: diagnosisStatusContainerColor,
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(diagnosisStatusIconData),
-                      title: Text(
-                        tr("diagnoses.status.${status.name}"),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: Icon(diagnosisStatusIconData),
+                        title: Text(
+                          tr("diagnoses.status.${status.name}"),
+                        ),
+                        subtitle: _getSubtitle,
+                        textColor: diagnosisStatusOnContainerColor,
+                        iconColor: diagnosisStatusOnContainerColor,
                       ),
-                      subtitle: _getSubtitle,
-                      textColor: diagnosisStatusOnContainerColor,
-                      iconColor: diagnosisStatusOnContainerColor,
-                    ),
-                    if (status == DiagnosisStatus.action_required)
-                      DiagnosisDragAndDropArea(
-                        fileName: _file?.name,
-                        onUploadFile: _uploadFile,
-                        onDragDone: _onDragDone,
-                        dataType: widget.diagnosisModel.todos[0].dataType,
+                      if (status == DiagnosisStatus.action_required)
+                        DiagnosisDragAndDropArea(
+                          fileName: _file?.name,
+                          onUploadFile: _uploadFile,
+                          onDragDone: _onDragDone,
+                          dataType: widget.diagnosisModel.todos[0].dataType,
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              // Perform save operation
+                            }
+                          },
+                          child: Text('Submit'),
+                        ),
                       ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 32),
