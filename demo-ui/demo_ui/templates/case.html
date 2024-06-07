@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<h1> Fall {{ case["_id"] }} <a class="linkbutton" href="/ui/{{ request.path_params['workshop_id'] }}/cases">Zurück zur Übersicht</a></h1>
+<h1> Fall {{ case["_id"] }} <a class="linkbutton" href="{{ request.base_url }}ui/{{ request.path_params['workshop_id'] }}/cases">Zurück zur Übersicht</a></h1>
 <div style="display:grid;grid-template-columns: 1fr 1fr;">
     <div>
         <h2> Details </h2>

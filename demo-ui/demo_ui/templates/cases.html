@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block sidebar %}
-    <a href="/ui/logout">Werkstatt {{ request.path_params["workshop_id"] }} (Abmelden)</a>
+    <a href="{{ request.base_url }}ui/logout">Werkstatt {{ request.path_params["workshop_id"] }} (Abmelden)</a>
     <a href="#"><b>Fälle</b></a>
 {% endblock %}
 
 {% block content %}
-<h1> Alle Fälle <a class="linkbutton" href="cases/new">Neuen Fall anlegen</a> <a class="linkbutton" href="/ui/logout">Abmelden</a> </h1>
+<h1> Alle Fälle <a class="linkbutton" href="cases/new">Neuen Fall anlegen</a> <a class="linkbutton" href="{{ request.base_url }}ui/logout">Abmelden</a> </h1>
 <table>
   <tr>
     <th>ID</th>
