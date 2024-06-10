@@ -65,6 +65,9 @@ diagnoses:
       ominview: "Drag and drop the ominview data here"
     uploadDataSuccessMessage: "The data has been uploaded successfully."
     uploadDataErrorMessage: "The data could not be uploaded."
+    component: "Component"
+    samplingRate: "Sampling Rate"
+    duration: "Duration"
 cases:
   title: "Cases"
   actions:

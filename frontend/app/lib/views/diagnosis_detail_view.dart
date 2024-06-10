@@ -113,14 +113,19 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                           dataType: widget.diagnosisModel.todos[0].dataType,
                         ),
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(16),
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (formKey.currentState!.validate()) {
                               // Perform save operation
+                              await _uploadFile();
                             }
                           },
-                          child: Text('Submit'),
+                          child: Text(
+                            "Submit",
+                            style:
+                                TextStyle(color: diagnosisStatusContainerColor),
+                          ),
                         ),
                       ),
                     ],

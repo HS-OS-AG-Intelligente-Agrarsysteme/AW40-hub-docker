@@ -75,7 +75,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             ],
             backgroundColor: diagnosisStatusOnContainerColor,
           ),*/
-          const SizedBox(height: 16),
+          //const SizedBox(height: 16),
         ],
       ),
     );
@@ -105,19 +105,19 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
                 const SizedBox(height: 10),
                 buildDecoratedBox(
                   diagnosisStatusOnContainerColor,
-                  "Component",
+                  "component",
                   componentController,
                 ),
                 const SizedBox(height: 10),
                 buildDecoratedBox(
                   diagnosisStatusOnContainerColor,
-                  "Sampling Rate",
+                  "samplingRate",
                   samplingRateController,
                 ),
                 const SizedBox(height: 10),
                 buildDecoratedBox(
                   diagnosisStatusOnContainerColor,
-                  "Duration",
+                  "duration",
                   durationController1,
                 ),
               ],
@@ -166,56 +166,67 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
     String description,
     TextEditingController fieldController,
   ) {
-    return DecoratedBox(
+    return /*DecoratedBox(
       decoration: BoxDecoration(
         border: Border.all(style: BorderStyle.none),
         borderRadius: const BorderRadius.all(Radius.circular(10)),
-        color: _dragging
-            ? diagnosisStatusOnContainerColor.withOpacity(0.3)
-            : diagnosisStatusOnContainerColor.withOpacity(0.2),
+        color: diagnosisStatusOnContainerColor.withOpacity(0.2),
+        //: diagnosisStatusOnContainerColor.withOpacity(0.2),
       ),
       child: DottedBorder(
         borderType: BorderType.RRect,
         dashPattern: const <double>[8, 4],
         radius: const Radius.circular(10),
-        padding: const EdgeInsets.only(left: 16, right: 16),
-        child: Center(
-          child: TextFormField(
-            decoration: InputDecoration(
-              labelText: ("general.$description"),
-              labelStyle: TextStyle(
-                color: diagnosisStatusOnContainerColor,
-              ),
-              floatingLabelStyle: TextStyle(
-                color: diagnosisStatusOnContainerColor,
-              ),
-              border: InputBorder.none,
+        //padding: const EdgeInsets.only(left: 16, right: 16),
+        child:*/
+        Center(
+      child: TextFormField(
+        decoration: InputDecoration(
+          labelText: tr("diagnoses.details.$description"),
+          filled: true,
+          fillColor: diagnosisStatusOnContainerColor.withOpacity(0.2),
+          labelStyle: TextStyle(
+            color: diagnosisStatusOnContainerColor,
+          ),
+          floatingLabelStyle: TextStyle(
+            color: diagnosisStatusOnContainerColor,
+          ),
+          //floatingLabelAlignment: FloatingLabelAlignment.center,
+          border: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: diagnosisStatusOnContainerColor,
             ),
-            controller: fieldController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return tr("general.obligatoryField");
-              }
-              return null;
-            },
-            onSaved: (description) {
-              if (description == null) {
-                throw AppException(
-                  exceptionType: ExceptionType.unexpectedNullValue,
-                  exceptionMessage: "$description was null, validation failed.",
-                );
-              }
-              if (description.isEmpty) {
-                throw AppException(
-                  exceptionType: ExceptionType.unexpectedNullValue,
-                  exceptionMessage:
-                      "$description was empty, validation failed.",
-                );
-              }
-            },
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
           ),
         ),
+        style: TextStyle(color: diagnosisStatusOnContainerColor),
+        textAlign: TextAlign.center,
+        cursorWidth: 0.5,
+        cursorColor: diagnosisStatusOnContainerColor.withOpacity(0.4),
+        controller: fieldController,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return tr("general.obligatoryField");
+          }
+          return null;
+        },
+        onSaved: (description) {
+          if (description == null) {
+            throw AppException(
+              exceptionType: ExceptionType.unexpectedNullValue,
+              exceptionMessage: "$description was null, validation failed.",
+            );
+          }
+          if (description.isEmpty) {
+            throw AppException(
+              exceptionType: ExceptionType.unexpectedNullValue,
+              exceptionMessage: "$description was empty, validation failed.",
+            );
+          }
+        },
       ),
+      //),
+      //),
     );
   }
 }
