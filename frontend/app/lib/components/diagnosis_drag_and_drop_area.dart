@@ -13,12 +13,14 @@ class DiagnosisDragAndDropArea extends StatefulWidget {
     required this.onUploadFile,
     required this.fileName,
     required this.dataType,
+    required this.formKey,
     super.key,
   });
   final String? fileName;
   final void Function(DropDoneDetails) onDragDone;
   final void Function() onUploadFile;
   final String dataType;
+  final GlobalKey<FormState> formKey;
 
   @override
   State<DiagnosisDragAndDropArea> createState() =>
@@ -33,6 +35,11 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
     final colorScheme = Theme.of(context).colorScheme;
     final diagnosisStatusOnContainerColor =
         HelperService.getDiagnosisStatusOnContainerColor(
+      colorScheme,
+      DiagnosisStatus.action_required,
+    );
+    final diagnosisStatusContainerColor =
+        HelperService.getDiagnosisStatusContainerColor(
       colorScheme,
       DiagnosisStatus.action_required,
     );
@@ -75,7 +82,21 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             ],
             backgroundColor: diagnosisStatusOnContainerColor,
           ),*/
-          //const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: ElevatedButton(
+              onPressed: () async {
+                if (widget.formKey.currentState!.validate()) {
+                  // Perform save operation
+                  widget.onUploadFile;
+                }
+              },
+              child: Text(
+                tr("diagnoses.details.uploadFileTooltip"),
+                style: TextStyle(color: diagnosisStatusContainerColor),
+              ),
+            ),
+          )
         ],
       ),
     );
@@ -185,19 +206,17 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
           labelText: tr("diagnoses.details.$description"),
           filled: true,
           fillColor: diagnosisStatusOnContainerColor.withOpacity(0.2),
-          labelStyle: TextStyle(
-            color: diagnosisStatusOnContainerColor,
-          ),
-          floatingLabelStyle: TextStyle(
-            color: diagnosisStatusOnContainerColor,
-          ),
-          //floatingLabelAlignment: FloatingLabelAlignment.center,
+          labelStyle: TextStyle(color: diagnosisStatusOnContainerColor),
+          floatingLabelStyle:
+              TextStyle(color: diagnosisStatusOnContainerColor, fontSize: 20),
           border: OutlineInputBorder(
             borderSide: BorderSide(
-              color: diagnosisStatusOnContainerColor,
+              color: diagnosisStatusOnContainerColor.withOpacity(0.4),
             ),
             borderRadius: const BorderRadius.all(Radius.circular(10)),
           ),
+          errorStyle: TextStyle(
+              color: diagnosisStatusOnContainerColor.withOpacity(0.9)),
         ),
         style: TextStyle(color: diagnosisStatusOnContainerColor),
         textAlign: TextAlign.center,
@@ -228,5 +247,14 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
       //),
       //),
     );
+  }
+
+  void _submitActionForm() {
+    final FormState? currentFormKeyState = widget.formKey.currentState;
+    if (currentFormKeyState != null && currentFormKeyState.validate()) {
+      currentFormKeyState.save();
+      widget.onUploadFile;
+      //   unawaited(Routemaster.of(context).pop<NewCaseDto>(newCaseDto));
+    }
   }
 }
