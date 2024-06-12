@@ -255,43 +255,35 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                     ),
                   ],
                 ),
-                Container(height: 32),
-                Row(
+                const SizedBox(height: 32),
+                Table(
+                  columnWidths: const {0: IntrinsicColumnWidth()},
                   children: [
-                    Expanded(
-                      flex: 3,
-                      child: Table(
-                        columnWidths: const {0: IntrinsicColumnWidth()},
-                        children: [
-                          TableRow(
-                            children: [
-                              const SizedBox(height: 32),
-                              Text(tr("general.id")),
-                              Text(tr("general.date")),
-                              Text(tr("general.dataType")),
-                            ],
-                          ),
-                          if (widget.caseModel.symptoms.isEmpty ||
-                              widget.caseModel.timeseriesData.isEmpty ||
-                              widget.caseModel.obdData.isEmpty)
-                            TableRow(
-                              children: [
-                                const SizedBox(height: 32),
-                                Text(tr("general.no.data")),
-                                const Text(""),
-                                const Text(""),
-                              ],
-                            )
-                          else ...[
-                            ...widget.caseModel.timeseriesData
-                                .map(buildTimeseriesDataRow),
-                            ...widget.caseModel.obdData.map(buildObdDataRow),
-                            ...widget.caseModel.symptoms
-                                .map(buildSymptomsDataRow),
-                          ],
-                        ],
-                      ),
+                    TableRow(
+                      children: [
+                        const SizedBox(height: 32),
+                        Text(tr("general.id")),
+                        Text(tr("general.date")),
+                        Text(tr("general.dataType")),
+                      ],
                     ),
+                    if (widget.caseModel.symptoms.isEmpty &&
+                        widget.caseModel.timeseriesData.isEmpty &&
+                        widget.caseModel.obdData.isEmpty)
+                      TableRow(
+                        children: [
+                          const SizedBox(height: 32),
+                          Text(tr("general.no.data")),
+                          const Text(""),
+                          const Text(""),
+                        ],
+                      )
+                    else ...[
+                      ...widget.caseModel.timeseriesData
+                          .map(buildTimeseriesDataRow),
+                      ...widget.caseModel.obdData.map(buildObdDataRow),
+                      ...widget.caseModel.symptoms.map(buildSymptomsDataRow),
+                    ],
                   ],
                 ),
               ],
@@ -308,7 +300,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
         const SizedBox(height: 32),
         Text(e.dataId.toString()),
         Text(e.timestamp.toString()),
-        Text(e.toString()),
+        Text(e.type.toString()),
       ],
     );
   }
@@ -319,7 +311,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
         const SizedBox(height: 32),
         Text(e.dataId.toString()),
         Text(e.timestamp.toString()),
-        Text(e.toString()),
+        const Text("obd"),
       ],
     );
   }
@@ -330,7 +322,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
         const SizedBox(height: 32),
         Text(e.dataId.toString()),
         Text(e.timestamp.toString()),
-        Text(e.toString()),
+        const Text("symptom"),
       ],
     );
   }
