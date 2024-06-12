@@ -31,6 +31,10 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
   XFile? _file;
   final Logger _logger = Logger("diagnosis detail view");
 
+  TextEditingController componentController = TextEditingController();
+  TextEditingController samplingRateController = TextEditingController();
+  TextEditingController durationController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -112,6 +116,9 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                           onDragDone: _onDragDone,
                           dataType: widget.diagnosisModel.todos[0].dataType,
                           formKey: formKey,
+                          componentController: componentController,
+                          samplingRateController: samplingRateController,
+                          durationController: durationController,
                         ),
                       /*Padding(
                         padding: const EdgeInsets.all(16),
@@ -212,16 +219,16 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
         case "ominview":
           final List<int> byteData = utf8.encode(fileContent);
           //TODO change parameters!
-          String component = "";
-          int samplingRate = 2;
-          int duration = 2;
+          final String component = componentController.text.toLowerCase();
+          final int? samplingRate = int.tryParse(samplingRateController.text);
+          final int? duration = int.tryParse(durationController.text);
           result = await diagnosisProvider.uploadOmniviewData(
             widget.diagnosisModel.caseId,
             byteData,
             file.name,
             component,
-            samplingRate,
-            duration,
+            samplingRate!,
+            duration!,
           );
           break;
 

@@ -22,7 +22,7 @@ class DiagnosisProvider with ChangeNotifier {
 
   Future<List<DiagnosisModel>> getDiagnoses(List<CaseModel> cases) async {
     // * Easy way of testing UI for now.
-    return <DiagnosisModel>[
+    /*return <DiagnosisModel>[
       DiagnosisModel(
         id: "1",
         timestamp: DateTime.now(),
@@ -95,7 +95,7 @@ class DiagnosisProvider with ChangeNotifier {
         stateMachineLog: [],
         todos: [],
       ),
-    ];
+    ];*/
 
     final List<String> caseIDs = cases
         .where((c) => c.workshopId == workShopId)

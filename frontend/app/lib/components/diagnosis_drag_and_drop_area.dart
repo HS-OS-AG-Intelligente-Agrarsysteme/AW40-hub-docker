@@ -1,19 +1,27 @@
+import "dart:convert";
+
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
+import "package:aw40_hub_frontend/providers/diagnosis_provider.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:cross_file/cross_file.dart";
 import "package:desktop_drop/desktop_drop.dart";
 import "package:dotted_border/dotted_border.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:http/http.dart";
+import "package:provider/provider.dart";
 
 class DiagnosisDragAndDropArea extends StatefulWidget {
-  const DiagnosisDragAndDropArea({
+  DiagnosisDragAndDropArea({
     required this.onDragDone,
     required this.onUploadFile,
     required this.fileName,
     required this.dataType,
     required this.formKey,
+    required this.componentController,
+    required this.samplingRateController,
+    required this.durationController,
     super.key,
   });
   final String? fileName;
@@ -21,6 +29,10 @@ class DiagnosisDragAndDropArea extends StatefulWidget {
   final void Function() onUploadFile;
   final String dataType;
   final GlobalKey<FormState> formKey;
+
+  TextEditingController componentController = TextEditingController();
+  TextEditingController samplingRateController = TextEditingController();
+  TextEditingController durationController = TextEditingController();
 
   @override
   State<DiagnosisDragAndDropArea> createState() =>
@@ -88,7 +100,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
               onPressed: () async {
                 if (widget.formKey.currentState!.validate()) {
                   // Perform save operation
-                  widget.onUploadFile;
+                  widget.onUploadFile();
                 }
               },
               child: Text(
@@ -111,12 +123,12 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
       case "symptom":
         return builldDropTarget(diagnosisStatusOnContainerColor);
       case "omniview":
-        final TextEditingController componentController =
+        /*final TextEditingController componentController =
             TextEditingController();
         final TextEditingController samplingRateController =
             TextEditingController();
-        final TextEditingController durationController1 =
-            TextEditingController();
+        final TextEditingController durationController =
+            TextEditingController();*/
         return Column(
           children: [
             Column(
@@ -127,24 +139,30 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
                 buildDecoratedBox(
                   diagnosisStatusOnContainerColor,
                   "component",
-                  componentController,
+                  widget.componentController,
                 ),
                 const SizedBox(height: 10),
                 buildDecoratedBox(
                   diagnosisStatusOnContainerColor,
                   "samplingRate",
-                  samplingRateController,
+                  widget.samplingRateController,
                 ),
                 const SizedBox(height: 10),
                 buildDecoratedBox(
                   diagnosisStatusOnContainerColor,
                   "duration",
-                  durationController1,
+                  widget.durationController,
                 ),
               ],
             ),
+            /*_submitOminviewForm(
+              componentController: componentController,
+              samplingRateController: samplingRateController,
+              durationController: durationController,
+            )*/
           ],
         );
+
       default:
         throw Exception("Unknown data Type: ${widget.dataType}");
     }
@@ -249,12 +267,51 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
     );
   }
 
-  void _submitActionForm() {
+  /*Widget _submitOminviewForm({
+    required TextEditingController componentController,
+    required TextEditingController samplingRateController,
+    required TextEditingController durationController,
+  }) {
     final FormState? currentFormKeyState = widget.formKey.currentState;
+    return ElevatedButton(onPressed: () async {
+      if (widget.formKey.currentState!.validate()) {
+        // Perform save operation
+        widget.onUploadFile;
+      }
+    },
+    child: const Text("Submit!"),);
     if (currentFormKeyState != null && currentFormKeyState.validate()) {
       currentFormKeyState.save();
-      widget.onUploadFile;
+      //_submitOminviewForm()
       //   unawaited(Routemaster.of(context).pop<NewCaseDto>(newCaseDto));
     }
   }
+
+  Future<void> _uploadFile() async {
+    final ScaffoldMessengerState scaffoldMessengerState =
+        ScaffoldMessenger.of(context);
+    final diagnosisProvider = Provider.of<DiagnosisProvider>(
+      context,
+      listen: false,
+    );
+
+    final XFile file = _file!;
+      final String fileContent = await file.readAsString();
+      bool result = false;
+
+
+    final List<int> byteData = utf8.encode(fileContent);
+          //TODO change parameters!
+          String component = "";
+          int samplingRate = 2;
+          int duration = 2;
+          result = await diagnosisProvider.uploadOmniviewData(
+            widget.diagnosisModel.caseId,
+            byteData,
+            file.name,
+            component,
+            samplingRate,
+            duration,
+          );
+  }*/
 }
