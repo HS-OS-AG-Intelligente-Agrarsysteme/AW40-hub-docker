@@ -24,7 +24,7 @@ void main() {
         type: TimeseriesType.oscillogram,
         deviceSpecs: 0,
         dataId: 2,
-        signalId: <String>["some_String", "3"],
+        signalId: "some_string",
       )
     ];
     final obdData = <ObdDataModel>[
@@ -441,7 +441,7 @@ void main() {
     const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
     const int dataId = 5;
-    const signalId = <String>["some_String", "3"];
+    const signalId = "some_String";
     final TimeseriesDataModel timeseriesDataModel = TimeseriesDataModel(
       timestamp: timestamp,
       component: component,

@@ -24,7 +24,7 @@ void main() {
         TimeseriesType.oscillogram,
         0,
         2,
-        <String>["some_String", "3"],
+        "some_String",
       )
     ];
     final obdData = <ObdDataDto>[
@@ -129,7 +129,7 @@ void main() {
         TimeseriesType.oscillogram,
         0,
         2,
-        <String>["some_String", "3"],
+        "some_string",
       )
     ];
     final obdData = <ObdDataDto>[
@@ -235,7 +235,7 @@ void main() {
         TimeseriesType.oscillogram,
         0,
         2,
-        <String>["some_String", "3"],
+        "some_string",
       )
     ];
     final obdData = <ObdDataDto>[
@@ -341,7 +341,7 @@ void main() {
         TimeseriesType.oscillogram,
         0,
         2,
-        <String>["some_String", "3"],
+        "some_string",
       )
     ];
     final obdData = <ObdDataDto>[
@@ -1094,7 +1094,7 @@ void main() {
     const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
     const int dataId = 5;
-    const signalId = <String>["some_String", "3"];
+    const signalId = "some_string";
     final Map<String, dynamic> json = <String, dynamic>{
       "timestamp": timestamp.toIso8601String(),
       "component": component,
@@ -1145,7 +1145,7 @@ void main() {
     const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
     const int dataId = 5;
-    const signalId = <String>["some_String", "3"];
+    const signalId = "some_String";
     final TimeseriesDataDto timeseriesDataDto = TimeseriesDataDto(
       timestamp,
       component,
@@ -1195,7 +1195,7 @@ void main() {
     const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
     const int dataId = 5;
-    const signalId = <String>["some_String", "3"];
+    const signalId = "some_String";
     final TimeseriesDataDto timeseriesDataDto = TimeseriesDataDto(
       timestamp,
       component,
