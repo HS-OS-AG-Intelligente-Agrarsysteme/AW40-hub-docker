@@ -61,6 +61,7 @@ diagnoses:
     dragAndDrop: "Drag and drop the file here"
     uploadDataSuccessMessage: "The data has been uploaded successfully."
     uploadDataErrorMessage: "The data could not be uploaded."
+    noFaultPathFound: "Kein Fehlerpfad gefunden"
 cases:
   title: "Cases"
   actions:
