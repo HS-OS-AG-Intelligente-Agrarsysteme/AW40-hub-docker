@@ -21,5 +21,5 @@ class TimeseriesDataModel {
   TimeseriesType? type;
   dynamic deviceSpecs;
   int? dataId;
-  List<String> signalId;
+  String signalId;
 }
