@@ -5,5 +5,6 @@ export "jwt_model.dart";
 export "logged_in_user_model.dart";
 export "navigation_item_model.dart";
 export "obd_data_model.dart";
+export "state_machine_log_entry_model.dart";
 export "symptom_model.dart";
 export "timeseries_data_model.dart";

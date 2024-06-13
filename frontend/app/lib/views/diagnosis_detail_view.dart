@@ -8,6 +8,7 @@ import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/utils/extensions.dart";
 import "package:cross_file/cross_file.dart";
 import "package:desktop_drop/desktop_drop.dart";
 import "package:easy_localization/easy_localization.dart";
@@ -135,15 +136,32 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
 
   Text? get _getSubtitle {
     final DiagnosisStatus status = widget.diagnosisModel.status;
-    if (status != DiagnosisStatus.action_required) return null;
-
-    return Text(
-      HelperService.convertIso88591ToUtf8(
-        widget.diagnosisModel.todos[0].instruction,
-      ),
-      softWrap: true,
-      overflow: TextOverflow.ellipsis,
-    );
+    switch (status) {
+      case DiagnosisStatus.finished:
+        final String? faultPath = _getFaultPathFromStateMachineLog(
+          widget.diagnosisModel.stateMachineLog,
+        );
+        return Text(
+          faultPath == null
+              ? "tr('diagnoses.details.noFaultPathFound')"
+              : "Fault path: $faultPath",
+        );
+      case DiagnosisStatus.action_required:
+        return Text(
+          HelperService.convertIso88591ToUtf8(
+            widget.diagnosisModel.todos[0].instruction,
+          ),
+          softWrap: true,
+          overflow: TextOverflow.ellipsis,
+        );
+      case DiagnosisStatus.scheduled:
+        break;
+      case DiagnosisStatus.processing:
+        break;
+      case DiagnosisStatus.failed:
+        break;
+    }
+    return null;
   }
 
   Future<void> _uploadFile() async {
@@ -268,5 +286,19 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       content: Center(child: Text(text)),
     );
     state.showSnackBar(snackBar);
+  }
+
+  String? _getFaultPathFromStateMachineLog(
+    List<StateMachineLogEntryModel> stateMachineLog,
+  ) {
+    for (final StateMachineLogEntryModel entry in stateMachineLog) {
+      if (entry.message.contains("FAULT_PATHS")) {
+        final String message = entry.message;
+        const String startMarker = "['";
+        const String endMarker = "']";
+        return message.substringBetween(startMarker, endMarker);
+      }
+    }
+    return "tr('diagnoses.details.noFaultPathFound')";
   }
 }

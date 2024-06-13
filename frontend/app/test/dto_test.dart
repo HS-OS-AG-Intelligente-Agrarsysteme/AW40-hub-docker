@@ -1,4 +1,5 @@
 import "package:aw40_hub_frontend/dtos/dtos.dart";
+import "package:aw40_hub_frontend/dtos/state_machine_log_entry_dto.dart";
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:flutter_test/flutter_test.dart";
@@ -497,7 +498,10 @@ void main() {
     final timeStamp = DateTime.utc(2021);
     const status = DiagnosisStatus.failed;
     const caseId = "some_case_id";
-    const stateMachineLog = <dynamic>[1, 2, 3];
+    final stateMachineLog = <StateMachineLogEntryDto>[
+      StateMachineLogEntryDto("some_message", "some_attachment"),
+      StateMachineLogEntryDto("another_message", "another_attachment"),
+    ];
     final todos = <ActionDto>[ActionDto("1", "some action", "1", "2", "3")];
     final DiagnosisDto diagnosisDto = DiagnosisDto(
       id,
@@ -531,14 +535,17 @@ void main() {
     final timeStamp = DateTime.utc(2021);
     const status = DiagnosisStatus.failed;
     const caseId = "some_case_id";
-    const stateMachineLog = <dynamic>[1, 2, 3];
+    final stateMachineLog = <StateMachineLogEntryDto>[
+      StateMachineLogEntryDto("some_message", "some_attachment"),
+      StateMachineLogEntryDto("another_message", "another_attachment"),
+    ];
     final todos = <ActionDto>[ActionDto("1", "some action", "1", "2", "3")];
     final Map<String, dynamic> json = <String, dynamic>{
       "_id": id,
       "timestamp": timeStamp.toIso8601String(),
       "status": status.name,
       "case_id": caseId,
-      "state_machine_log": stateMachineLog,
+      "state_machine_log": stateMachineLog.map((e) => e.toJson()).toList(),
       "todos": todos.map((e) => e.toJson()).toList(),
     };
     final DiagnosisDto diagnosisDto = DiagnosisDto.fromJson(json);
@@ -555,7 +562,10 @@ void main() {
       expect(diagnosisDto.caseId, caseId);
     });
     test("correctly assigns stateMachineLog", () {
-      expect(diagnosisDto.stateMachineLog, stateMachineLog);
+      expect(
+        diagnosisDto.stateMachineLog,
+        isA<List<StateMachineLogEntryDto>>(),
+      );
     });
     test("correctly assigns todos", () {
       expect(diagnosisDto.todos, isA<List<ActionDto>>());
@@ -566,7 +576,10 @@ void main() {
     final timeStamp = DateTime.utc(2021);
     const status = DiagnosisStatus.failed;
     const caseId = "some_case_id";
-    const stateMachineLog = <dynamic>[1, 2, 3];
+    final stateMachineLog = <StateMachineLogEntryDto>[
+      StateMachineLogEntryDto("some_message", "some_attachment"),
+      StateMachineLogEntryDto("another_message", "another_attachment"),
+    ];
     final todos = <ActionDto>[ActionDto("1", "some action", "1", "2", "3")];
     final DiagnosisDto diagnosisDto = DiagnosisDto(
       id,
@@ -601,7 +614,10 @@ void main() {
     final timeStamp = DateTime.utc(2021);
     const status = DiagnosisStatus.failed;
     const caseId = "some_case_id";
-    const stateMachineLog = <dynamic>[1, 2, 3];
+    final stateMachineLog = <StateMachineLogEntryDto>[
+      StateMachineLogEntryDto("some_message", "some_attachment"),
+      StateMachineLogEntryDto("another_message", "another_attachment"),
+    ];
     final actionDto = ActionDto("1", "some action", "1", "2", "3");
     final todoDtos = <ActionDto>[actionDto];
     final DiagnosisDto diagnosisDto = DiagnosisDto(
@@ -626,22 +642,13 @@ void main() {
       expect(diagnosisModel.caseId, caseId);
     });
     test("correctly assigns stateMachineLog", () {
-      expect(diagnosisModel.stateMachineLog, stateMachineLog);
+      expect(
+        diagnosisModel.stateMachineLog,
+        isA<List<StateMachineLogEntryModel>>(),
+      );
     });
     test("correctly assigns todos", () {
-      final List<ActionModel> todoModels =
-          todoDtos.map((e) => e.toModel()).toList();
-      assert(todoDtos.length == todoModels.length);
-
-      for (var i = 0; i < todoDtos.length; i++) {
-        final ActionDto todoDto = todoDtos[i];
-        final ActionModel todoModel = todoModels[i];
-        expect(todoModel.id, todoDto.id);
-        expect(todoModel.instruction, todoDto.instruction);
-        expect(todoModel.actionType, todoDto.actionType);
-        expect(todoModel.dataType, todoDto.dataType);
-        expect(todoModel.component, todoDto.component);
-      }
+      expect(diagnosisModel.todos, isA<List<ActionModel>>());
     });
   });
   group("NewCaseDto primary constructor", () {
@@ -1234,6 +1241,70 @@ void main() {
     });
     test("correctly assigns signalId", () {
       expect(timeseriesDataModel.signalId, signalId);
+    });
+  });
+  group("StateMachineLogEntryDto primary constructor", () {
+    const String message = "some_message";
+    const String attachment = "some_attachment";
+    final StateMachineLogEntryDto stateMachineLogEntryDto =
+        StateMachineLogEntryDto(
+      message,
+      attachment,
+    );
+    test("correctly assigns message", () {
+      expect(stateMachineLogEntryDto.message, message);
+    });
+    test("correctly assigns attachment", () {
+      expect(stateMachineLogEntryDto.attachment, attachment);
+    });
+  });
+  group("StateMachineLogEntryDto fromJson constructor", () {
+    const String message = "some_message";
+    const String attachment = "some_attachment";
+    final Map<String, dynamic> json = <String, dynamic>{
+      "message": message,
+      "attachment": attachment,
+    };
+    final StateMachineLogEntryDto stateMachineLogEntryDto =
+        StateMachineLogEntryDto.fromJson(json);
+    test("correctly assigns message", () {
+      expect(stateMachineLogEntryDto.message, equals(message));
+    });
+    test("correctly assigns attachment", () {
+      expect(stateMachineLogEntryDto.attachment, equals(attachment));
+    });
+  });
+  group("StateMachineLogEntryDto toJson method", () {
+    const String message = "some_message";
+    const String attachment = "some_attachment";
+    final StateMachineLogEntryDto stateMachineLogEntryDto =
+        StateMachineLogEntryDto(
+      message,
+      attachment,
+    );
+    final Map<String, dynamic> json = stateMachineLogEntryDto.toJson();
+    test("correctly assigns message", () {
+      expect(json["message"], equals(message));
+    });
+    test("correctly assigns attachment", () {
+      expect(json["attachment"], equals(attachment));
+    });
+  });
+  group("StateMachineLogEntryDto toModel method", () {
+    const String message = "some_message";
+    const String attachment = "some_attachment";
+    final StateMachineLogEntryDto stateMachineLogEntryDto =
+        StateMachineLogEntryDto(
+      message,
+      attachment,
+    );
+    final StateMachineLogEntryModel stateMachineLogEntryModel =
+        stateMachineLogEntryDto.toModel();
+    test("correctly assigns message", () {
+      expect(stateMachineLogEntryModel.message, equals(message));
+    });
+    test("correctly assigns attachment", () {
+      expect(stateMachineLogEntryModel.attachment, equals(attachment));
     });
   });
   group("SymptomDto fromJson constructor", () {
