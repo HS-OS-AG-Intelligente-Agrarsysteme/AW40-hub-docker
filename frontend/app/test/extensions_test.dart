@@ -12,7 +12,8 @@ void main() {
   group("StringExtension", () {
     group("substringBetween()", () {
       test(
-        "with valid startDelimiter, no endDelimiter: returns substring after startDelimiter",
+        "with valid startDelimiter, no endDelimiter: "
+        "returns substring after startDelimiter",
         () {
           const String string = "Hello, World!";
           final String substring = string.substringBetween(",");
@@ -20,7 +21,8 @@ void main() {
         },
       );
       test(
-        "with valid startDelimiter, valid endDelimiter: returns substring after startDelimiter and before endDelimiter",
+        "with valid startDelimiter, valid endDelimiter: "
+        "returns substring after startDelimiter and before endDelimiter",
         () {
           const String string = "Hello, World!";
           final String substring = string.substringBetween(",", "!");
@@ -28,7 +30,8 @@ void main() {
         },
       );
       test(
-        "with valid startDelimiter, invalid endDelimiter: returns substring after startDelimiter",
+        "with valid startDelimiter, invalid endDelimiter: "
+        "returns substring after startDelimiter",
         () {
           const String string = "Hello, World!";
           final String substring = string.substringBetween(",", "?");
@@ -36,7 +39,8 @@ void main() {
         },
       );
       test(
-        "with invalid startDelimiter, no endDelimiter: returns original string",
+        "with invalid startDelimiter, no endDelimiter: "
+        "returns original string",
         () {
           const String string = "Hello, World!";
           final String substring = string.substringBetween("?");
@@ -44,7 +48,8 @@ void main() {
         },
       );
       test(
-        "with invalid startDelimiter, valid endDelimiter: returns substring before endDelimiter",
+        "with invalid startDelimiter, valid endDelimiter: "
+        "returns substring before endDelimiter",
         () {
           const String string = "Hello, World!";
           final String substring = string.substringBetween("?", "!");
@@ -52,7 +57,8 @@ void main() {
         },
       );
       test(
-        "with invalid startDelimiter, invalid endDelimiter: returns original string",
+        "with invalid startDelimiter, invalid endDelimiter: "
+        "returns original string",
         () {
           const String string = "Hello, World!";
           final String substring = string.substringBetween("?", "?");
@@ -76,7 +82,8 @@ void main() {
         },
       );
       test(
-        "throws RangeError if both delimiters are valid, but endDelimiter comes before startDelimiter",
+        "throws RangeError if both delimiters are valid, "
+        "but endDelimiter comes before startDelimiter",
         () {
           const String string = "Hello, World!";
           expect(() => string.substringBetween("o", "e"), throwsRangeError);
