@@ -203,7 +203,13 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     );
 
     try {
-      final XFile file = _file!;
+      final XFile? file = _file;
+      if (file == null) {
+        throw AppException(
+          exceptionType: ExceptionType.unexpectedNullValue,
+          exceptionMessage: "file is null in _uploadFile().",
+        );
+      }
       final String fileContent = await file.readAsString();
       bool result = false;
 
