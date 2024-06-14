@@ -213,7 +213,8 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       final String fileContent = await file.readAsString();
       bool result = false;
 
-      switch (widget.diagnosisModel.todos.first.dataType) {
+      final datatype = widget.diagnosisModel.todos.first.dataType;
+      switch (datatype) {
         case "obd":
           final Map<String, dynamic> jsonMap = jsonDecode(fileContent);
           final NewOBDDataDto newOBDDataDto = NewOBDDataDto.fromJson(jsonMap);
