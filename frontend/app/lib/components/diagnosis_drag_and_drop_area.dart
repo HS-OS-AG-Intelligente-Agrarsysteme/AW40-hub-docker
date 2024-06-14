@@ -105,7 +105,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
       case "obd":
       case "oscillogram":
       case "symptom":
-        return buildDropTarget(diagnosisStatusOnContainerColor);
+        return buildFileDropTarget(diagnosisStatusOnContainerColor);
       case "omniview":
         return Column(
           children: [
@@ -130,7 +130,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
                   widget.durationController,
                 ),
                 const SizedBox(height: 16),
-                buildDropTarget(diagnosisStatusOnContainerColor),
+                buildFileDropTarget(diagnosisStatusOnContainerColor),
               ],
             ),
           ],
@@ -141,7 +141,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
     }
   }
 
-  Widget buildDropTarget(Color diagnosisStatusOnContainerColor) {
+  Widget buildFileDropTarget(Color diagnosisStatusOnContainerColor) {
     return DropTarget(
       onDragDone: (details) => widget.onDragDone(details),
       onDragEntered: (_) => setState(() => _dragging = true),
