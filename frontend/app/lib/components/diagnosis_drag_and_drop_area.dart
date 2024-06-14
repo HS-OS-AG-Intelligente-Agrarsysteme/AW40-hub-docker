@@ -80,17 +80,6 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
           ],
           buildAddArea(diagnosisStatusOnContainerColor),
 
-          /*AlertDialog(
-            title: Text("Add Data"),
-            content: buildAddArea(diagnosisStatusOnContainerColor),
-            actions: [
-              TextButton(
-                onPressed: widget.onUploadFile,
-                child: Text(tr("general.save")),
-              ),
-            ],
-            backgroundColor: diagnosisStatusOnContainerColor,
-          ),*/
           Padding(
             padding: const EdgeInsets.all(16),
             child: ElevatedButton(
@@ -146,11 +135,6 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
                 ),
               ],
             ),
-            /*_submitOminviewForm(
-              componentController: componentController,
-              samplingRateController: samplingRateController,
-              durationController: durationController,
-            )*/
           ],
         );
 
@@ -197,20 +181,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
     String description,
     TextEditingController fieldController,
   ) {
-    return /*DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.all(style: BorderStyle.none),
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-        color: diagnosisStatusOnContainerColor.withOpacity(0.2),
-        //: diagnosisStatusOnContainerColor.withOpacity(0.2),
-      ),
-      child: DottedBorder(
-        borderType: BorderType.RRect,
-        dashPattern: const <double>[8, 4],
-        radius: const Radius.circular(10),
-        //padding: const EdgeInsets.only(left: 16, right: 16),
-        child:*/
-        Center(
+    return Center(
       child: TextFormField(
         decoration: InputDecoration(
           labelText: tr("diagnoses.details.$description"),
@@ -255,8 +226,6 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
           }
         },
       ),
-      //),
-      //),
     );
   }
-
+}
