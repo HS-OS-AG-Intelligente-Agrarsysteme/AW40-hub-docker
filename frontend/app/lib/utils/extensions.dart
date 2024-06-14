@@ -9,11 +9,8 @@ extension SetStateIfMountedExtension on State {
   }
 }
 
-extension DateExtension on DateTime {
-  String toGermanDateString() => "$day.$month.$year";
-}
-
 extension DateTimeExtension on DateTime {
+  String toGermanDateString() => "$day.$month.$year";
   String toGermanDateTimeString() =>
       // ignore: lines_longer_than_80_chars
       "$day.$month.$year, ${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} Uhr";
