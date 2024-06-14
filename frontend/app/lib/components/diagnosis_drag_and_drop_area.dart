@@ -24,6 +24,7 @@ class DiagnosisDragAndDropArea extends StatefulWidget {
     required this.durationController,
     super.key,
   });
+
   final String? fileName;
   final void Function(DropDoneDetails) onDragDone;
   final void Function() onUploadFile;
@@ -234,7 +235,8 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             borderRadius: const BorderRadius.all(Radius.circular(10)),
           ),
           errorStyle: TextStyle(
-              color: diagnosisStatusOnContainerColor.withOpacity(0.9)),
+            color: diagnosisStatusOnContainerColor.withOpacity(0.9),
+          ),
         ),
         style: TextStyle(color: diagnosisStatusOnContainerColor),
         textAlign: TextAlign.center,
