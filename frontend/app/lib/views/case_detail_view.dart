@@ -257,36 +257,30 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                   ],
                 ),
                 const SizedBox(height: 32),
-                Table(
-                  columnWidths: const {0: IntrinsicColumnWidth()},
-                  children: [
-                    TableRow(
-                      children: [
-                        const SizedBox(height: 32),
-                        Text(tr("general.id")),
-                        Text(tr("general.date")),
-                        Text(tr("general.dataType")),
-                      ],
-                    ),
-                    if (widget.caseModel.symptoms.isEmpty &&
-                        widget.caseModel.timeseriesData.isEmpty &&
-                        widget.caseModel.obdData.isEmpty)
+                if (widget.caseModel.symptoms.isEmpty &&
+                    widget.caseModel.timeseriesData.isEmpty &&
+                    widget.caseModel.obdData.isEmpty)
+                  Text(tr("general.no.data"))
+                else
+                  Table(
+                    columnWidths: const {0: IntrinsicColumnWidth()},
+                    children: [
                       TableRow(
                         children: [
                           const SizedBox(height: 32),
-                          Text(tr("general.no.data")),
-                          const Text(""),
-                          const Text(""),
+                          Text(tr("general.id")),
+                          Text(tr("general.date")),
+                          Text(tr("general.dataType")),
                         ],
-                      )
-                    else ...[
-                      ...widget.caseModel.timeseriesData
-                          .map(buildTimeseriesDataRow),
-                      ...widget.caseModel.obdData.map(buildObdDataRow),
-                      ...widget.caseModel.symptoms.map(buildSymptomsDataRow),
+                      ),
+                      ...[
+                        ...widget.caseModel.timeseriesData
+                            .map(buildTimeseriesDataRow),
+                        ...widget.caseModel.obdData.map(buildObdDataRow),
+                        ...widget.caseModel.symptoms.map(buildSymptomsDataRow),
+                      ],
                     ],
-                  ],
-                ),
+                  ),
               ],
             ),
           ),
