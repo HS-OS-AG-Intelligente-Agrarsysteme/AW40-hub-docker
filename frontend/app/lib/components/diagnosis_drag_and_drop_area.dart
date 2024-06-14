@@ -84,7 +84,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             padding: const EdgeInsets.all(16),
             child: ElevatedButton(
               onPressed: () async {
-                if (widget.formKey.currentState!.validate()) {
+                if (widget.formKey.currentState?.validate() ?? false) {
                   // Perform save operation
                   widget.onUploadFile();
                 }
