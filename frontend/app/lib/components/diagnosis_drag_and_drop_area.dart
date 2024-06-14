@@ -78,7 +78,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             ),
             const SizedBox(height: 16),
           ],
-          buildAddArea(diagnosisStatusOnContainerColor),
+          buildDatasetUploadForm(diagnosisStatusOnContainerColor),
 
           Padding(
             padding: const EdgeInsets.all(16),
@@ -100,7 +100,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
     );
   }
 
-  Widget buildAddArea(Color diagnosisStatusOnContainerColor) {
+  Widget buildDatasetUploadForm(Color diagnosisStatusOnContainerColor) {
     switch (widget.dataType) {
       case "obd":
       //return ;
@@ -137,7 +137,6 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             ),
           ],
         );
-
       default:
         _logger.warning("Unknown data Type: ${widget.dataType}");
         return const Placeholder();
