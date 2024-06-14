@@ -241,7 +241,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             newSymptomDto,
           );
           break;
-        case "ominview":
+        case "omniview":
           final List<int> byteData = utf8.encode(fileContent);
           //TODO change parameters!
           final String component = componentController.text.toLowerCase();

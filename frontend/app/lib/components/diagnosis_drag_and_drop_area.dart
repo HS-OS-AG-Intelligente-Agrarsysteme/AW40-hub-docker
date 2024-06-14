@@ -120,12 +120,6 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
       case "symptom":
         return builldDropTarget(diagnosisStatusOnContainerColor);
       case "omniview":
-        /*final TextEditingController componentController =
-            TextEditingController();
-        final TextEditingController samplingRateController =
-            TextEditingController();
-        final TextEditingController durationController =
-            TextEditingController();*/
         return Column(
           children: [
             Column(
@@ -266,51 +260,3 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
     );
   }
 
-  /*Widget _submitOminviewForm({
-    required TextEditingController componentController,
-    required TextEditingController samplingRateController,
-    required TextEditingController durationController,
-  }) {
-    final FormState? currentFormKeyState = widget.formKey.currentState;
-    return ElevatedButton(onPressed: () async {
-      if (widget.formKey.currentState!.validate()) {
-        // Perform save operation
-        widget.onUploadFile;
-      }
-    },
-    child: const Text("Submit!"),);
-    if (currentFormKeyState != null && currentFormKeyState.validate()) {
-      currentFormKeyState.save();
-      //_submitOminviewForm()
-      //   unawaited(Routemaster.of(context).pop<NewCaseDto>(newCaseDto));
-    }
-  }
-
-  Future<void> _uploadFile() async {
-    final ScaffoldMessengerState scaffoldMessengerState =
-        ScaffoldMessenger.of(context);
-    final diagnosisProvider = Provider.of<DiagnosisProvider>(
-      context,
-      listen: false,
-    );
-
-    final XFile file = _file!;
-      final String fileContent = await file.readAsString();
-      bool result = false;
-
-
-    final List<int> byteData = utf8.encode(fileContent);
-          //TODO change parameters!
-          String component = "";
-          int samplingRate = 2;
-          int duration = 2;
-          result = await diagnosisProvider.uploadOmniviewData(
-            widget.diagnosisModel.caseId,
-            byteData,
-            file.name,
-            component,
-            samplingRate,
-            duration,
-          );
-  }*/
-}
