@@ -106,5 +106,42 @@ void main() {
         },
       );
     });
+    group("capitalize()", () {
+      test("capitalizes first character of string", () {
+        const String string = "hello, world!";
+        final String capitalizedString = string.capitalize();
+        expect(capitalizedString, equals("Hello, world!"));
+      });
+      test("returns original string if empty", () {
+        const String string = "";
+        final String capitalizedString = string.capitalize();
+        expect(capitalizedString, equals(string));
+      });
+      test("returns original string if already capitalized", () {
+        const String string = "Hello, world!";
+        final String capitalizedString = string.capitalize();
+        expect(capitalizedString, equals(string));
+      });
+      test("capitalizes first and only character if only one character", () {
+        const String string = "h";
+        final String capitalizedString = string.capitalize();
+        expect(capitalizedString, equals("H"));
+      });
+      test("does not trim leading white space", () {
+        const String string = " hello, world!";
+        final String capitalizedString = string.capitalize();
+        expect(capitalizedString, startsWith(" "));
+      });
+      test("does not trim trailing white space", () {
+        const String string = "hello, world! ";
+        final String capitalizedString = string.capitalize();
+        expect(capitalizedString, endsWith(" "));
+      });
+      test("does not advance to first non-whitespace character", (){
+        const String string = " hello, world!";
+        final String capitalizedString = string.capitalize();
+        expect(capitalizedString, equals(string));
+      });
+    });
   });
 }
