@@ -43,17 +43,18 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     final TextTheme textTheme = theme.textTheme;
     final DiagnosisStatus status = widget.diagnosisModel.status;
 
-    final diagnosisStatusContainerColor =
+    final Color diagnosisStatusContainerColor =
         HelperService.getDiagnosisStatusContainerColor(
       colorScheme,
       status,
     );
-    final diagnosisStatusOnContainerColor =
+    final Color diagnosisStatusOnContainerColor =
         HelperService.getDiagnosisStatusOnContainerColor(
       colorScheme,
       status,
     );
-    final diagnosisStatusIconData = HelperService.getDiagnosisStatusIconData(
+    final IconData diagnosisStatusIconData =
+        HelperService.getDiagnosisStatusIconData(
       status,
     );
 
@@ -90,7 +91,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
               const SizedBox(height: 16),
               // Case ID
               Text(
-                "${tr('general.case')}: ${widget.diagnosisModel.caseId}",
+                "${tr('general.case')} ID: ${widget.diagnosisModel.caseId}",
                 style: textTheme.titleMedium,
               ),
               const SizedBox(height: 16),
@@ -103,9 +104,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                     children: [
                       ListTile(
                         leading: Icon(diagnosisStatusIconData),
-                        title: Text(
-                          tr("diagnoses.status.${status.name}"),
-                        ),
+                        title: Text(tr("diagnoses.status.${status.name}")),
                         subtitle: _getSubtitle,
                         textColor: diagnosisStatusOnContainerColor,
                         iconColor: diagnosisStatusOnContainerColor,
@@ -231,13 +230,17 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
           final String component = componentController.text.toLowerCase();
           final int? samplingRate = int.tryParse(samplingRateController.text);
           final int? duration = int.tryParse(durationController.text);
+          if (samplingRate == null || duration == null) {
+            _logger.warning("Sampling rate or duration is null.");
+            break;
+          }
           result = await diagnosisProvider.uploadOmniviewData(
             widget.diagnosisModel.caseId,
             byteData,
             file.name,
             component,
-            samplingRate!,
-            duration!,
+            samplingRate,
+            duration,
           );
           break;
         default:
