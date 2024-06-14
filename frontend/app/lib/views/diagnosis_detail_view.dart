@@ -256,8 +256,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             duration!,
           );
           break;
-
-        // TODO: Add case for omniview data.
         default:
           throw AppException(
             exceptionType: ExceptionType.unexpectedNullValue,
