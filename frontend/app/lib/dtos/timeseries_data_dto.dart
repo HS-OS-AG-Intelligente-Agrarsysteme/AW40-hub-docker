@@ -49,5 +49,5 @@ class TimeseriesDataDto {
   @JsonKey(name: "data_id")
   int? dataId;
   @JsonKey(name: "signal_id")
-  List<String> signalId;
+  String signalId;
 }

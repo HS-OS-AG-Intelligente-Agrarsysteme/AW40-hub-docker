@@ -442,7 +442,8 @@ async def new_timeseries_data_upload_omniview(
         ressource_url,
         access_token,
         files={"upload": (omniview_file.filename, omniview_file.file)},
-        data=form
+        data=form,
+        timeout=None
     )
 
     new_data_id = case["timeseries_data"][-1]["data_id"]

@@ -4,7 +4,9 @@ general:
   close: "Close"
   customer: "Customer"
   customerId: "Customer id"
+  dataType: "Data Type"
   date: "Date"
+  datasets: "Datasets"
   delete: "Delete"
   edit: "Edit"
   filter: "Filter"
@@ -30,6 +32,7 @@ general:
   workshopId: "Workshop id"
   yes: "Yes"
   no:
+    data: "No data available"
     date: "No Date"
     customerId: "No customer id"
     vehiclevin: "No vehicle vin"
@@ -58,13 +61,14 @@ diagnoses:
     obdUpload: "Uplaod OBD data"
     uploadFile: "Upload a file"
     uploadFileTooltip: "Upload file"
-    dragAndDrop: 
+    dragAndDrop:
       obd: "Drag and drop the OBD data here"
       oscillogram: "Drag and drop the oscillogram data here"
       symptom: "Drag and drop the symptom here"
       ominview: "Drag and drop the ominview data here"
     uploadDataSuccessMessage: "The data has been uploaded successfully."
     uploadDataErrorMessage: "The data could not be uploaded."
+    noFaultPathFound: "Kein Fehlerpfad gefunden"
     component: "Component"
     samplingRate: "Sampling Rate"
     duration: "Duration"
@@ -104,6 +108,10 @@ cases:
     status:
       open: "Open"
       closed: "Closed"
+    dataTypes:
+      obdData: "OBD Data"
+      symptoms: "Symptoms"
+      timeseriesData: "Timeseries Data"
 customers:
   title: "Customers"
 vehicles:

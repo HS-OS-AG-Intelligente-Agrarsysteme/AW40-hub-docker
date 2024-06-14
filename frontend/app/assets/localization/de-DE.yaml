@@ -4,7 +4,9 @@ general:
   close: "Schließen"
   customer: "Kunde"
   customerId: "Kunden ID"
+  dataType: "Datentyp"
   date: "Datum"
+  datasets: "Datensätze"
   delete: "Löschen"
   edit: "Bearbeiten"
   filter: "Filtern"
@@ -30,6 +32,7 @@ general:
   workshopId: "Werkstatt ID"
   yes: "Ja"
   no:
+    data: "Keine Daten verfügbar"
     date: "Kein Datum"
     customerId: "Keine Kunden ID"
     vehicleVin: "Keine @:general.vehicleVin"
@@ -58,13 +61,14 @@ diagnoses:
     obdUpload: "OBD-Daten hochladen"
     uploadFile: "Laden Sie eine Datei hoch"
     uploadFileTooltip: "Datei hochladen"
-    dragAndDrop: 
+    dragAndDrop:
       obd: "OBD Daten per Drag & Drop hier ablegen"
       oscillogram: "Picoscope Daten per Drag & Drop hier ablegen"
       symptom: "Symptoms per Drag & Drop hier ablegen"
       omniview: "Omniview Daten per Drag & Drop hier ablegen"
     uploadDataSuccessMessage: "Die Daten wurden erfolgreich hochgeladen."
     uploadDataErrorMessage: "Die Daten konnten nicht hochgeladen werden."
+    noFaultPathFound: "Kein Fehlerpfad gefunden"
     component: "Komponente"
     samplingRate: "Sampling Rate"
     duration: "Dauer"
@@ -104,6 +108,10 @@ cases:
     status:
       open: "Offen"
       closed: "Geschlossen"
+    dataTypes:
+      obdData: "OBD Daten"
+      symptoms: "Symptome"
+      timeseriesData: "Zeitreihendaten"
 customers:
   title: "Kunden"
 vehicles:

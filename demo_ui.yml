@@ -1,11 +1,15 @@
 version: "3.8"
 
+x-restart-policy: &default_restart_policy
+  restart: ${DEFAULT_RESTART_POLICY:-unless-stopped}
+
 services:
   demo-ui:
     build:
       context: ./demo-ui
       # DEVELOPMENT: run with reload and mount source code
     command: uvicorn --host 0.0.0.0 --port 8002 --reload demo_ui.main:app
+    <<: *default_restart_policy
     depends_on:
       api:
         condition: service_healthy

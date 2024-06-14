@@ -1,4 +1,5 @@
 import "package:aw40_hub_frontend/dtos/action_dto.dart";
+import "package:aw40_hub_frontend/dtos/state_machine_log_entry_dto.dart";
 import "package:aw40_hub_frontend/models/diagnosis_model.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:json_annotation/json_annotation.dart";
@@ -26,7 +27,7 @@ class DiagnosisDto {
       id: id,
       timestamp: timestamp,
       status: status,
-      stateMachineLog: stateMachineLog,
+      stateMachineLog: stateMachineLog.map((e) => e.toModel()).toList(),
       todos: todos.map((e) => e.toModel()).toList(),
       caseId: caseId,
     );
@@ -39,6 +40,6 @@ class DiagnosisDto {
   @JsonKey(name: "case_id")
   String caseId;
   @JsonKey(name: "state_machine_log")
-  List<dynamic> stateMachineLog;
+  List<StateMachineLogEntryDto> stateMachineLog;
   List<ActionDto> todos;
 }
