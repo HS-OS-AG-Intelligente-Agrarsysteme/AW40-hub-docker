@@ -165,7 +165,8 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
         );
 
       default:
-        throw Exception("Unknown data Type: ${widget.dataType}");
+        _logger.warning("Unknown data Type: ${widget.dataType}");
+        return const Placeholder();
     }
   }
 
