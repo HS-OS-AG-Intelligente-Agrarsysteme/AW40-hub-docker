@@ -103,9 +103,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
   Widget buildDatasetUploadForm(Color diagnosisStatusOnContainerColor) {
     switch (widget.dataType) {
       case "obd":
-      //return ;
       case "oscillogram":
-      //return;
       case "symptom":
         return buildDropTarget(diagnosisStatusOnContainerColor);
       case "omniview":
@@ -114,25 +112,25 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                buildDropTarget(diagnosisStatusOnContainerColor),
-                const SizedBox(height: 10),
                 buildDecoratedBox(
                   diagnosisStatusOnContainerColor,
                   "component",
                   widget.componentController,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
                 buildDecoratedBox(
                   diagnosisStatusOnContainerColor,
                   "samplingRate",
                   widget.samplingRateController,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
                 buildDecoratedBox(
                   diagnosisStatusOnContainerColor,
                   "duration",
                   widget.durationController,
                 ),
+                const SizedBox(height: 16),
+                buildDropTarget(diagnosisStatusOnContainerColor),
               ],
             ),
           ],
