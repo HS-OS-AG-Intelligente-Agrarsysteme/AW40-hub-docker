@@ -24,7 +24,7 @@ void main() {
         type: TimeseriesType.oscillogram,
         deviceSpecs: 0,
         dataId: 2,
-        signalId: <String>["some_String", "3"],
+        signalId: "some_string",
       )
     ];
     final obdData = <ObdDataModel>[
@@ -115,7 +115,16 @@ void main() {
     final timestamp = DateTime.now();
     const status = DiagnosisStatus.processing;
     const caseId = "some_case_id";
-    final stateMachineLog = <dynamic>[1, 2, 3];
+    final stateMachineLog = <StateMachineLogEntryModel>[
+      StateMachineLogEntryModel(
+        message: "some_message",
+        attachment: "some_attachment",
+      ),
+      StateMachineLogEntryModel(
+        message: "another_message",
+        attachment: "another_attachment",
+      ),
+    ];
     final todos = <ActionModel>[
       ActionModel(
         id: "1",
@@ -441,7 +450,7 @@ void main() {
     const TimeseriesType type = TimeseriesType.oscillogram;
     const dynamic deviceSpecs = 0;
     const int dataId = 5;
-    const signalId = <String>["some_String", "3"];
+    const signalId = "some_String";
     final TimeseriesDataModel timeseriesDataModel = TimeseriesDataModel(
       timestamp: timestamp,
       component: component,
@@ -476,6 +485,21 @@ void main() {
     });
     test("correctly assigns signalId", () {
       expect(timeseriesDataModel.signalId, signalId);
+    });
+  });
+  group("StateMachineLogEntryModel", () {
+    const String message = "some_message";
+    const String attachment = "some_attachment";
+    final StateMachineLogEntryModel stateMachineLogEntryModel =
+        StateMachineLogEntryModel(
+      message: message,
+      attachment: attachment,
+    );
+    test("correctly assigns message", () {
+      expect(stateMachineLogEntryModel.message, message);
+    });
+    test("correctly assigns attachment", () {
+      expect(stateMachineLogEntryModel.attachment, attachment);
     });
   });
   group("SymptomModel", () {

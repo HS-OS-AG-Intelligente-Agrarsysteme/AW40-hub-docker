@@ -46,4 +46,13 @@ extension StringExtension on String {
     }
     return null;
   }
+
+  /// Returns the substring between the first occurrence of [startDelimiter] and
+  /// the last occurrence of [endDelimiter], exclusively.
+  String substringBetween(String startDelimiter, [String? endDelimiter]) {
+    final int start = indexOf(startDelimiter) + startDelimiter.length;
+    int end = endDelimiter == null ? length : lastIndexOf(endDelimiter);
+    if (end == -1) end = length;
+    return substring(start, end);
+  }
 }

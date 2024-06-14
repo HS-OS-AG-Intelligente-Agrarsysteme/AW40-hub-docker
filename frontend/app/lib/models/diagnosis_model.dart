@@ -1,4 +1,4 @@
-import "package:aw40_hub_frontend/models/action_model.dart";
+import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 
 class DiagnosisModel {
@@ -15,6 +15,6 @@ class DiagnosisModel {
   DateTime timestamp;
   DiagnosisStatus status;
   String caseId;
-  List<dynamic> stateMachineLog;
+  List<StateMachineLogEntryModel> stateMachineLog;
   List<ActionModel> todos;
 }
