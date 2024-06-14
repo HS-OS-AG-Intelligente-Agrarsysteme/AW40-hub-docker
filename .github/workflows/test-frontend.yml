@@ -2,8 +2,8 @@
 
   on:
     pull_request:
-      paths:
-        - "frontend/**"
+      branches:
+        - main
   jobs:
     test_frontend:
       timeout-minutes: 10
