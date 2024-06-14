@@ -6,6 +6,7 @@ general:
   customerId: "Customer id"
   dataType: "Data Type"
   date: "Date"
+  datasets: "Datasets"
   delete: "Delete"
   edit: "Edit"
   filter: "Filter"

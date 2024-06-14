@@ -143,6 +143,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
@@ -256,6 +257,11 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                   ],
                 ),
                 const SizedBox(height: 32),
+                Text(
+                  tr("general.datasets"),
+                  style: textTheme.headlineLarge,
+                ),
+                const SizedBox(height: 16),
                 if (hasNoData)
                   Text(tr("general.no.data"))
                 else
