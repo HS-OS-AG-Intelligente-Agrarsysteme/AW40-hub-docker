@@ -137,7 +137,7 @@ void main() {
         final String capitalizedString = string.capitalize();
         expect(capitalizedString, endsWith(" "));
       });
-      test("does not advance to first non-whitespace character", (){
+      test("does not advance to first non-whitespace character", () {
         const String string = " hello, world!";
         final String capitalizedString = string.capitalize();
         expect(capitalizedString, equals(string));
