@@ -3,6 +3,7 @@ import "package:aw40_hub_frontend/dialogs/update_case_dialog.dart";
 import "package:aw40_hub_frontend/dtos/case_update_dto.dart";
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:aw40_hub_frontend/utils/extensions.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
@@ -294,35 +295,35 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
     );
   }
 
-  TableRow buildTimeseriesDataRow(TimeseriesDataModel e) {
+  TableRow buildTimeseriesDataRow(TimeseriesDataModel timeseriesDataModel) {
     return TableRow(
       children: [
         const SizedBox(height: 32),
-        Text(e.dataId.toString()),
-        Text(e.timestamp.toString()),
-        Text(e.type.toString()),
+        Text(timeseriesDataModel.dataId.toString()),
+        Text(timeseriesDataModel.timestamp?.toGermanDateTimeString() ?? ""),
+        Text(timeseriesDataModel.type?.name.capitalize() ?? ""),
       ],
     );
   }
 
-  TableRow buildObdDataRow(ObdDataModel e) {
+  TableRow buildObdDataRow(ObdDataModel obdDataModel) {
     return TableRow(
       children: [
         const SizedBox(height: 32),
-        Text(e.dataId.toString()),
-        Text(e.timestamp.toString()),
-        const Text("obd"),
+        Text(obdDataModel.dataId.toString()),
+        Text(obdDataModel.timestamp?.toGermanDateTimeString() ?? ""),
+        const Text("Obd"),
       ],
     );
   }
 
-  TableRow buildSymptomsDataRow(SymptomModel e) {
+  TableRow buildSymptomsDataRow(SymptomModel symptomModel) {
     return TableRow(
       children: [
         const SizedBox(height: 32),
-        Text(e.dataId.toString()),
-        Text(e.timestamp.toString()),
-        const Text("symptom"),
+        Text(symptomModel.dataId.toString()),
+        Text(symptomModel.timestamp?.toGermanDateTimeString() ?? ""),
+        const Text("Symptom"),
       ],
     );
   }
