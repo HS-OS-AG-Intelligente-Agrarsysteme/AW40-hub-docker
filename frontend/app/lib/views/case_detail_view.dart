@@ -256,9 +256,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                   ],
                 ),
                 const SizedBox(height: 32),
-                if (widget.caseModel.symptoms.isEmpty &&
-                    widget.caseModel.timeseriesData.isEmpty &&
-                    widget.caseModel.obdData.isEmpty)
+                if (hasNoData)
                   Text(tr("general.no.data"))
                 else
                   Table(
@@ -287,6 +285,11 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
       ),
     );
   }
+
+  bool get hasNoData =>
+      widget.caseModel.symptoms.isEmpty &&
+      widget.caseModel.timeseriesData.isEmpty &&
+      widget.caseModel.obdData.isEmpty;
 
   TableRow buildTimeseriesDataRow(TimeseriesDataModel timeseriesDataModel) {
     return TableRow(
