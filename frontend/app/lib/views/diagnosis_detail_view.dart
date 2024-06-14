@@ -30,7 +30,7 @@ class DiagnosisDetailView extends StatefulWidget {
 
 class _DiagnosisDetailView extends State<DiagnosisDetailView> {
   XFile? _file;
-  final Logger _logger = Logger("diagnosis detail view");
+  final Logger _logger = Logger("diagnosis_detail_view");
 
   TextEditingController componentController = TextEditingController();
   TextEditingController samplingRateController = TextEditingController();
