@@ -52,4 +52,9 @@ extension StringExtension on String {
     if (end == -1) end = length;
     return substring(start, end);
   }
+
+  /// Capitalizes the first character of the string, ignoring the rest.
+  String capitalize() {
+    return "${this[0].toUpperCase()}${substring(1)}";
+  }
 }
