@@ -13,7 +13,7 @@ import "package:http/http.dart";
 import "package:provider/provider.dart";
 
 class DiagnosisDragAndDropArea extends StatefulWidget {
-  DiagnosisDragAndDropArea({
+  const DiagnosisDragAndDropArea({
     required this.onDragDone,
     required this.onUploadFile,
     required this.fileName,
@@ -31,9 +31,9 @@ class DiagnosisDragAndDropArea extends StatefulWidget {
   final String dataType;
   final GlobalKey<FormState> formKey;
 
-  TextEditingController componentController = TextEditingController();
-  TextEditingController samplingRateController = TextEditingController();
-  TextEditingController durationController = TextEditingController();
+  final TextEditingController componentController;
+  final TextEditingController samplingRateController;
+  final TextEditingController durationController;
 
   @override
   State<DiagnosisDragAndDropArea> createState() =>
