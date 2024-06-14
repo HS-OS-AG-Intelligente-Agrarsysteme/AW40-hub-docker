@@ -121,22 +121,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                           samplingRateController: samplingRateController,
                           durationController: durationController,
                         ),
-                      /*Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            if (formKey.currentState!.validate()) {
-                              // Perform save operation
-                              await _uploadFile();
-                            }
-                          },
-                          child: Text(
-                            "Submit",
-                            style:
-                                TextStyle(color: diagnosisStatusContainerColor),
-                          ),
-                        ),
-                      ),*/
                     ],
                   ),
                 ),
