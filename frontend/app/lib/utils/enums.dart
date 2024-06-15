@@ -59,4 +59,7 @@ enum StateMachineEvent {
   retrievedDataSet,
   heatmaps,
   causalGraphVisualizations,
+  faultPaths,
+  diagnosisFailed,
+  unknown,
 }

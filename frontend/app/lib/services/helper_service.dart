@@ -2,6 +2,7 @@ import "dart:convert";
 
 import "package:aw40_hub_frontend/exceptions/exceptions.dart";
 import "package:aw40_hub_frontend/main.dart";
+import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:collection/collection.dart";
@@ -78,8 +79,9 @@ class HelperService {
     DiagnosisStatus diagnosisStatus,
   ) {
     switch (diagnosisStatus) {
-      case DiagnosisStatus.processing:
       case DiagnosisStatus.scheduled:
+        return colorScheme.onBackground;
+      case DiagnosisStatus.processing:
         return colorScheme.primary;
       case DiagnosisStatus.finished:
         return colorScheme.secondary;
@@ -133,5 +135,11 @@ class HelperService {
       "${response.statusCode}: ${response.reasonPhrase}",
     );
     return false;
+  }
+
+  static Widget getTableRowFromStateMachineLogEntry(
+    StateMachineLogEntryModel logEntry,
+  ) {
+    return Text(logEntry.toString());
   }
 }

@@ -231,5 +231,17 @@ void main() {
         expect(capitalizedString, equals(string));
       });
     });
+    group("constantCaseToCamelCase()", () {
+      test("converts constant case string to camel case", () {
+        const String constantCaseString = "HELLO_WORLD";
+        final String camelCaseString = constantCaseString.constantCaseToCamelCase();
+        expect(camelCaseString, equals("helloWorld"));
+      });
+      test("returns original string if empty", () {
+        const String constantCaseString = "";
+        final String camelCaseString = constantCaseString.constantCaseToCamelCase();
+        expect(camelCaseString, equals(constantCaseString));
+      });
+    });
   });
 }

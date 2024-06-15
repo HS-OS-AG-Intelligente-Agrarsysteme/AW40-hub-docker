@@ -1,3 +1,4 @@
+import "package:change_case/change_case.dart";
 import "package:flutter/widgets.dart";
 
 extension SetStateIfMountedExtension on State {
@@ -91,5 +92,9 @@ extension StringExtension on String {
   String capitalize() {
     if (isEmpty) return this;
     return "${this[0].toUpperCase()}${substring(1)}";
+  }
+
+  String constantCaseToCamelCase() {
+    return toLowerCase().replaceAll("_", " ").toCamelCase();
   }
 }
