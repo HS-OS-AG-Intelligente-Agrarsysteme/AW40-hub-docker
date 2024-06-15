@@ -16,7 +16,7 @@ void main() {
         "returns substring after startDelimiter",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween(",");
+          final String substring = string.substringBetween(startDelimiter: ",");
           expect(substring, equals(" World!"));
         },
       );
@@ -25,7 +25,7 @@ void main() {
         "returns substring after startDelimiter and before endDelimiter",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween(",", "!");
+          final String substring = string.substringBetween(startDelimiter: ",", endDelimiter: "!");
           expect(substring, equals(" World"));
         },
       );
@@ -34,7 +34,7 @@ void main() {
         "returns substring after startDelimiter",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween(",", "?");
+          final String substring = string.substringBetween(startDelimiter: ",", endDelimiter: "?");
           expect(substring, equals(" World!"));
         },
       );
@@ -43,7 +43,7 @@ void main() {
         "returns original string",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween("?");
+          final String substring = string.substringBetween(startDelimiter: "?");
           expect(substring, equals("Hello, World!"));
         },
       );
@@ -52,7 +52,7 @@ void main() {
         "returns substring before endDelimiter",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween("?", "!");
+          final String substring = string.substringBetween(startDelimiter: "?", endDelimiter: "!");
           expect(substring, equals("Hello, World"));
         },
       );
@@ -61,7 +61,7 @@ void main() {
         "returns original string",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween("?", "?");
+          final String substring = string.substringBetween(startDelimiter: "?", endDelimiter: "?");
           expect(substring, equals("Hello, World!"));
         },
       );
@@ -69,7 +69,7 @@ void main() {
         "uses first occurrence of startDelimiter",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween("o");
+          final String substring = string.substringBetween(startDelimiter: "o");
           expect(substring, equals(", World!"));
         },
       );
@@ -77,7 +77,7 @@ void main() {
         "uses last occurrence of endDelimiter",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween(",", "o");
+          final String substring = string.substringBetween(startDelimiter: ",", endDelimiter: "o");
           expect(substring, equals(" W"));
         },
       );
@@ -86,14 +86,14 @@ void main() {
         "but endDelimiter comes before startDelimiter",
         () {
           const String string = "Hello, World!";
-          expect(() => string.substringBetween("o", "e"), throwsRangeError);
+          expect(() => string.substringBetween(startDelimiter: "o", endDelimiter: "e"), throwsRangeError);
         },
       );
       test(
         "accounts for length of startDelimiter",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween("o, ");
+          final String substring = string.substringBetween(startDelimiter: "o, ");
           expect(substring, equals("World!"));
         },
       );
@@ -101,7 +101,7 @@ void main() {
         "accounts for length of endDelimiter",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween("o", "rld!");
+          final String substring = string.substringBetween(startDelimiter: "o", endDelimiter: "rld!");
           expect(substring, equals(", Wo"));
         },
       );

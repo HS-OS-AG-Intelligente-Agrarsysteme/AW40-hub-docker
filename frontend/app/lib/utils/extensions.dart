@@ -11,6 +11,7 @@ extension SetStateIfMountedExtension on State {
 
 extension DateTimeExtension on DateTime {
   String toGermanDateString() => "$day.$month.$year";
+
   String toGermanDateTimeString() =>
       // ignore: lines_longer_than_80_chars
       "$day.$month.$year, ${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} Uhr";
@@ -46,12 +47,15 @@ extension StringExtension on String {
 
   /// Returns the substring between the first occurrence of [startDelimiter] and
   /// the last occurrence of [endDelimiter], exclusively.
-  String substringBetween(String startDelimiter, [String? endDelimiter]) {
-    final int start = indexOf(startDelimiter) + startDelimiter.length;
-    int end = endDelimiter == null ? length : lastIndexOf(endDelimiter);
-    if (end == -1) end = length;
-    return substring(start, end);
-  }
+ String substringBetween({
+  String? startDelimiter,
+  String? endDelimiter,
+}) {
+  final int start = startDelimiter == null ? 0 : indexOf(startDelimiter) + startDelimiter.length;
+  int end = endDelimiter == null ? length : lastIndexOf(endDelimiter);
+  if (end == -1) end = length;
+  return substring(start, end);
+}
 
   /// Capitalizes the first character of the string, ignoring the rest.
   String capitalize() {
