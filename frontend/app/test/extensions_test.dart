@@ -106,6 +106,94 @@ void main() {
         },
       );
     });
+    group("substringAfter()", () {
+      test("returns substring after delimiter", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringAfter(",");
+        expect(substring, equals(" World!"));
+      });
+      test("returns original string if delimiter not found", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringAfter("?");
+        expect(substring, equals(string));
+      });
+      test("returns empty string if delimiter is last character", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringAfter("!");
+        expect(substring, isEmpty);
+      });
+      test("returns substring after first occurrence of delimiter", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringAfter("o");
+        expect(substring, equals(", World!"));
+      });
+    });
+    group("substringAfterLast()", () {
+      test("returns substring after delimiter", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringAfterLast(",");
+        expect(substring, equals(" World!"));
+      });
+      test("returns original string if delimiter not found", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringAfterLast("?");
+        expect(substring, equals(string));
+      });
+      test("returns empty string if delimiter is last character", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringAfterLast("!");
+        expect(substring, isEmpty);
+      });
+      test("returns substring after last occurrence of delimiter", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringAfterLast("o");
+        expect(substring, equals("rld!"));
+      });
+    });
+    group("substringBefore()", () {
+      test("returns substring before delimiter", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringBefore(",");
+        expect(substring, equals("Hello"));
+      });
+      test("returns original string if delimiter not found", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringBefore("?");
+        expect(substring, equals(string));
+      });
+      test("returns empty string if delimiter is first character", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringBefore("H");
+        expect(substring, isEmpty);
+      });
+      test("returns substring before first occurrence of delimiter", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringBefore("o");
+        expect(substring, equals("Hell"));
+      });
+    });
+    group("substringBeforeLast()", () {
+      test("returns substring before delimiter", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringBeforeLast(",");
+        expect(substring, equals("Hello"));
+      });
+      test("returns original string if delimiter not found", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringBeforeLast("?");
+        expect(substring, equals(string));
+      });
+      test("returns empty string if delimiter is first character", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringBeforeLast("H");
+        expect(substring, isEmpty);
+      });
+      test("returns substring before last occurrence of delimiter", () {
+        const String string = "Hello, World!";
+        final String substring = string.substringBeforeLast("o");
+        expect(substring, equals("Hello, W"));
+      });
+    });
     group("capitalize()", () {
       test("capitalizes first character of string", () {
         const String string = "hello, world!";
