@@ -14,10 +14,23 @@ services:
       api:
         condition: service_healthy
     hostname: "demo-ui"
+    env_file:
+          - demo-ui/demo-ui.env
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=hubnet
+
+      - traefik.http.routers.demo_ui.rule=Host(`${DEMO_UI_ADDRESS:?error}`) && PathPrefix(`${DEMO_UI_PATH:-/}`)
+      - traefik.http.routers.demo_ui.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
+      #- traefik.http.middlewares.demo_ui-remove-prefix.stripprefix.prefixes=${DEMO_UI_PATH:-/}
+      #- traefik.http.routers.demo_ui.middlewares=demo_ui-remove-prefix@docker
+      - traefik.http.routers.demo_ui.service=demo_ui
+      - traefik.http.services.demo_ui.loadbalancer.server.port=8002
     networks:
       - keycloaknet
       - frontend-backend
-    ports:
-      - 8002:8002
+      - hubnet
+    #ports:
+    #  - 8002:8002
     volumes:
       - ./demo-ui/demo_ui/:/home/demo-ui/demo_ui/
