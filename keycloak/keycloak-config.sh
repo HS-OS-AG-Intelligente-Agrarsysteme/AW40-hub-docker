@@ -179,6 +179,18 @@ $kcadm update clients/${MINIO_ID}/default-client-scopes/${MINIO_SCOPE_ID} \
 $kcadm update clients/${FRONTEND_ID}/default-client-scopes/${FRONTEND_SCOPE_ID} \
     -r werkstatt-hub
 
+if [ "$CREATE_DEMO_UI_CLIENT" = true ]
+then
+    $kcadm create clients \
+        -r werkstatt-hub \
+        -s clientId=demo-ui-client \
+        -s enabled=true \
+        -s description="Client für Demo UI" \
+        -s secret=${DEMO_UI_CLIENT_SECRET} \
+        -s publicClient=false \
+        -s directAccessGrantsEnabled=true
+fi
+
 # Create development client and user
 if [ "$CREATE_DEV_USER" = true ]
 then
