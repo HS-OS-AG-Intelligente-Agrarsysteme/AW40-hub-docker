@@ -2,9 +2,11 @@ import "dart:convert";
 
 import "package:aw40_hub_frontend/exceptions/exceptions.dart";
 import "package:aw40_hub_frontend/main.dart";
+import "package:aw40_hub_frontend/models/action_model.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:collection/collection.dart";
+import "package:enum_to_string/enum_to_string.dart";
 import "package:flutter/material.dart";
 import "package:http/http.dart";
 import "package:logging/logging.dart";
@@ -133,5 +135,18 @@ class HelperService {
       "${response.statusCode}: ${response.reasonPhrase}",
     );
     return false;
+  }
+
+  static DatasetType getDatasetType(List<ActionModel> todos) {
+    if (todos.isEmpty) {
+      throw AppException(
+        exceptionType: ExceptionType.unknown,
+        exceptionMessage: "No Todos required!",
+      );
+    }
+    final DatasetType datasetTypeEnum =
+        EnumToString.fromString(DatasetType.values, todos[0].dataType) ??
+            DatasetType.unknown;
+    return datasetTypeEnum;
   }
 }

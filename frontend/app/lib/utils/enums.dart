@@ -53,3 +53,5 @@ enum TimeseriesDataLabel { unknown, norm, anomaly }
 enum PicoscopeLabel { unknown, norm, anomaly }
 
 enum TimeseriesType { oscillogram }
+
+enum DatasetType { obd, omniscope, unknown }
