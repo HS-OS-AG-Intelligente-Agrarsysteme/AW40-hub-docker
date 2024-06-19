@@ -107,6 +107,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                         fileName: _file?.name,
                         onUploadFile: _uploadFile,
                         onDragDone: _onDragDone,
+                        todos: widget.diagnosisModel.todos,
                       ),
                   ],
                 ),

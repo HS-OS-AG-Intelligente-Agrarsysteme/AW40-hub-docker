@@ -1,3 +1,4 @@
+import "package:aw40_hub_frontend/models/action_model.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:desktop_drop/desktop_drop.dart";
@@ -10,11 +11,13 @@ class DiagnosisDragAndDropArea extends StatefulWidget {
     required this.onDragDone,
     required this.onUploadFile,
     required this.fileName,
+    required this.todos,
     super.key,
   });
   final String? fileName;
   final void Function(DropDoneDetails) onDragDone;
   final void Function() onUploadFile;
+  final List<ActionModel> todos;
 
   @override
   State<DiagnosisDragAndDropArea> createState() =>
