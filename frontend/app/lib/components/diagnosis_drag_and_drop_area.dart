@@ -37,6 +37,9 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
       colorScheme,
       DiagnosisStatus.action_required,
     );
+    final DatasetType datasetType = HelperService.getDatasetType(widget.todos);
+    //final String datasetTypeString = datasetType.name;
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -63,6 +66,14 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             ),
             const SizedBox(height: 16),
           ],
+          Text(
+            datasetType.name,
+            style: TextStyle(
+              color: diagnosisStatusOnContainerColor,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
           DropTarget(
             onDragDone: (details) => widget.onDragDone(details),
             onDragEntered: (_) => setState(() => _dragging = true),
