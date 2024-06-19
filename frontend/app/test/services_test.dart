@@ -1,3 +1,5 @@
+import "package:aw40_hub_frontend/exceptions/app_exception.dart";
+import "package:aw40_hub_frontend/models/action_model.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:enum_to_string/enum_to_string.dart";
@@ -567,6 +569,39 @@ void main() {
         expect(HelperService.stringToLogLevel("WaRnInG"), Level.WARNING);
         expect(HelperService.stringToLogLevel("sEvErE"), Level.SEVERE);
         expect(HelperService.stringToLogLevel("ShOuT"), Level.SHOUT);
+      });
+    });
+    group("getDatasetType", () {
+      test("Datset from ActionModel transformed in Enum", () {
+        //arrange
+        final actionModel = ActionModel(
+          id: "",
+          instruction: "",
+          actionType: "",
+          dataType: "obd",
+          component: null,
+        );
+        //act
+        final actual = HelperService.getDatasetType([actionModel]);
+        //assert
+        expect(actual, equals(DatasetType.obd));
+      });
+      test("Empty Todo List throws Exception", () {
+        expect(
+          () => HelperService.getDatasetType([]),
+          throwsA(isA<AppException>()),
+        );
+      });
+      test("Unknown Value returns DatasetType.unknown", () {
+        final actionModel = ActionModel(
+          id: "",
+          instruction: "",
+          actionType: "",
+          dataType: "someString",
+          component: null,
+        );
+        final actual = HelperService.getDatasetType([actionModel]);
+        expect(actual, DatasetType.unknown);
       });
     });
   });
