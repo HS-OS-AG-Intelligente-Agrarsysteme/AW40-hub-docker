@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:aw40_hub_frontend/data_sources/diagnosis_data_table_source.dart";
 import "package:aw40_hub_frontend/exceptions/exceptions.dart";
 import "package:aw40_hub_frontend/models/diagnosis_model.dart";
@@ -6,6 +8,7 @@ import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:aw40_hub_frontend/views/diagnosis_detail_view.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
+import "package:logging/logging.dart";
 import "package:provider/provider.dart";
 
 class DiagnosesView extends StatelessWidget {
@@ -72,6 +75,47 @@ class DesktopDiagnosesView extends StatefulWidget {
 
 class _DesktopDiagnosesViewState extends State<DesktopDiagnosesView> {
   int? currentDiagnosisIndex;
+  Timer? _timer;
+  final Logger _logger = Logger("DesktopDiagnosesView");
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) async => _checkForUpdates(),
+    );
+  }
+
+  Future<void> _checkForUpdates() async {
+    for (final DiagnosisModel diagnosis in widget.diagnosisModels) {
+      final DiagnosisModel? updatedDiagnosis =
+          await Provider.of<DiagnosisProvider>(context, listen: false)
+              .getDiagnosis(diagnosis.caseId);
+      if (updatedDiagnosis == null) {
+        _logger.warning(
+          "Could not fetch diagnosis with id ${diagnosis.id}."
+          " This is likely a mistake in the backend."
+          " The frontend does not handle this error, please reload.",
+        );
+        continue;
+      }
+
+      if (updatedDiagnosis.status != diagnosis.status) {
+        setState(() => diagnosis.status = updatedDiagnosis.status);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,6 +170,8 @@ class _DesktopDiagnosesViewState extends State<DesktopDiagnosesView> {
             ),
           ),
         ),
+        // MRU: I don't think this check is necessary, but maybe someone added
+        // it for a reason. I'm too afraid to remove it.
         if (widget.diagnosisModels.isNotEmpty)
           Expanded(
             flex: 2,
