@@ -274,7 +274,9 @@ class DiagnosisProvider with ChangeNotifier {
   }
 
   Future<bool> uploadSymptomData(
-      String caseId, NewSymptomDto symptomDto) async {
+    String caseId,
+    NewSymptomDto symptomDto,
+  ) async {
     final String authToken = _getAuthToken();
     final Map<String, dynamic> symptomDataJson = symptomDto.toJson();
     final Response response = await _httpService.uploadSymptomData(

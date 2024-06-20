@@ -1,6 +1,5 @@
 import "package:aw40_hub_frontend/data_sources/diagnosis_data_table_source.dart";
 import "package:aw40_hub_frontend/exceptions/exceptions.dart";
-import "package:aw40_hub_frontend/models/case_model.dart";
 import "package:aw40_hub_frontend/models/diagnosis_model.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
@@ -11,13 +10,14 @@ import "package:provider/provider.dart";
 
 class DiagnosesView extends StatelessWidget {
   const DiagnosesView({super.key, this.diagnosisId});
+
   final String? diagnosisId;
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       // ignore: discarded_futures
-      future: _getDiagnoses(context),
+      future: Provider.of<DiagnosisProvider>(context).getDiagnoses(),
       builder:
           (BuildContext context, AsyncSnapshot<List<DiagnosisModel>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
@@ -53,18 +53,6 @@ class DiagnosesView extends StatelessWidget {
   ) {
     final diagnosisIndex = models.indexWhere((d) => d.id == id);
     return diagnosisIndex == -1 ? 0 : diagnosisIndex;
-  }
-
-  static Future<List<DiagnosisModel>> _getDiagnoses(
-    BuildContext context,
-  ) async {
-    final caseProvider = Provider.of<CaseProvider>(context);
-    final diagnosisProvider = Provider.of<DiagnosisProvider>(context);
-    final List<CaseModel> caseModels = await caseProvider.getCurrentCases();
-    final Future<List<DiagnosisModel>> diagnoses =
-        diagnosisProvider.getDiagnoses();
-
-    return diagnoses;
   }
 }
 
