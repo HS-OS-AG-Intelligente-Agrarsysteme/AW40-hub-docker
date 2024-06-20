@@ -2,7 +2,6 @@ import "dart:convert";
 
 import "package:aw40_hub_frontend/exceptions/exceptions.dart";
 import "package:aw40_hub_frontend/main.dart";
-import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:collection/collection.dart";
@@ -135,11 +134,5 @@ class HelperService {
       "${response.statusCode}: ${response.reasonPhrase}",
     );
     return false;
-  }
-
-  static Widget getTableRowFromStateMachineLogEntry(
-    StateMachineLogEntryModel logEntry,
-  ) {
-    return Text(logEntry.toString());
   }
 }
