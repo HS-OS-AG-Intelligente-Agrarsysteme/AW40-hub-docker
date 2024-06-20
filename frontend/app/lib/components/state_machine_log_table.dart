@@ -79,6 +79,7 @@ class StateMachineLogTable extends StatelessWidget {
                     .constantCaseToCamelCase()
                     .toSentenceCase();
                 return ListTile(
+                  isThreeLine: true,
                   title: Text("${tr('general.state')}: $newState"),
                   subtitle: Table(
                     columnWidths: const {0: IntrinsicColumnWidth()},
