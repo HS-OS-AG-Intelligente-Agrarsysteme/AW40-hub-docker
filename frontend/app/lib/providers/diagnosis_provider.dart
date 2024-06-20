@@ -7,7 +7,6 @@ import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
-import "package:collection/collection.dart";
 import "package:flutter/material.dart";
 import "package:http/http.dart";
 import "package:logging/logging.dart";
