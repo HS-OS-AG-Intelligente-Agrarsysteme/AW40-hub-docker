@@ -118,7 +118,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                     ? const Center(
                         child: Text("No state machine log available."),
                       )
-                    : StateMachineLogTable(
+                    : StateMachineLogView(
                         stateMachineLog: widget.diagnosisModel.stateMachineLog,
                       ),
               ),

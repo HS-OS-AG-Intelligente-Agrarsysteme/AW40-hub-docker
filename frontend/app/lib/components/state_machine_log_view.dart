@@ -7,8 +7,8 @@ import "package:enum_to_string/enum_to_string.dart";
 import "package:flutter/material.dart";
 import "package:logging/logging.dart";
 
-class StateMachineLogTable extends StatelessWidget {
-  const StateMachineLogTable({required this.stateMachineLog, super.key});
+class StateMachineLogView extends StatelessWidget {
+  const StateMachineLogView({required this.stateMachineLog, super.key});
 
   final List<StateMachineLogEntryModel> stateMachineLog;
 
