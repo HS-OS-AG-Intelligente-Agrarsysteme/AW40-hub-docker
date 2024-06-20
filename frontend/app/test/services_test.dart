@@ -259,6 +259,32 @@ void main() {
       await HttpService(client).deleteCase("token", workshopId, caseId);
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
+    test("verify getDiagnoses", () async {
+      const workshopId = "some-workshop-id";
+      bool sentRequest = false;
+      final client = MockClient((http.Request request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("GET"),
+          reason: "Request method should be GET",
+        );
+        expect(
+          request.headers["content-type"],
+          isNull,
+          reason: "Request should not have content-type header",
+        );
+        expect(request.body, isEmpty, reason: "Request body  empty");
+        expect(
+          request.url.toString(),
+          endsWith("/$workshopId/diagnoses"),
+          reason: "Request URL should end with /{workshopId}/diagnoses",
+        );
+        return http.Response('{"status": "success"}', 200);
+      });
+      await HttpService(client).getDiagnoses("token", workshopId);
+      expect(sentRequest, isTrue, reason: "Request was not sent");
+    });
     test("verify getDiagnosis", () async {
       const workshopId = "some-workshop-id";
       const caseId = "some-case-id";
