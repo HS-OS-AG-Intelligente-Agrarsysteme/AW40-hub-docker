@@ -34,7 +34,7 @@ class DiagnosesView extends StatelessWidget {
               ? 0
               : _getDiagnosisIndexFromId(diagnosisModels, diagnosisId!);
 
-          return DesktopDiagnosisView(
+          return DesktopDiagnosesView(
             diagnosisModels: diagnosisModels,
             initialDiagnosisIndex: initialDiagnosisIndex,
           );
@@ -56,8 +56,8 @@ class DiagnosesView extends StatelessWidget {
   }
 }
 
-class DesktopDiagnosisView extends StatefulWidget {
-  const DesktopDiagnosisView({
+class DesktopDiagnosesView extends StatefulWidget {
+  const DesktopDiagnosesView({
     required this.diagnosisModels,
     required this.initialDiagnosisIndex,
     super.key,
@@ -67,10 +67,10 @@ class DesktopDiagnosisView extends StatefulWidget {
   final int initialDiagnosisIndex;
 
   @override
-  State<DesktopDiagnosisView> createState() => _DesktopDiagnosisViewState();
+  State<DesktopDiagnosesView> createState() => _DesktopDiagnosesViewState();
 }
 
-class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
+class _DesktopDiagnosesViewState extends State<DesktopDiagnosesView> {
   int? currentDiagnosisIndex;
 
   @override
