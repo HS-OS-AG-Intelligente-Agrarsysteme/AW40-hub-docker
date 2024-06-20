@@ -84,56 +84,56 @@ class _DesktopDiagnosesViewState extends State<DesktopDiagnosesView> {
           style: Theme.of(context).textTheme.displaySmall,
         ),
       );
-    } else {
-      return Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: SingleChildScrollView(
-              child: PaginatedDataTable(
-                source: DiagnosisDataTableSource(
-                  themeData: Theme.of(context),
-                  currentIndex: currentDiagnosisIndex,
-                  diagnosisModels: widget.diagnosisModels,
-                  onPressedRow: (int i) =>
-                      setState(() => currentDiagnosisIndex = i),
-                ),
-                showCheckboxColumn: false,
-                rowsPerPage: 50,
-                columns: [
-                  DataColumn(
-                    label: Expanded(
-                      child: Text(tr("general.id")),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Expanded(
-                      child: Text(tr("general.status")),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Expanded(
-                      child: Text(tr("general.case")),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Expanded(
-                      child: Text(tr("general.date")),
-                    ),
-                  ),
-                ],
+    }
+
+    return Row(
+      children: [
+        Expanded(
+          flex: 3,
+          child: SingleChildScrollView(
+            child: PaginatedDataTable(
+              source: DiagnosisDataTableSource(
+                themeData: Theme.of(context),
+                currentIndex: currentDiagnosisIndex,
+                diagnosisModels: widget.diagnosisModels,
+                onPressedRow: (int i) =>
+                    setState(() => currentDiagnosisIndex = i),
               ),
+              showCheckboxColumn: false,
+              rowsPerPage: 50,
+              columns: [
+                DataColumn(
+                  label: Expanded(
+                    child: Text(tr("general.id")),
+                  ),
+                ),
+                DataColumn(
+                  label: Expanded(
+                    child: Text(tr("general.status")),
+                  ),
+                ),
+                DataColumn(
+                  label: Expanded(
+                    child: Text(tr("general.case")),
+                  ),
+                ),
+                DataColumn(
+                  label: Expanded(
+                    child: Text(tr("general.date")),
+                  ),
+                ),
+              ],
             ),
           ),
-          if (widget.diagnosisModels.isNotEmpty)
-            Expanded(
-              flex: 2,
-              child: DiagnosisDetailView(
-                diagnosisModel: widget.diagnosisModels[currentDiagnosisIndex!],
-              ),
+        ),
+        if (widget.diagnosisModels.isNotEmpty)
+          Expanded(
+            flex: 2,
+            child: DiagnosisDetailView(
+              diagnosisModel: widget.diagnosisModels[currentDiagnosisIndex!],
             ),
-        ],
-      );
-    }
+          ),
+      ],
+    );
   }
 }
