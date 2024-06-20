@@ -12,7 +12,7 @@ class StateMachineLogTable extends StatelessWidget {
 
   final List<StateMachineLogEntryModel> stateMachineLog;
 
-  Icon getIcon(StateMachineEvent event) {
+  Icon _getIcon(StateMachineEvent event) {
     switch (event) {
       case StateMachineEvent.stateTransition:
         return const Icon(Icons.autorenew);
@@ -60,6 +60,7 @@ class StateMachineLogTable extends StatelessWidget {
 
               final String infos = message.substringAfter(": ");
 
+              // Special handling for state transition.
               if (event == StateMachineEvent.stateTransition) {
                 final String oldState = infos
                     .substringBefore(" --- ")
@@ -93,13 +94,13 @@ class StateMachineLogTable extends StatelessWidget {
                       ),
                     ],
                   ),
-                  leading: getIcon(event),
+                  leading: _getIcon(event),
                 );
               }
               return ListTile(
                 title: Text(event.name.toSentenceCase()),
                 subtitle: Text(infos),
-                leading: getIcon(event),
+                leading: _getIcon(event),
               );
             },
             separatorBuilder: (c, i) => const Divider(),
