@@ -44,13 +44,16 @@ class StateMachineLogTable extends StatelessWidget {
         Expanded(
           child: ListView.separated(
             itemCount: stateMachineLog.length,
+            separatorBuilder: (c, i) => const Divider(),
             itemBuilder: (context, index) {
               final int reverseIndex = stateMachineLog.length - index - 1;
               final String message = stateMachineLog[reverseIndex].message;
               final String eventString =
                   message.substringBefore(":").constantCaseToCamelCase();
               final StateMachineEvent event = EnumToString.fromString(
-                      StateMachineEvent.values, eventString) ??
+                    StateMachineEvent.values,
+                    eventString,
+                  ) ??
                   StateMachineEvent.unknown;
               if (event == StateMachineEvent.unknown) {
                 logger.warning(
@@ -103,7 +106,6 @@ class StateMachineLogTable extends StatelessWidget {
                 leading: _getIcon(event),
               );
             },
-            separatorBuilder: (c, i) => const Divider(),
           ),
         ),
       ],

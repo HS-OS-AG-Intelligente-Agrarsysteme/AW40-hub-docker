@@ -302,7 +302,10 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     for (final StateMachineLogEntryModel entry in stateMachineLog) {
       if (entry.message.contains("FAULT_PATHS")) {
         final String message = entry.message;
-        return message.substringBetween(startDelimiter: "['", endDelimiter: "']");
+        return message.substringBetween(
+          startDelimiter: "['",
+          endDelimiter: "']",
+        );
       }
     }
     return "tr('diagnoses.details.noFaultPathFound')";

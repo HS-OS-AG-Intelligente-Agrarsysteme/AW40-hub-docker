@@ -25,7 +25,8 @@ void main() {
         "returns substring after startDelimiter and before endDelimiter",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween(startDelimiter: ",", endDelimiter: "!");
+          final String substring =
+              string.substringBetween(startDelimiter: ",", endDelimiter: "!");
           expect(substring, equals(" World"));
         },
       );
@@ -34,7 +35,8 @@ void main() {
         "returns substring after startDelimiter",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween(startDelimiter: ",", endDelimiter: "?");
+          final String substring =
+              string.substringBetween(startDelimiter: ",", endDelimiter: "?");
           expect(substring, equals(" World!"));
         },
       );
@@ -52,7 +54,8 @@ void main() {
         "returns substring before endDelimiter",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween(startDelimiter: "?", endDelimiter: "!");
+          final String substring =
+              string.substringBetween(startDelimiter: "?", endDelimiter: "!");
           expect(substring, equals("Hello, World"));
         },
       );
@@ -61,7 +64,8 @@ void main() {
         "returns original string",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween(startDelimiter: "?", endDelimiter: "?");
+          final String substring =
+              string.substringBetween(startDelimiter: "?", endDelimiter: "?");
           expect(substring, equals("Hello, World!"));
         },
       );
@@ -77,7 +81,8 @@ void main() {
         "uses last occurrence of endDelimiter",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween(startDelimiter: ",", endDelimiter: "o");
+          final String substring =
+              string.substringBetween(startDelimiter: ",", endDelimiter: "o");
           expect(substring, equals(" W"));
         },
       );
@@ -86,14 +91,21 @@ void main() {
         "but endDelimiter comes before startDelimiter",
         () {
           const String string = "Hello, World!";
-          expect(() => string.substringBetween(startDelimiter: "o", endDelimiter: "e"), throwsRangeError);
+          expect(
+            () => string.substringBetween(
+              startDelimiter: "o",
+              endDelimiter: "e",
+            ),
+            throwsRangeError,
+          );
         },
       );
       test(
         "accounts for length of startDelimiter",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween(startDelimiter: "o, ");
+          final String substring =
+              string.substringBetween(startDelimiter: "o, ");
           expect(substring, equals("World!"));
         },
       );
@@ -101,7 +113,10 @@ void main() {
         "accounts for length of endDelimiter",
         () {
           const String string = "Hello, World!";
-          final String substring = string.substringBetween(startDelimiter: "o", endDelimiter: "rld!");
+          final String substring = string.substringBetween(
+            startDelimiter: "o",
+            endDelimiter: "rld!",
+          );
           expect(substring, equals(", Wo"));
         },
       );
@@ -234,12 +249,14 @@ void main() {
     group("constantCaseToCamelCase()", () {
       test("converts constant case string to camel case", () {
         const String constantCaseString = "HELLO_WORLD";
-        final String camelCaseString = constantCaseString.constantCaseToCamelCase();
+        final String camelCaseString =
+            constantCaseString.constantCaseToCamelCase();
         expect(camelCaseString, equals("helloWorld"));
       });
       test("returns original string if empty", () {
         const String constantCaseString = "";
-        final String camelCaseString = constantCaseString.constantCaseToCamelCase();
+        final String camelCaseString =
+            constantCaseString.constantCaseToCamelCase();
         expect(camelCaseString, equals(constantCaseString));
       });
     });

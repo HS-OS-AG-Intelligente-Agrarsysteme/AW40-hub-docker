@@ -11,7 +11,6 @@ import "package:collection/collection.dart";
 import "package:flutter/material.dart";
 import "package:http/http.dart";
 import "package:logging/logging.dart";
-import "package:uuid/uuid.dart";
 
 class DiagnosisProvider with ChangeNotifier {
   DiagnosisProvider(this._httpService);
@@ -24,6 +23,8 @@ class DiagnosisProvider with ChangeNotifier {
 
   Future<List<DiagnosisModel>> getDiagnoses(List<CaseModel> cases) async {
     // * Easy way of testing UI for now.
+    // Explicitly ignored lines_longer_than_80_chars lint rule, because this is
+    // not actual code.
     // return <DiagnosisModel>[
     //   DiagnosisModel(
     //     id: const Uuid().v4(),
@@ -201,11 +202,13 @@ class DiagnosisProvider with ChangeNotifier {
     //     stateMachineLog: [
     //       StateMachineLogEntryModel(
     //         message:
+    // ignore: lines_longer_than_80_chars
     //             "STATE_TRANSITION: REC_VEHICLE_AND_PROC_METADATA --- (processed_metadata) ---> PROC_CUSTOMER_COMPLAINTS",
     //         attachment: null,
     //       ),
     //       StateMachineLogEntryModel(
     //         message:
+    // ignore: lines_longer_than_80_chars
     //             "STATE_TRANSITION: PROC_CUSTOMER_COMPLAINTS --- (no_complaints) ---> READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES",
     //         attachment: null,
     //       ),
@@ -215,26 +218,31 @@ class DiagnosisProvider with ChangeNotifier {
     //       ),
     //       StateMachineLogEntryModel(
     //         message:
+    // ignore: lines_longer_than_80_chars
     //             "STATE_TRANSITION: READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES --- (processed_OBD_data) ---> RETRIEVE_HISTORICAL_DATA",
     //         attachment: null,
     //       ),
     //       StateMachineLogEntryModel(
     //         message:
+    // ignore: lines_longer_than_80_chars
     //             "STATE_TRANSITION: RETRIEVE_HISTORICAL_DATA --- (processed_all_data) ---> ESTABLISH_INITIAL_HYPOTHESIS",
     //         attachment: null,
     //       ),
     //       StateMachineLogEntryModel(
     //         message:
+    // ignore: lines_longer_than_80_chars
     //             "STATE_TRANSITION: ESTABLISH_INITIAL_HYPOTHESIS --- (established_init_hypothesis) ---> DIAGNOSIS",
     //         attachment: null,
     //       ),
     //       StateMachineLogEntryModel(
     //         message:
+    // ignore: lines_longer_than_80_chars
     //             "STATE_TRANSITION: SELECT_BEST_UNUSED_ERROR_CODE_INSTANCE --- (no_matching_selected_best_instance) ---> SUGGEST_SUSPECT_COMPONENTS",
     //         attachment: null,
     //       ),
     //       StateMachineLogEntryModel(
     //         message:
+    // ignore: lines_longer_than_80_chars
     //             "STATE_TRANSITION: SUGGEST_SUSPECT_COMPONENTS --- (provided_suggestions) ---> CLASSIFY_COMPONENTS",
     //         attachment: null,
     //       ),
@@ -244,6 +252,7 @@ class DiagnosisProvider with ChangeNotifier {
     //       ),
     //       StateMachineLogEntryModel(
     //         message:
+    // ignore: lines_longer_than_80_chars
     //             "DIAGNOSIS_FAILED: Unexpected error during execution of the state machine.",
     //         attachment: null,
     //       )
