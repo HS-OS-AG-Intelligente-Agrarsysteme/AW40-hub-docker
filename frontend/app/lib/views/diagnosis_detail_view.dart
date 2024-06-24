@@ -105,8 +105,9 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                     if (status == DiagnosisStatus.action_required)
                       DiagnosisDragAndDropArea(
                         fileName: _file?.name,
-                        onUploadFile: _uploadFile,
-                        onDragDone: _onDragDone,
+                        diagnosisModel: widget.diagnosisModel,
+                        //onUploadFile: _uploadFile,
+                        //onDragDone: _onDragDone,
                         todos: widget.diagnosisModel.todos,
                       ),
                   ],
@@ -122,7 +123,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     );
   }
 
-  void _onDragDone(DropDoneDetails dropDoneDetails) {
+  /*void _onDragDone(DropDoneDetails dropDoneDetails) {
     setState(() {
       final files = dropDoneDetails.files;
       if (files.isEmpty) {
@@ -133,7 +134,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       }
       _file = files.first;
     });
-  }
+  }*/
 
   Text? get _getSubtitle {
     final DiagnosisStatus status = widget.diagnosisModel.status;
@@ -165,7 +166,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     return null;
   }
 
-  Future<void> _uploadFile() async {
+  /*Future<void> _uploadFile() async {
     final ScaffoldMessengerState scaffoldMessengerState =
         ScaffoldMessenger.of(context);
     final diagnosisProvider = Provider.of<DiagnosisProvider>(
@@ -228,7 +229,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
         scaffoldMessengerState,
       );
     }
-  }
+  }*/
 
 //***
 // ab hier ist doppelt

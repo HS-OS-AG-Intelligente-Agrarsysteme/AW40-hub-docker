@@ -23,23 +23,25 @@ class DiagnosisProvider with ChangeNotifier {
 
   Future<List<DiagnosisModel>> getDiagnoses(List<CaseModel> cases) async {
     // * Easy way of testing UI for now.
-    // return <DiagnosisModel>[
-    //   DiagnosisModel(
-    //     id: "1",
-    //     timestamp: DateTime.now(),
-    //     status: DiagnosisStatus.action_required,
-    //     caseId: "1",
-    //     stateMachineLog: [],
-    //     todos: [
-    //       ActionModel(
-    //         id: "1",
-    //         instruction: "Laden Sie OBD-Daten hoch",
-    //         actionType: "",
-    //         dataType: "",
-    //         component: "",
-    //       )
-    //     ],
-    //   ),
+    return <DiagnosisModel>[
+      DiagnosisModel(
+        id: "1",
+        timestamp: DateTime.now(),
+        status: DiagnosisStatus.action_required,
+        caseId: "1",
+        stateMachineLog: [],
+        todos: [
+          ActionModel(
+            id: "1",
+            instruction: "Laden Sie OBD-Daten hoch",
+            actionType: "",
+            dataType: "omniscope",
+            component: "",
+          )
+        ],
+      ),
+    ];
+
     //   DiagnosisModel(
     //     id: "2",
     //     timestamp: DateTime.now(),
