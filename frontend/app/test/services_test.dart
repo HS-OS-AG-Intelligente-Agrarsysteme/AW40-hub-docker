@@ -1,6 +1,7 @@
 import "dart:convert";
 
 import "package:aw40_hub_frontend/dtos/case_dto.dart";
+import "package:aw40_hub_frontend/dtos/diagnosis_dto.dart";
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
 import "package:aw40_hub_frontend/services/mock_http_service.dart";
 import "package:aw40_hub_frontend/services/services.dart";
@@ -597,22 +598,22 @@ void main() {
         expect(
           caseDto.vehicleVin,
           requestBody["vehicle_vin"],
-          reason: "vehicleVin should be ${requestBody["vehicle_vin"]}",
+          reason: "vehicleVin should be input parameter",
         );
         expect(
           caseDto.customerId,
           requestBody["customer_id"],
-          reason: "customerId should be ${requestBody["customer_id"]}",
+          reason: "customerId should be input parameter",
         );
         expect(
           caseDto.occasion.name,
           requestBody["occasion"],
-          reason: "occasion should be ${requestBody["occasion"]}",
+          reason: "occasion should be input parameter",
         );
         expect(
           caseDto.milage,
           requestBody["milage"],
-          reason: "milage should be ${requestBody["milage"]}",
+          reason: "milage should be input parameter",
         );
       });
       test("returns 422 on incorrect requestBody", () async {
@@ -630,13 +631,37 @@ void main() {
     });
     test("deleteCase returns 200", () async {
       final response =
-      await mockHttpService.deleteCase("token", "workshopId", "caseId");
+          await mockHttpService.deleteCase("token", "workshopId", "caseId");
       expect(response.statusCode, 200, reason: "status code should be 200");
     });
     test("deleteDiagnosis returns 200", () async {
-      final response =
-      await mockHttpService.deleteDiagnosis("token", "workshopId", "caseId");
+      final response = await mockHttpService.deleteDiagnosis(
+        "token",
+        "workshopId",
+        "caseId",
+      );
       expect(response.statusCode, 200, reason: "status code should be 200");
+    });
+    test("getDiagnosis returns 200 DiagnosisDto json", () async {
+      const caseId = "caseId";
+      final response =
+          await mockHttpService.getDiagnosis("token", "workshopId", caseId);
+
+      expect(response.statusCode, 200, reason: "status code should be 200");
+      expect(
+        () => DiagnosisDto.fromJson(jsonDecode(response.body)),
+        returnsNormally,
+        reason: "should return valid DiagnosisDto json",
+      );
+
+      final DiagnosisDto diagnosisDto =
+          DiagnosisDto.fromJson(jsonDecode(response.body));
+
+      expect(
+        diagnosisDto.caseId,
+        caseId,
+        reason: "customerId should be input parameter",
+      );
     });
     test("getAuthHeaderWith throws UnsupportedError", () {
       expect(
