@@ -13,6 +13,13 @@ class ConfigService {
   final Map<ConfigKey, String> _configMap = {};
   bool _initialized = false;
 
+  /// Clears the config map and sets initialized to false.
+  /// Necessary for testing singleton.
+  void reset() {
+    _configMap.clear();
+    _initialized = false;
+  }
+
   Future<void> initialize() async {
     await _importConfigValues();
     _initialized = true;
