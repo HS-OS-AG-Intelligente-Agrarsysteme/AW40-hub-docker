@@ -1,3 +1,5 @@
+import "dart:collection";
+
 import "package:aw40_hub_frontend/env/env.dart";
 import "package:aw40_hub_frontend/exceptions/exceptions.dart";
 import "package:aw40_hub_frontend/services/services.dart";
@@ -21,6 +23,12 @@ class ConfigService {
   }
 
   Future<void> initialize() async {
+    // Note: LinkedHashMap preserves insertion order and iterates in that order.
+    // It is the default map type in Dart, so this cast should always succeed.
+    // However, I am a bit paranoid about this because a regular HashMap would
+    // result in multiple tests failing.
+    assert(_configMap is LinkedHashMap, "_configMap is not a LinkedHashMap.");
+
     await _importConfigValues();
     _initialized = true;
   }
