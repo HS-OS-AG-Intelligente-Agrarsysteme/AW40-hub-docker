@@ -40,6 +40,9 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
   bool _dragging = false;
   final Logger _logger = Logger("diagnosis detail view");
   XFile? _file;
+  final TextEditingController _componentController = TextEditingController();
+  final TextEditingController _samplingRateController = TextEditingController();
+  final TextEditingController _durationController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +136,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
         return Column(
           children: [
             TextFormField(
+              controller: _componentController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
@@ -157,6 +161,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             ),
             const SizedBox(height: 16),
             TextFormField(
+              controller: _samplingRateController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
@@ -181,6 +186,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             ),
             const SizedBox(height: 16),
             TextFormField(
+              controller: _durationController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
