@@ -51,6 +51,12 @@ class MockHttpService implements HttpService {
   }
 
   @override
+  Future<Response> getDiagnoses(String token, String workshopId) {
+    // TODO: implement getDiagnoses
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Response> getDiagnosis(
     String token,
     String workshopId,
