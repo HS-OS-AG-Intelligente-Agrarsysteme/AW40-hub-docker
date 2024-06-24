@@ -257,11 +257,18 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
           break;
         case DatasetType.omniscope:
           final List<int> byteData = utf8.encode(fileContent);
-          result = await diagnosisProvider.uploadPicoscopeData(
+          //TODO change parameters!
+          /*final String component = _componentController.text.toLowerCase();
+          final int? samplingRate = int.tryParse(_samplingRateController.text);
+          final int? duration = int.tryParse(_durationController.text);
+          result = await diagnosisProvider.uploadOmniscopeData(
             widget.diagnosisModel.caseId,
             byteData,
             file.name,
-          );
+            component,
+            samplingRate!,
+            duration!,
+          );*/
           break;
         case DatasetType.unknown:
           throw AppException(

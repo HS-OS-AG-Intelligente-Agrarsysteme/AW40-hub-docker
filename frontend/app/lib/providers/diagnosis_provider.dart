@@ -272,6 +272,37 @@ class DiagnosisProvider with ChangeNotifier {
     return true;
   }
 
+  Future<bool> uploadOmniscopeData(
+    String caseId,
+    List<int> omniviewData,
+    String filename,
+    String component,
+    int samplingRate,
+    int duration,
+  ) async {
+    final String authToken = _getAuthToken();
+    final Response response = await _httpService.uploadOmniviewData(
+      authToken,
+      workShopId,
+      caseId,
+      component,
+      samplingRate,
+      duration,
+      omniviewData,
+      filename,
+    );
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
+      response.statusCode,
+      201,
+      "Could not upload Omniview data. ",
+      response,
+      _logger,
+    );
+    if (!verifyStatusCode) return false;
+    notifyListeners();
+    return true;
+  }
+
   Future<bool> uploadSymtomData(String caseId, NewSymptomDto symptomDto) async {
     final String authToken = _getAuthToken();
     final Map<String, dynamic> symptomDataJson = symptomDto.toJson();
