@@ -628,6 +628,11 @@ void main() {
         expect(response.statusCode, 422, reason: "status code should be 422");
       });
     });
+    test("deleteCase returns 200", () async {
+      final response =
+          await mockHttpService.deleteCase("token", "workshopId", "caseId");
+      expect(response.statusCode, 200, reason: "status code should be 200");
+    });
     test("getAuthHeaderWith throws UnsupportedError", () {
       expect(
         () => mockHttpService.getAuthHeaderWith("token"),
