@@ -12,12 +12,15 @@ enum HostPlatform { web, android, ios, windows, linux, macos }
 enum TokenType { jwt, refresh, id }
 
 enum ConfigKey {
+  // Note: Always do this in alphabetical order. Unit tests for ConfigService
+  // are relying on it.
   apiAddress,
   frontendAddress,
   keyCloakAddress,
   keyCloakClient,
   keyCloakRealm,
   logLevel,
+  proxyDefaultScheme,
   redirectUriMobile,
   useMockData,
 }

@@ -34,12 +34,14 @@ class ConfigService {
   }
 
   Future<void> _importConfigValues() async {
+    // Note: Always do this in alphabetical order. Unit tests are relying on it.
     _configMap[ConfigKey.apiAddress] = Env.apiAddress;
     _configMap[ConfigKey.frontendAddress] = Env.frontendAddress;
     _configMap[ConfigKey.keyCloakAddress] = Env.keyCloakAddress;
     _configMap[ConfigKey.keyCloakClient] = Env.keyCloakClient;
     _configMap[ConfigKey.keyCloakRealm] = Env.keyCloakRealm;
     _configMap[ConfigKey.logLevel] = Env.logLevel;
+    _configMap[ConfigKey.proxyDefaultScheme] = Env.proxyDefaultScheme;
     _configMap[ConfigKey.redirectUriMobile] = Env.redirectUriMobile;
     _configMap[ConfigKey.useMockData] =
         // ignore: do_not_use_environment
