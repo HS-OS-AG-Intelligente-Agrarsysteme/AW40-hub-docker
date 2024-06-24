@@ -41,7 +41,9 @@ class ConfigService {
     _configMap[ConfigKey.keyCloakRealm] = Env.keyCloakRealm;
     _configMap[ConfigKey.logLevel] = Env.logLevel;
     _configMap[ConfigKey.redirectUriMobile] = Env.redirectUriMobile;
-    _configMap[ConfigKey.proxyDefaultScheme] = Env.proxyDefaultScheme;
+    _configMap[ConfigKey.useMockData] =
+        // ignore: do_not_use_environment
+        const String.fromEnvironment("USE_MOCK_DATA", defaultValue: "false");
 
     if (EnvironmentService().hostPlatform == HostPlatform.android) {
       for (final key in ConfigKey.values) {

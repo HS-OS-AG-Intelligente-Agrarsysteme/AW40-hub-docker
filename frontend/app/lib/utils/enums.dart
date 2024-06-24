@@ -19,7 +19,7 @@ enum ConfigKey {
   keyCloakRealm,
   logLevel,
   redirectUriMobile,
-  proxyDefaultScheme,
+  useMockData,
 }
 
 enum LocalStorageKey { verifier, redirectUri, refreshToken }
