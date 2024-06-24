@@ -1,4 +1,5 @@
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
+import "package:aw40_hub_frontend/services/mock_http_service.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:collection/collection.dart";
@@ -555,6 +556,19 @@ void main() {
         filename,
       );
       expect(sentRequest, isTrue, reason: "Request was not sent");
+    });
+  });
+  group("MockHttpService", () {
+    late MockHttpService mockHttpService;
+    setUp(() => mockHttpService = MockHttpService());
+    test("checkBackendHealth", () async {
+      final response = await mockHttpService.checkBackendHealth();
+      expect(response.statusCode, 200, reason: "status code should be 200");
+      expect(
+        response.body,
+        '{"status": "success"}',
+        reason: "should return expected body",
+      );
     });
   });
   group("HelperService", () {
