@@ -1,3 +1,6 @@
+import "dart:convert";
+
+import "package:aw40_hub_frontend/dtos/case_dto.dart";
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
 import "package:aw40_hub_frontend/services/mock_http_service.dart";
 import "package:aw40_hub_frontend/services/services.dart";
@@ -569,6 +572,61 @@ void main() {
         '{"status": "success"}',
         reason: "should return expected body",
       );
+    });
+    group("addCase", () {
+      test("returns 201 CaseDto json", () async {
+        final Map<String, dynamic> requestBody = {
+          "vehicle_vin": "12345678901234567",
+          "customer_id": "unknown",
+          "occasion": "problem_defect",
+          "milage": 100,
+        };
+
+        final response =
+            await mockHttpService.addCase("token", "workshopId", requestBody);
+
+        expect(response.statusCode, 201, reason: "status code should be 201");
+        expect(
+          () => CaseDto.fromJson(jsonDecode(response.body)),
+          returnsNormally,
+          reason: "should return valid CaseDto json",
+        );
+
+        final CaseDto caseDto = CaseDto.fromJson(jsonDecode(response.body));
+
+        expect(
+          caseDto.vehicleVin,
+          requestBody["vehicle_vin"],
+          reason: "vehicleVin should be ${requestBody["vehicle_vin"]}",
+        );
+        expect(
+          caseDto.customerId,
+          requestBody["customer_id"],
+          reason: "customerId should be ${requestBody["customer_id"]}",
+        );
+        expect(
+          caseDto.occasion.name,
+          requestBody["occasion"],
+          reason: "occasion should be ${requestBody["occasion"]}",
+        );
+        expect(
+          caseDto.milage,
+          requestBody["milage"],
+          reason: "milage should be ${requestBody["milage"]}",
+        );
+      });
+      test("returns 422 on incorrect requestBody", () async {
+        final Map<String, dynamic> requestBody = {
+          "vehicle_vin": "12345678901234567",
+          "customer_id": "unknown",
+          "occasion": "problem_defect",
+          "milage": "100",
+        };
+
+        final response =
+            await mockHttpService.addCase("token", "workshopId", requestBody);
+        expect(response.statusCode, 422, reason: "status code should be 422");
+      });
     });
     test("getAuthHeaderWith throws UnsupportedError", () {
       expect(
