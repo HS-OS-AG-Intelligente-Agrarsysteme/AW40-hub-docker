@@ -85,6 +85,16 @@ class HttpService {
     );
   }
 
+  Future<http.Response> getDiagnoses(
+    String token,
+    String workshopId,
+  ) {
+    return _client.get(
+      Uri.parse("$backendUrl/$workshopId/diagnoses"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
   Future<http.Response> getDiagnosis(
     String token,
     String workshopId,

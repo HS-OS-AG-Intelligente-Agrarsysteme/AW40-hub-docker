@@ -7,7 +7,6 @@ import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
-import "package:collection/collection.dart";
 import "package:flutter/material.dart";
 import "package:http/http.dart";
 import "package:logging/logging.dart";
@@ -21,7 +20,7 @@ class DiagnosisProvider with ChangeNotifier {
   late final String workShopId;
   String? _authToken;
 
-  Future<List<DiagnosisModel>> getDiagnoses(List<CaseModel> cases) async {
+  Future<List<DiagnosisModel>> getDiagnoses() async {
     // * Easy way of testing UI for now.
     // return <DiagnosisModel>[
     //   DiagnosisModel(
@@ -161,18 +160,22 @@ class DiagnosisProvider with ChangeNotifier {
     //   ),
     // ];
 
-    final List<String> caseIDs = cases
-        .where((c) => c.workshopId == workShopId)
-        .map((e) => e.id)
-        .toList();
-
-    final List<Future<DiagnosisModel?>> individualDiagnosisRequests =
-        caseIDs.map(getDiagnosis).toList();
-
-    final List<DiagnosisModel?> diagnoses =
-        await Future.wait(individualDiagnosisRequests);
-
-    return diagnoses.whereNotNull().toList();
+    final String authToken = _getAuthToken();
+    final Response response =
+        await _httpService.getDiagnoses(authToken, workShopId);
+    if (response.statusCode != 200) {
+      _logger.warning(
+        "Could not get diagnoses. "
+        "${response.statusCode}: ${response.reasonPhrase}",
+      );
+      return [];
+    }
+    final json = jsonDecode(response.body);
+    if (json is! List) {
+      _logger.warning("Could not decode json response to List.");
+      return [];
+    }
+    return json.map((e) => DiagnosisDto.fromJson(e).toModel()).toList();
   }
 
   Future<DiagnosisModel?> getDiagnosis(String caseId) async {
@@ -270,7 +273,10 @@ class DiagnosisProvider with ChangeNotifier {
     return true;
   }
 
-  Future<bool> uploadSymtomData(String caseId, NewSymptomDto symptomDto) async {
+  Future<bool> uploadSymptomData(
+    String caseId,
+    NewSymptomDto symptomDto,
+  ) async {
     final String authToken = _getAuthToken();
     final Map<String, dynamic> symptomDataJson = symptomDto.toJson();
     final Response response = await _httpService.uploadSymptomData(

@@ -199,7 +199,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
           final Map<String, dynamic> jsonMap = jsonDecode(fileContent);
           final NewSymptomDto newSymptomDto = NewSymptomDto.fromJson(jsonMap);
 
-          result = await diagnosisProvider.uploadSymtomData(
+          result = await diagnosisProvider.uploadSymptomData(
             widget.diagnosisModel.caseId,
             newSymptomDto,
           );
