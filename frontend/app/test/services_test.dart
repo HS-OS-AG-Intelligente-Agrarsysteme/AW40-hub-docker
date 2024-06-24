@@ -663,6 +663,27 @@ void main() {
         reason: "customerId should be input parameter",
       );
     });
+    test("startDiagnosis returns 200 DiagnosisDto json", () async {
+      const caseId = "caseId";
+      final response =
+          await mockHttpService.startDiagnosis("token", "workshopId", caseId);
+
+      expect(response.statusCode, 200, reason: "status code should be 200");
+      expect(
+        () => DiagnosisDto.fromJson(jsonDecode(response.body)),
+        returnsNormally,
+        reason: "should return valid DiagnosisDto json",
+      );
+
+      final DiagnosisDto diagnosisDto =
+          DiagnosisDto.fromJson(jsonDecode(response.body));
+
+      expect(
+        diagnosisDto.caseId,
+        caseId,
+        reason: "customerId should be input parameter",
+      );
+    });
     test("getAuthHeaderWith throws UnsupportedError", () {
       expect(
         () => mockHttpService.getAuthHeaderWith("token"),
