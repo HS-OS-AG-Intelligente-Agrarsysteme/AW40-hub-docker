@@ -8,7 +8,9 @@ import "package:logging/logging.dart";
 
 class ConfigService {
   factory ConfigService() => _configService;
+
   ConfigService._singleton();
+
   static final ConfigService _configService = ConfigService._singleton();
 
   final Logger _logger = Logger("config_service");
@@ -90,8 +92,17 @@ class ConfigService {
   }
 
   void logValues() {
-    for (final key in _configMap.keys) {
-      _logger.info("$key: ${_configMap[key]}");
+    for (final configKey in ConfigKey.values) {
+      if (!_configMap.containsKey(configKey)) {
+        _logger.warning("$configKey not found in config map.");
+      } else {
+        final String value = _configMap[configKey]!;
+        if (value.isEmpty) {
+          _logger.warning("$configKey has empty value.");
+        } else {
+          _logger.info("$configKey: $value");
+        }
+      }
     }
   }
 }
