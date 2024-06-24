@@ -1,3 +1,10 @@
+// ignore_for_file: avoid_catching_errors
+import "dart:convert";
+
+import "package:aw40_hub_frontend/dtos/case_dto.dart";
+import "package:aw40_hub_frontend/dtos/case_update_dto.dart";
+import "package:aw40_hub_frontend/dtos/diagnosis_dto.dart";
+import "package:aw40_hub_frontend/dtos/new_case_dto.dart";
 import "package:aw40_hub_frontend/services/http_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:http/http.dart" show Response;
@@ -9,20 +16,52 @@ class MockHttpService implements HttpService {
     String workshopId,
     Map<String, dynamic> requestBody,
   ) {
-    // TODO: implement addCase
-    throw UnimplementedError();
+    final NewCaseDto newCaseDto;
+    try {
+      newCaseDto = NewCaseDto.fromJson(requestBody);
+    } on Error {
+      return Future.delayed(
+        const Duration(milliseconds: 100),
+        () => Response("", 422),
+      );
+    }
+    final CaseDto caseDto = CaseDto(
+      "1",
+      DateTime.now(),
+      newCaseDto.occasion,
+      newCaseDto.milage,
+      CaseStatus.open,
+      newCaseDto.customerId,
+      newCaseDto.vehicleVin,
+      workshopId,
+      null,
+      [],
+      [],
+      [],
+      0,
+      0,
+      0,
+    );
+    return Future.delayed(
+      const Duration(milliseconds: 100),
+      () => Response(jsonEncode(caseDto.toJson()), 201),
+    );
   }
 
   @override
   Future<Response> checkBackendHealth() {
-    // TODO: implement checkBackendHealth
-    throw UnimplementedError();
+    return Future.delayed(
+      const Duration(milliseconds: 100),
+      () => Response('{"status": "success"}', 200),
+    );
   }
 
   @override
   Future<Response> deleteCase(String token, String workshopId, String caseId) {
-    // TODO: implement deleteCase
-    throw UnimplementedError();
+    return Future.delayed(
+      const Duration(milliseconds: 100),
+      () => Response("", 200),
+    );
   }
 
   @override
@@ -31,8 +70,10 @@ class MockHttpService implements HttpService {
     String workshopId,
     String caseId,
   ) {
-    // TODO: implement deleteDiagnosis
-    throw UnimplementedError();
+    return Future.delayed(
+      const Duration(milliseconds: 100),
+      () => Response("", 200),
+    );
   }
 
   @override
@@ -40,8 +81,11 @@ class MockHttpService implements HttpService {
     String token, [
     Map<String, String>? otherHeaders,
   ]) {
-    // TODO: implement getAuthHeaderWith
-    throw UnimplementedError();
+    // TODO: Make getAuthHeaderWith() private in HttpService, amend tests,
+    //  remove this implementation
+    throw UnsupportedError(
+      "This method should never be called on MockHttpService",
+    );
   }
 
   @override
@@ -52,7 +96,7 @@ class MockHttpService implements HttpService {
 
   @override
   Future<Response> getDiagnoses(String token, String workshopId) {
-    // TODO: implement getDiagnoses
+    // TODO: implement getDiagnosis
     throw UnimplementedError();
   }
 
@@ -62,8 +106,18 @@ class MockHttpService implements HttpService {
     String workshopId,
     String caseId,
   ) {
-    // TODO: implement getDiagnosis
-    throw UnimplementedError();
+    final DiagnosisDto diagnosisDto = DiagnosisDto(
+      "1",
+      DateTime.now(),
+      DiagnosisStatus.processing,
+      caseId,
+      [],
+      [],
+    );
+    return Future.delayed(
+      const Duration(milliseconds: 100),
+      () => Response(jsonEncode(diagnosisDto.toJson()), 200),
+    );
   }
 
   @override
@@ -78,8 +132,18 @@ class MockHttpService implements HttpService {
     String workshopId,
     String caseId,
   ) {
-    // TODO: implement startDiagnosis
-    throw UnimplementedError();
+    final DiagnosisDto diagnosisDto = DiagnosisDto(
+      "1",
+      DateTime.now(),
+      DiagnosisStatus.processing,
+      caseId,
+      [],
+      [],
+    );
+    return Future.delayed(
+      const Duration(milliseconds: 100),
+          () => Response(jsonEncode(diagnosisDto.toJson()), 200),
+    );
   }
 
   @override
@@ -89,8 +153,36 @@ class MockHttpService implements HttpService {
     String caseId,
     Map<String, dynamic> requestBody,
   ) {
-    // TODO: implement updateCase
-    throw UnimplementedError();
+    final CaseUpdateDto caseUpdateDto;
+    try {
+      caseUpdateDto = CaseUpdateDto.fromJson(requestBody);
+    } on Error {
+      return Future.delayed(
+        const Duration(milliseconds: 100),
+        () => Response("", 422),
+      );
+    }
+    final CaseDto caseDto = CaseDto(
+      caseId,
+      caseUpdateDto.timestamp,
+      caseUpdateDto.occasion,
+      caseUpdateDto.milage,
+      caseUpdateDto.status,
+      "unknown",
+      "12345678901234567",
+      workshopId,
+      null,
+      [],
+      [],
+      [],
+      0,
+      0,
+      0,
+    );
+    return Future.delayed(
+      const Duration(milliseconds: 100),
+          () => Response(jsonEncode(caseDto.toJson()), 200),
+    );
   }
 
   @override
