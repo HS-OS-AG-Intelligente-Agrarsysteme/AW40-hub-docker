@@ -570,6 +570,12 @@ void main() {
         reason: "should return expected body",
       );
     });
+    test("getAuthHeaderWith throws UnsupportedError", () {
+      expect(
+        () => mockHttpService.getAuthHeaderWith("token"),
+        throwsUnsupportedError,
+      );
+    });
   });
   group("HelperService", () {
     group("stringToLogLevel", () {
