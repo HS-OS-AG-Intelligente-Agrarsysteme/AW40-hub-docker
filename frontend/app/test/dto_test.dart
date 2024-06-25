@@ -502,7 +502,9 @@ void main() {
       StateMachineLogEntryDto("some_message", "some_attachment"),
       StateMachineLogEntryDto("another_message", "another_attachment"),
     ];
-    final todos = <ActionDto>[ActionDto("1", "some action", "1", "2", "3")];
+    final todos = <ActionDto>[
+      ActionDto("1", "some action", "1", DatasetType.obd, "3")
+    ];
     final DiagnosisDto diagnosisDto = DiagnosisDto(
       id,
       timeStamp,
@@ -539,7 +541,7 @@ void main() {
       StateMachineLogEntryDto("some_message", "some_attachment"),
       StateMachineLogEntryDto("another_message", "another_attachment"),
     ];
-    final todos = <ActionDto>[ActionDto("1", "some action", "1", "2", "3")];
+    final todos = <ActionDto>[ActionDto("1", "some action", "1", DatasetType.obd, "3")];
     final Map<String, dynamic> json = <String, dynamic>{
       "_id": id,
       "timestamp": timeStamp.toIso8601String(),
@@ -580,7 +582,7 @@ void main() {
       StateMachineLogEntryDto("some_message", "some_attachment"),
       StateMachineLogEntryDto("another_message", "another_attachment"),
     ];
-    final todos = <ActionDto>[ActionDto("1", "some action", "1", "2", "3")];
+    final todos = <ActionDto>[ActionDto("1", "some action", "1", DatasetType.obd, "3")];
     final DiagnosisDto diagnosisDto = DiagnosisDto(
       id,
       timeStamp,
@@ -618,7 +620,7 @@ void main() {
       StateMachineLogEntryDto("some_message", "some_attachment"),
       StateMachineLogEntryDto("another_message", "another_attachment"),
     ];
-    final actionDto = ActionDto("1", "some action", "1", "2", "3");
+    final actionDto = ActionDto("1", "some action", "1", DatasetType.obd, "3");
     final todoDtos = <ActionDto>[actionDto];
     final DiagnosisDto diagnosisDto = DiagnosisDto(
       id,
@@ -902,7 +904,7 @@ void main() {
     const String id = "some_id";
     const String instruction = "some_customer_id";
     const String actionType = "some_action_type";
-    const String dataType = "some_data_type";
+    const DatasetType dataType = DatasetType.obd;
     const String component = "some_component";
     final ActionDto actionDto = ActionDto(
       id,
@@ -931,13 +933,13 @@ void main() {
     const String id = "some_id";
     const String instruction = "some_customer_id";
     const String actionType = "some_action_type";
-    const String dataType = "some_data_type";
+    const DatasetType dataType = DatasetType.obd;
     const String component = "some_component";
     final Map<String, dynamic> json = <String, dynamic>{
       "id": id,
       "instruction": instruction,
       "action_type": actionType,
-      "data_type": dataType,
+      "data_type": dataType.name,
       "component": component,
     };
     final ActionDto actionDto = ActionDto.fromJson(json);
@@ -961,7 +963,7 @@ void main() {
     const String id = "some_id";
     const String instruction = "some_customer_id";
     const String actionType = "some_action_type";
-    const String dataType = "some_data_type";
+    const DatasetType dataType = DatasetType.obd;
     const String component = "some_component";
     final ActionDto actionDto = ActionDto(
       id,
@@ -981,7 +983,7 @@ void main() {
       expect(json["action_type"], actionType);
     });
     test("correctly assigns dataType", () {
-      expect(json["data_type"], dataType);
+      expect(json["data_type"], dataType.name);
     });
     test("correctly assigns component", () {
       expect(json["component"], component);
@@ -991,7 +993,7 @@ void main() {
     const String id = "some_id";
     const String instruction = "some_customer_id";
     const String actionType = "some_action_type";
-    const String dataType = "some_data_type";
+    const dataType = DatasetType.obd;
     const String component = "some_component";
     final ActionDto actionDto = ActionDto(
       id,

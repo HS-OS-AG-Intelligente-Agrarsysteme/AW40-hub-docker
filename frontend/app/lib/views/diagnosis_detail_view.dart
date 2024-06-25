@@ -178,7 +178,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       bool result = false;
 
       switch (widget.diagnosisModel.todos.first.dataType) {
-        case "obd":
+        case DatasetType.obd:
           final Map<String, dynamic> jsonMap = jsonDecode(fileContent);
           final NewOBDDataDto newOBDDataDto = NewOBDDataDto.fromJson(jsonMap);
 
@@ -187,7 +187,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             newOBDDataDto,
           );
           break;
-        case "oscillogram":
+        case DatasetType.timeseries:
           final List<int> byteData = utf8.encode(fileContent);
           result = await diagnosisProvider.uploadPicoscopeData(
             widget.diagnosisModel.caseId,
@@ -195,7 +195,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             file.name,
           );
           break;
-        case "symptom":
+        case DatasetType.symptom:
           final Map<String, dynamic> jsonMap = jsonDecode(fileContent);
           final NewSymptomDto newSymptomDto = NewSymptomDto.fromJson(jsonMap);
 
@@ -204,7 +204,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             newSymptomDto,
           );
           break;
-        // TODO: Add case for omniview data.
         default:
           throw AppException(
             exceptionType: ExceptionType.unexpectedNullValue,
