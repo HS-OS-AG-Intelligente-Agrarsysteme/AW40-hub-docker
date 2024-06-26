@@ -264,7 +264,7 @@ void main() {
       });
     });
     test("getDiagnosis() returns 200 DiagnosisDto json", () async {
-      const caseId = "caseId";
+      const caseId = "1";
       final Response response =
           await mockHttpService.getDiagnosis("token", "workshopId", caseId);
 

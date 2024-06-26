@@ -57,6 +57,182 @@ class MockHttpService implements HttpService {
     0,
   );
 
+  final List<DiagnosisDto> _diagnosisDtos = [
+    // scheduled
+    DiagnosisDto(
+      "1",
+      DateTime.utc(2018, 3, 28),
+      DiagnosisStatus.scheduled,
+      "2",
+      [],
+      [],
+    ),
+    // processing
+    DiagnosisDto(
+      "2",
+      DateTime.utc(2018, 3, 28),
+      DiagnosisStatus.processing,
+      "3",
+      [],
+      [],
+    ),
+    // finished
+    DiagnosisDto(
+      "3",
+      DateTime.utc(2018, 3, 28),
+      DiagnosisStatus.finished,
+      "5",
+      [
+        StateMachineLogEntryDto(
+          "STATE_TRANSITION: REC_VEHICLE_AND_PROC_METADATA --- "
+          "(processed_metadata) ---> PROC_CUSTOMER_COMPLAINTS",
+          null,
+        ),
+        StateMachineLogEntryDto(
+          "STATE_TRANSITION: PROC_CUSTOMER_COMPLAINTS --- "
+          "(no_complaints) ---> "
+          "READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES",
+          null,
+        ),
+        StateMachineLogEntryDto(
+          "RETRIEVED_DATASET: obd_data/0",
+          null,
+        ),
+        StateMachineLogEntryDto(
+          "STATE_TRANSITION: READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES "
+          "--- (processed_OBD_data) ---> RETRIEVE_HISTORICAL_DATA",
+          null,
+        ),
+        StateMachineLogEntryDto(
+          "STATE_TRANSITION: RETRIEVE_HISTORICAL_DATA --- "
+          "(processed_all_data) ---> ESTABLISH_INITIAL_HYPOTHESIS",
+          null,
+        ),
+        StateMachineLogEntryDto(
+          "STATE_TRANSITION: ESTABLISH_INITIAL_HYPOTHESIS --- "
+          "(established_init_hypothesis) ---> DIAGNOSIS",
+          null,
+        ),
+        StateMachineLogEntryDto(
+          "STATE_TRANSITION: "
+          "SELECT_BEST_UNUSED_ERROR_CODE_INSTANCE "
+          "--- (no_matching_selected_best_instance) ---> "
+          "SUGGEST_SUSPECT_COMPONENTS",
+          null,
+        ),
+        StateMachineLogEntryDto(
+          "STATE_TRANSITION: SUGGEST_SUSPECT_COMPONENTS --- "
+          "(provided_suggestions) ---> CLASSIFY_COMPONENTS",
+          null,
+        ),
+        StateMachineLogEntryDto(
+          "RETRIEVED_DATASET: timeseries_data/0",
+          null,
+        ),
+        StateMachineLogEntryDto(
+          "HEATMAPS: boost_pressure_control_valve "
+              "[ANOMALY - SCORE: 0.0029614063]",
+          "666abcf93d9fdf79fb6c11b5",
+        ),
+        StateMachineLogEntryDto(
+          "STATE_TRANSITION: CLASSIFY_COMPONENTS --- "
+          "(detected_anomalies) ---> "
+          "ISOLATE_PROBLEM_CHECK_EFFECTIVE_RADIUS",
+          null,
+        ),
+        StateMachineLogEntryDto(
+          "CAUSAL_GRAPH_VISUALIZATIONS: 0",
+          "666abcfa3d9fdf79fb6c11b7",
+        ),
+        StateMachineLogEntryDto(
+          "RETRIEVED_DATASET: symptoms/0",
+          null,
+        ),
+        StateMachineLogEntryDto(
+          "CAUSAL_GRAPH_VISUALIZATIONS: 0",
+          "666abcfa3d9fdf79fb6c11b9",
+        ),
+        StateMachineLogEntryDto(
+          "STATE_TRANSITION: "
+          "ISOLATE_PROBLEM_CHECK_EFFECTIVE_RADIUS --- "
+          "(isolated_problem) ---> PROVIDE_DIAG_AND_SHOW_TRACE",
+          null,
+        ),
+        StateMachineLogEntryDto(
+          "FAULT_PATHS: ['boost_pressure_solenoid_valve -> "
+          "boost_pressure_control_valve']",
+          null,
+        ),
+        StateMachineLogEntryDto(
+          "STATE_TRANSITION: PROVIDE_DIAG_AND_SHOW_TRACE --- "
+          "(uploaded_diag) ---> diag",
+          null,
+        )
+      ],
+      [],
+    ),
+    // failed
+    DiagnosisDto(
+      "4",
+      DateTime.utc(2018, 3, 28),
+      DiagnosisStatus.failed,
+      "6",
+      [],
+      [],
+    ),
+    // action_required, obd
+    DiagnosisDto(
+      "5",
+      DateTime.utc(2018, 3, 28),
+      DiagnosisStatus.action_required,
+      "4",
+      [],
+      [
+        ActionDto(
+          "1",
+          "some instruction",
+          "some action type",
+          DatasetType.obd,
+          "some component",
+        ),
+      ],
+    ),
+    // action_required, timeseries
+    DiagnosisDto(
+      "6",
+      DateTime.utc(2018, 3, 28),
+      DiagnosisStatus.action_required,
+      "8",
+      [],
+      [
+        ActionDto(
+          "1",
+          "some instruction",
+          "some action type",
+          DatasetType.timeseries,
+          "some component",
+        ),
+      ],
+    ),
+    // action_required, symptom
+    DiagnosisDto(
+      "7",
+      DateTime.utc(2018, 3, 28),
+      DiagnosisStatus.action_required,
+      "9",
+      [],
+      [
+        ActionDto(
+          "1",
+          "some instruction",
+          "some action type",
+          DatasetType.symptom,
+          "some component",
+        ),
+      ],
+    ),
+  ];
+
   Future<void> _demoDiagnosisStage0() async {
     if (_demoDiagnosisStage != 0) return;
     _demoDiagnosisStage++;
@@ -459,188 +635,14 @@ class MockHttpService implements HttpService {
 
   @override
   Future<Response> getDiagnoses(String token, String workshopId) {
-    final List<DiagnosisDto> diagnosisDtos = [
-      // scheduled
-      DiagnosisDto(
-        "1",
-        DateTime.utc(2018, 3, 28),
-        DiagnosisStatus.scheduled,
-        "2",
-        [],
-        [],
-      ),
-      // processing
-      DiagnosisDto(
-        "2",
-        DateTime.utc(2018, 3, 28),
-        DiagnosisStatus.processing,
-        "3",
-        [],
-        [],
-      ),
-      // finished
-      DiagnosisDto(
-        "3",
-        DateTime.utc(2018, 3, 28),
-        DiagnosisStatus.finished,
-        "5",
-        [
-          StateMachineLogEntryDto(
-            "STATE_TRANSITION: REC_VEHICLE_AND_PROC_METADATA --- "
-            "(processed_metadata) ---> PROC_CUSTOMER_COMPLAINTS",
-            null,
-          ),
-          StateMachineLogEntryDto(
-            "STATE_TRANSITION: PROC_CUSTOMER_COMPLAINTS --- "
-            "(no_complaints) ---> "
-            "READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES",
-            null,
-          ),
-          StateMachineLogEntryDto(
-            "RETRIEVED_DATASET: obd_data/0",
-            null,
-          ),
-          StateMachineLogEntryDto(
-            "STATE_TRANSITION: READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES "
-            "--- (processed_OBD_data) ---> RETRIEVE_HISTORICAL_DATA",
-            null,
-          ),
-          StateMachineLogEntryDto(
-            "STATE_TRANSITION: RETRIEVE_HISTORICAL_DATA --- "
-            "(processed_all_data) ---> ESTABLISH_INITIAL_HYPOTHESIS",
-            null,
-          ),
-          StateMachineLogEntryDto(
-            "STATE_TRANSITION: ESTABLISH_INITIAL_HYPOTHESIS --- "
-            "(established_init_hypothesis) ---> DIAGNOSIS",
-            null,
-          ),
-          StateMachineLogEntryDto(
-            "STATE_TRANSITION: "
-            "SELECT_BEST_UNUSED_ERROR_CODE_INSTANCE "
-            "--- (no_matching_selected_best_instance) ---> "
-            "SUGGEST_SUSPECT_COMPONENTS",
-            null,
-          ),
-          StateMachineLogEntryDto(
-            "STATE_TRANSITION: SUGGEST_SUSPECT_COMPONENTS --- "
-            "(provided_suggestions) ---> CLASSIFY_COMPONENTS",
-            null,
-          ),
-          StateMachineLogEntryDto(
-            "RETRIEVED_DATASET: timeseries_data/0",
-            null,
-          ),
-          StateMachineLogEntryDto(
-            "HEATMAPS: boost_pressure_control_valve "
-                "[ANOMALY - SCORE: 0.0029614063]",
-            "666abcf93d9fdf79fb6c11b5",
-          ),
-          StateMachineLogEntryDto(
-            "STATE_TRANSITION: CLASSIFY_COMPONENTS --- "
-            "(detected_anomalies) ---> "
-            "ISOLATE_PROBLEM_CHECK_EFFECTIVE_RADIUS",
-            null,
-          ),
-          StateMachineLogEntryDto(
-            "CAUSAL_GRAPH_VISUALIZATIONS: 0",
-            "666abcfa3d9fdf79fb6c11b7",
-          ),
-          StateMachineLogEntryDto(
-            "RETRIEVED_DATASET: symptoms/0",
-            null,
-          ),
-          StateMachineLogEntryDto(
-            "CAUSAL_GRAPH_VISUALIZATIONS: 0",
-            "666abcfa3d9fdf79fb6c11b9",
-          ),
-          StateMachineLogEntryDto(
-            "STATE_TRANSITION: "
-            "ISOLATE_PROBLEM_CHECK_EFFECTIVE_RADIUS --- "
-            "(isolated_problem) ---> PROVIDE_DIAG_AND_SHOW_TRACE",
-            null,
-          ),
-          StateMachineLogEntryDto(
-            "FAULT_PATHS: ['boost_pressure_solenoid_valve -> "
-            "boost_pressure_control_valve']",
-            null,
-          ),
-          StateMachineLogEntryDto(
-            "STATE_TRANSITION: PROVIDE_DIAG_AND_SHOW_TRACE --- "
-            "(uploaded_diag) ---> diag",
-            null,
-          )
-        ],
-        [],
-      ),
-      // failed
-      DiagnosisDto(
-        "4",
-        DateTime.utc(2018, 3, 28),
-        DiagnosisStatus.failed,
-        "6",
-        [],
-        [],
-      ),
-      // action_required, obd
-      DiagnosisDto(
-        "5",
-        DateTime.utc(2018, 3, 28),
-        DiagnosisStatus.action_required,
-        "4",
-        [],
-        [
-          ActionDto(
-            "1",
-            "some instruction",
-            "some action type",
-            DatasetType.obd,
-            "some component",
-          ),
-        ],
-      ),
-      // action_required, timeseries
-      DiagnosisDto(
-        "6",
-        DateTime.utc(2018, 3, 28),
-        DiagnosisStatus.action_required,
-        "8",
-        [],
-        [
-          ActionDto(
-            "1",
-            "some instruction",
-            "some action type",
-            DatasetType.timeseries,
-            "some component",
-          ),
-        ],
-      ),
-      // action_required, symptom
-      DiagnosisDto(
-        "7",
-        DateTime.utc(2018, 3, 28),
-        DiagnosisStatus.action_required,
-        "9",
-        [],
-        [
-          ActionDto(
-            "1",
-            "some instruction",
-            "some action type",
-            DatasetType.symptom,
-            "some component",
-          ),
-        ],
-      ),
-    ];
+    _logger.shout("Calling getDiagnoses()");
     if (_demoDiagnosisStage > 0) {
-      diagnosisDtos.add(_demoDiagnosisDto);
+      _diagnosisDtos.add(_demoDiagnosisDto);
     }
     return Future.delayed(
       Duration(milliseconds: delay),
       () => Response(
-        jsonEncode(diagnosisDtos.map((e) => e.toJson()).toList()),
+        jsonEncode(_diagnosisDtos.map((e) => e.toJson()).toList()),
         200,
       ),
     );
@@ -658,13 +660,22 @@ class MockHttpService implements HttpService {
         () => Response(jsonEncode(_demoDiagnosisDto.toJson()), 200),
       );
     }
-    final DiagnosisDto diagnosisDto = DiagnosisDto(
+    final DiagnosisDto backupDiagnosisDto = DiagnosisDto(
       "1",
       DateTime.now(),
       DiagnosisStatus.processing,
       caseId,
       [],
       [],
+    );
+    final DiagnosisDto diagnosisDto = _diagnosisDtos.singleWhere(
+      (element) => element.caseId == caseId,
+      orElse: () {
+        _logger.warning(
+          "No diagnosis found for case $caseId. Is this intended behavior?",
+        );
+        return backupDiagnosisDto;
+      },
     );
     return Future.delayed(
       Duration(milliseconds: delay),
