@@ -349,12 +349,49 @@ void main() {
         expect(response.statusCode, 422, reason: "status code should be 422");
       });
     });
+    group("uploadOmniviewData", () {
+      test("returns 201 CaseDto json", () async {
+        const caseId = "caseId";
+        const workshopId = "workshopId";
+        final Response response = await mockHttpService.uploadOmniviewData(
+          "token",
+          workshopId,
+          caseId,
+          "component",
+          4,
+          8,
+          [15],
+          "filename",
+        );
+        expect(response.statusCode, 201, reason: "status code should be 201");
+        expect(
+              () => CaseDto.fromJson(jsonDecode(response.body)),
+          returnsNormally,
+          reason: "should return valid CaseDto json",
+        );
+
+        final CaseDto caseDto = CaseDto.fromJson(jsonDecode(response.body));
+        expect(
+          caseDto.id,
+          equals(caseId),
+          reason: "id should be input parameter",
+        );
+        expect(
+          caseDto.workshopId,
+          equals(workshopId),
+          reason: "workshopId should be input parameter",
+        );
+      });
+      // TODO: Test validation once DTO is implemented.
+    });
     group("uploadPicoscopeData", () {
       test("returns 201 CaseDto json", () async {
+        const caseId = "caseId";
+        const workshopId = "workshopId";
         final Response response = await mockHttpService.uploadPicoscopeData(
           "token",
-          "workshopId",
-          "caseId",
+          workshopId,
+          caseId,
           [],
           "filename",
         );
@@ -366,6 +403,16 @@ void main() {
         );
 
         final CaseDto caseDto = CaseDto.fromJson(jsonDecode(response.body));
+        expect(
+          caseDto.id,
+          equals(caseId),
+          reason: "id should be input parameter",
+        );
+        expect(
+          caseDto.workshopId,
+          equals(workshopId),
+          reason: "workshopId should be input parameter",
+        );
       });
       // TODO: Test validation once DTO is implemented.
     });

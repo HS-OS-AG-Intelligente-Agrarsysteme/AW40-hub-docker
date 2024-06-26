@@ -591,8 +591,40 @@ class MockHttpService implements HttpService {
     List<int> omniviewData,
     String filename,
   ) {
-    // TODO: implement uploadOmniviewData
-    throw UnimplementedError();
+    _logger.warning(
+      "OmniviewDto not implemented, not checking for potential"
+          " validation errors.",
+    );
+    final CaseDto caseDto = CaseDto(
+      caseId,
+      DateTime.now(),
+      CaseOccasion.problem_defect,
+      47233,
+      CaseStatus.open,
+      "unknown",
+      "12345678901234567",
+      workshopId,
+      null,
+      [],
+      [],
+      [],
+      0,
+      0,
+      0,
+    );
+    if (caseId == demoCaseId) {
+      return Future.delayed(
+        Duration(milliseconds: delay),
+            () {
+          _demoDiagnosisStage2();
+          return Response(jsonEncode(_demoCaseDto.toJson()), 200);
+        },
+      );
+    }
+    return Future.delayed(
+      Duration(milliseconds: delay),
+          () => Response(jsonEncode(caseDto.toJson()), 201),
+    );
   }
 
   @override
