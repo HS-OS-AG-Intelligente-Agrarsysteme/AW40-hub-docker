@@ -487,13 +487,13 @@ class MockHttpService implements HttpService {
         [
           StateMachineLogEntryDto(
             "STATE_TRANSITION: REC_VEHICLE_AND_PROC_METADATA --- "
-                "(processed_metadata) ---> PROC_CUSTOMER_COMPLAINTS",
+            "(processed_metadata) ---> PROC_CUSTOMER_COMPLAINTS",
             null,
           ),
           StateMachineLogEntryDto(
             "STATE_TRANSITION: PROC_CUSTOMER_COMPLAINTS --- "
-                "(no_complaints) ---> "
-                "READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES",
+            "(no_complaints) ---> "
+            "READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES",
             null,
           ),
           StateMachineLogEntryDto(
@@ -501,31 +501,30 @@ class MockHttpService implements HttpService {
             null,
           ),
           StateMachineLogEntryDto(
-
             "STATE_TRANSITION: READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES "
-                "--- (processed_OBD_data) ---> RETRIEVE_HISTORICAL_DATA",
+            "--- (processed_OBD_data) ---> RETRIEVE_HISTORICAL_DATA",
             null,
           ),
           StateMachineLogEntryDto(
             "STATE_TRANSITION: RETRIEVE_HISTORICAL_DATA --- "
-                "(processed_all_data) ---> ESTABLISH_INITIAL_HYPOTHESIS",
+            "(processed_all_data) ---> ESTABLISH_INITIAL_HYPOTHESIS",
             null,
           ),
           StateMachineLogEntryDto(
             "STATE_TRANSITION: ESTABLISH_INITIAL_HYPOTHESIS --- "
-                "(established_init_hypothesis) ---> DIAGNOSIS",
+            "(established_init_hypothesis) ---> DIAGNOSIS",
             null,
           ),
           StateMachineLogEntryDto(
             "STATE_TRANSITION: "
-                "SELECT_BEST_UNUSED_ERROR_CODE_INSTANCE "
-                "--- (no_matching_selected_best_instance) ---> "
-                "SUGGEST_SUSPECT_COMPONENTS",
+            "SELECT_BEST_UNUSED_ERROR_CODE_INSTANCE "
+            "--- (no_matching_selected_best_instance) ---> "
+            "SUGGEST_SUSPECT_COMPONENTS",
             null,
           ),
           StateMachineLogEntryDto(
             "STATE_TRANSITION: SUGGEST_SUSPECT_COMPONENTS --- "
-                "(provided_suggestions) ---> CLASSIFY_COMPONENTS",
+            "(provided_suggestions) ---> CLASSIFY_COMPONENTS",
             null,
           ),
           StateMachineLogEntryDto(
@@ -539,8 +538,8 @@ class MockHttpService implements HttpService {
           ),
           StateMachineLogEntryDto(
             "STATE_TRANSITION: CLASSIFY_COMPONENTS --- "
-                "(detected_anomalies) ---> "
-                "ISOLATE_PROBLEM_CHECK_EFFECTIVE_RADIUS",
+            "(detected_anomalies) ---> "
+            "ISOLATE_PROBLEM_CHECK_EFFECTIVE_RADIUS",
             null,
           ),
           StateMachineLogEntryDto(
@@ -557,18 +556,18 @@ class MockHttpService implements HttpService {
           ),
           StateMachineLogEntryDto(
             "STATE_TRANSITION: "
-                "ISOLATE_PROBLEM_CHECK_EFFECTIVE_RADIUS --- "
-                "(isolated_problem) ---> PROVIDE_DIAG_AND_SHOW_TRACE",
+            "ISOLATE_PROBLEM_CHECK_EFFECTIVE_RADIUS --- "
+            "(isolated_problem) ---> PROVIDE_DIAG_AND_SHOW_TRACE",
             null,
           ),
           StateMachineLogEntryDto(
             "FAULT_PATHS: ['boost_pressure_solenoid_valve -> "
-                "boost_pressure_control_valve']",
+            "boost_pressure_control_valve']",
             null,
           ),
           StateMachineLogEntryDto(
             "STATE_TRANSITION: PROVIDE_DIAG_AND_SHOW_TRACE --- "
-                "(uploaded_diag) ---> diag",
+            "(uploaded_diag) ---> diag",
             null,
           )
         ],
@@ -635,7 +634,7 @@ class MockHttpService implements HttpService {
         ],
       ),
     ];
-    if (_demoDiagnosisStage > 0){
+    if (_demoDiagnosisStage > 0) {
       diagnosisDtos.add(_demoDiagnosisDto);
     }
     return Future.delayed(

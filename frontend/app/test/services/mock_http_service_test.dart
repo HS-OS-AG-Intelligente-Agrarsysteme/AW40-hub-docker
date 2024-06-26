@@ -14,7 +14,7 @@ void main() {
   group("MockHttpService", () {
     late MockHttpService mockHttpService;
     setUp(() => mockHttpService = MockHttpService());
-    group("addCase", () {
+    group("addCase()", () {
       test("returns 201 CaseDto json", () async {
         const vehicleVin = "12345678901234567";
         const customerId = "unknown";
@@ -73,7 +73,7 @@ void main() {
         expect(response.statusCode, 422, reason: "status code should be 422");
       });
     });
-    test("checkBackendHealth", () async {
+    test("checkBackendHealth()", () async {
       final response = await mockHttpService.checkBackendHealth();
       expect(response.statusCode, 200, reason: "status code should be 200");
       expect(
@@ -82,12 +82,12 @@ void main() {
         reason: "should return expected body",
       );
     });
-    test("deleteCase returns 200", () async {
+    test("deleteCase() returns 200", () async {
       final response =
           await mockHttpService.deleteCase("token", "workshopId", "caseId");
       expect(response.statusCode, 200, reason: "status code should be 200");
     });
-    test("deleteDiagnosis returns 200", () async {
+    test("deleteDiagnosis() returns 200", () async {
       final response = await mockHttpService.deleteDiagnosis(
         "token",
         "workshopId",
@@ -95,7 +95,7 @@ void main() {
       );
       expect(response.statusCode, 200, reason: "status code should be 200");
     });
-    test("getAuthHeaderWith throws UnsupportedError", () {
+    test("getAuthHeaderWith() throws UnsupportedError", () {
       expect(
         () => mockHttpService.getAuthHeaderWith("token"),
         throwsUnsupportedError,
@@ -263,7 +263,7 @@ void main() {
         });
       });
     });
-    test("getDiagnosis returns 200 DiagnosisDto json", () async {
+    test("getDiagnosis() returns 200 DiagnosisDto json", () async {
       const caseId = "caseId";
       final Response response =
           await mockHttpService.getDiagnosis("token", "workshopId", caseId);
@@ -284,7 +284,7 @@ void main() {
         reason: "customerId should be input parameter",
       );
     });
-    test("startDiagnosis returns 200 DiagnosisDto json", () async {
+    test("startDiagnosis() returns 200 DiagnosisDto json", () async {
       const caseId = "caseId";
       final response =
           await mockHttpService.startDiagnosis("token", "workshopId", caseId);
@@ -305,7 +305,7 @@ void main() {
         reason: "customerId should be input parameter",
       );
     });
-    group("updateCase", () {
+    group("updateCase()", () {
       test("returns 200 CaseDto json", () async {
         final timestamp = DateTime.now();
         const occasion = "problem_defect";
@@ -383,7 +383,7 @@ void main() {
         expect(response.statusCode, 422, reason: "status code should be 422");
       });
     });
-    group("uploadObdData", () {
+    group("uploadObdData()", () {
       test("returns 201 CaseDto json", () async {
         final newObdDataDto = NewOBDDataDto(["some obd specs"], ["some dtcs"]);
         const caseId = "caseId";
@@ -447,7 +447,7 @@ void main() {
         expect(response.statusCode, 422, reason: "status code should be 422");
       });
     });
-    group("uploadOmniviewData", () {
+    group("uploadOmniviewData()", () {
       test("returns 201 CaseDto json", () async {
         const caseId = "caseId";
         const workshopId = "workshopId";
@@ -482,7 +482,7 @@ void main() {
       });
       // TODO: Test validation once DTO is implemented.
     });
-    group("uploadPicoscopeData", () {
+    group("uploadPicoscopeData()", () {
       test("returns 201 CaseDto json", () async {
         const caseId = "caseId";
         const workshopId = "workshopId";
@@ -514,7 +514,7 @@ void main() {
       });
       // TODO: Test validation once DTO is implemented.
     });
-    group("uploadSymptomData", () {
+    group("uploadSymptomData()", () {
       test("returns 201 CaseDto json", () async {
         final symptomDto = SymptomDto(
           DateTime.utc(2021, 2, 3),
@@ -583,7 +583,7 @@ void main() {
         expect(response.statusCode, 422, reason: "status code should be 422");
       });
     });
-    group("diagnosis workflow", () {
+    group("diagnosis workflow()", () {
       const String demoCaseId = MockHttpService.demoCaseId;
       test("first case in getCases is diagnosis demo case", () async {
         final Response response =
