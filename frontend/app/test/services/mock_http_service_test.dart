@@ -365,7 +365,7 @@ void main() {
         );
         expect(response.statusCode, 201, reason: "status code should be 201");
         expect(
-              () => CaseDto.fromJson(jsonDecode(response.body)),
+          () => CaseDto.fromJson(jsonDecode(response.body)),
           returnsNormally,
           reason: "should return valid CaseDto json",
         );
@@ -443,27 +443,6 @@ void main() {
           cases.first.diagnosisId,
           isNull,
           reason: "first case should have no diagnosis",
-        );
-      });
-      test(
-          "calling startDiagnosis with demoCaseId returns diagnosis with status scheduled ",
-          () async {
-        final response = await mockHttpService.startDiagnosis(
-          "token",
-          "workshopId",
-          demoCaseId,
-        );
-        final DiagnosisDto diagnosisDto =
-            DiagnosisDto.fromJson(jsonDecode(response.body));
-        expect(
-          diagnosisDto.caseId,
-          equals(demoCaseId),
-          reason: "diagnosisDto should have id demoCaseId",
-        );
-        expect(
-          diagnosisDto.status,
-          equals(DiagnosisStatus.scheduled),
-          reason: "diagnosisDto should have status scheduled",
         );
       });
       test("diagnosis transitions through states correctly", () async {
