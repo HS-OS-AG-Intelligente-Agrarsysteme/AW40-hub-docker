@@ -204,12 +204,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             newSymptomDto,
           );
           break;
-        default:
-          throw AppException(
-            exceptionType: ExceptionType.unexpectedNullValue,
-            exceptionMessage: "Unknown data type: "
-                "${widget.diagnosisModel.todos.first.dataType}",
-          );
       }
 
       _showMessage(
