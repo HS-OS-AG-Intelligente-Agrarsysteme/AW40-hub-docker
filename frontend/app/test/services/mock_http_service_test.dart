@@ -3,6 +3,7 @@ import "dart:convert";
 import "package:aw40_hub_frontend/dtos/case_dto.dart";
 import "package:aw40_hub_frontend/dtos/diagnosis_dto.dart";
 import "package:aw40_hub_frontend/dtos/new_obd_data_dto.dart";
+import "package:aw40_hub_frontend/dtos/obd_data_dto.dart";
 import "package:aw40_hub_frontend/services/mock_http_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter_test/flutter_test.dart";
@@ -289,13 +290,15 @@ void main() {
         expect(response.statusCode, 422, reason: "status code should be 422");
       });
     });
-    group("uploadObdData", (){
+    group("uploadObdData", () {
       test("returns 201 CaseDto json", () async {
         final newObdDataDto = NewOBDDataDto(["some obd specs"], ["some dtcs"]);
+        const caseId = "caseId";
+        const workshopId = "workshopId";
         final Response response = await mockHttpService.uploadObdData(
           "token",
-          "workshopId",
-          "caseId",
+          workshopId,
+          caseId,
           newObdDataDto.toJson(),
         );
 
@@ -304,6 +307,30 @@ void main() {
           () => CaseDto.fromJson(jsonDecode(response.body)),
           returnsNormally,
           reason: "should return valid CaseDto json",
+        );
+
+        final CaseDto caseDto = CaseDto.fromJson(jsonDecode(response.body));
+        expect(
+          caseDto.id,
+          equals(caseId),
+          reason: "obdData should be input parameter",
+        );
+        expect(
+          caseDto.workshopId,
+          equals(workshopId),
+          reason: "obdData should be input parameter",
+        );
+
+        final ObdDataDto obdDataDto = caseDto.obdData.first;
+        expect(
+          obdDataDto.obdSpecs,
+          equals(newObdDataDto.obdSpecs),
+          reason: "obdDataDto.obdSpecs should be input parameter",
+        );
+        expect(
+          obdDataDto.dtcs,
+          equals(newObdDataDto.dtcs),
+          reason: "obdDataDto.dtcs should be input parameter",
         );
       });
       test("returns 422 on incorrect requestBody", () async {
@@ -320,8 +347,27 @@ void main() {
         );
 
         expect(response.statusCode, 422, reason: "status code should be 422");
-
       });
+    });
+    group("uploadPicoscopeData", () {
+      test("returns 201 CaseDto json", () async {
+        final Response response = await mockHttpService.uploadPicoscopeData(
+          "token",
+          "workshopId",
+          "caseId",
+          [],
+          "filename",
+        );
+        expect(response.statusCode, 201, reason: "status code should be 201");
+        expect(
+          () => CaseDto.fromJson(jsonDecode(response.body)),
+          returnsNormally,
+          reason: "should return valid CaseDto json",
+        );
+
+        final CaseDto caseDto = CaseDto.fromJson(jsonDecode(response.body));
+      });
+      // TODO: Test validation once DTO is implemented.
     });
     group("diagnosis workflow", () {
       const String demoCaseId = MockHttpService.demoCaseId;
@@ -404,7 +450,6 @@ void main() {
           equals(DiagnosisStatus.scheduled),
           reason: "startDiagnosisDto should have status scheduled",
         );
-
 
         // Check initial state is scheduled.
         // Note: We could use final variables here, but the values we're

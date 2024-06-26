@@ -44,7 +44,7 @@ class MockHttpService implements HttpService {
     CaseOccasion.problem_defect,
     100,
     CaseStatus.open,
-    "unknown",
+    "Linda de Mo",
     "12345678901234567",
     "workshop_id",
     null,
@@ -61,7 +61,7 @@ class MockHttpService implements HttpService {
     _demoDiagnosisStage++;
     _logger.info("Starting demo diagnosis with transition interval "
         "$diagnosisTransitionInterval ms. and delay $delay ms.");
-    _logger.info("Waiting for transition to action_required, obd");
+    _demoCaseDto.diagnosisId = _demoDiagnosisDto.id;
     await Future.delayed(Duration(milliseconds: diagnosisTransitionInterval));
     _demoDiagnosisDto.status = DiagnosisStatus.action_required;
     _demoDiagnosisDto.todos = [
@@ -73,7 +73,6 @@ class MockHttpService implements HttpService {
         "some component",
       ),
     ];
-    _logger.info("Set: action_required, obd.");
   }
 
   Future<void> _demoDiagnosisStage1() async {
@@ -88,6 +87,23 @@ class MockHttpService implements HttpService {
         "some instruction",
         "some action type",
         DatasetType.timeseries,
+        "some component",
+      ),
+    ];
+  }
+
+  Future<void> _demoDiagnosisStage2() async {
+    if (_demoDiagnosisStage != 2) return;
+    _demoDiagnosisStage++;
+    _demoDiagnosisDto.status = DiagnosisStatus.processing;
+    await Future.delayed(Duration(milliseconds: diagnosisTransitionInterval));
+    _demoDiagnosisDto.status = DiagnosisStatus.action_required;
+    _demoDiagnosisDto.todos = [
+      ActionDto(
+        "1",
+        "some instruction",
+        "some action type",
+        DatasetType.symptom,
         "some component",
       ),
     ];
@@ -595,8 +611,40 @@ class MockHttpService implements HttpService {
     PicoscopeLabel? labelC,
     PicoscopeLabel? labelD,
   }) {
-    // TODO: implement uploadPicoscopeData
-    throw UnimplementedError();
+    _logger.warning(
+      "PicoscopeDto not implemented, not checking for potential"
+      " validation errors.",
+    );
+    final CaseDto caseDto = CaseDto(
+      caseId,
+      DateTime.now(),
+      CaseOccasion.problem_defect,
+      47233,
+      CaseStatus.open,
+      "unknown",
+      "12345678901234567",
+      workshopId,
+      null,
+      [],
+      [],
+      [],
+      0,
+      0,
+      0,
+    );
+    if (caseId == demoCaseId) {
+      return Future.delayed(
+        Duration(milliseconds: delay),
+        () {
+          _demoDiagnosisStage2();
+          return Response(jsonEncode(_demoCaseDto.toJson()), 200);
+        },
+      );
+    }
+    return Future.delayed(
+      Duration(milliseconds: delay),
+          () => Response(jsonEncode(caseDto.toJson()), 201),
+    );
   }
 
   @override
