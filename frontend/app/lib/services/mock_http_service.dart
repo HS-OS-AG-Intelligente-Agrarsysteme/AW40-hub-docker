@@ -239,6 +239,12 @@ class MockHttpService implements HttpService {
     _logger.info("Starting demo diagnosis with transition interval "
         "$diagnosisTransitionInterval ms. and delay $delay ms.");
     _demoCaseDto.diagnosisId = _demoDiagnosisDto.id;
+
+    _logger.info(
+      "Starting demo diagnosis stage 0 with transition interval "
+      "$diagnosisTransitionInterval ms. and delay $delay ms.",
+    );
+
     await Future.delayed(Duration(milliseconds: diagnosisTransitionInterval));
     _demoDiagnosisDto.status = DiagnosisStatus.action_required;
     _demoDiagnosisDto.todos = [
@@ -250,12 +256,25 @@ class MockHttpService implements HttpService {
         "some component",
       ),
     ];
+
+    _logger.info(
+      "Finished demo diagnosis stage 0."
+      " status: ${_demoDiagnosisDto.status},"
+      " todos: ${_demoDiagnosisDto.todos.length}",
+    );
   }
 
   Future<void> _demoDiagnosisStage1() async {
     if (_demoDiagnosisStage != 1) return;
     _demoDiagnosisStage++;
     _demoDiagnosisDto.status = DiagnosisStatus.processing;
+
+    _logger.info(
+      "Starting demo diagnosis stage 1."
+      " status: ${_demoDiagnosisDto.status.name},"
+      " todos: ${_demoDiagnosisDto.todos.length}",
+    );
+
     await Future.delayed(Duration(milliseconds: diagnosisTransitionInterval));
     _demoDiagnosisDto.status = DiagnosisStatus.action_required;
     _demoDiagnosisDto.todos = [
@@ -267,6 +286,12 @@ class MockHttpService implements HttpService {
         "some component",
       ),
     ];
+
+    _logger.info(
+      "Finished demo diagnosis stage 1."
+      " status: ${_demoDiagnosisDto.status},"
+      " todos: ${_demoDiagnosisDto.todos.length}",
+    );
   }
 
   Future<void> _demoDiagnosisStage2() async {
@@ -635,14 +660,13 @@ class MockHttpService implements HttpService {
 
   @override
   Future<Response> getDiagnoses(String token, String workshopId) {
-    _logger.shout("Calling getDiagnoses()");
-    if (_demoDiagnosisStage > 0) {
-      _diagnosisDtos.add(_demoDiagnosisDto);
-    }
+    final List<DiagnosisDto> diagnosisDtos = _demoDiagnosisStage > 0
+        ? _diagnosisDtos + [_demoDiagnosisDto]
+        : _diagnosisDtos;
     return Future.delayed(
       Duration(milliseconds: delay),
       () => Response(
-        jsonEncode(_diagnosisDtos.map((e) => e.toJson()).toList()),
+        jsonEncode(diagnosisDtos.map((e) => e.toJson()).toList()),
         200,
       ),
     );
@@ -654,12 +678,6 @@ class MockHttpService implements HttpService {
     String workshopId,
     String caseId,
   ) {
-    if (caseId == demoCaseId) {
-      return Future.delayed(
-        Duration(milliseconds: delay),
-        () => Response(jsonEncode(_demoDiagnosisDto.toJson()), 200),
-      );
-    }
     final DiagnosisDto backupDiagnosisDto = DiagnosisDto(
       "1",
       DateTime.now(),
@@ -668,15 +686,25 @@ class MockHttpService implements HttpService {
       [],
       [],
     );
-    final DiagnosisDto diagnosisDto = _diagnosisDtos.singleWhere(
-      (element) => element.caseId == caseId,
-      orElse: () {
-        _logger.warning(
-          "No diagnosis found for case $caseId. Is this intended behavior?",
-        );
-        return backupDiagnosisDto;
-      },
-    );
+    final DiagnosisDto diagnosisDto = caseId == demoCaseId
+        ? _demoDiagnosisDto
+        : _diagnosisDtos.singleWhere(
+            (element) => element.caseId == caseId,
+            orElse: () {
+              _logger.warning(
+                "No diagnosis found for case $caseId."
+                " Is this intended behavior?",
+              );
+              return backupDiagnosisDto;
+            },
+          );
+    if (diagnosisDto.status == DiagnosisStatus.action_required &&
+        diagnosisDto.todos.isEmpty) {
+      _logger.warning(
+        "Status is action_required, but found empty todo list. Case ID:"
+        " $caseId, _demoDiagnosisStage: $_demoDiagnosisStage",
+      );
+    }
     return Future.delayed(
       Duration(milliseconds: delay),
       () {
