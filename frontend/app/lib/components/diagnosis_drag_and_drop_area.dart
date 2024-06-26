@@ -69,14 +69,14 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
                         color: diagnosisStatusOnContainerColor,
                       ),
                 ),
-                IconButton(
+                /*IconButton(
                   icon: const Icon(Icons.upload_file),
                   style: IconButton.styleFrom(
                     foregroundColor: diagnosisStatusOnContainerColor,
                   ),
                   onPressed: () => _uploadFile,
                   tooltip: tr("diagnoses.details.uploadFileTooltip"),
-                ),
+                ),*/
               ],
             ),
             const SizedBox(height: 16),
@@ -111,14 +111,6 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             ),
           ),
           const SizedBox(height: 16),
-          /*Text(
-            datasetType.name,
-            style: TextStyle(
-              color: diagnosisStatusOnContainerColor,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),*/
           createTextfields(datasetType, diagnosisStatusOnContainerColor),
         ],
       ),
@@ -128,11 +120,20 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
   Widget createTextfields(DatasetType datasetType, Color fieldColor) {
     switch (datasetType) {
       case DatasetType.obd:
-        // TODO: Handle this case.
-        return const Text('obd');
+        //placeholder
+        return Center(
+          child: _dragging
+              ? _buildButton(fieldColor, DatasetType.obd)
+              : IconButton(
+                  icon: const Icon(Icons.upload_file),
+                  style: IconButton.styleFrom(
+                    foregroundColor: fieldColor,
+                  ),
+                  onPressed: null,
+                ),
+        );
 
       case DatasetType.omniscope:
-        // TODO: Handle this case.
         return Column(
           children: [
             TextFormField(
@@ -209,14 +210,38 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
               cursorColor: fieldColor,
               cursorWidth: 1,
             ),
-            //omniscopeComponent,
-            //omniscopeSamplingRate,
-            //omniscopeDuration
+            const SizedBox(height: 16),
+            Center(
+              child: (_componentController.text.isNotEmpty &&
+                      _samplingRateController.text.isNotEmpty &&
+                      _durationController.text.isNotEmpty &&
+                      _dragging)
+                  ? _buildButton(fieldColor, DatasetType.omniscope)
+                  : IconButton(
+                      icon: const Icon(Icons.upload_file),
+                      style: IconButton.styleFrom(
+                        foregroundColor: fieldColor,
+                      ),
+                      onPressed: null,
+                    ),
+            )
           ],
         );
       case DatasetType.unknown:
-        return const Text("unknown");
+        //Placeholder
+        return const Text("");
     }
+  }
+
+  Widget _buildButton(Color iconColor, DatasetType datasetType) {
+    return IconButton(
+      icon: const Icon(Icons.upload_file),
+      style: IconButton.styleFrom(
+        foregroundColor: iconColor,
+      ),
+      onPressed: () async => _uploadFile(datasetType),
+      tooltip: tr("diagnoses.details.uploadFileTooltip"),
+    );
   }
 
   void _onDragDone(DropDoneDetails dropDoneDetails) {
@@ -257,8 +282,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
           break;
         case DatasetType.omniscope:
           final List<int> byteData = utf8.encode(fileContent);
-          //TODO change parameters!
-          /*final String component = _componentController.text.toLowerCase();
+          final String component = _componentController.text.toLowerCase();
           final int? samplingRate = int.tryParse(_samplingRateController.text);
           final int? duration = int.tryParse(_durationController.text);
           result = await diagnosisProvider.uploadOmniscopeData(
@@ -268,7 +292,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             component,
             samplingRate!,
             duration!,
-          );*/
+          );
           break;
         case DatasetType.unknown:
           throw AppException(

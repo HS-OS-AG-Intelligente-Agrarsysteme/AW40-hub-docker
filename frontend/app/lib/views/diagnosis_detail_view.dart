@@ -1,19 +1,14 @@
 import "dart:async";
-import "dart:convert";
 
 import "package:aw40_hub_frontend/components/components.dart";
-import "package:aw40_hub_frontend/dtos/dtos.dart";
-import "package:aw40_hub_frontend/exceptions/app_exception.dart";
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:aw40_hub_frontend/utils/extensions.dart";
 import "package:cross_file/cross_file.dart";
-import "package:desktop_drop/desktop_drop.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
-import "package:logging/logging.dart";
 import "package:provider/provider.dart";
 
 class DiagnosisDetailView extends StatefulWidget {
@@ -30,7 +25,7 @@ class DiagnosisDetailView extends StatefulWidget {
 
 class _DiagnosisDetailView extends State<DiagnosisDetailView> {
   XFile? _file;
-  final Logger _logger = Logger("diagnosis detail view");
+  //final Logger _logger = Logger("diagnosis detail view");
 
   @override
   Widget build(BuildContext context) {
