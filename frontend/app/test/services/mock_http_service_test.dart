@@ -103,7 +103,8 @@ void main() {
     });
     group("getCases()", () {
       test("returns 200 List<CaseDto> json", () async {
-        final response = await mockHttpService.getCases("token", "workshop");
+        final Response response =
+            await mockHttpService.getCases("token", "workshop");
         final json = jsonDecode(response.body);
 
         expect(response.statusCode, 200, reason: "status code should be 200");
@@ -121,40 +122,143 @@ void main() {
       });
       group("returns at least one case with", () {
         late List<CaseDto> cases;
-        setUp(() async {
+        setUpAll(() async {
           cases = await _getCaseDtosFromGetCases(mockHttpService);
         });
         test("obd data", () {
           expect(
-            cases.any((c) => c.obdData.isNotEmpty),
-            isTrue,
+            cases,
+            anyElement((CaseDto c) => c.obdData.isNotEmpty),
             reason: "at least one case should have obd data",
           );
         });
         test("timeseries data", () {
           expect(
-            cases.any((c) => c.timeseriesData.isNotEmpty),
-            isTrue,
+            cases,
+            anyElement((CaseDto c) => c.timeseriesData.isNotEmpty),
             reason: "at least one case should have timeseries data",
           );
         });
         test("symptomDtoResponse data", () {
           expect(
-            cases.any((c) => c.symptoms.isNotEmpty),
-            isTrue,
+            cases,
+            anyElement((CaseDto c) => c.symptoms.isNotEmpty),
             reason: "at least one case should have symptomDtoResponse data",
           );
         });
         test("all dataset types", () {
           expect(
-            cases.any(
-              (c) =>
+            cases,
+            anyElement(
+              (CaseDto c) =>
                   c.obdData.isNotEmpty &&
                   c.timeseriesData.isNotEmpty &&
                   c.symptoms.isNotEmpty,
             ),
-            isTrue,
             reason: "at least one case should have all dataset types",
+          );
+        });
+      });
+    });
+    group("getDiagnoses()", () {
+      test("returns 200 List<DiagnosisDto> json", () async {
+        final Response response =
+            await mockHttpService.getDiagnoses("token", "workshopId");
+        final json = jsonDecode(response.body);
+
+        expect(response.statusCode, 200, reason: "status code should be 200");
+        expect(json, isA<List>(), reason: "should return List json");
+        // For type promotion.
+        if (json is! List) {
+          fail("json is not a List, previous expect() should have failed");
+        }
+        expect(
+          // ignore: unnecessary_lambdas
+          () => json.map((e) => DiagnosisDto.fromJson(e)),
+          returnsNormally,
+          reason: "should return valid List<DiagnosisDto> json",
+        );
+      });
+      group("returns at least one diagnosis with", () {
+        late List<DiagnosisDto> diagnoses;
+        setUpAll(() async {
+          diagnoses = await _getDiagnosisDtosFromGetDiagnoses(mockHttpService);
+        });
+        group("status action_required", () {
+          test("and datatype obd", () {
+            expect(
+              diagnoses,
+              anyElement(
+                (DiagnosisDto d) =>
+                    d.status == DiagnosisStatus.action_required &&
+                    d.todos.isNotEmpty &&
+                    d.todos[0].dataType == DatasetType.obd,
+              ),
+              reason: "at least one diagnosis should have status"
+                  " action_required and datatype obd",
+            );
+          });
+          test("and datatype timeseries", () {
+            expect(
+              diagnoses,
+              anyElement(
+                (DiagnosisDto d) =>
+                    d.status == DiagnosisStatus.action_required &&
+                    d.todos.isNotEmpty &&
+                    d.todos[0].dataType == DatasetType.timeseries,
+              ),
+              reason: "at least one diagnosis should have status"
+                  " action_required and datatype timeseries",
+            );
+          });
+          test("and datatype symptom", () {
+            expect(
+              diagnoses,
+              anyElement(
+                (DiagnosisDto d) =>
+                    d.status == DiagnosisStatus.action_required &&
+                    d.todos.isNotEmpty &&
+                    d.todos[0].dataType == DatasetType.symptom,
+              ),
+              reason: "at least one diagnosis should have status"
+                  " action_required and datatype symptom",
+            );
+          });
+        });
+        test("status scheduled", () {
+          expect(
+            diagnoses,
+            anyElement(
+              (DiagnosisDto d) => d.status == DiagnosisStatus.scheduled,
+            ),
+            reason: "at least one diagnosis should have status scheduled",
+          );
+        });
+        test("status processing", () {
+          expect(
+            diagnoses,
+            anyElement(
+              (DiagnosisDto d) => d.status == DiagnosisStatus.processing,
+            ),
+            reason: "at least one diagnosis should have status processing",
+          );
+        });
+        test("status finished", () {
+          expect(
+            diagnoses,
+            anyElement(
+              (DiagnosisDto d) => d.status == DiagnosisStatus.finished,
+            ),
+            reason: "at least one diagnosis should have status finished",
+          );
+        });
+        test("status failed", () {
+          expect(
+            diagnoses,
+            anyElement(
+              (DiagnosisDto d) => d.status == DiagnosisStatus.failed,
+            ),
+            reason: "at least one diagnosis should have status failed",
           );
         });
       });
@@ -688,6 +792,26 @@ void main() {
         );
       });
     });
+  });
+}
+
+/// Convenience function to get [DiagnosisDto]s from
+/// [MockHttpService.getDiagnoses].
+Future<List<DiagnosisDto>> _getDiagnosisDtosFromGetDiagnoses(
+  MockHttpService mockHttpService,
+) {
+  return mockHttpService
+      .getDiagnoses("token", "workshopId")
+      .then((response) => jsonDecode(response.body))
+      .then((json) {
+    if (json is! List) {
+      throw ArgumentError(
+        "Json is not a List."
+        " There is a unit test for this which should have failed.",
+      );
+    }
+    // ignore: unnecessary_lambdas
+    return json.map((e) => DiagnosisDto.fromJson(e)).toList();
   });
 }
 
