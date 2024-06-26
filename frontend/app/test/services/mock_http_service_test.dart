@@ -284,6 +284,72 @@ void main() {
         reason: "customerId should be input parameter",
       );
     });
+    group("getSharedCases()", () {
+      test("returns 200 List<CaseDto> json", () async {
+        final Response response = await mockHttpService.getSharedCases("token");
+        final json = jsonDecode(response.body);
+
+        expect(response.statusCode, 200, reason: "status code should be 200");
+        expect(json, isA<List>(), reason: "should return List json");
+        // For type promotion.
+        if (json is! List) {
+          fail("json is not a List, previous expect() should have failed");
+        }
+        expect(
+          // ignore: unnecessary_lambdas
+          () => json.map((e) => CaseDto.fromJson(e)),
+          returnsNormally,
+          reason: "should return valid List<CaseDto> json",
+        );
+      });
+      group("returns at least one case with", () {
+        late List<CaseDto> cases;
+        setUpAll(() async {
+          cases = await _getCaseDtosFromSharedCases(mockHttpService);
+        });
+        test("obd data", () {
+          expect(
+            cases,
+            anyElement((CaseDto c) => c.obdData.isNotEmpty),
+            reason: "at least one case should have obd data",
+          );
+        });
+        test("timeseries data", () {
+          expect(
+            cases,
+            anyElement((CaseDto c) => c.timeseriesData.isNotEmpty),
+            reason: "at least one case should have timeseries data",
+          );
+        });
+        test("symptomDtoResponse data", () {
+          expect(
+            cases,
+            anyElement((CaseDto c) => c.symptoms.isNotEmpty),
+            reason: "at least one case should have symptomDtoResponse data",
+          );
+        });
+        test("all dataset types", () {
+          expect(
+            cases,
+            anyElement(
+              (CaseDto c) =>
+                  c.obdData.isNotEmpty &&
+                  c.timeseriesData.isNotEmpty &&
+                  c.symptoms.isNotEmpty,
+            ),
+            reason: "at least one case should have all dataset types",
+          );
+        });
+        test("different workshop id", () {
+          final workshopIds = cases.map((e) => e.workshopId).toSet();
+          expect(
+            workshopIds,
+            hasLength(greaterThan(1)),
+            reason: "should return cases with more than one workshop id",
+          );
+        });
+      });
+    });
     test("startDiagnosis() returns 200 DiagnosisDto json", () async {
       const caseId = "caseId";
       final response =
@@ -820,6 +886,24 @@ Future<List<CaseDto>> _getCaseDtosFromGetCases(
   MockHttpService mockHttpService,
 ) async {
   final response = await mockHttpService.getCases("token", "workshop");
+  final json = jsonDecode(response.body);
+  if (json is! List) {
+    // Throwing ArgumentError here instead of calling [fail()], because
+    // it's not what this test is testing.
+    throw ArgumentError(
+      "Json is not a List."
+      " There is a unit test for this which should have failed.",
+    );
+  }
+  // ignore: unnecessary_lambdas
+  return json.map((e) => CaseDto.fromJson(e)).toList();
+}
+
+/// Convenience function to get [CaseDto]s from
+/// [MockHttpService.getSharedCases].
+Future<List<CaseDto>> _getCaseDtosFromSharedCases(
+    MockHttpService mockHttpService) async {
+  final response = await mockHttpService.getSharedCases("token");
   final json = jsonDecode(response.body);
   if (json is! List) {
     // Throwing ArgumentError here instead of calling [fail()], because

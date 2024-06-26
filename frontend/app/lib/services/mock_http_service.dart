@@ -676,8 +676,260 @@ class MockHttpService implements HttpService {
 
   @override
   Future<Response> getSharedCases(String token) {
-    // TODO: implement getSharedCases
-    throw UnimplementedError();
+    final List<CaseDto> caseDtos = [
+      // Case for diagnosis status scheduled.
+      // No data sets.
+      CaseDto(
+        "2",
+        DateTime.utc(2021, 1, 21, 12, 0, 8),
+        CaseOccasion.problem_defect,
+        100,
+        CaseStatus.open,
+        "unknown",
+        "12345678901234567",
+        "workshop_id",
+        "1",
+        [],
+        [],
+        [],
+        0,
+        0,
+        0,
+      ),
+      // Case for diagnosis status processing.
+      // Obd data.
+      CaseDto(
+        "3",
+        DateTime.utc(2021, 1, 21, 12, 0, 8),
+        CaseOccasion.problem_defect,
+        100,
+        CaseStatus.open,
+        "unknown",
+        "12345678901234567",
+        "workshop_id",
+        "2",
+        [],
+        [
+          ObdDataDto(
+            DateTime.utc(2021, 1, 21, 12, 41, 24),
+            [0],
+            ["P0001", "P0002", "P0003"],
+            42,
+          ),
+          ObdDataDto(
+            DateTime.utc(2021, 1, 21, 12, 44, 24),
+            ["could literally be anything"],
+            ["P0004", "P0005", "P0006"],
+            2479,
+          ),
+        ],
+        [],
+        0,
+        0,
+        0,
+      ),
+      // Case for diagnosis status action_required, obd.
+      // Timeseries data.
+      CaseDto(
+        "4",
+        DateTime.utc(2021, 1, 21, 12, 0, 8),
+        CaseOccasion.problem_defect,
+        100,
+        CaseStatus.open,
+        "unknown",
+        "12345678901234567",
+        "workshop_id",
+        "5",
+        [
+          TimeseriesDataDto(
+            DateTime.utc(2021, 1, 21, 13, 21, 35),
+            "component",
+            TimeseriesDataLabel.anomaly,
+            29,
+            2957,
+            TimeseriesType.oscillogram,
+            "device_specs",
+            42,
+            "signal_id",
+          ),
+          TimeseriesDataDto(
+            DateTime.utc(2021, 1, 21, 13, 24, 35),
+            "component",
+            TimeseriesDataLabel.norm,
+            8,
+            29,
+            TimeseriesType.oscillogram,
+            "other_device_specs",
+            7248394,
+            "another_signal_id",
+          ),
+        ],
+        [],
+        [],
+        0,
+        0,
+        0,
+      ),
+      // Case for diagnosis status action_required, timeseries.
+      CaseDto(
+        "8",
+        DateTime.utc(2021, 1, 21, 12, 0, 8),
+        CaseOccasion.problem_defect,
+        100,
+        CaseStatus.open,
+        "unknown",
+        "12345678901234567",
+        "workshop_id",
+        "6",
+        [],
+        [],
+        [],
+        0,
+        0,
+        0,
+      ),
+      // Case for diagnosis status action_required, symptom.
+      CaseDto(
+        "9",
+        DateTime.utc(2021, 1, 21, 12, 0, 8),
+        CaseOccasion.problem_defect,
+        100,
+        CaseStatus.open,
+        "unknown",
+        "12345678901234567",
+        "other_workshop_id",
+        "7",
+        [],
+        [],
+        [],
+        0,
+        0,
+        0,
+      ),
+      // Case for diagnosis status finished.
+      // Symptom data.
+      CaseDto(
+        "5",
+        DateTime.utc(2021, 1, 21, 12, 0, 8),
+        CaseOccasion.problem_defect,
+        100,
+        CaseStatus.open,
+        "unknown",
+        "12345678901234567",
+        "other_workshop_id",
+        "3",
+        [],
+        [],
+        [
+          SymptomDto(
+            DateTime.utc(2021, 1, 21, 13, 21, 35),
+            "component",
+            SymptomLabel.defect,
+            29,
+          ),
+          SymptomDto(
+            DateTime.utc(2021, 1, 21, 13, 24, 19),
+            "component",
+            SymptomLabel.ok,
+            25823473,
+          ),
+        ],
+        0,
+        0,
+        0,
+      ),
+      // Case for diagnosis status failed.
+      // All data set types.
+      CaseDto(
+        "6",
+        DateTime.utc(2021, 1, 21, 12, 0, 8),
+        CaseOccasion.problem_defect,
+        100,
+        CaseStatus.open,
+        "unknown",
+        "12345678901234567",
+        "other_workshop_id",
+        "4",
+        [
+          TimeseriesDataDto(
+            DateTime.utc(2021, 1, 21, 13, 21, 35),
+            "component",
+            TimeseriesDataLabel.anomaly,
+            29,
+            2957,
+            TimeseriesType.oscillogram,
+            "device_specs",
+            42,
+            "signal_id",
+          ),
+          TimeseriesDataDto(
+            DateTime.utc(2021, 1, 21, 13, 24, 35),
+            "component",
+            TimeseriesDataLabel.norm,
+            8,
+            29,
+            TimeseriesType.oscillogram,
+            "other_device_specs",
+            7248394,
+            "another_signal_id",
+          ),
+        ],
+        [
+          ObdDataDto(
+            DateTime.utc(2021, 1, 21, 12, 41, 24),
+            [0],
+            ["P0001", "P0002", "P0003"],
+            42,
+          ),
+          ObdDataDto(
+            DateTime.utc(2021, 1, 21, 12, 44, 24),
+            ["could literally be anything"],
+            ["P0004", "P0005", "P0006"],
+            2479,
+          ),
+        ],
+        [
+          SymptomDto(
+            DateTime.utc(2021, 1, 21, 13, 21, 35),
+            "component",
+            SymptomLabel.defect,
+            29,
+          ),
+          SymptomDto(
+            DateTime.utc(2021, 1, 21, 13, 24, 19),
+            "component",
+            SymptomLabel.ok,
+            25823473,
+          ),
+        ],
+        0,
+        0,
+        0,
+      ),
+      // Case without diagnosis
+      // No data sets
+      CaseDto(
+        "7",
+        DateTime.utc(2021, 1, 21, 12, 0, 8),
+        CaseOccasion.problem_defect,
+        100,
+        CaseStatus.closed,
+        "unknown",
+        "12345678901234567",
+        "other_workshop_id",
+        null,
+        [],
+        [],
+        [],
+        0,
+        0,
+        0,
+      )
+    ];
+    return Future.delayed(
+      Duration(milliseconds: delay),
+      () => Response(jsonEncode(caseDtos.map((e) => e.toJson()).toList()), 200),
+    );
   }
 
   @override
