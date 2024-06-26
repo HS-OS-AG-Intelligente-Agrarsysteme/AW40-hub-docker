@@ -1046,9 +1046,7 @@ class MockHttpService implements HttpService {
       workshopId,
       null,
       [],
-      [
-        obdDataDto,
-      ],
+      [obdDataDto],
       [],
       0,
       0,
@@ -1216,7 +1214,46 @@ class MockHttpService implements HttpService {
     String caseId,
     List<int> vcdsData,
   ) {
-    // TODO: implement uploadVcdsData
-    throw UnimplementedError();
+    _logger.warning(
+      "actual method not implemented, not checking for potential"
+      " validation errors.",
+    );
+    final ObdDataDto obdDataDto = ObdDataDto(
+      DateTime.now(),
+      [0],
+      ["P0001", "P0002", "P0003"],
+      29,
+    );
+    if (caseId == demoCaseId) {
+      _demoCaseDto.obdData.add(obdDataDto);
+      return Future.delayed(
+        Duration(milliseconds: delay),
+        () {
+          _demoDiagnosisStage1();
+          return Response(jsonEncode(_demoCaseDto.toJson()), 201);
+        },
+      );
+    }
+    final CaseDto caseDto = CaseDto(
+      caseId,
+      DateTime.now(),
+      CaseOccasion.problem_defect,
+      47233,
+      CaseStatus.open,
+      "unknown",
+      "12345678901234567",
+      workshopId,
+      null,
+      [],
+      [obdDataDto],
+      [],
+      0,
+      0,
+      0,
+    );
+    return Future.delayed(
+      Duration(milliseconds: delay),
+      () => Response(jsonEncode(caseDto.toJson()), 201),
+    );
   }
 }

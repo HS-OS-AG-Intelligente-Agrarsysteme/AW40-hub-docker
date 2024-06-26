@@ -649,6 +649,43 @@ void main() {
         expect(response.statusCode, 422, reason: "status code should be 422");
       });
     });
+    group("uploadVcdsData",(){
+      test("returns 201 CaseDto json", () async {
+        const caseId = "caseId";
+        const workshopId = "workshopId";
+        final Response response = await mockHttpService.uploadVcdsData(
+          "token",
+          workshopId,
+          caseId,
+          [0],
+        );
+
+        expect(response.statusCode, 201, reason: "status code should be 201");
+        expect(
+              () => CaseDto.fromJson(jsonDecode(response.body)),
+          returnsNormally,
+          reason: "should return valid CaseDto json",
+        );
+
+        final CaseDto caseDto = CaseDto.fromJson(jsonDecode(response.body));
+        expect(
+          caseDto.id,
+          equals(caseId),
+          reason: "caseId should be input parameter",
+        );
+        expect(
+          caseDto.workshopId,
+          equals(workshopId),
+          reason: "workshopId should be input parameter",
+        );
+        expect(
+          caseDto.obdData.length,
+          equals(1),
+          reason: "caseDto should have one obdData",
+        );
+      });
+      // TODO: Test validation once actual method is implemented.
+    });
     group("diagnosis workflow()", () {
       const String demoCaseId = MockHttpService.demoCaseId;
       test("first case in getCases is diagnosis demo case", () async {
@@ -737,6 +774,7 @@ void main() {
 
         // Add obd data.
         // TODO: This should also work with a call to uploadVcdsData.
+        // (Which it does, it just isn't tested yet.)
         final NewOBDDataDto newOBDDataDto = NewOBDDataDto([], []);
         Response response = await mockHttpService.uploadObdData(
           "token",
@@ -778,6 +816,7 @@ void main() {
 
         // Add timeseries data.
         // TODO: This should also work with a call to uploadOmniviewData.
+        // (Which it does, it just isn't tested yet.)
         response = await mockHttpService.uploadPicoscopeData(
           "token",
           "workshopId",
