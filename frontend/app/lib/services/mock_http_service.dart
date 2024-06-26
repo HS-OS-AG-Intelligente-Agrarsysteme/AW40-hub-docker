@@ -601,7 +601,7 @@ class MockHttpService implements HttpService {
   ) {
     _logger.warning(
       "OmniviewDto not implemented, not checking for potential"
-          " validation errors.",
+      " validation errors.",
     );
     final CaseDto caseDto = CaseDto(
       caseId,
@@ -623,7 +623,7 @@ class MockHttpService implements HttpService {
     if (caseId == demoCaseId) {
       return Future.delayed(
         Duration(milliseconds: delay),
-            () {
+        () {
           _demoDiagnosisStage2();
           return Response(jsonEncode(_demoCaseDto.toJson()), 200);
         },
@@ -631,7 +631,7 @@ class MockHttpService implements HttpService {
     }
     return Future.delayed(
       Duration(milliseconds: delay),
-          () => Response(jsonEncode(caseDto.toJson()), 201),
+      () => Response(jsonEncode(caseDto.toJson()), 201),
     );
   }
 

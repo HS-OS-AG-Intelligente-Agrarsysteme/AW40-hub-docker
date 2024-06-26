@@ -541,7 +541,9 @@ void main() {
       StateMachineLogEntryDto("some_message", "some_attachment"),
       StateMachineLogEntryDto("another_message", "another_attachment"),
     ];
-    final todos = <ActionDto>[ActionDto("1", "some action", "1", DatasetType.obd, "3")];
+    final todos = <ActionDto>[
+      ActionDto("1", "some action", "1", DatasetType.obd, "3")
+    ];
     final Map<String, dynamic> json = <String, dynamic>{
       "_id": id,
       "timestamp": timeStamp.toIso8601String(),
@@ -582,7 +584,9 @@ void main() {
       StateMachineLogEntryDto("some_message", "some_attachment"),
       StateMachineLogEntryDto("another_message", "another_attachment"),
     ];
-    final todos = <ActionDto>[ActionDto("1", "some action", "1", DatasetType.obd, "3")];
+    final todos = <ActionDto>[
+      ActionDto("1", "some action", "1", DatasetType.obd, "3")
+    ];
     final DiagnosisDto diagnosisDto = DiagnosisDto(
       id,
       timeStamp,

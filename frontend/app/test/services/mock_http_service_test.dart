@@ -9,21 +9,9 @@ import "package:aw40_hub_frontend/services/mock_http_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:http/http.dart" show Response;
-import "package:logging/logging.dart";
 
 void main() {
-  // Logger.root.level = Level.ALL;
-  // Logger.root.onRecord.listen((record) {
-  //   final String loggerName = record.loggerName.padRight(19);
-  //   final time =
-  //       "${record.time.hour.toString().padLeft(2, "0")}:"
-  //       "${record.time.minute.toString().padLeft(2, "0")}:"
-  //       "${record.time.second}.${record.time.millisecond}";
-  //   // ignore: avoid_print
-  //   print("$loggerName $time: ${record.message}");
-  // });
   group("MockHttpService", () {
-    final Logger logger = Logger("MockHttpServiceTest");
     late MockHttpService mockHttpService;
     setUp(() => mockHttpService = MockHttpService());
     group("addCase", () {
@@ -531,14 +519,12 @@ void main() {
         mockHttpService.delay = delay;
 
         // Trigger diagnosis demo by calling startDiagnosis with demoCaseId.
-        logger.info("Calling startDiagnosis()");
         final Response startDiagnosisResponse =
             await mockHttpService.startDiagnosis(
           "token",
           "workshopId",
           demoCaseId,
         );
-        logger.info("startDiagnosis() returned");
         final DiagnosisDto startDiagnosisDto =
             DiagnosisDto.fromJson(jsonDecode(startDiagnosisResponse.body));
         expect(
@@ -565,9 +551,7 @@ void main() {
         );
 
         // Wait, then check status is action_required and data_type is obd
-        logger.info("Waiting before checking: action_required, obd");
         await Future.delayed(const Duration(milliseconds: interval * 2));
-        logger.info("Checking action_required, obd");
         demoDiagnosisDto =
             await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
         expect(
