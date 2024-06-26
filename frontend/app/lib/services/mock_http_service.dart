@@ -109,6 +109,14 @@ class MockHttpService implements HttpService {
     ];
   }
 
+  Future<void> _demoDiagnosisStage3() async {
+    if (_demoDiagnosisStage != 3) return;
+    _demoDiagnosisStage++;
+    _demoDiagnosisDto.status = DiagnosisStatus.processing;
+    await Future.delayed(Duration(milliseconds: diagnosisTransitionInterval));
+    _demoDiagnosisDto.status = DiagnosisStatus.finished;
+  }
+
   @override
   Future<Response> addCase(
     String token,
@@ -551,7 +559,7 @@ class MockHttpService implements HttpService {
         Duration(milliseconds: delay),
         () {
           _demoDiagnosisStage1();
-          return Response(jsonEncode(_demoCaseDto.toJson()), 200);
+          return Response(jsonEncode(_demoCaseDto.toJson()), 201);
         },
       );
     }
@@ -669,13 +677,13 @@ class MockHttpService implements HttpService {
         Duration(milliseconds: delay),
         () {
           _demoDiagnosisStage2();
-          return Response(jsonEncode(_demoCaseDto.toJson()), 200);
+          return Response(jsonEncode(_demoCaseDto.toJson()), 201);
         },
       );
     }
     return Future.delayed(
       Duration(milliseconds: delay),
-          () => Response(jsonEncode(caseDto.toJson()), 201),
+      () => Response(jsonEncode(caseDto.toJson()), 201),
     );
   }
 
@@ -686,7 +694,46 @@ class MockHttpService implements HttpService {
     String caseId,
     Map<String, dynamic> requestBody,
   ) {
-    // TODO: implement uploadSymptomData
-    throw UnimplementedError();
+    final SymptomDto symptomDto;
+    try {
+      symptomDto = SymptomDto.fromJson(requestBody);
+    } on Error {
+      return Future.delayed(
+        Duration(milliseconds: delay),
+        () => Response("", 422),
+      );
+    }
+
+    final CaseDto caseDto = CaseDto(
+      caseId,
+      DateTime.now(),
+      CaseOccasion.problem_defect,
+      47233,
+      CaseStatus.open,
+      "unknown",
+      "12345678901234567",
+      workshopId,
+      null,
+      [],
+      [],
+      [symptomDto],
+      0,
+      0,
+      0,
+    );
+
+    if (caseId == demoCaseId) {
+      return Future.delayed(
+        Duration(milliseconds: delay),
+        () {
+          _demoDiagnosisStage3();
+          return Response(jsonEncode(_demoCaseDto.toJson()), 201);
+        },
+      );
+    }
+    return Future.delayed(
+      Duration(milliseconds: delay),
+      () => Response(jsonEncode(caseDto.toJson()), 201),
+    );
   }
 }

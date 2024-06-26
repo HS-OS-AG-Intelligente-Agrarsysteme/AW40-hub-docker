@@ -4,6 +4,7 @@ import "package:aw40_hub_frontend/dtos/case_dto.dart";
 import "package:aw40_hub_frontend/dtos/diagnosis_dto.dart";
 import "package:aw40_hub_frontend/dtos/new_obd_data_dto.dart";
 import "package:aw40_hub_frontend/dtos/obd_data_dto.dart";
+import "package:aw40_hub_frontend/dtos/symptom_dto.dart";
 import "package:aw40_hub_frontend/services/mock_http_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter_test/flutter_test.dart";
@@ -149,11 +150,11 @@ void main() {
             reason: "at least one case should have timeseries data",
           );
         });
-        test("symptom data", () {
+        test("symptomDtoResponse data", () {
           expect(
             cases.any((c) => c.symptoms.isNotEmpty),
             isTrue,
-            reason: "at least one case should have symptom data",
+            reason: "at least one case should have symptomDtoResponse data",
           );
         });
         test("all dataset types", () {
@@ -313,24 +314,29 @@ void main() {
         expect(
           caseDto.id,
           equals(caseId),
-          reason: "obdData should be input parameter",
+          reason: "caseId should be input parameter",
         );
         expect(
           caseDto.workshopId,
           equals(workshopId),
-          reason: "obdData should be input parameter",
+          reason: "workshopId should be input parameter",
         );
 
+        expect(
+          caseDto.obdData.length,
+          equals(1),
+          reason: "caseDto should have one obdData",
+        );
         final ObdDataDto obdDataDto = caseDto.obdData.first;
         expect(
           obdDataDto.obdSpecs,
           equals(newObdDataDto.obdSpecs),
-          reason: "obdDataDto.obdSpecs should be input parameter",
+          reason: "symptomDtoResponse.obdSpecs should be input parameter",
         );
         expect(
           obdDataDto.dtcs,
           equals(newObdDataDto.dtcs),
-          reason: "obdDataDto.dtcs should be input parameter",
+          reason: "symptomDtoResponse.dtcs should be input parameter",
         );
       });
       test("returns 422 on incorrect requestBody", () async {
@@ -415,6 +421,75 @@ void main() {
         );
       });
       // TODO: Test validation once DTO is implemented.
+    });
+    group("uploadSymptomData", () {
+      test("returns 201 CaseDto json", () async {
+        final symptomDto = SymptomDto(
+          DateTime.utc(2021, 2, 3),
+          "component",
+          SymptomLabel.defect,
+          5,
+        );
+        const caseId = "caseId";
+        const workshopId = "workshopId";
+        final Response response = await mockHttpService.uploadSymptomData(
+          "token",
+          workshopId,
+          caseId,
+          symptomDto.toJson(),
+        );
+
+        expect(response.statusCode, 201, reason: "status code should be 201");
+        expect(
+          () => CaseDto.fromJson(jsonDecode(response.body)),
+          returnsNormally,
+          reason: "should return valid CaseDto json",
+        );
+
+        final CaseDto caseDto = CaseDto.fromJson(jsonDecode(response.body));
+        expect(
+          caseDto.id,
+          equals(caseId),
+          reason: "caseId should be input parameter",
+        );
+        expect(
+          caseDto.workshopId,
+          equals(workshopId),
+          reason: "workshopId should be input parameter",
+        );
+
+        expect(
+          caseDto.symptoms.length,
+          equals(1),
+          reason: "caseDto should have one symptomDtoResponse",
+        );
+        final SymptomDto symptomDtoResponse = caseDto.symptoms.first;
+        expect(
+          symptomDtoResponse.timestamp,
+          equals(symptomDto.timestamp),
+          reason: "symptomDtoResponse.timestamp should be input parameter",
+        );
+        expect(
+          symptomDtoResponse.component,
+          equals(symptomDto.component),
+          reason: "symptomDtoResponse.component should be input parameter",
+        );
+      });
+      test("returns 422 on incorrect requestBody", () async {
+        final Map<String, dynamic> requestBody = {
+          "obd_specs": ["some obd specs"],
+          "dtcs": 5,
+        };
+
+        final response = await mockHttpService.uploadSymptomData(
+          "token",
+          "workshopId",
+          "caseId",
+          requestBody,
+        );
+
+        expect(response.statusCode, 422, reason: "status code should be 422");
+      });
     });
     group("diagnosis workflow", () {
       const String demoCaseId = MockHttpService.demoCaseId;
@@ -509,12 +584,18 @@ void main() {
         // Add obd data.
         // TODO: This should also work with a call to uploadVcdsData.
         final NewOBDDataDto newOBDDataDto = NewOBDDataDto([], []);
-        await mockHttpService.uploadObdData(
+        Response response = await mockHttpService.uploadObdData(
           "token",
           "workshopId",
           demoCaseId,
           newOBDDataDto.toJson(),
         );
+        expect(
+          response.statusCode,
+          equals(201),
+          reason: "status code should be 201",
+        );
+
         // Check status is processing.
         demoDiagnosisDto =
             await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
@@ -543,12 +624,17 @@ void main() {
 
         // Add timeseries data.
         // TODO: This should also work with a call to uploadOmniviewData.
-        await mockHttpService.uploadPicoscopeData(
+        response = await mockHttpService.uploadPicoscopeData(
           "token",
           "workshopId",
           demoCaseId,
           [],
           "filename",
+        );
+        expect(
+          response.statusCode,
+          equals(201),
+          reason: "status code should be 201",
         );
 
         // Check status is processing.
@@ -579,12 +665,22 @@ void main() {
         );
 
         // Add symptom data.
-        await mockHttpService.uploadSymptomData(
+        final SymptomDto symptomDto = SymptomDto(
+          DateTime.utc(2021, 2, 3),
+          "component",
+          SymptomLabel.defect,
+          5,
+        );
+        response = await mockHttpService.uploadSymptomData(
           "token",
           "workshopId",
           demoCaseId,
-          // Note: SymptomDto not yet implemented.
-          {},
+          symptomDto.toJson(),
+        );
+        expect(
+          response.statusCode,
+          equals(201),
+          reason: "status code should be 201",
         );
 
         // Check status is processing.
@@ -599,7 +695,6 @@ void main() {
 
         // Wait, then check status is finished.
         await Future.delayed(const Duration(milliseconds: interval));
-        // fakeAsync.elapse(const Duration(seconds: interval));
         demoDiagnosisDto =
             await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
         expect(
