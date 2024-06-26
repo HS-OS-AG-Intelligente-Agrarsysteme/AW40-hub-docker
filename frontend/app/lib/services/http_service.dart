@@ -143,6 +143,18 @@ class HttpService {
     );
   }
 
+  Future<http.Response> uploadVcdsData(
+    String token,
+    String workshopId,
+    String caseId,
+    List<int> vcdsData,
+  ) {
+    // TODO: implement uploadVcdsData
+    // I added it with what I hope will be the actual signature so I can mock it
+    // in the MockHttpService.
+    throw UnimplementedError();
+  }
+
   Future<http.Response> uploadPicoscopeData(
     String token,
     String workshopId,

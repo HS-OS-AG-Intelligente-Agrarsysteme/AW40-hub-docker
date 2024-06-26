@@ -1208,4 +1208,15 @@ class MockHttpService implements HttpService {
       () => Response(jsonEncode(caseDto.toJson()), 201),
     );
   }
+
+  @override
+  Future<Response> uploadVcdsData(
+    String token,
+    String workshopId,
+    String caseId,
+    List<int> vcdsData,
+  ) {
+    // TODO: implement uploadVcdsData
+    throw UnimplementedError();
+  }
 }
