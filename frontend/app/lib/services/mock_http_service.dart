@@ -962,13 +962,13 @@ class MockHttpService implements HttpService {
         Duration(milliseconds: delay),
         () {
           _demoDiagnosisStage0();
-          return Response(jsonEncode(_demoDiagnosisDto.toJson()), 200);
+          return Response(jsonEncode(_demoDiagnosisDto.toJson()), 201);
         },
       );
     }
     return Future.delayed(
       Duration(milliseconds: delay),
-      () => Response(jsonEncode(diagnosisDto.toJson()), 200),
+      () => Response(jsonEncode(diagnosisDto.toJson()), 201),
     );
   }
 

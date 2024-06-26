@@ -350,12 +350,12 @@ void main() {
         });
       });
     });
-    test("startDiagnosis() returns 200 DiagnosisDto json", () async {
+    test("startDiagnosis() returns 201 DiagnosisDto json", () async {
       const caseId = "caseId";
       final response =
           await mockHttpService.startDiagnosis("token", "workshopId", caseId);
 
-      expect(response.statusCode, 200, reason: "status code should be 200");
+      expect(response.statusCode, 201, reason: "status code should be 201");
       expect(
         () => DiagnosisDto.fromJson(jsonDecode(response.body)),
         returnsNormally,
