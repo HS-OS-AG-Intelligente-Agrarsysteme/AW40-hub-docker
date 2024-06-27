@@ -27,8 +27,7 @@ class FileUploadArea extends StatefulWidget {
   final List<ActionModel> todos;
 
   @override
-  State<FileUploadArea> createState() =>
-      _FileUploadAreaState();
+  State<FileUploadArea> createState() => _FileUploadAreaState();
 }
 
 class _FileUploadAreaState extends State<FileUploadArea> {
@@ -41,6 +40,7 @@ class _FileUploadAreaState extends State<FileUploadArea> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     final diagnosisStatusOnContainerColor =
         HelperService.getDiagnosisStatusOnContainerColor(
@@ -50,66 +50,55 @@ class _FileUploadAreaState extends State<FileUploadArea> {
     final DatasetType? datasetType = widget.todos.firstOrNull?.dataType;
     final XFile? file = _file;
 
+    switch (datasetType) {
+      case DatasetType.obd:
+        return Text(
+          "OBD | VCDS",
+          style: textTheme.bodyLarge?.copyWith(
+            color: diagnosisStatusOnContainerColor,
+          ),
+        );
+      case DatasetType.timeseries:
+        return Text(
+          "Time Series | Omniview | Picoscope",
+          style: textTheme.bodyLarge?.copyWith(
+            color: diagnosisStatusOnContainerColor,
+          ),
+        );
+      case DatasetType.symptom:
+        return Text(
+          "Symptom",
+          style: textTheme.bodyLarge?.copyWith(
+            color: diagnosisStatusOnContainerColor,
+          ),
+        );
+      case DatasetType.unknown:
+      case null:
+    }
+
+    // Return error UI.
     return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          // If file chosen, show name and upload button.
-          if (file != null) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  file.name,
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        color: diagnosisStatusOnContainerColor,
-                      ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.upload_file),
-                  style: IconButton.styleFrom(
-                    foregroundColor: diagnosisStatusOnContainerColor,
-                  ),
-                  onPressed: () => _uploadFile,
-                  tooltip: tr("diagnoses.details.uploadFileTooltip"),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-          ],
-          DropTarget(
-            onDragDone: _onDragDone,
-            onDragEntered: (_) => setState(() => _dragging = true),
-            onDragExited: (_) => setState(() => _dragging = false),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border.all(style: BorderStyle.none),
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-                color: _dragging
-                    ? diagnosisStatusOnContainerColor.withOpacity(0.3)
-                    : diagnosisStatusOnContainerColor.withOpacity(0.2),
-              ),
-              child: DottedBorder(
-                borderType: BorderType.RRect,
-                dashPattern: const <double>[8, 4],
-                radius: const Radius.circular(10),
-                padding: const EdgeInsets.all(16),
-                child: Center(
-                  child: Text(
-                    tr("diagnoses.details.dragAndDrop"),
-                    style: TextStyle(
-                      color: diagnosisStatusOnContainerColor,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+      child: Card(
+        color: colorScheme.errorContainer,
+        child: ListTile(
+          isThreeLine: true,
+          leading: Icon(Icons.error, color: colorScheme.error),
+          title: Text(
+            datasetType == null
+                ? tr("diagnoses.todos.noTodosFound")
+                : tr("diagnoses.todos.unknownDatasetType"),
+            style: textTheme.bodyLarge?.copyWith(color: colorScheme.error),
+          ),
+          subtitle: Text(
+            datasetType == null
+              ? tr("diagnoses.todos.noTodosFoundDescription")
+                : tr("diagnoses.todos.unknownDatasetTypeDescription"),
+            style: textTheme.bodyMedium?.copyWith(
+              color: colorScheme.error,
             ),
           ),
-          const SizedBox(height: 16),
-          if (datasetType != null)
-            createTextfields(datasetType, diagnosisStatusOnContainerColor),
-        ],
+        ),
       ),
     );
   }
@@ -228,7 +217,7 @@ class _FileUploadAreaState extends State<FileUploadArea> {
         // TODO: Implement
         return const Placeholder();
       case DatasetType.symptom:
-      // TODO: Implement
+        // TODO: Implement
         return const Placeholder();
     }
   }
@@ -285,9 +274,8 @@ class _FileUploadAreaState extends State<FileUploadArea> {
           final String component = _componentController.text.toLowerCase();
           final int? samplingRate = int.tryParse(_samplingRateController.text);
           final int? duration = int.tryParse(_durationController.text);
-          result = await diagnosisProvider.uploadOmniscopeData(
+          result = await diagnosisProvider.uploadOmniviewData(
             widget.caseId,
-
             byteData,
             file.name,
             component,
