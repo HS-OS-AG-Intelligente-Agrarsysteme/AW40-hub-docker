@@ -686,216 +686,255 @@ void main() {
       });
       // TODO: Test validation once actual method is implemented.
     });
-    group("diagnosis workflow()", () {
-      const String demoCaseId = MockHttpService.demoCaseId;
-      test("first case in getCases is diagnosis demo case", () async {
-        final Response response =
-            await mockHttpService.getCases("token", "workshop");
-        final json = jsonDecode(response.body);
-        // For type promotion.
-        if (json is! List) {
-          // Throwing ArgumentError here instead of calling [fail()], because
-          // it's not what this test is testing.
-          throw ArgumentError(
-            "Json is not a List."
-            " There is a unit test for this which should have failed.",
-          );
-        }
-        final List<CaseDto> cases =
-            // ignore: unnecessary_lambdas
-            json.map((e) => CaseDto.fromJson(e)).toList();
-        expect(
-          cases.first.id,
-          equals(demoCaseId),
-          reason: "first case should have demo case id",
-        );
-        expect(
-          cases.first.diagnosisId,
-          isNull,
-          reason: "first case should have no diagnosis",
-        );
-      });
-      test("diagnosis transitions through states correctly", () async {
-        // Milliseconds before demo diagnosis advances to next state.
-        const int interval = 100;
-        // Milliseconds futures from MockHttpService take to complete.
-        const int delay = 0;
-        // (Lowest I got away with is 100, 0.)
+    testDemoDiagnosisWorkflow();
+  });
+}
 
-        mockHttpService.diagnosisTransitionInterval = interval;
-        mockHttpService.delay = delay;
+/// This method executes two tests for testing the demo diagnosis workflow. The
+/// first is self-explanatory.
+/// This second test triggers the demo diagnosis by calling
+/// [startDiagnosis(..., caseId: demoCaseId)]. It then repeatedly checks the
+/// status of the diagnosis. Where appropriate, it will wait before checking
+/// that the diagnosis advanced to the next state. In a nutshell, it tests the
+/// following sequence (unless mentioned otherwise, the demo diagnosis is
+/// obtained through calling [getDiagnosis(..., caseId: demoCaseId)]:
+///
+/// - calling [startDiagnosis()] with demoCaseId returns a diagnosis with status
+///   `scheduled`
+/// - demo diagnosis has status `scheduled`
+/// - wait
+/// - demo diagnosis has status `action_required` with data type `obd`
+/// - execute any correct call with `demoCaseId` to [uploadObdData()]
+/// - demo diagnosis has status `processing`
+/// - wait
+/// - demo diagnosis has status `action_required` with data type `timeseries`
+/// - execute any correct call with `demoCaseId` to [uploadPicoscopeData()]
+/// - demo diagnosis has status `processing`
+/// - wait
+/// - demo diagnosis has status `action_required` with data type `symptom`
+/// - execute any correct call with `demoCaseId` to [uploadSymptomData()]
+/// - demo diagnosis has status `processing`
+/// - wait
+/// - demo diagnosis has status `finished`
+///
+/// When submitting data, the following aspects are _not_ checked:
+/// - file extension (responsibility of widgets)
+/// - file content (responsibility of the backend)
+/// - parameter content (responsibility of other tests)
+/// I.e. uploading a PowerPoint presentation as a picoscope file with
+/// `token="jam", workshopId="ketchup", caseId=<DEMO_CASE_ID>` will pass.
+void testDemoDiagnosisWorkflow() {
+  group("diagnosis workflow()", () {
+    late MockHttpService mockHttpService;
+    setUp(() => mockHttpService = MockHttpService());
+    const String demoCaseId = MockHttpService.demoCaseId;
 
-        // Trigger diagnosis demo by calling startDiagnosis with demoCaseId.
-        final Response startDiagnosisResponse =
-            await mockHttpService.startDiagnosis(
-          "token",
-          "workshopId",
-          demoCaseId,
+    test("first case in getCases is diagnosis demo case", () async {
+      final Response response =
+          await mockHttpService.getCases("token", "workshop");
+      final json = jsonDecode(response.body);
+      // For type promotion.
+      if (json is! List) {
+        // Throwing ArgumentError here instead of calling [fail()], because
+        // it's not what this test is testing.
+        throw ArgumentError(
+          "Json is not a List."
+          " There is a unit test for this which should have failed.",
         );
-        final DiagnosisDto startDiagnosisDto =
-            DiagnosisDto.fromJson(jsonDecode(startDiagnosisResponse.body));
-        expect(
-          startDiagnosisDto.caseId,
-          equals(demoCaseId),
-          reason: "startDiagnosisDto should have id demoCaseId",
-        );
-        expect(
-          startDiagnosisDto.status,
-          equals(DiagnosisStatus.scheduled),
-          reason: "startDiagnosisDto should have status scheduled",
-        );
+      }
+      final List<CaseDto> cases =
+          // ignore: unnecessary_lambdas
+          json.map((e) => CaseDto.fromJson(e)).toList();
+      expect(
+        cases.first.id,
+        equals(demoCaseId),
+        reason: "first case should have demo case id",
+      );
+      expect(
+        cases.first.diagnosisId,
+        isNull,
+        reason: "first case should have no diagnosis",
+      );
+    });
+    test("diagnosis transitions through states correctly", () async {
+      // Milliseconds before demo diagnosis advances to next state.
+      const int interval = 50;
+      const int intervalWithBuffer = interval + 10;
+      // Milliseconds futures from MockHttpService take to complete.
+      const int delay = 0;
 
-        // Check initial state is scheduled.
-        // Note: We could use final variables here, but the values we're
-        // interested in testing could be changed on a final variable as well,
-        // so there's no advantage.
-        DiagnosisDto demoDiagnosisDto =
-            await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
-        expect(
-          demoDiagnosisDto.status,
-          equals(DiagnosisStatus.scheduled),
-          reason: "demoDiagnosisDto should have initial status scheduled",
-        );
+      mockHttpService.diagnosisTransitionInterval = interval;
+      mockHttpService.delay = delay;
 
-        // Wait, then check status is action_required and data_type is obd
-        await Future.delayed(const Duration(milliseconds: interval * 2));
-        demoDiagnosisDto =
-            await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
-        expect(
-          demoDiagnosisDto.status,
-          equals(DiagnosisStatus.action_required),
-          reason: "demoDiagnosisDto should have status action_required",
-        );
-        expect(
-          demoDiagnosisDto.todos[0].dataType,
-          equals(DatasetType.obd),
-          reason: "demoDiagnosisDto.todos[0].dataType should be obd",
-        );
+      // Trigger diagnosis demo by calling startDiagnosis with demoCaseId.
+      final Response startDiagnosisResponse =
+          await mockHttpService.startDiagnosis(
+        "token",
+        "workshopId",
+        demoCaseId,
+      );
+      final DiagnosisDto startDiagnosisDto =
+          DiagnosisDto.fromJson(jsonDecode(startDiagnosisResponse.body));
+      expect(
+        startDiagnosisDto.caseId,
+        equals(demoCaseId),
+        reason: "startDiagnosisDto should have id demoCaseId",
+      );
+      expect(
+        startDiagnosisDto.status,
+        equals(DiagnosisStatus.scheduled),
+        reason: "startDiagnosisDto should have status scheduled",
+      );
 
-        // Add obd data.
-        // TODO: This should also work with a call to uploadVcdsData.
-        // (Which it does, it just isn't tested yet.)
-        final NewOBDDataDto newOBDDataDto = NewOBDDataDto([], []);
-        Response response = await mockHttpService.uploadObdData(
-          "token",
-          "workshopId",
-          demoCaseId,
-          newOBDDataDto.toJson(),
-        );
-        expect(
-          response.statusCode,
-          equals(201),
-          reason: "status code should be 201",
-        );
+      // Check initial state is scheduled.
+      // Note: We could use final variables here, but the values we're
+      // interested in testing could be changed on a final variable as well,
+      // so there's no advantage.
+      DiagnosisDto demoDiagnosisDto =
+          await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
+      expect(
+        demoDiagnosisDto.status,
+        equals(DiagnosisStatus.scheduled),
+        reason: "demoDiagnosisDto should have initial status scheduled",
+      );
 
-        // Check status is processing.
-        demoDiagnosisDto =
-            await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
-        expect(
-          demoDiagnosisDto.status,
-          equals(DiagnosisStatus.processing),
-          reason: "directly after adding odb data,"
-              " demoDiagnosisDto should have status processing",
-        );
+      // Wait, then check status is action_required and data_type is obd
+      await Future.delayed(const Duration(milliseconds: intervalWithBuffer));
+      demoDiagnosisDto =
+          await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
+      expect(
+        demoDiagnosisDto.status,
+        equals(DiagnosisStatus.action_required),
+        reason: "demoDiagnosisDto should have status action_required",
+      );
+      expect(
+        demoDiagnosisDto.todos[0].dataType,
+        equals(DatasetType.obd),
+        reason: "demoDiagnosisDto.todos[0].dataType should be obd",
+      );
 
-        // Wait, then check status is action_required and data_type is
-        // timeseries.
-        await Future.delayed(const Duration(milliseconds: interval));
-        demoDiagnosisDto =
-            await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
-        expect(
-          demoDiagnosisDto.status,
-          equals(DiagnosisStatus.action_required),
-          reason: "demoDiagnosisDto should have status action_required",
-        );
-        expect(
-          demoDiagnosisDto.todos[0].dataType,
-          equals(DatasetType.timeseries),
-          reason: "demoDiagnosisDto.todos[0].dataType should be timeseries",
-        );
+      // Add obd data.
+      // TODO: This should also work with a call to uploadVcdsData.
+      // (Which it does, it just isn't tested yet.)
+      final NewOBDDataDto newOBDDataDto = NewOBDDataDto([], []);
+      Response response = await mockHttpService.uploadObdData(
+        "token",
+        "workshopId",
+        demoCaseId,
+        newOBDDataDto.toJson(),
+      );
+      expect(
+        response.statusCode,
+        equals(201),
+        reason: "status code should be 201",
+      );
 
-        // Add timeseries data.
-        // TODO: This should also work with a call to uploadOmniviewData.
-        // (Which it does, it just isn't tested yet.)
-        response = await mockHttpService.uploadPicoscopeData(
-          "token",
-          "workshopId",
-          demoCaseId,
-          [],
-          "filename",
-        );
-        expect(
-          response.statusCode,
-          equals(201),
-          reason: "status code should be 201",
-        );
+      // Check status is processing.
+      demoDiagnosisDto =
+          await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
+      expect(
+        demoDiagnosisDto.status,
+        equals(DiagnosisStatus.processing),
+        reason: "directly after adding odb data,"
+            " demoDiagnosisDto should have status processing",
+      );
 
-        // Check status is processing.
-        demoDiagnosisDto =
-            await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
-        expect(
-          demoDiagnosisDto.status,
-          equals(DiagnosisStatus.processing),
-          reason: "directly after adding timeseries data,"
-              " demoDiagnosisDto should have status processing",
-        );
+      // Wait, then check status is action_required and data_type is
+      // timeseries.
+      await Future.delayed(const Duration(milliseconds: interval));
+      demoDiagnosisDto =
+          await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
+      expect(
+        demoDiagnosisDto.status,
+        equals(DiagnosisStatus.action_required),
+        reason: "demoDiagnosisDto should have status action_required",
+      );
+      expect(
+        demoDiagnosisDto.todos[0].dataType,
+        equals(DatasetType.timeseries),
+        reason: "demoDiagnosisDto.todos[0].dataType should be timeseries",
+      );
 
-        // Wait, then check status is action_required and data_type is
-        // symptom.
-        await Future.delayed(const Duration(milliseconds: interval));
-        // fakeAsync.elapse(const Duration(seconds: interval));
-        demoDiagnosisDto =
-            await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
-        expect(
-          demoDiagnosisDto.status,
-          equals(DiagnosisStatus.action_required),
-          reason: "demoDiagnosisDto should have status action_required",
-        );
-        expect(
-          demoDiagnosisDto.todos[0].dataType,
-          equals(DatasetType.symptom),
-          reason: "demoDiagnosisDto.todos[0].dataType should be symptom",
-        );
+      // Add timeseries data.
+      // TODO: This should also work with a call to uploadOmniviewData.
+      // (Which it does, it just isn't tested yet.)
+      response = await mockHttpService.uploadPicoscopeData(
+        "token",
+        "workshopId",
+        demoCaseId,
+        [],
+        "filename",
+      );
+      expect(
+        response.statusCode,
+        equals(201),
+        reason: "status code should be 201",
+      );
 
-        // Add symptom data.
-        final SymptomDto symptomDto = SymptomDto(
-          DateTime.utc(2021, 2, 3),
-          "component",
-          SymptomLabel.defect,
-          5,
-        );
-        response = await mockHttpService.uploadSymptomData(
-          "token",
-          "workshopId",
-          demoCaseId,
-          symptomDto.toJson(),
-        );
-        expect(
-          response.statusCode,
-          equals(201),
-          reason: "status code should be 201",
-        );
+      // Check status is processing.
+      demoDiagnosisDto =
+          await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
+      expect(
+        demoDiagnosisDto.status,
+        equals(DiagnosisStatus.processing),
+        reason: "directly after adding timeseries data,"
+            " demoDiagnosisDto should have status processing",
+      );
 
-        // Check status is processing.
-        demoDiagnosisDto =
-            await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
-        expect(
-          demoDiagnosisDto.status,
-          equals(DiagnosisStatus.processing),
-          reason: "directly after adding symptomdata,"
-              " demoDiagnosisDto should have status processing",
-        );
+      // Wait, then check status is action_required and data_type is
+      // symptom.
+      await Future.delayed(const Duration(milliseconds: interval));
+      demoDiagnosisDto =
+          await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
+      expect(
+        demoDiagnosisDto.status,
+        equals(DiagnosisStatus.action_required),
+        reason: "demoDiagnosisDto should have status action_required",
+      );
+      expect(
+        demoDiagnosisDto.todos[0].dataType,
+        equals(DatasetType.symptom),
+        reason: "demoDiagnosisDto.todos[0].dataType should be symptom",
+      );
 
-        // Wait, then check status is finished.
-        await Future.delayed(const Duration(milliseconds: interval));
-        demoDiagnosisDto =
-            await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
-        expect(
-          demoDiagnosisDto.status,
-          equals(DiagnosisStatus.finished),
-          reason: "demoDiagnosisDto should have status finished",
-        );
-      });
+      // Add symptom data.
+      final SymptomDto symptomDto = SymptomDto(
+        DateTime.utc(2021, 2, 3),
+        "component",
+        SymptomLabel.defect,
+        5,
+      );
+      response = await mockHttpService.uploadSymptomData(
+        "token",
+        "workshopId",
+        demoCaseId,
+        symptomDto.toJson(),
+      );
+      expect(
+        response.statusCode,
+        equals(201),
+        reason: "status code should be 201",
+      );
+
+      // Check status is processing.
+      demoDiagnosisDto =
+          await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
+      expect(
+        demoDiagnosisDto.status,
+        equals(DiagnosisStatus.processing),
+        reason: "directly after adding symptomdata,"
+            " demoDiagnosisDto should have status processing",
+      );
+
+      // Wait, then check status is finished.
+      await Future.delayed(const Duration(milliseconds: interval));
+      demoDiagnosisDto =
+          await _getDemoDiagnosisDtoFromGetDiagnosis(mockHttpService);
+      expect(
+        demoDiagnosisDto.status,
+        equals(DiagnosisStatus.finished),
+        reason: "demoDiagnosisDto should have status finished",
+      );
     });
   });
 }

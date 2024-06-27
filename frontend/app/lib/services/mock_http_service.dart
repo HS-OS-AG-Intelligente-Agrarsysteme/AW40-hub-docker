@@ -19,7 +19,7 @@ import "package:logging/logging.dart";
 class MockHttpService implements HttpService {
   final Logger _logger = Logger("MockHttpService");
 
-  /// The interval for diagnosis transition in milliseconds.
+  /// The interval for demo diagnosis transition in milliseconds.
   /// Non-final for testing purposes.
   int diagnosisTransitionInterval = 5000;
 
