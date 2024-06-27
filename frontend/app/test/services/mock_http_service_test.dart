@@ -717,9 +717,9 @@ void main() {
       });
       test("diagnosis transitions through states correctly", () async {
         // Milliseconds before demo diagnosis advances to next state.
-        const int interval = 1000;
+        const int interval = 100;
         // Milliseconds futures from MockHttpService take to complete.
-        const int delay = 100;
+        const int delay = 0;
         // (Lowest I got away with is 100, 0.)
 
         mockHttpService.diagnosisTransitionInterval = interval;
