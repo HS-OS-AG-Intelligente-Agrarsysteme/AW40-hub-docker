@@ -134,7 +134,7 @@ class DiagnosisProvider with ChangeNotifier {
     return true;
   }
 
-  Future<bool> uploadOmniscopeData(
+  Future<bool> uploadOmniviewData(
     String caseId,
     List<int> omniviewData,
     String filename,
