@@ -98,7 +98,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                       iconColor: diagnosisStatusOnContainerColor,
                     ),
                     if (status == DiagnosisStatus.action_required)
-                      DiagnosisDragAndDropArea(
+                      FileUploadArea(
                         caseId: widget.diagnosisModel.caseId,
                         todos: widget.diagnosisModel.todos,
                       ),

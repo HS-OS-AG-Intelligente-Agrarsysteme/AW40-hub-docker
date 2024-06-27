@@ -15,8 +15,8 @@ import "package:flutter/material.dart";
 import "package:logging/logging.dart";
 import "package:provider/provider.dart";
 
-class DiagnosisDragAndDropArea extends StatefulWidget {
-  const DiagnosisDragAndDropArea({
+class FileUploadArea extends StatefulWidget {
+  const FileUploadArea({
     required this.caseId,
     required this.todos,
     super.key,
@@ -27,11 +27,11 @@ class DiagnosisDragAndDropArea extends StatefulWidget {
   final List<ActionModel> todos;
 
   @override
-  State<DiagnosisDragAndDropArea> createState() =>
-      _DiagnosisDragAndDropAreaState();
+  State<FileUploadArea> createState() =>
+      _FileUploadAreaState();
 }
 
-class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
+class _FileUploadAreaState extends State<FileUploadArea> {
   bool _dragging = false;
   final Logger _logger = Logger("diagnosis detail view");
   XFile? _file;
