@@ -113,8 +113,16 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                 ),
               ),
               const SizedBox(height: 32),
-              // TBD: State Machine Log
-              const Expanded(child: Placeholder()),
+              // State Machine Log
+              Expanded(
+                child: widget.diagnosisModel.stateMachineLog.isEmpty
+                    ? const Center(
+                        child: Text("No state machine log available."),
+                      )
+                    : StateMachineLogView(
+                        stateMachineLog: widget.diagnosisModel.stateMachineLog,
+                      ),
+              ),
             ],
           ),
         ),
@@ -295,9 +303,10 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     for (final StateMachineLogEntryModel entry in stateMachineLog) {
       if (entry.message.contains("FAULT_PATHS")) {
         final String message = entry.message;
-        const String startMarker = "['";
-        const String endMarker = "']";
-        return message.substringBetween(startMarker, endMarker);
+        return message.substringBetween(
+          startDelimiter: "['",
+          endDelimiter: "']",
+        );
       }
     }
     return "tr('diagnoses.details.noFaultPathFound')";

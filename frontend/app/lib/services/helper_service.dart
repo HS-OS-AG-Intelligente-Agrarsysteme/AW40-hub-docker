@@ -78,8 +78,9 @@ class HelperService {
     DiagnosisStatus diagnosisStatus,
   ) {
     switch (diagnosisStatus) {
-      case DiagnosisStatus.processing:
       case DiagnosisStatus.scheduled:
+        return colorScheme.onBackground;
+      case DiagnosisStatus.processing:
         return colorScheme.primary;
       case DiagnosisStatus.finished:
         return colorScheme.secondary;
