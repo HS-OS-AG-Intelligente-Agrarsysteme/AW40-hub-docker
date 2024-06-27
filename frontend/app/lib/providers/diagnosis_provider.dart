@@ -22,13 +22,28 @@ class DiagnosisProvider with ChangeNotifier {
 
   Future<List<DiagnosisModel>> getDiagnoses() async {
     // * Easy way of testing UI for now.
+    // Explicitly ignored lines_longer_than_80_chars lint rule, because this is
+    // not actual code.
     // return <DiagnosisModel>[
     //   DiagnosisModel(
-    //     id: "1",
+    //     id: const Uuid().v4(),
     //     timestamp: DateTime.now(),
     //     status: DiagnosisStatus.action_required,
-    //     caseId: "1",
-    //     stateMachineLog: [],
+    //     caseId: const Uuid().v4(),
+    //     stateMachineLog: [
+    //       StateMachineLogEntryModel(
+    //         message: "STATE_TRANSITION: REC_VEHICLE_AND_PROC_METADATA --- "
+    //             "(processed_metadata) ---> PROC_CUSTOMER_COMPLAINTS",
+    //         attachment: null,
+    //       ),
+    //       StateMachineLogEntryModel(
+    //         message: "STATE_TRANSITION: PROC_CUSTOMER_COMPLAINTS --- "
+    //             "(no_complaints) ---> "
+    //             "READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES",
+    //         attachment: null,
+    //       ),
+    //
+    //     ],
     //     todos: [
     //       ActionModel(
     //         id: "1",
@@ -40,26 +55,54 @@ class DiagnosisProvider with ChangeNotifier {
     //     ],
     //   ),
     //   DiagnosisModel(
-    //     id: "2",
+    //     id: const Uuid().v4(),
     //     timestamp: DateTime.now(),
     //     status: DiagnosisStatus.scheduled,
-    //     caseId: "2",
+    //     caseId: const Uuid().v4(),
     //     stateMachineLog: [],
     //     todos: [],
     //   ),
     //   DiagnosisModel(
-    //     id: "3",
+    //     id: const Uuid().v4(),
     //     timestamp: DateTime.now(),
     //     status: DiagnosisStatus.processing,
-    //     caseId: "3",
-    //     stateMachineLog: [],
+    //     caseId: const Uuid().v4(),
+    //     stateMachineLog: [
+    //       StateMachineLogEntryModel(
+    //         message: "STATE_TRANSITION: REC_VEHICLE_AND_PROC_METADATA --- "
+    //             "(processed_metadata) ---> PROC_CUSTOMER_COMPLAINTS",
+    //         attachment: null,
+    //       ),
+    //       StateMachineLogEntryModel(
+    //         message: "STATE_TRANSITION: PROC_CUSTOMER_COMPLAINTS --- "
+    //             "(no_complaints) ---> "
+    //             "READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES",
+    //         attachment: null,
+    //       ),
+    //       StateMachineLogEntryModel(
+    //         message: "RETRIEVED_DATASET: obd_data/0",
+    //         attachment: null,
+    //       ),
+    //       StateMachineLogEntryModel(
+    //         message:
+    //         "STATE_TRANSITION: READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES "
+    //             "--- (processed_OBD_data) ---> RETRIEVE_HISTORICAL_DATA",
+    //         attachment: null,
+    //       ),
+    //       StateMachineLogEntryModel(
+    //         message: "STATE_TRANSITION: RETRIEVE_HISTORICAL_DATA --- "
+    //             "(processed_all_data) ---> ESTABLISH_INITIAL_HYPOTHESIS",
+    //         attachment: null,
+    //       ),
+    //
+    //     ],
     //     todos: [],
     //   ),
     //   DiagnosisModel(
-    //     id: "4",
+    //     id: const Uuid().v4(),
     //     timestamp: DateTime.now(),
     //     status: DiagnosisStatus.finished,
-    //     caseId: "4",
+    //     caseId: const Uuid().v4(),
     //     stateMachineLog: [
     //       StateMachineLogEntryModel(
     //         message: "STATE_TRANSITION: REC_VEHICLE_AND_PROC_METADATA --- "
@@ -151,11 +194,68 @@ class DiagnosisProvider with ChangeNotifier {
     //     todos: [],
     //   ),
     //   DiagnosisModel(
-    //     id: "5",
+    //     id: const Uuid().v4(),
     //     timestamp: DateTime.now(),
     //     status: DiagnosisStatus.failed,
-    //     caseId: "5",
-    //     stateMachineLog: [],
+    //     caseId: const Uuid().v4(),
+    //     stateMachineLog: [
+    //       StateMachineLogEntryModel(
+    //         message:
+    // ignore: lines_longer_than_80_chars
+    //             "STATE_TRANSITION: REC_VEHICLE_AND_PROC_METADATA --- (processed_metadata) ---> PROC_CUSTOMER_COMPLAINTS",
+    //         attachment: null,
+    //       ),
+    //       StateMachineLogEntryModel(
+    //         message:
+    // ignore: lines_longer_than_80_chars
+    //             "STATE_TRANSITION: PROC_CUSTOMER_COMPLAINTS --- (no_complaints) ---> READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES",
+    //         attachment: null,
+    //       ),
+    //       StateMachineLogEntryModel(
+    //         message: "RETRIEVED_DATASET: obd_data/0",
+    //         attachment: null,
+    //       ),
+    //       StateMachineLogEntryModel(
+    //         message:
+    // ignore: lines_longer_than_80_chars
+    //             "STATE_TRANSITION: READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES --- (processed_OBD_data) ---> RETRIEVE_HISTORICAL_DATA",
+    //         attachment: null,
+    //       ),
+    //       StateMachineLogEntryModel(
+    //         message:
+    // ignore: lines_longer_than_80_chars
+    //             "STATE_TRANSITION: RETRIEVE_HISTORICAL_DATA --- (processed_all_data) ---> ESTABLISH_INITIAL_HYPOTHESIS",
+    //         attachment: null,
+    //       ),
+    //       StateMachineLogEntryModel(
+    //         message:
+    // ignore: lines_longer_than_80_chars
+    //             "STATE_TRANSITION: ESTABLISH_INITIAL_HYPOTHESIS --- (established_init_hypothesis) ---> DIAGNOSIS",
+    //         attachment: null,
+    //       ),
+    //       StateMachineLogEntryModel(
+    //         message:
+    // ignore: lines_longer_than_80_chars
+    //             "STATE_TRANSITION: SELECT_BEST_UNUSED_ERROR_CODE_INSTANCE --- (no_matching_selected_best_instance) ---> SUGGEST_SUSPECT_COMPONENTS",
+    //         attachment: null,
+    //       ),
+    //       StateMachineLogEntryModel(
+    //         message:
+    // ignore: lines_longer_than_80_chars
+    //             "STATE_TRANSITION: SUGGEST_SUSPECT_COMPONENTS --- (provided_suggestions) ---> CLASSIFY_COMPONENTS",
+    //         attachment: null,
+    //       ),
+    //       StateMachineLogEntryModel(
+    //         message: "RETRIEVED_DATASET: timeseries_data/0",
+    //         attachment: null,
+    //       ),
+    //       StateMachineLogEntryModel(
+    //         message:
+    // ignore: lines_longer_than_80_chars
+    //             "DIAGNOSIS_FAILED: Unexpected error during execution of the state machine.",
+    //         attachment: null,
+    //       )
+    //     ],
     //     todos: [],
     //   ),
     // ];

@@ -259,7 +259,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                 const SizedBox(height: 32),
                 Text(
                   tr("general.datasets"),
-                  style: textTheme.headlineLarge,
+                  style: textTheme.headlineMedium,
                 ),
                 const SizedBox(height: 16),
                 if (hasNoData)

@@ -9,6 +9,7 @@ import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:aw40_hub_frontend/utils/extensions.dart";
+import "package:collection/collection.dart";
 import "package:cross_file/cross_file.dart";
 import "package:desktop_drop/desktop_drop.dart";
 import "package:easy_localization/easy_localization.dart";
@@ -112,8 +113,16 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                 ),
               ),
               const SizedBox(height: 32),
-              // TBD: State Machine Log
-              const Expanded(child: Placeholder()),
+              // State Machine Log
+              Expanded(
+                child: widget.diagnosisModel.stateMachineLog.isEmpty
+                    ? const Center(
+                        child: Text("No state machine log available."),
+                      )
+                    : StateMachineLogView(
+                        stateMachineLog: widget.diagnosisModel.stateMachineLog,
+                      ),
+              ),
             ],
           ),
         ),
@@ -147,9 +156,16 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
               : "Fault path: $faultPath",
         );
       case DiagnosisStatus.action_required:
+        final ActionModel? todo = widget.diagnosisModel.todos.firstOrNull;
+        if (todo == null) {
+          _logger.warning(
+            "Status is action_required, but found empty todo list.",
+          );
+          break;
+        }
         return Text(
           HelperService.convertIso88591ToUtf8(
-            widget.diagnosisModel.todos[0].instruction,
+            todo.instruction,
           ),
           softWrap: true,
           overflow: TextOverflow.ellipsis,
@@ -178,7 +194,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       bool result = false;
 
       switch (widget.diagnosisModel.todos.first.dataType) {
-        case "obd":
+        case DatasetType.obd:
           final Map<String, dynamic> jsonMap = jsonDecode(fileContent);
           final NewOBDDataDto newOBDDataDto = NewOBDDataDto.fromJson(jsonMap);
 
@@ -187,7 +203,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             newOBDDataDto,
           );
           break;
-        case "oscillogram":
+        case DatasetType.timeseries:
           final List<int> byteData = utf8.encode(fileContent);
           result = await diagnosisProvider.uploadPicoscopeData(
             widget.diagnosisModel.caseId,
@@ -195,7 +211,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             file.name,
           );
           break;
-        case "symptom":
+        case DatasetType.symptom:
           final Map<String, dynamic> jsonMap = jsonDecode(fileContent);
           final NewSymptomDto newSymptomDto = NewSymptomDto.fromJson(jsonMap);
 
@@ -204,13 +220,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
             newSymptomDto,
           );
           break;
-        // TODO: Add case for omniview data.
-        default:
-          throw AppException(
-            exceptionType: ExceptionType.unexpectedNullValue,
-            exceptionMessage: "Unknown data type: "
-                "${widget.diagnosisModel.todos.first.dataType}",
-          );
       }
 
       _showMessage(
@@ -294,9 +303,10 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     for (final StateMachineLogEntryModel entry in stateMachineLog) {
       if (entry.message.contains("FAULT_PATHS")) {
         final String message = entry.message;
-        const String startMarker = "['";
-        const String endMarker = "']";
-        return message.substringBetween(startMarker, endMarker);
+        return message.substringBetween(
+          startDelimiter: "['",
+          endDelimiter: "']",
+        );
       }
     }
     return "tr('diagnoses.details.noFaultPathFound')";

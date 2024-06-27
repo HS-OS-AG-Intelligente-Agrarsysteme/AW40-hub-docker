@@ -92,29 +92,31 @@ class _DesktopDiagnosesViewState extends State<DesktopDiagnosesView> {
 
   void _startTimer() {
     _timer = Timer.periodic(
-      const Duration(seconds: 5),
+      const Duration(seconds: 3),
       (_) async => _checkForUpdates(),
     );
   }
 
   Future<void> _checkForUpdates() async {
-    for (final DiagnosisModel diagnosis in widget.diagnosisModels) {
-      final DiagnosisModel? updatedDiagnosis =
-          await Provider.of<DiagnosisProvider>(context, listen: false)
-              .getDiagnosis(diagnosis.caseId);
-      if (updatedDiagnosis == null) {
+    final provider = Provider.of<DiagnosisProvider>(context, listen: false);
+    final List<DiagnosisModel> models = widget.diagnosisModels;
+
+    final Map<int, DiagnosisModel> updates = {};
+    for (int i = 0; i < models.length; i++) {
+      final DiagnosisModel oldModel = models[i];
+      final DiagnosisModel? newModel =
+          await provider.getDiagnosis(oldModel.caseId);
+      if (newModel == null) {
         _logger.warning(
-          "Could not fetch diagnosis with id ${diagnosis.id}."
+          "Could not fetch diagnosis with id ${oldModel.id}."
           " This is likely a mistake in the backend."
           " The frontend does not handle this error, please reload.",
         );
         continue;
       }
-
-      if (updatedDiagnosis.status != diagnosis.status) {
-        setState(() => diagnosis.status = updatedDiagnosis.status);
-      }
+      if (newModel.status != oldModel.status) updates[i] = newModel;
     }
+    setState(() => updates.forEach((i, model) => models[i] = model));
   }
 
   @override
