@@ -7,4 +7,30 @@ void main() {
     final List<String> sortedValues = List<String>.from(values)..sort();
     expect(values, equals(sortedValues));
   });
+  group("DatasetType fromJson", () {
+    test("should map strings that correspond to values as normal", () {
+      expect(
+        DatasetType.fromJson("obd"),
+        equals(DatasetType.obd),
+      );
+      expect(
+        DatasetType.fromJson("timeseries"),
+        equals(DatasetType.timeseries),
+      );
+      expect(
+        DatasetType.fromJson("symptom"),
+        equals(DatasetType.symptom),
+      );
+      expect(
+        DatasetType.fromJson("unknown"),
+        equals(DatasetType.unknown),
+      );
+    });
+    test("should map strings that do not correspond to values to unknown", () {
+      expect(
+        DatasetType.fromJson("not a value"),
+        equals(DatasetType.unknown),
+      );
+    });
+  });
 }

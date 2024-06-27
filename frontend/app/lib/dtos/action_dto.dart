@@ -17,6 +17,7 @@ class ActionDto {
   factory ActionDto.fromJson(Map<String, dynamic> json) {
     return _$ActionDtoFromJson(json);
   }
+
   Map<String, dynamic> toJson() => _$ActionDtoToJson(this);
 
   ActionModel toModel() {
@@ -33,7 +34,6 @@ class ActionDto {
   String instruction;
   @JsonKey(name: "action_type")
   String actionType;
-  // TODO: Transform to DatasetType.unknown for unknown values.
   @JsonKey(name: "data_type")
   DatasetType dataType;
   String? component;

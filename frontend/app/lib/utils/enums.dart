@@ -1,3 +1,5 @@
+import "package:enum_to_string/enum_to_string.dart";
+
 enum AuthorizedGroup {
   // ignore: constant_identifier_names
   Analysts,
@@ -53,7 +55,17 @@ enum SymptomLabel { unknown, ok, defect }
 
 enum TimeseriesDataLabel { unknown, norm, anomaly }
 
-enum DatasetType { obd, timeseries, symptom, unknown }
+enum DatasetType {
+  obd,
+  timeseries,
+  symptom,
+  unknown;
+
+  factory DatasetType.fromJson(String value) {
+    return EnumToString.fromString(DatasetType.values, value) ??
+        DatasetType.unknown;
+  }
+}
 
 enum PicoscopeLabel { unknown, norm, anomaly }
 
