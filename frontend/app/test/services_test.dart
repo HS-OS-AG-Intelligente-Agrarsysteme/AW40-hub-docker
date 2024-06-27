@@ -597,6 +597,26 @@ void main() {
         expect(HelperService.stringToLogLevel("ShOuT"), Level.SHOUT);
       });
     });
+    group("getDuplicates()", () {
+      test("returns empty iterable if given empty iterable", () {
+        expect(HelperService.getDuplicates([]), isEmpty);
+      });
+      test(
+        "returns empty iterable if given iterable with no duplicates",
+        () {
+          expect(HelperService.getDuplicates([1, 2, 3, 4, 5]), isEmpty);
+        },
+      );
+      test(
+        "returns iterable containing only duplicates if given iterable with duplicates",
+        () {
+          expect(
+            HelperService.getDuplicates([1, 1, 2, 2, 2, 3, 4]),
+            equals([1, 2]),
+          );
+        },
+      );
+    });
   });
   group("ConfigService", () {
     final ConfigService configService = ConfigService();

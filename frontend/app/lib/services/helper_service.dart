@@ -135,4 +135,15 @@ class HelperService {
     );
     return false;
   }
+
+  static Iterable<T> getDuplicates<T>(Iterable<T> iterable) {
+    final Set<T> seen = {};
+    final Set<T> duplicates = {};
+
+    for (final T item in iterable) {
+      if (!seen.add(item)) duplicates.add(item);
+    }
+
+    return duplicates;
+  }
 }
