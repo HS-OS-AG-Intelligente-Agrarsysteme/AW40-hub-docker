@@ -62,15 +62,34 @@ class _FileUploadAreaState extends State<FileUploadArea> {
           ),
         );
       case DatasetType.timeseries:
-        return SegmentedButton(
-          showSelectedIcon: false,
-          segments: TimeseriesFormat.values.map((v) {
-            return ButtonSegment(value: v, label: Text(v.name.toTitleCase()));
-          }).toList(),
-          selected: {selectedTimeseriesFormat},
-          onSelectionChanged: (Set<TimeseriesFormat> newSelection) {
-            setState(() => selectedTimeseriesFormat = newSelection.first);
-          },
+        return Column(
+          children: [
+            SegmentedButton(
+              showSelectedIcon: false,
+              segments: TimeseriesFormat.values.map((v) {
+                return ButtonSegment(
+                  value: v,
+                  label: Text(v.name.toTitleCase()),
+                );
+              }).toList(),
+              selected: {selectedTimeseriesFormat},
+              onSelectionChanged: (Set<TimeseriesFormat> newSelection) {
+                setState(() => selectedTimeseriesFormat = newSelection.first);
+              },
+            ),
+            Container(
+              height: 400,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: colorScheme.onTertiaryContainer,
+                  width: 2,
+                ),
+              ),
+              child: Center(
+                child: Text("${selectedTimeseriesFormat.name} form goes here."),
+              ),
+            )
+          ],
         );
       case DatasetType.symptom:
         return Text(
