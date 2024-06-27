@@ -86,3 +86,7 @@ enum StateMachineEvent {
   diagnosisFailed,
   unknown,
 }
+
+enum ObdUploadFormats { obd, vcds }
+
+enum TimeseriesFormat { timeseries, omniview, picoscope }

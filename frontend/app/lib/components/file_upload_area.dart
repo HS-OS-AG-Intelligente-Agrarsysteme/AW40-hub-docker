@@ -6,6 +6,7 @@ import "package:aw40_hub_frontend/models/action_model.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:change_case/change_case.dart";
 import "package:collection/collection.dart";
 import "package:cross_file/cross_file.dart";
 import "package:desktop_drop/desktop_drop.dart";
@@ -34,6 +35,8 @@ class _FileUploadAreaState extends State<FileUploadArea> {
   bool _dragging = false;
   final Logger _logger = Logger("diagnosis detail view");
   XFile? _file;
+  TimeseriesFormat selectedTimeseriesFormat = TimeseriesFormat.timeseries;
+
   final TextEditingController _componentController = TextEditingController();
   final TextEditingController _samplingRateController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
@@ -59,11 +62,15 @@ class _FileUploadAreaState extends State<FileUploadArea> {
           ),
         );
       case DatasetType.timeseries:
-        return Text(
-          "Time Series | Omniview | Picoscope",
-          style: textTheme.bodyLarge?.copyWith(
-            color: diagnosisStatusOnContainerColor,
-          ),
+        return SegmentedButton(
+          showSelectedIcon: false,
+          segments: TimeseriesFormat.values.map((v) {
+            return ButtonSegment(value: v, label: Text(v.name.toTitleCase()));
+          }).toList(),
+          selected: {selectedTimeseriesFormat},
+          onSelectionChanged: (Set<TimeseriesFormat> newSelection) {
+            setState(() => selectedTimeseriesFormat = newSelection.first);
+          },
         );
       case DatasetType.symptom:
         return Text(
@@ -92,7 +99,7 @@ class _FileUploadAreaState extends State<FileUploadArea> {
           ),
           subtitle: Text(
             datasetType == null
-              ? tr("diagnoses.todos.noTodosFoundDescription")
+                ? tr("diagnoses.todos.noTodosFoundDescription")
                 : tr("diagnoses.todos.unknownDatasetTypeDescription"),
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.error,

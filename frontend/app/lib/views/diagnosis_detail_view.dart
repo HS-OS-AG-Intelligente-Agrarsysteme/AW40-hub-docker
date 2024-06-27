@@ -1,6 +1,7 @@
 import "dart:async";
 
 import "package:aw40_hub_frontend/components/components.dart";
+import "package:aw40_hub_frontend/components/file_upload_area.dart";
 import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/services.dart";

@@ -608,7 +608,8 @@ void main() {
         },
       );
       test(
-        "returns iterable containing only duplicates if given iterable with duplicates",
+        "returns iterable containing only duplicates if given iterable with"
+            " duplicates",
         () {
           expect(
             HelperService.getDuplicates([1, 1, 2, 2, 2, 3, 4]),
