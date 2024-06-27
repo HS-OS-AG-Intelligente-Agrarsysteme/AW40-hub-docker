@@ -846,7 +846,9 @@ class MockHttpService implements HttpService {
   @override
   Future<Response> getCases(String token, String workshopId) {
     _demoCaseDto.workshopId = workshopId;
-    for (final c in _caseDtos) {c.workshopId = workshopId;}
+    for (final c in _caseDtos) {
+      c.workshopId = workshopId;
+    }
     return Future.delayed(
       Duration(milliseconds: delay),
       () =>
@@ -894,13 +896,6 @@ class MockHttpService implements HttpService {
               return backupDiagnosisDto;
             },
           );
-    if (diagnosisDto.status == DiagnosisStatus.action_required &&
-        diagnosisDto.todos.isEmpty) {
-      _logger.warning(
-        "Status is action_required, but found empty todo list. Case ID:"
-        " $caseId, _demoDiagnosisStage: $_demoDiagnosisStage",
-      );
-    }
     return Future.delayed(
       Duration(milliseconds: delay),
       () {
@@ -914,8 +909,7 @@ class MockHttpService implements HttpService {
     final List<CaseDto> caseDtos = _caseDtos + _sharedCaseDtos;
     return Future.delayed(
       Duration(milliseconds: delay),
-      () =>
-          Response(jsonEncode(caseDtos.map((e) => e.toJson()).toList()), 200),
+      () => Response(jsonEncode(caseDtos.map((e) => e.toJson()).toList()), 200),
     );
   }
 
