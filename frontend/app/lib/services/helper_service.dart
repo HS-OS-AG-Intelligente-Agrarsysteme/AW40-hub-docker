@@ -74,9 +74,9 @@ class HelperService {
   }
 
   static Color getDiagnosisStatusIconColor(
-      ColorScheme colorScheme,
-      DiagnosisStatus diagnosisStatus,
-      ) {
+    ColorScheme colorScheme,
+    DiagnosisStatus diagnosisStatus,
+  ) {
     switch (diagnosisStatus) {
       case DiagnosisStatus.scheduled:
         return colorScheme.onBackground;
