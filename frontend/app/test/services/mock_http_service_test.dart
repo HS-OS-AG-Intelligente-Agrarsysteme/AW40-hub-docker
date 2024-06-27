@@ -649,7 +649,7 @@ void main() {
         expect(response.statusCode, 422, reason: "status code should be 422");
       });
     });
-    group("uploadVcdsData",(){
+    group("uploadVcdsData", () {
       test("returns 201 CaseDto json", () async {
         const caseId = "caseId";
         const workshopId = "workshopId";
@@ -662,7 +662,7 @@ void main() {
 
         expect(response.statusCode, 201, reason: "status code should be 201");
         expect(
-              () => CaseDto.fromJson(jsonDecode(response.body)),
+          () => CaseDto.fromJson(jsonDecode(response.body)),
           returnsNormally,
           reason: "should return valid CaseDto json",
         );
@@ -941,7 +941,8 @@ Future<List<CaseDto>> _getCaseDtosFromGetCases(
 /// Convenience function to get [CaseDto]s from
 /// [MockHttpService.getSharedCases].
 Future<List<CaseDto>> _getCaseDtosFromSharedCases(
-    MockHttpService mockHttpService) async {
+  MockHttpService mockHttpService,
+) async {
   final response = await mockHttpService.getSharedCases("token");
   final json = jsonDecode(response.body);
   if (json is! List) {

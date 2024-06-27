@@ -104,7 +104,8 @@ class _DesktopDiagnosesViewState extends State<DesktopDiagnosesView> {
     final Map<int, DiagnosisModel> updates = {};
     for (int i = 0; i < models.length; i++) {
       final DiagnosisModel oldModel = models[i];
-      final DiagnosisModel? newModel = await provider.getDiagnosis(oldModel.caseId);
+      final DiagnosisModel? newModel =
+          await provider.getDiagnosis(oldModel.caseId);
       if (newModel == null) {
         _logger.warning(
           "Could not fetch diagnosis with id ${oldModel.id}."
