@@ -99,7 +99,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                     ),
                     if (status == DiagnosisStatus.action_required)
                       DiagnosisDragAndDropArea(
-                        diagnosisModel: widget.diagnosisModel,
+                        caseId: widget.diagnosisModel.caseId,
                         todos: widget.diagnosisModel.todos,
                       ),
                   ],

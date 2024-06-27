@@ -3,7 +3,6 @@ import "dart:convert";
 import "package:aw40_hub_frontend/dtos/dtos.dart";
 import "package:aw40_hub_frontend/exceptions/exceptions.dart";
 import "package:aw40_hub_frontend/models/action_model.dart";
-import "package:aw40_hub_frontend/models/diagnosis_model.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
@@ -18,12 +17,12 @@ import "package:provider/provider.dart";
 
 class DiagnosisDragAndDropArea extends StatefulWidget {
   const DiagnosisDragAndDropArea({
-    required this.diagnosisModel,
+    required this.caseId,
     required this.todos,
     super.key,
   });
 
-  final DiagnosisModel diagnosisModel;
+  final String caseId;
 
   final List<ActionModel> todos;
 
@@ -55,6 +54,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
+          // If file chosen, show name and upload button.
           if (file != null) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -276,7 +276,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
           final NewOBDDataDto newOBDDataDto = NewOBDDataDto.fromJson(jsonMap);
 
           result = await diagnosisProvider.uploadObdData(
-            widget.diagnosisModel.caseId,
+            widget.caseId,
             newOBDDataDto,
           );
           break;
@@ -286,7 +286,8 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
           final int? samplingRate = int.tryParse(_samplingRateController.text);
           final int? duration = int.tryParse(_durationController.text);
           result = await diagnosisProvider.uploadOmniscopeData(
-            widget.diagnosisModel.caseId,
+            widget.caseId,
+
             byteData,
             file.name,
             component,
@@ -298,7 +299,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
           throw AppException(
             exceptionType: ExceptionType.unexpectedNullValue,
             exceptionMessage: "Unknown data type: "
-                "${widget.diagnosisModel.todos.first.dataType}",
+                "${widget.todos.first.dataType}",
           );
         case DatasetType.symptom:
           // TODO: Handle this case.
