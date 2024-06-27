@@ -49,29 +49,30 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
       DiagnosisStatus.action_required,
     );
     final DatasetType? datasetType = widget.todos.firstOrNull?.dataType;
+    final XFile? file = _file;
 
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          if (_file != null) ...[
+          if (file != null) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  widget.fileName!,
+                  file.name,
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: diagnosisStatusOnContainerColor,
                       ),
                 ),
-                /*IconButton(
+                IconButton(
                   icon: const Icon(Icons.upload_file),
                   style: IconButton.styleFrom(
                     foregroundColor: diagnosisStatusOnContainerColor,
                   ),
                   onPressed: () => _uploadFile,
                   tooltip: tr("diagnoses.details.uploadFileTooltip"),
-                ),*/
+                ),
               ],
             ),
             const SizedBox(height: 16),
