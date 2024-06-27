@@ -1,4 +1,5 @@
 import "package:enum_to_string/enum_to_string.dart";
+import "package:logging/logging.dart";
 
 enum AuthorizedGroup {
   // ignore: constant_identifier_names
@@ -62,8 +63,13 @@ enum DatasetType {
   unknown;
 
   factory DatasetType.fromJson(String value) {
-    return EnumToString.fromString(DatasetType.values, value) ??
-        DatasetType.unknown;
+    final DatasetType? result =
+        EnumToString.fromString(DatasetType.values, value);
+    if (result == null) {
+      Logger("DatasetType").warning("Unknown DatasetType: $value");
+      return DatasetType.unknown;
+    }
+    return result;
   }
 }
 
