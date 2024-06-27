@@ -130,7 +130,7 @@ void main() {
         id: "1",
         instruction: "some action",
         actionType: "1",
-        dataType: "2",
+        dataType: DatasetType.obd,
         component: "3",
       ),
     ];
@@ -390,7 +390,7 @@ void main() {
     const String id = "some_id";
     const String instruction = "some_customer_id";
     const String actionType = "some_action_type";
-    const String dataType = "some_data_type";
+    const DatasetType dataType = DatasetType.obd;
     const String component = "some_component";
 
     final actionModel = ActionModel(

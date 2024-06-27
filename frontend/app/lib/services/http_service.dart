@@ -85,6 +85,16 @@ class HttpService {
     );
   }
 
+  Future<http.Response> getDiagnoses(
+    String token,
+    String workshopId,
+  ) {
+    return _client.get(
+      Uri.parse("$backendUrl/$workshopId/diagnoses"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
   Future<http.Response> getDiagnosis(
     String token,
     String workshopId,
@@ -131,6 +141,18 @@ class HttpService {
       }),
       body: jsonEncode(requestBody),
     );
+  }
+
+  Future<http.Response> uploadVcdsData(
+    String token,
+    String workshopId,
+    String caseId,
+    List<int> vcdsData,
+  ) {
+    // TODO: implement uploadVcdsData
+    // I added it with what I hope will be the actual signature so I can mock it
+    // in the MockHttpService.
+    throw UnimplementedError();
   }
 
   Future<http.Response> uploadPicoscopeData(

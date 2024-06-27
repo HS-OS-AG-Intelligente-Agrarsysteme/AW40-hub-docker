@@ -7,7 +7,6 @@ import "package:aw40_hub_frontend/models/models.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
-import "package:collection/collection.dart";
 import "package:flutter/material.dart";
 import "package:http/http.dart";
 import "package:logging/logging.dart";
@@ -21,160 +20,23 @@ class DiagnosisProvider with ChangeNotifier {
   late final String workShopId;
   String? _authToken;
 
-  Future<List<DiagnosisModel>> getDiagnoses(List<CaseModel> cases) async {
-    // * Easy way of testing UI for now.
-    /*return <DiagnosisModel>[
-      DiagnosisModel(
-        id: "1",
-        timestamp: DateTime.now(),
-        status: DiagnosisStatus.action_required,
-        caseId: "1",
-        stateMachineLog: [],
-        todos: [
-          ActionModel(
-            id: "1",
-            instruction: "Laden Sie OBD-Daten hoch",
-            actionType: "",
-            dataType: "omniscope",
-            component: "",
-          )
-        ],
-      ),
-    ];*/
-
-    //   DiagnosisModel(
-    //     id: "2",
-    //     timestamp: DateTime.now(),
-    //     status: DiagnosisStatus.scheduled,
-    //     caseId: "2",
-    //     stateMachineLog: [],
-    //     todos: [],
-    //   ),
-    //   DiagnosisModel(
-    //     id: "3",
-    //     timestamp: DateTime.now(),
-    //     status: DiagnosisStatus.processing,
-    //     caseId: "3",
-    //     stateMachineLog: [],
-    //     todos: [],
-    //   ),
-    //   DiagnosisModel(
-    //     id: "4",
-    //     timestamp: DateTime.now(),
-    //     status: DiagnosisStatus.finished,
-    //     caseId: "4",
-    //     stateMachineLog: [
-    //       StateMachineLogEntryModel(
-    //         message: "STATE_TRANSITION: REC_VEHICLE_AND_PROC_METADATA --- "
-    //             "(processed_metadata) ---> PROC_CUSTOMER_COMPLAINTS",
-    //         attachment: null,
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "STATE_TRANSITION: PROC_CUSTOMER_COMPLAINTS --- "
-    //             "(no_complaints) ---> "
-    //             "READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES",
-    //         attachment: null,
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "RETRIEVED_DATASET: obd_data/0",
-    //         attachment: null,
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message:
-    //             "STATE_TRANSITION: READ_OBD_DATA_AND_GEN_ONTOLOGY_INSTANCES "
-    //             "--- (processed_OBD_data) ---> RETRIEVE_HISTORICAL_DATA",
-    //         attachment: null,
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "STATE_TRANSITION: RETRIEVE_HISTORICAL_DATA --- "
-    //             "(processed_all_data) ---> ESTABLISH_INITIAL_HYPOTHESIS",
-    //         attachment: null,
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "STATE_TRANSITION: ESTABLISH_INITIAL_HYPOTHESIS --- "
-    //             "(established_init_hypothesis) ---> DIAGNOSIS",
-    //         attachment: null,
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "STATE_TRANSITION: "
-    //             "SELECT_BEST_UNUSED_ERROR_CODE_INSTANCE "
-    //             "--- (no_matching_selected_best_instance) ---> "
-    //             "SUGGEST_SUSPECT_COMPONENTS",
-    //         attachment: null,
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "STATE_TRANSITION: SUGGEST_SUSPECT_COMPONENTS --- "
-    //             "(provided_suggestions) ---> CLASSIFY_COMPONENTS",
-    //         attachment: null,
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "RETRIEVED_DATASET: timeseries_data/0",
-    //         attachment: null,
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "HEATMAPS: boost_pressure_control_valve "
-    //             "[ANOMALY - SCORE: 0.0029614063]",
-    //         attachment: "666abcf93d9fdf79fb6c11b5",
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "STATE_TRANSITION: CLASSIFY_COMPONENTS --- "
-    //             "(detected_anomalies) ---> "
-    //             "ISOLATE_PROBLEM_CHECK_EFFECTIVE_RADIUS",
-    //         attachment: null,
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "CAUSAL_GRAPH_VISUALIZATIONS: 0",
-    //         attachment: "666abcfa3d9fdf79fb6c11b7",
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "RETRIEVED_DATASET: symptoms/0",
-    //         attachment: null,
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "CAUSAL_GRAPH_VISUALIZATIONS: 0",
-    //         attachment: "666abcfa3d9fdf79fb6c11b9",
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "STATE_TRANSITION: "
-    //             "ISOLATE_PROBLEM_CHECK_EFFECTIVE_RADIUS --- "
-    //             "(isolated_problem) ---> PROVIDE_DIAG_AND_SHOW_TRACE",
-    //         attachment: null,
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "FAULT_PATHS: ['boost_pressure_solenoid_valve -> "
-    //             "boost_pressure_control_valve']",
-    //         attachment: null,
-    //       ),
-    //       StateMachineLogEntryModel(
-    //         message: "STATE_TRANSITION: PROVIDE_DIAG_AND_SHOW_TRACE --- "
-    //             "(uploaded_diag) ---> diag",
-    //         attachment: null,
-    //       )
-    //     ],
-    //     todos: [],
-    //   ),
-    //   DiagnosisModel(
-    //     id: "5",
-    //     timestamp: DateTime.now(),
-    //     status: DiagnosisStatus.failed,
-    //     caseId: "5",
-    //     stateMachineLog: [],
-    //     todos: [],
-    //   ),
-    // ];
-
-    final List<String> caseIDs = cases
-        .where((c) => c.workshopId == workShopId)
-        .map((e) => e.id)
-        .toList();
-
-    final List<Future<DiagnosisModel?>> individualDiagnosisRequests =
-        caseIDs.map(getDiagnosis).toList();
-
-    final List<DiagnosisModel?> diagnoses =
-        await Future.wait(individualDiagnosisRequests);
-
-    return diagnoses.whereNotNull().toList();
+  Future<List<DiagnosisModel>> getDiagnoses() async {
+    final String authToken = _getAuthToken();
+    final Response response =
+        await _httpService.getDiagnoses(authToken, workShopId);
+    if (response.statusCode != 200) {
+      _logger.warning(
+        "Could not get diagnoses. "
+        "${response.statusCode}: ${response.reasonPhrase}",
+      );
+      return [];
+    }
+    final json = jsonDecode(response.body);
+    if (json is! List) {
+      _logger.warning("Could not decode json response to List.");
+      return [];
+    }
+    return json.map((e) => DiagnosisDto.fromJson(e).toModel()).toList();
   }
 
   Future<DiagnosisModel?> getDiagnosis(String caseId) async {
@@ -303,7 +165,10 @@ class DiagnosisProvider with ChangeNotifier {
     return true;
   }
 
-  Future<bool> uploadSymtomData(String caseId, NewSymptomDto symptomDto) async {
+  Future<bool> uploadSymptomData(
+    String caseId,
+    NewSymptomDto symptomDto,
+  ) async {
     final String authToken = _getAuthToken();
     final Map<String, dynamic> symptomDataJson = symptomDto.toJson();
     final Response response = await _httpService.uploadSymptomData(

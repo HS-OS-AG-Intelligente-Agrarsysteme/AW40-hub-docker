@@ -1,7 +1,7 @@
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
-import "package:aw40_hub_frontend/models/action_model.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:collection/collection.dart";
 import "package:enum_to_string/enum_to_string.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter_test/flutter_test.dart";
@@ -259,6 +259,32 @@ void main() {
         return http.Response('{"status": "success"}', 200);
       });
       await HttpService(client).deleteCase("token", workshopId, caseId);
+      expect(sentRequest, isTrue, reason: "Request was not sent");
+    });
+    test("verify getDiagnoses", () async {
+      const workshopId = "some-workshop-id";
+      bool sentRequest = false;
+      final client = MockClient((http.Request request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("GET"),
+          reason: "Request method should be GET",
+        );
+        expect(
+          request.headers["content-type"],
+          isNull,
+          reason: "Request should not have content-type header",
+        );
+        expect(request.body, isEmpty, reason: "Request body  empty");
+        expect(
+          request.url.toString(),
+          endsWith("/$workshopId/diagnoses"),
+          reason: "Request URL should end with /{workshopId}/diagnoses",
+        );
+        return http.Response('{"status": "success"}', 200);
+      });
+      await HttpService(client).getDiagnoses("token", workshopId);
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
     test("verify getDiagnosis", () async {
@@ -571,38 +597,98 @@ void main() {
         expect(HelperService.stringToLogLevel("ShOuT"), Level.SHOUT);
       });
     });
-    group("getDatasetType", () {
-      test("Datset from ActionModel transformed in Enum", () {
-        //arrange
-        final actionModel = ActionModel(
-          id: "",
-          instruction: "",
-          actionType: "",
-          dataType: "obd",
-          component: null,
-        );
-        //act
-        final actual = HelperService.getDatasetType([actionModel]);
-        //assert
-        expect(actual, equals(DatasetType.obd));
-      });
-      test("Empty Todo List throws Exception", () {
+  });
+  group("ConfigService", () {
+    final ConfigService configService = ConfigService();
+    setUp(configService.reset);
+    test("should be Singleton", () {
+      final ConfigService configService1 = ConfigService();
+      final ConfigService configService2 = ConfigService();
+      expect(identical(configService1, configService2), true);
+    });
+    test("logValues() logs once for each ConfigKey", () async {
+      final Logger testLogger = Logger("test_logger");
+      final logRecords = <LogRecord>[];
+      testLogger.onRecord.listen(logRecords.add);
+      configService.logValues();
+      expect(logRecords.length, ConfigKey.values.length);
+    });
+    test("logValues() logs in order of ConfigKeys", () async {
+      final Logger testLogger = Logger("test_logger");
+      final logRecords = <LogRecord>[];
+      testLogger.onRecord.listen(logRecords.add);
+      configService.logValues();
+      ConfigKey.values.forEachIndexed((i, k) {
         expect(
-          () => HelperService.getDatasetType([]),
-          throwsA(isA<AppException>()),
+          logRecords[i].message,
+          contains(k.name),
+          reason: "${i}th key should contain ${k.name},"
+              " but was '${logRecords[i].message}'",
         );
       });
-      test("Unknown Value returns DatasetType.unknown", () {
-        final actionModel = ActionModel(
-          id: "",
-          instruction: "",
-          actionType: "",
-          dataType: "someString",
-          component: null,
+    });
+    test("_configMap is empty before calling initialize()", () {
+      final Logger testLogger = Logger("test_logger");
+      final logRecords = <LogRecord>[];
+      testLogger.onRecord.listen(logRecords.add);
+
+      configService.logValues();
+
+      ConfigKey.values.forEachIndexed((i, k) {
+        expect(
+          logRecords[i].message,
+          contains("not found"),
+          reason: "key $k should not be in _configMap, but was found",
         );
-        final actual = HelperService.getDatasetType([actionModel]);
-        expect(actual, DatasetType.unknown);
       });
+    });
+    test("_configMap is populated after calling initialize()", () async {
+      final Logger testLogger = Logger("test_logger");
+      final logRecords = <LogRecord>[];
+      testLogger.onRecord.listen(logRecords.add);
+
+      await configService.initialize();
+      configService.logValues();
+
+      ConfigKey.values.forEachIndexed((i, k) {
+        expect(
+          logRecords[i].message,
+          isNot(contains("not found")),
+          reason: "key $k should be in _configMap, but was not found",
+        );
+        expect(
+          logRecords[i].message,
+          isNot(contains("empty value")),
+          reason: "key $k was in _configMap, but had empty value",
+        );
+      });
+    });
+    test("calling getConfigValue() before initialize() throws exception", () {
+      expect(
+        () => configService.getConfigValue(ConfigKey.apiAddress),
+        throwsA(isA<AppException>()),
+      );
+    });
+    test(
+      "calling getConfigValue() after initialize() does not throw exception",
+      () async {
+        await configService.initialize();
+        expect(
+          () => configService.getConfigValue(ConfigKey.apiAddress),
+          returnsNormally,
+        );
+      },
+    );
+    test("getConfigValue() should not return empty strings", () async {
+      await configService.initialize();
+      for (final configKey in ConfigKey.values) {
+        final String value = configService.getConfigValue(configKey);
+        expect(
+          value,
+          isNotEmpty,
+          reason: "key $configKey should not have empty value",
+        );
+      }
     });
   });
 }

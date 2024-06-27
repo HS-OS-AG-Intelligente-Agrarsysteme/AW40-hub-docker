@@ -48,6 +48,7 @@ class TimeseriesDataDto {
   dynamic deviceSpecs;
   @JsonKey(name: "data_id")
   int? dataId;
+  // Note: The API says this should be a List<String>, but it actually isn't.
   @JsonKey(name: "signal_id")
   String signalId;
 }

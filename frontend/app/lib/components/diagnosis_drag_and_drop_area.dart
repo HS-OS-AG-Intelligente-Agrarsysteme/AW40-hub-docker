@@ -7,6 +7,7 @@ import "package:aw40_hub_frontend/models/diagnosis_model.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:collection/collection.dart";
 import "package:cross_file/cross_file.dart";
 import "package:desktop_drop/desktop_drop.dart";
 import "package:dotted_border/dotted_border.dart";
@@ -24,8 +25,10 @@ class DiagnosisDragAndDropArea extends StatefulWidget {
     required this.todos,
     super.key,
   });
+
   final String? fileName;
   final DiagnosisModel diagnosisModel;
+
   //final void Function(DropDoneDetails) onDragDone;
   //final void Function() onUploadFile;
   final List<ActionModel> todos;
@@ -51,8 +54,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
       colorScheme,
       DiagnosisStatus.action_required,
     );
-    final DatasetType datasetType = HelperService.getDatasetType(widget.todos);
-    //final String datasetTypeString = datasetType.name;
+    final DatasetType? datasetType = widget.todos.firstOrNull?.dataType;
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -110,7 +112,8 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             ),
           ),
           const SizedBox(height: 16),
-          createTextfields(datasetType, diagnosisStatusOnContainerColor),
+          if (datasetType != null)
+            createTextfields(datasetType, diagnosisStatusOnContainerColor),
         ],
       ),
     );
@@ -132,7 +135,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
                 ),
         );
 
-      case DatasetType.omniscope:
+      case DatasetType.timeseries:
         return Column(
           children: [
             TextFormField(
@@ -215,7 +218,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
                       _samplingRateController.text.isNotEmpty &&
                       _durationController.text.isNotEmpty &&
                       _dragging)
-                  ? _buildButton(fieldColor, DatasetType.omniscope)
+                  ? _buildButton(fieldColor, DatasetType.timeseries)
                   : IconButton(
                       icon: const Icon(Icons.upload_file),
                       style: IconButton.styleFrom(
@@ -227,8 +230,11 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
           ],
         );
       case DatasetType.unknown:
-        //Placeholder
-        return const Text("");
+        // TODO: Implement
+        return const Placeholder();
+      case DatasetType.symptom:
+      // TODO: Implement
+        return const Placeholder();
     }
   }
 
@@ -279,7 +285,7 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             newOBDDataDto,
           );
           break;
-        case DatasetType.omniscope:
+        case DatasetType.timeseries:
           final List<int> byteData = utf8.encode(fileContent);
           final String component = _componentController.text.toLowerCase();
           final int? samplingRate = int.tryParse(_samplingRateController.text);
@@ -299,6 +305,9 @@ class _DiagnosisDragAndDropAreaState extends State<DiagnosisDragAndDropArea> {
             exceptionMessage: "Unknown data type: "
                 "${widget.diagnosisModel.todos.first.dataType}",
           );
+        case DatasetType.symptom:
+          // TODO: Handle this case.
+          break;
       }
 
       _showMessage(

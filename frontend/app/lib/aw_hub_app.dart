@@ -2,8 +2,10 @@ import "package:aw40_hub_frontend/configs/configs.dart";
 import "package:aw40_hub_frontend/main.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/routing/router.dart";
+import "package:aw40_hub_frontend/services/mock_http_service.dart";
 import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/themes/color_schemes.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:easy_localization_loader/easy_localization_loader.dart";
 import "package:flutter/material.dart";
@@ -18,7 +20,10 @@ class AWHubApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final httpService = HttpService(http.Client());
+    final useMockData =
+        ConfigService().getConfigValue(ConfigKey.useMockData) == "true";
+    final httpService =
+        useMockData ? MockHttpService() : HttpService(http.Client());
     return EasyLocalization(
       path: kLocalesPath,
       supportedLocales: kSupportedLocales.values.toList(),

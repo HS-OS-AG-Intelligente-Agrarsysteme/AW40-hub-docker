@@ -12,14 +12,17 @@ enum HostPlatform { web, android, ios, windows, linux, macos }
 enum TokenType { jwt, refresh, id }
 
 enum ConfigKey {
+  // Note: Always do this in alphabetical order. Unit tests for ConfigService
+  // are relying on it.
   apiAddress,
   frontendAddress,
   keyCloakAddress,
   keyCloakClient,
   keyCloakRealm,
   logLevel,
-  redirectUriMobile,
   proxyDefaultScheme,
+  redirectUriMobile,
+  useMockData,
 }
 
 enum LocalStorageKey { verifier, redirectUri, refreshToken }
@@ -50,8 +53,18 @@ enum SymptomLabel { unknown, ok, defect }
 
 enum TimeseriesDataLabel { unknown, norm, anomaly }
 
+enum DatasetType { obd, timeseries, symptom, unknown }
+
 enum PicoscopeLabel { unknown, norm, anomaly }
 
 enum TimeseriesType { oscillogram }
 
-enum DatasetType { obd, omniscope, unknown }
+enum StateMachineEvent {
+  stateTransition,
+  retrievedDataSet,
+  heatmaps,
+  causalGraphVisualizations,
+  faultPaths,
+  diagnosisFailed,
+  unknown,
+}

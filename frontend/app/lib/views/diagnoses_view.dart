@@ -1,23 +1,26 @@
+import "dart:async";
+
 import "package:aw40_hub_frontend/data_sources/diagnosis_data_table_source.dart";
 import "package:aw40_hub_frontend/exceptions/exceptions.dart";
-import "package:aw40_hub_frontend/models/case_model.dart";
 import "package:aw40_hub_frontend/models/diagnosis_model.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/utils/utils.dart";
 import "package:aw40_hub_frontend/views/diagnosis_detail_view.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
+import "package:logging/logging.dart";
 import "package:provider/provider.dart";
 
 class DiagnosesView extends StatelessWidget {
   const DiagnosesView({super.key, this.diagnosisId});
+
   final String? diagnosisId;
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       // ignore: discarded_futures
-      future: _getDiagnoses(context),
+      future: Provider.of<DiagnosisProvider>(context).getDiagnoses(),
       builder:
           (BuildContext context, AsyncSnapshot<List<DiagnosisModel>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
@@ -34,7 +37,7 @@ class DiagnosesView extends StatelessWidget {
               ? 0
               : _getDiagnosisIndexFromId(diagnosisModels, diagnosisId!);
 
-          return DesktopDiagnosisView(
+          return DesktopDiagnosesView(
             diagnosisModels: diagnosisModels,
             initialDiagnosisIndex: initialDiagnosisIndex,
           );
@@ -54,22 +57,10 @@ class DiagnosesView extends StatelessWidget {
     final diagnosisIndex = models.indexWhere((d) => d.id == id);
     return diagnosisIndex == -1 ? 0 : diagnosisIndex;
   }
-
-  static Future<List<DiagnosisModel>> _getDiagnoses(
-    BuildContext context,
-  ) async {
-    final caseProvider = Provider.of<CaseProvider>(context);
-    final diagnosisProvider = Provider.of<DiagnosisProvider>(context);
-    final List<CaseModel> caseModels = await caseProvider.getCurrentCases();
-    final Future<List<DiagnosisModel>> diagnoses =
-        diagnosisProvider.getDiagnoses(caseModels);
-
-    return diagnoses;
-  }
 }
 
-class DesktopDiagnosisView extends StatefulWidget {
-  const DesktopDiagnosisView({
+class DesktopDiagnosesView extends StatefulWidget {
+  const DesktopDiagnosesView({
     required this.diagnosisModels,
     required this.initialDiagnosisIndex,
     super.key,
@@ -79,11 +70,54 @@ class DesktopDiagnosisView extends StatefulWidget {
   final int initialDiagnosisIndex;
 
   @override
-  State<DesktopDiagnosisView> createState() => _DesktopDiagnosisViewState();
+  State<DesktopDiagnosesView> createState() => _DesktopDiagnosesViewState();
 }
 
-class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
+class _DesktopDiagnosesViewState extends State<DesktopDiagnosesView> {
   int? currentDiagnosisIndex;
+  Timer? _timer;
+  final Logger _logger = Logger("DesktopDiagnosesView");
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(
+      const Duration(seconds: 3),
+      (_) async => _checkForUpdates(),
+    );
+  }
+
+  Future<void> _checkForUpdates() async {
+    final provider = Provider.of<DiagnosisProvider>(context, listen: false);
+    final List<DiagnosisModel> models = widget.diagnosisModels;
+
+    final Map<int, DiagnosisModel> updates = {};
+    for (int i = 0; i < models.length; i++) {
+      final DiagnosisModel oldModel = models[i];
+      final DiagnosisModel? newModel =
+          await provider.getDiagnosis(oldModel.caseId);
+      if (newModel == null) {
+        _logger.warning(
+          "Could not fetch diagnosis with id ${oldModel.id}."
+          " This is likely a mistake in the backend."
+          " The frontend does not handle this error, please reload.",
+        );
+        continue;
+      }
+      if (newModel.status != oldModel.status) updates[i] = newModel;
+    }
+    setState(() => updates.forEach((i, model) => models[i] = model));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,56 +130,58 @@ class _DesktopDiagnosisViewState extends State<DesktopDiagnosisView> {
           style: Theme.of(context).textTheme.displaySmall,
         ),
       );
-    } else {
-      return Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: SingleChildScrollView(
-              child: PaginatedDataTable(
-                source: DiagnosisDataTableSource(
-                  themeData: Theme.of(context),
-                  currentIndex: currentDiagnosisIndex,
-                  diagnosisModels: widget.diagnosisModels,
-                  onPressedRow: (int i) =>
-                      setState(() => currentDiagnosisIndex = i),
-                ),
-                showCheckboxColumn: false,
-                rowsPerPage: 50,
-                columns: [
-                  DataColumn(
-                    label: Expanded(
-                      child: Text(tr("general.id")),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Expanded(
-                      child: Text(tr("general.status")),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Expanded(
-                      child: Text(tr("general.case")),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Expanded(
-                      child: Text(tr("general.date")),
-                    ),
-                  ),
-                ],
+    }
+
+    return Row(
+      children: [
+        Expanded(
+          flex: 3,
+          child: SingleChildScrollView(
+            child: PaginatedDataTable(
+              source: DiagnosisDataTableSource(
+                themeData: Theme.of(context),
+                currentIndex: currentDiagnosisIndex,
+                diagnosisModels: widget.diagnosisModels,
+                onPressedRow: (int i) =>
+                    setState(() => currentDiagnosisIndex = i),
               ),
+              showCheckboxColumn: false,
+              rowsPerPage: 50,
+              columns: [
+                DataColumn(
+                  label: Expanded(
+                    child: Text(tr("general.id")),
+                  ),
+                ),
+                DataColumn(
+                  label: Expanded(
+                    child: Text(tr("general.status")),
+                  ),
+                ),
+                DataColumn(
+                  label: Expanded(
+                    child: Text(tr("general.case")),
+                  ),
+                ),
+                DataColumn(
+                  label: Expanded(
+                    child: Text(tr("general.date")),
+                  ),
+                ),
+              ],
             ),
           ),
-          if (widget.diagnosisModels.isNotEmpty)
-            Expanded(
-              flex: 2,
-              child: DiagnosisDetailView(
-                diagnosisModel: widget.diagnosisModels[currentDiagnosisIndex!],
-              ),
+        ),
+        // MRU: I don't think this check is necessary, but maybe someone added
+        // it for a reason. I'm too afraid to remove it.
+        if (widget.diagnosisModels.isNotEmpty)
+          Expanded(
+            flex: 2,
+            child: DiagnosisDetailView(
+              diagnosisModel: widget.diagnosisModels[currentDiagnosisIndex!],
             ),
-        ],
-      );
-    }
+          ),
+      ],
+    );
   }
 }
