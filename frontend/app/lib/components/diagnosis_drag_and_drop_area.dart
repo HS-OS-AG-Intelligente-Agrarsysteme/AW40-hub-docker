@@ -18,19 +18,13 @@ import "package:provider/provider.dart";
 
 class DiagnosisDragAndDropArea extends StatefulWidget {
   const DiagnosisDragAndDropArea({
-    //required this.onDragDone,
-    //required this.onUploadFile,
     required this.diagnosisModel,
-    required this.fileName,
     required this.todos,
     super.key,
   });
 
-  final String? fileName;
   final DiagnosisModel diagnosisModel;
 
-  //final void Function(DropDoneDetails) onDragDone;
-  //final void Function() onUploadFile;
   final List<ActionModel> todos;
 
   @override

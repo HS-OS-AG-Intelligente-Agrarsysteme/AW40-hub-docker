@@ -7,7 +7,6 @@ import "package:aw40_hub_frontend/services/services.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:aw40_hub_frontend/utils/extensions.dart";
 import "package:collection/collection.dart";
-import "package:cross_file/cross_file.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:logging/logging.dart";
@@ -26,7 +25,6 @@ class DiagnosisDetailView extends StatefulWidget {
 }
 
 class _DiagnosisDetailView extends State<DiagnosisDetailView> {
-  XFile? _file;
   final Logger _logger = Logger("diagnosis detail view");
 
   @override
@@ -101,10 +99,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                     ),
                     if (status == DiagnosisStatus.action_required)
                       DiagnosisDragAndDropArea(
-                        fileName: _file?.name,
                         diagnosisModel: widget.diagnosisModel,
-                        //onUploadFile: _uploadFile,
-                        //onDragDone: _onDragDone,
                         todos: widget.diagnosisModel.todos,
                       ),
                   ],
