@@ -73,10 +73,10 @@ class HelperService {
     }
   }
 
-  static Color getDiagnosisStatusContainerColor(
-    ColorScheme colorScheme,
-    DiagnosisStatus diagnosisStatus,
-  ) {
+  static Color getDiagnosisStatusIconColor(
+      ColorScheme colorScheme,
+      DiagnosisStatus diagnosisStatus,
+      ) {
     switch (diagnosisStatus) {
       case DiagnosisStatus.scheduled:
         return colorScheme.onBackground;
@@ -91,20 +91,39 @@ class HelperService {
     }
   }
 
+  static Color getDiagnosisStatusContainerColor(
+    ColorScheme colorScheme,
+    DiagnosisStatus diagnosisStatus,
+  ) {
+    switch (diagnosisStatus) {
+      case DiagnosisStatus.scheduled:
+        return colorScheme.onBackground;
+      case DiagnosisStatus.processing:
+        return colorScheme.primaryContainer;
+      case DiagnosisStatus.finished:
+        return colorScheme.secondaryContainer;
+      case DiagnosisStatus.action_required:
+        return colorScheme.tertiaryContainer;
+      case DiagnosisStatus.failed:
+        return colorScheme.errorContainer;
+    }
+  }
+
   static Color getDiagnosisStatusOnContainerColor(
     ColorScheme colorScheme,
     DiagnosisStatus diagnosisStatus,
   ) {
     switch (diagnosisStatus) {
-      case DiagnosisStatus.processing:
       case DiagnosisStatus.scheduled:
-        return colorScheme.onPrimary;
+        return colorScheme.background;
+      case DiagnosisStatus.processing:
+        return colorScheme.onPrimaryContainer;
       case DiagnosisStatus.finished:
-        return colorScheme.onSecondary;
+        return colorScheme.onSecondaryContainer;
       case DiagnosisStatus.action_required:
-        return colorScheme.onTertiary;
+        return colorScheme.onTertiaryContainer;
       case DiagnosisStatus.failed:
-        return colorScheme.onError;
+        return colorScheme.onErrorContainer;
     }
   }
 

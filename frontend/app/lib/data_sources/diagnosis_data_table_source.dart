@@ -26,7 +26,7 @@ class DiagnosisDataTableSource extends DataTableSource {
             message: tr("diagnoses.status.${diagnosisStatus.name}"),
             child: Icon(
               HelperService.getDiagnosisStatusIconData(diagnosisStatus),
-              color: HelperService.getDiagnosisStatusContainerColor(
+              color: HelperService.getDiagnosisStatusIconColor(
                 themeData.colorScheme,
                 diagnosisStatus,
               ),
