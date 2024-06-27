@@ -190,7 +190,7 @@ class MockHttpService implements HttpService {
       [
         ActionDto(
           "1",
-          "some instruction",
+          "Upload OBD data.",
           "some action type",
           DatasetType.obd,
           "some component",
@@ -207,7 +207,7 @@ class MockHttpService implements HttpService {
       [
         ActionDto(
           "1",
-          "some instruction",
+          "Upload Timeseries data.",
           "some action type",
           DatasetType.timeseries,
           "some component",
@@ -225,7 +225,7 @@ class MockHttpService implements HttpService {
         ActionDto(
           "1",
           "some instruction",
-          "some action type",
+          "Upload Symptom data.",
           DatasetType.symptom,
           "some component",
         ),
