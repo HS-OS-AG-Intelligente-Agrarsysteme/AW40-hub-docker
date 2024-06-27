@@ -69,6 +69,11 @@ diagnoses:
     uploadDataSuccessMessage: "The data has been uploaded successfully."
     uploadDataErrorMessage: "The data could not be uploaded."
     noFaultPathFound: "No fault path found"
+  todos:
+    noTodosFound: "No todos found"
+    noTodosFoundDescription: "The diagnosis has status action_required, but no associated todos. This is likely a mistake in the backend.",
+    unknownDatasetType: "Unknown data type"
+    unknownDatasetTypeDescription: "The diagnosis has status action_required, but the data type is unknown. This is likely a mistake in the backend."
 cases:
   title: "Cases"
   actions:
@@ -117,5 +122,5 @@ training:
   title: "Training"
 pageNotFound:
   title: "Page @:general.notFound"
-noAuthorization :
+noAuthorization:
   title: "No Authorization"
