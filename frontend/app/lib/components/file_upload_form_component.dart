@@ -1,18 +1,22 @@
+import "dart:typed_data";
+
 import "package:collection/collection.dart";
 import "package:cross_file/cross_file.dart";
 import "package:desktop_drop/desktop_drop.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
+import "package:logging/logging.dart";
 
 class FileUploadFormComponent extends StatelessWidget {
-  const FileUploadFormComponent({required this.onFileDrop, super.key});
+  FileUploadFormComponent({required this.onFileDrop, super.key});
 
-  final void Function(XFile) onFileDrop;
+  final Logger _logger = Logger("FileUploadFormComponent");
+  final void Function(Uint8List) onFileDrop;
 
   @override
   Widget build(BuildContext context) {
     return DropTarget(
-      onDragDone: (DropDoneDetails details) {
+      onDragDone: (DropDoneDetails details) async {
         final XFile? file = details.files.firstOrNull;
         if (file == null) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -22,7 +26,14 @@ class FileUploadFormComponent extends StatelessWidget {
           );
           return;
         }
-        onFileDrop(file);
+        Uint8List bytes;
+        try {
+          bytes = await file.readAsBytes();
+        } on Exception catch (e) {
+          _logger.severe("Could not read file as bytes.", e);
+          return;
+        }
+        onFileDrop(bytes);
       },
       child: Container(
         alignment: Alignment.center,
