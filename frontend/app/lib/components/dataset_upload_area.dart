@@ -53,8 +53,7 @@ class _DatasetUploadAreaState extends State<DatasetUploadArea> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildChild() {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     final DatasetType? datasetType = widget.todos.firstOrNull?.dataType;
@@ -76,6 +75,7 @@ class _DatasetUploadAreaState extends State<DatasetUploadArea> {
                 setState(() => selectedObdFormat = newSelection.first);
               },
             ),
+            const SizedBox(height: 16),
             _getObdUploadForm(selectedObdFormat)
           ],
         );
@@ -95,6 +95,7 @@ class _DatasetUploadAreaState extends State<DatasetUploadArea> {
                 setState(() => selectedTimeseriesFormat = newSelection.first);
               },
             ),
+            const SizedBox(height: 16),
             Container(
               height: 400,
               decoration: BoxDecoration(
@@ -136,6 +137,14 @@ class _DatasetUploadAreaState extends State<DatasetUploadArea> {
           ),
         ),
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal:68, vertical: 16),
+      child: _buildChild(),
     );
   }
 }
