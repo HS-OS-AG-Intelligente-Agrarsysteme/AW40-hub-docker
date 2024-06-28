@@ -16,25 +16,7 @@ class FileUploadFormComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropTarget(
-      onDragDone: (DropDoneDetails details) async {
-        final XFile? file = details.files.firstOrNull;
-        if (file == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(tr("diagnoses.details.dropFileError")),
-            ),
-          );
-          return;
-        }
-        Uint8List bytes;
-        try {
-          bytes = await file.readAsBytes();
-        } on Exception catch (e) {
-          _logger.severe("Could not read file as bytes.", e);
-          return;
-        }
-        onFileDrop(bytes);
-      },
+      onDragDone: (details) async => _onDragDone(details, context),
       child: Container(
         alignment: Alignment.center,
         color: Colors.grey[200],
@@ -43,5 +25,26 @@ class FileUploadFormComponent extends StatelessWidget {
         child: const Text("Drop file here"),
       ),
     );
+  }
+
+  Future<void> _onDragDone(
+    DropDoneDetails details,
+    BuildContext context,
+  ) async {
+    final XFile? file = details.files.firstOrNull;
+    if (file == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(tr("diagnoses.details.dropFileError"))),
+      );
+      return;
+    }
+    Uint8List bytes;
+    try {
+      bytes = await file.readAsBytes();
+    } on Exception catch (e) {
+      _logger.severe("Could not read file as bytes.", e);
+      return;
+    }
+    onFileDrop(bytes);
   }
 }
