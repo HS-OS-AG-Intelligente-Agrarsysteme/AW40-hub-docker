@@ -40,9 +40,16 @@ class _FileUploadAreaState extends State<FileUploadArea> {
   XFile? _file;
   TimeseriesFormat selectedTimeseriesFormat = TimeseriesFormat.timeseries;
 
-  final TextEditingController _componentController = TextEditingController();
-  final TextEditingController _samplingRateController = TextEditingController();
-  final TextEditingController _durationController = TextEditingController();
+  Widget _getTimeseriesUploadForm(TimeseriesFormat format) {
+    switch (format) {
+      case TimeseriesFormat.timeseries:
+        return const UploadTimeseriesForm();
+      case TimeseriesFormat.picoscope:
+        return const UploadPicoscopeForm();
+      case TimeseriesFormat.omniview:
+        return const UploadOmniviewForm();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,16 +95,7 @@ class _FileUploadAreaState extends State<FileUploadArea> {
                   width: 2,
                 ),
               ),
-              child: () {
-                switch (selectedTimeseriesFormat) {
-                  case TimeseriesFormat.timeseries:
-                    return const UploadTimeseriesForm();
-                  case TimeseriesFormat.picoscope:
-                    return const UploadPicoscopeForm();
-                  case TimeseriesFormat.omniview:
-                    return const UploadOmniviewForm();
-                }
-              }(),
+              child: _getTimeseriesUploadForm(selectedTimeseriesFormat),
             )
           ],
         );
