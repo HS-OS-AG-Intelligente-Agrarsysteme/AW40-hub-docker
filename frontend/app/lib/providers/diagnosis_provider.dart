@@ -106,7 +106,6 @@ class DiagnosisProvider with ChangeNotifier {
       _logger,
     );
     if (!verifyStatusCode) return false;
-    notifyListeners();
     return true;
   }
 
