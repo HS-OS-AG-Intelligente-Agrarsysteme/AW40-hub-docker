@@ -19,6 +19,8 @@ class DiagnosisProvider with ChangeNotifier {
   final Logger _logger = Logger("diagnosis_provider");
   late final String workShopId;
   String? _authToken;
+  /// The caseId of the diagnosis whose detail view was last shown.
+  late String diagnosisCaseId;
 
   Future<List<DiagnosisModel>> getDiagnoses() async {
     final String authToken = _getAuthToken();

@@ -31,6 +31,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
 
   @override
   Widget build(BuildContext context) {
+    _updateCaseId();
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
     final DiagnosisStatus status = widget.diagnosisModel.status;
@@ -124,6 +125,13 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
         ),
       ),
     );
+  }
+
+  void _updateCaseId() {
+    Provider.of<DiagnosisProvider>(
+      context,
+      listen: false,
+    ).diagnosisCaseId = widget.diagnosisModel.caseId;
   }
 
   Text? get _getSubtitle {
