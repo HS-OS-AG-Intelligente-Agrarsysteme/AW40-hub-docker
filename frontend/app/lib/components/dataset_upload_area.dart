@@ -143,7 +143,7 @@ class _DatasetUploadAreaState extends State<DatasetUploadArea> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal:68, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 68, vertical: 16),
       child: _buildChild(),
     );
   }

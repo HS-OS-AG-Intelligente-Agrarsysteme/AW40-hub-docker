@@ -25,6 +25,7 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
+              // ignore: no_runtimeType_tostring
               runtimeType.toString(),
               style: Theme.of(context).textTheme.headlineSmall,
             ),
