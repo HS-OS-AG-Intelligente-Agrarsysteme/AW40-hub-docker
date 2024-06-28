@@ -89,6 +89,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                 color: diagnosisStatusContainerColor,
                 child: Column(
                   children: [
+                    // State icon, name, description.
                     ListTile(
                       leading: Icon(diagnosisStatusIconData),
                       title: Text(
@@ -98,6 +99,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                       textColor: diagnosisStatusOnContainerColor,
                       iconColor: diagnosisStatusOnContainerColor,
                     ),
+                    // If diagnosis requires file upload, show FileUploadArea.
                     if (status == DiagnosisStatus.action_required)
                       FileUploadArea(
                         caseId: widget.diagnosisModel.caseId,
