@@ -17,15 +17,16 @@ class DiagnosisProvider with ChangeNotifier {
   final HttpService _httpService;
 
   final Logger _logger = Logger("diagnosis_provider");
-  late final String workShopId;
+  late final String workshopId;
   String? _authToken;
+
   /// The caseId of the diagnosis whose detail view was last shown.
   late String diagnosisCaseId;
 
   Future<List<DiagnosisModel>> getDiagnoses() async {
     final String authToken = _getAuthToken();
     final Response response =
-        await _httpService.getDiagnoses(authToken, workShopId);
+        await _httpService.getDiagnoses(authToken, workshopId);
     if (response.statusCode != 200) {
       _logger.warning(
         "Could not get diagnoses. "
@@ -44,7 +45,7 @@ class DiagnosisProvider with ChangeNotifier {
   Future<DiagnosisModel?> getDiagnosis(String caseId) async {
     final String authToken = _getAuthToken();
     final Response response =
-        await _httpService.getDiagnosis(authToken, workShopId, caseId);
+        await _httpService.getDiagnosis(authToken, workshopId, caseId);
     if (response.statusCode == 404) return null;
     final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
@@ -60,7 +61,7 @@ class DiagnosisProvider with ChangeNotifier {
   Future<DiagnosisModel?> startDiagnosis(String caseId) async {
     final String authToken = _getAuthToken();
     final Response response =
-        await _httpService.startDiagnosis(authToken, workShopId, caseId);
+        await _httpService.startDiagnosis(authToken, workshopId, caseId);
     final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       201,
@@ -76,7 +77,7 @@ class DiagnosisProvider with ChangeNotifier {
   Future<bool> deleteDiagnosis(String caseId) async {
     final String authToken = _getAuthToken();
     final Response response =
-        await _httpService.deleteDiagnosis(authToken, workShopId, caseId);
+        await _httpService.deleteDiagnosis(authToken, workshopId, caseId);
     final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       200,
@@ -94,7 +95,7 @@ class DiagnosisProvider with ChangeNotifier {
     final Map<String, dynamic> obdDataJson = obdDataDto.toJson();
     final Response response = await _httpService.uploadObdData(
       authToken,
-      workShopId,
+      workshopId,
       caseId,
       obdDataJson,
     );
@@ -113,7 +114,7 @@ class DiagnosisProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response = await _httpService.uploadVcdsData(
       authToken,
-      workShopId,
+      workshopId,
       caseId,
       vcdsData,
     );
@@ -134,7 +135,7 @@ class DiagnosisProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response = await _httpService.uploadPicoscopeData(
       authToken,
-      workShopId,
+      workshopId,
       caseId,
       picoscopeData,
       filename,
@@ -163,7 +164,7 @@ class DiagnosisProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response = await _httpService.uploadOmniviewData(
       authToken,
-      workShopId,
+      workshopId,
       caseId,
       component,
       samplingRate,
@@ -191,7 +192,7 @@ class DiagnosisProvider with ChangeNotifier {
     final Map<String, dynamic> symptomDataJson = symptomDto.toJson();
     final Response response = await _httpService.uploadSymptomData(
       authToken,
-      workShopId,
+      workshopId,
       caseId,
       symptomDataJson,
     );

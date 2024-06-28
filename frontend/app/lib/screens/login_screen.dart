@@ -123,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     final String workShopId = authProvider.loggedInUser.workShopId;
     caseProvider.workShopId = workShopId;
-    diagnosisProvider.workShopId = workShopId;
+    diagnosisProvider.workshopId = workShopId;
   }
 
   Future<void> _webGoToKeyCloakLogin() async {
