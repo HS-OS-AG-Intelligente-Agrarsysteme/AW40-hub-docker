@@ -87,6 +87,6 @@ enum StateMachineEvent {
   unknown,
 }
 
-enum ObdUploadFormats { obd, vcds }
+enum ObdFormat { obd, vcds }
 
 enum TimeseriesFormat { timeseries, omniview, picoscope }
