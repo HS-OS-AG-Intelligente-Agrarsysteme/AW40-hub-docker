@@ -27,12 +27,12 @@ class DiagnosisDetailView extends StatefulWidget {
 
 class _DiagnosisDetailView extends State<DiagnosisDetailView> {
   final Logger _logger = Logger("diagnosis detail view");
+  static const double _spacing = 16;
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme colorScheme = theme.colorScheme;
-    final TextTheme textTheme = theme.textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
     final DiagnosisStatus status = widget.diagnosisModel.status;
 
     final diagnosisStatusContainerColor =
@@ -52,7 +52,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     return SizedBox.expand(
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(_spacing),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -77,13 +77,13 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: _spacing),
               // Case ID
               Text(
                 "${tr('general.case')}: ${widget.diagnosisModel.caseId}",
                 style: textTheme.titleMedium,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: _spacing),
               // Coloured card for current State
               Card(
                 color: diagnosisStatusContainerColor,
@@ -108,7 +108,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: _spacing),
               // State Machine Log
               Expanded(
                 child: widget.diagnosisModel.stateMachineLog.isEmpty
