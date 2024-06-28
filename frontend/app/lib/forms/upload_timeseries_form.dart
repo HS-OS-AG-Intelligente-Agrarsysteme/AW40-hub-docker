@@ -8,6 +8,8 @@ class UploadTimeseriesForm extends StatefulWidget {
 }
 
 class _UploadTimeseriesFormState extends State<UploadTimeseriesForm> {
+  bool _isChecked = false;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -19,9 +21,21 @@ class _UploadTimeseriesFormState extends State<UploadTimeseriesForm> {
         ),
       ),
       child: Center(
-        child: Text(
-          "UploadTimeseriesForm",
-          style: Theme.of(context).textTheme.headlineSmall,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              runtimeType.toString(),
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            Checkbox(
+              value: _isChecked,
+              onChanged: (v) {
+                if (v == null) return;
+                setState(() => _isChecked = v);
+              },
+            ),
+          ],
         ),
       ),
     );

@@ -2,6 +2,9 @@ import "dart:convert";
 
 import "package:aw40_hub_frontend/dtos/dtos.dart";
 import "package:aw40_hub_frontend/exceptions/exceptions.dart";
+import "package:aw40_hub_frontend/forms/upload_omniview_form.dart";
+import "package:aw40_hub_frontend/forms/upload_picoscope_form.dart";
+import "package:aw40_hub_frontend/forms/upload_timeseries_form.dart";
 import "package:aw40_hub_frontend/models/action_model.dart";
 import "package:aw40_hub_frontend/providers/providers.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";

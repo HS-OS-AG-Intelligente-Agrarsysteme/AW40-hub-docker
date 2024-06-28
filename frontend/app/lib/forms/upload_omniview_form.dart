@@ -8,6 +8,8 @@ class UploadOmniviewForm extends StatefulWidget {
 }
 
 class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
+  bool _isChecked = false;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -19,9 +21,21 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
         ),
       ),
       child: Center(
-        child: Text(
-          "UploadOmniviewForm",
-          style: Theme.of(context).textTheme.headlineSmall,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              runtimeType.toString(),
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            Checkbox(
+              value: _isChecked,
+              onChanged: (v) {
+                if (v == null) return;
+                setState(() => _isChecked = v);
+              },
+            ),
+          ],
         ),
       ),
     );
