@@ -12,8 +12,8 @@ import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:logging/logging.dart";
 
-class FileUploadArea extends StatefulWidget {
-  const FileUploadArea({
+class DatasetUploadArea extends StatefulWidget {
+  const DatasetUploadArea({
     required this.caseId,
     required this.todos,
     super.key,
@@ -24,10 +24,10 @@ class FileUploadArea extends StatefulWidget {
   final List<ActionModel> todos;
 
   @override
-  State<FileUploadArea> createState() => _FileUploadAreaState();
+  State<DatasetUploadArea> createState() => _DatasetUploadAreaState();
 }
 
-class _FileUploadAreaState extends State<FileUploadArea> {
+class _DatasetUploadAreaState extends State<DatasetUploadArea> {
   // ignore: unused_field
   final Logger _logger = Logger("diagnosis detail view");
   TimeseriesFormat selectedTimeseriesFormat = TimeseriesFormat.timeseries;
