@@ -124,19 +124,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     );
   }
 
-  /*void _onDragDone(DropDoneDetails dropDoneDetails) {
-    setState(() {
-      final files = dropDoneDetails.files;
-      if (files.isEmpty) {
-        throw AppException(
-          exceptionType: ExceptionType.unexpectedNullValue,
-          exceptionMessage: "`dropDoneDetails.files` is empty.",
-        );
-      }
-      _file = files.first;
-    });
-  }*/
-
   Text? get _getSubtitle {
     final DiagnosisStatus status = widget.diagnosisModel.status;
     switch (status) {
@@ -174,67 +161,6 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     return null;
   }
 
-  /*Future<void> _uploadFile() async {
-    final ScaffoldMessengerState scaffoldMessengerState =
-        ScaffoldMessenger.of(context);
-    final diagnosisProvider = Provider.of<DiagnosisProvider>(
-      context,
-      listen: false,
-    );
-
-    try {
-      final XFile file = _file!;
-      final String fileContent = await file.readAsString();
-      bool result = false;
-
-      switch (widget.diagnosisModel.todos.first.dataType) {
-        case DatasetType.obd:
-          final Map<String, dynamic> jsonMap = jsonDecode(fileContent);
-          final NewOBDDataDto newOBDDataDto = NewOBDDataDto.fromJson(jsonMap);
-
-          result = await diagnosisProvider.uploadObdData(
-            widget.diagnosisModel.caseId,
-            newOBDDataDto,
-          );
-          break;
-        case DatasetType.timeseries:
-          final List<int> byteData = utf8.encode(fileContent);
-          result = await diagnosisProvider.uploadPicoscopeData(
-            widget.diagnosisModel.caseId,
-            byteData,
-            file.name,
-          );
-          break;
-        case DatasetType.symptom:
-          final Map<String, dynamic> jsonMap = jsonDecode(fileContent);
-          final NewSymptomDto newSymptomDto = NewSymptomDto.fromJson(jsonMap);
-
-          result = await diagnosisProvider.uploadSymptomData(
-            widget.diagnosisModel.caseId,
-            newSymptomDto,
-          );
-          break;
-      }
-
-      _showMessage(
-        result
-            ? tr("diagnoses.details.uploadDataSuccessMessage")
-            : tr("diagnoses.details.uploadDataErrorMessage"),
-        scaffoldMessengerState,
-      );
-      // ignore: avoid_catches_without_on_clauses
-    } catch (e) {
-      _logger.info("Exception during file upload: $e");
-      _showMessage(
-        tr("diagnoses.details.uploadObdDataErrorMessage"),
-        scaffoldMessengerState,
-      );
-    }
-  }*/
-
-//***
-// ab hier ist doppelt
-//***
   static Future<bool?> _showConfirmDeleteDialog(BuildContext context) {
     return showDialog<bool>(
       context: context,
