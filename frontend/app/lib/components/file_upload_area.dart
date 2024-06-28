@@ -85,9 +85,16 @@ class _FileUploadAreaState extends State<FileUploadArea> {
                   width: 2,
                 ),
               ),
-              child: Center(
-                child: Text("${selectedTimeseriesFormat.name} form goes here."),
-              ),
+              child: () {
+                switch (selectedTimeseriesFormat) {
+                  case TimeseriesFormat.timeseries:
+                    return const UploadTimeseriesForm();
+                  case TimeseriesFormat.picoscope:
+                    return const UploadPicoscopeForm();
+                  case TimeseriesFormat.omniview:
+                    return const UploadOmniviewForm();
+                }
+              }(),
             )
           ],
         );
