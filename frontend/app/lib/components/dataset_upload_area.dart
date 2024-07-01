@@ -96,16 +96,7 @@ class _DatasetUploadAreaState extends State<DatasetUploadArea> {
               },
             ),
             const SizedBox(height: 16),
-            Container(
-              height: 400,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: colorScheme.onTertiaryContainer,
-                  width: 2,
-                ),
-              ),
-              child: _getTimeseriesUploadForm(selectedTimeseriesFormat),
-            )
+            _getTimeseriesUploadForm(selectedTimeseriesFormat),
           ],
         );
       case DatasetType.symptom:
