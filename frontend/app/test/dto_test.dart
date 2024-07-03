@@ -1,7 +1,23 @@
-import "package:aw40_hub_frontend/dtos/dtos.dart";
+import "package:aw40_hub_frontend/dtos/action_dto.dart";
+import "package:aw40_hub_frontend/dtos/case_dto.dart";
+import "package:aw40_hub_frontend/dtos/case_update_dto.dart";
+import "package:aw40_hub_frontend/dtos/diagnosis_dto.dart";
+import "package:aw40_hub_frontend/dtos/new_case_dto.dart";
+import "package:aw40_hub_frontend/dtos/new_obd_data_dto.dart";
+import "package:aw40_hub_frontend/dtos/new_symptom_dto.dart";
+import "package:aw40_hub_frontend/dtos/new_timeseries_data_dto.dart";
+import "package:aw40_hub_frontend/dtos/obd_data_dto.dart";
 import "package:aw40_hub_frontend/dtos/state_machine_log_entry_dto.dart";
-import "package:aw40_hub_frontend/models/models.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/dtos/symptom_dto.dart";
+import "package:aw40_hub_frontend/dtos/timeseries_data_dto.dart";
+import "package:aw40_hub_frontend/models/action_model.dart";
+import "package:aw40_hub_frontend/models/case_model.dart";
+import "package:aw40_hub_frontend/models/diagnosis_model.dart";
+import "package:aw40_hub_frontend/models/obd_data_model.dart";
+import "package:aw40_hub_frontend/models/state_machine_log_entry_model.dart";
+import "package:aw40_hub_frontend/models/symptom_model.dart";
+import "package:aw40_hub_frontend/models/timeseries_data_model.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter_test/flutter_test.dart";
 
 void main() {

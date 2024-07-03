@@ -1,8 +1,9 @@
-import "package:aw40_hub_frontend/configs/configs.dart";
+import "package:aw40_hub_frontend/configs/localization_config.dart";
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
-import "package:aw40_hub_frontend/providers/providers.dart";
-import "package:aw40_hub_frontend/services/services.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/providers/auth_provider.dart";
+import "package:aw40_hub_frontend/providers/theme_provider.dart";
+import "package:aw40_hub_frontend/services/localization_service.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";

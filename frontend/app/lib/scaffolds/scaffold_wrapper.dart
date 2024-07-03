@@ -1,11 +1,15 @@
 import "dart:async";
 
-import "package:aw40_hub_frontend/dialogs/dialogs.dart";
-import "package:aw40_hub_frontend/dtos/dtos.dart";
-import "package:aw40_hub_frontend/models/models.dart";
-import "package:aw40_hub_frontend/providers/providers.dart";
-import "package:aw40_hub_frontend/scaffolds/scaffolds.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/dialogs/add_case_dialog.dart";
+import "package:aw40_hub_frontend/dialogs/filter_cases_dialog.dart";
+import "package:aw40_hub_frontend/dtos/new_case_dto.dart";
+import "package:aw40_hub_frontend/models/logged_in_user_model.dart";
+import "package:aw40_hub_frontend/models/navigation_item_model.dart";
+import "package:aw40_hub_frontend/providers/auth_provider.dart";
+import "package:aw40_hub_frontend/providers/case_provider.dart";
+import "package:aw40_hub_frontend/scaffolds/desktop_scaffold.dart";
+import "package:aw40_hub_frontend/utils/constants.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:logging/logging.dart";

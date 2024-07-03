@@ -1,8 +1,15 @@
 import "dart:async";
 import "package:aw40_hub_frontend/dialogs/update_case_dialog.dart";
 import "package:aw40_hub_frontend/dtos/case_update_dto.dart";
-import "package:aw40_hub_frontend/models/models.dart";
-import "package:aw40_hub_frontend/providers/providers.dart";
+import "package:aw40_hub_frontend/models/case_model.dart";
+import "package:aw40_hub_frontend/models/diagnosis_model.dart";
+import "package:aw40_hub_frontend/models/logged_in_user_model.dart";
+import "package:aw40_hub_frontend/models/obd_data_model.dart";
+import "package:aw40_hub_frontend/models/symptom_model.dart";
+import "package:aw40_hub_frontend/models/timeseries_data_model.dart";
+import "package:aw40_hub_frontend/providers/auth_provider.dart";
+import "package:aw40_hub_frontend/providers/case_provider.dart";
+import "package:aw40_hub_frontend/providers/diagnosis_provider.dart";
 import "package:aw40_hub_frontend/utils/extensions.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";

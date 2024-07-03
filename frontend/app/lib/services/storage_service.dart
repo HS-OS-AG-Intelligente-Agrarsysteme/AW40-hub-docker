@@ -1,4 +1,4 @@
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:enum_to_string/enum_to_string.dart";
 import "package:flutter_secure_storage/flutter_secure_storage.dart";
 

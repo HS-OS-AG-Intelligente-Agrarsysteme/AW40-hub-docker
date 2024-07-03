@@ -1,4 +1,4 @@
-import "package:aw40_hub_frontend/text_input_formatters/text_input_formatters.dart";
+import "package:aw40_hub_frontend/text_input_formatters/upper_case_text_input_formatter.dart";
 import "package:flutter_test/flutter_test.dart";
 
 void main() {

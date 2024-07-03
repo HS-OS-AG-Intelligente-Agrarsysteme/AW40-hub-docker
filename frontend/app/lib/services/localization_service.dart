@@ -1,4 +1,4 @@
-import "package:aw40_hub_frontend/configs/configs.dart";
+import "package:aw40_hub_frontend/configs/localization_config.dart";
 import "package:collection/collection.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";

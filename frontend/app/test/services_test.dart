@@ -1,5 +1,8 @@
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
-import "package:aw40_hub_frontend/services/services.dart";
+import "package:aw40_hub_frontend/services/auth_service.dart";
+import "package:aw40_hub_frontend/services/config_service.dart";
+import "package:aw40_hub_frontend/services/helper_service.dart";
+import "package:aw40_hub_frontend/services/http_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:collection/collection.dart";
 import "package:enum_to_string/enum_to_string.dart";

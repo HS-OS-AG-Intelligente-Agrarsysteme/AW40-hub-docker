@@ -1,5 +1,6 @@
-import "package:aw40_hub_frontend/models/models.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/models/action_model.dart";
+import "package:aw40_hub_frontend/models/state_machine_log_entry_model.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 
 class DiagnosisModel {
   DiagnosisModel({
