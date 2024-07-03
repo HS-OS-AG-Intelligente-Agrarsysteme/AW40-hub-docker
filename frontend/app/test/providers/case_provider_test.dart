@@ -14,7 +14,7 @@ import "package:mockito/annotations.dart";
 import "package:mockito/mockito.dart";
 
 @GenerateNiceMocks([MockSpec<HttpService>(), MockSpec<AuthProvider>()])
-import "providers_test.mocks.dart";
+import "case_provider_test.mocks.dart";
 
 void main() {
   group("CaseProvider", () {
@@ -53,10 +53,10 @@ void main() {
     test("toggleShowSharedCases toggles showSharedCases", () async {
       final mockHttpService = MockHttpService();
       when(mockHttpService.getSharedCases(any)).thenAnswer(
-        (_) async => http.Response("[]", 200),
+            (_) async => http.Response("[]", 200),
       );
       when(mockHttpService.getCases(any, any)).thenAnswer(
-        (_) async => http.Response("[]", 200),
+            (_) async => http.Response("[]", 200),
       );
 
       final caseProvider = CaseProvider(mockHttpService);
@@ -68,11 +68,11 @@ void main() {
     group("getCurrentCases()", () {
       test(
         "getCurrentCases() calls HttpService.getSharedCases() "
-        "when showSharedCases=true",
-        () async {
+            "when showSharedCases=true",
+            () async {
           final mockHttpService = MockHttpService();
           when(mockHttpService.getSharedCases(any)).thenAnswer(
-            (_) async => http.Response("[]", 200),
+                (_) async => http.Response("[]", 200),
           );
           final caseProvider = CaseProvider(mockHttpService);
           await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
@@ -87,10 +87,10 @@ void main() {
       );
       test(
           "getCurrentCases() calls HttpService.getCases() "
-          "when showSharedCases=false", () async {
+              "when showSharedCases=false", () async {
         final mockHttpService = MockHttpService();
         when(mockHttpService.getCases(any, any)).thenAnswer(
-          (_) async => http.Response("[]", 200),
+              (_) async => http.Response("[]", 200),
         );
         final caseProvider = CaseProvider(mockHttpService);
         await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
@@ -110,7 +110,7 @@ void main() {
       test("calls HttpService.addCase()", () async {
         final mockHttpService = MockHttpService();
         when(mockHttpService.addCase(any, any, any)).thenAnswer(
-          (_) async => http.Response(jsonEncode(dummyCaseDtoJson), 201),
+              (_) async => http.Response(jsonEncode(dummyCaseDtoJson), 201),
         );
         final caseProvider = CaseProvider(mockHttpService);
         await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
@@ -123,114 +123,13 @@ void main() {
       test("calls HttpService.deleteCase()", () async {
         final mockHttpService = MockHttpService();
         when(mockHttpService.deleteCase(any, any, any)).thenAnswer(
-          (_) async => http.Response("{}", 201),
+              (_) async => http.Response("{}", 201),
         );
         final caseProvider = CaseProvider(mockHttpService);
         await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
         caseProvider.workShopId = "some_workshop_id";
         await caseProvider.deleteCase("some_case_id");
         verify(mockHttpService.deleteCase(any, any, any)).called(1);
-      });
-    });
-  });
-  group("DiagnosisProvider", () {
-    final mockAuthProvider = MockAuthProvider();
-    setUpAll(() async {
-      when(mockAuthProvider.getAuthToken())
-          .thenAnswer((_) async => "some_token");
-      await ConfigService().initialize();
-    });
-    group("getDiagnoses", () {
-      test("calls HttpService.getDiagnoses()", () async {
-        // Arrange.
-        final mockHttpService = MockHttpService();
-        when(mockHttpService.getDiagnoses(any, any)).thenAnswer(
-          (_) async => http.Response("[]", 200),
-        );
-        final diagnosisProvider = DiagnosisProvider(mockHttpService);
-        diagnosisProvider.workShopId = "some_workshop_id";
-        await diagnosisProvider.fetchAndSetAuthToken(mockAuthProvider);
-        // Act.
-        await diagnosisProvider.getDiagnoses();
-        // Assert.
-        verify(mockHttpService.getDiagnoses(any, any)).called(1);
-        verifyNoMoreInteractions(mockHttpService);
-      });
-      test("converts json response to List<DiagnosisModel>", () async {
-        // Arrange.
-        final mockHttpService = MockHttpService();
-        final timeStamp = DateTime(2023, 5, 17, 10, 52, 26);
-        const diagnosisStatus = DiagnosisStatus.scheduled;
-        const caseId = "some_case_id";
-        final List<Map<String, dynamic>> json = [
-          {
-            "_id": "some_id",
-            "timestamp": timeStamp.toIso8601String(),
-            "status": diagnosisStatus.name,
-            "case_id": caseId,
-            "state_machine_log": [],
-            "todos": [],
-          },
-        ];
-        when(mockHttpService.getDiagnoses(any, any)).thenAnswer(
-          (_) async => http.Response(jsonEncode(json), 200),
-        );
-        final diagnosisProvider = DiagnosisProvider(mockHttpService);
-        diagnosisProvider.workShopId = "some_workshop_id";
-        await diagnosisProvider.fetchAndSetAuthToken(mockAuthProvider);
-        // Act.
-        final List<DiagnosisModel> diagnoses =
-            await diagnosisProvider.getDiagnoses();
-        // Assert.
-        expect(
-          diagnoses.length,
-          equals(1),
-          reason: "should return one diagnosis",
-        );
-        final DiagnosisModel diagnosis = diagnoses[0];
-        expect(
-          diagnosis.id,
-          equals("some_id"),
-          reason: "should have correct id",
-        );
-        expect(
-          diagnosis.timestamp,
-          equals(timeStamp),
-          reason: "should have correct timestamp",
-        );
-        expect(
-          diagnosis.status,
-          equals(diagnosisStatus),
-          reason: "should have correct status",
-        );
-        expect(
-          diagnosis.caseId,
-          equals(caseId),
-          reason: "should have correct caseId",
-        );
-        expect(
-          diagnosis.stateMachineLog,
-          isEmpty,
-          reason: "should have empty stateMachineLog",
-        );
-        expect(diagnosis.todos, isEmpty, reason: "should have empty todos");
-      });
-      test("returns empty list when response is not a list", () async {
-        // Arrange.
-        final mockHttpService = MockHttpService();
-        when(mockHttpService.getDiagnoses(any, any)).thenAnswer(
-          (_) async => http.Response("{}", 200),
-        );
-        final diagnosisProvider = DiagnosisProvider(mockHttpService);
-        diagnosisProvider.workShopId = "some_workshop_id";
-        await diagnosisProvider.fetchAndSetAuthToken(mockAuthProvider);
-
-        // Act.
-        final List<DiagnosisModel> diagnoses =
-            await diagnosisProvider.getDiagnoses();
-
-        // Assert.
-        expect(diagnoses, isEmpty, reason: "should return empty list");
       });
     });
   });
