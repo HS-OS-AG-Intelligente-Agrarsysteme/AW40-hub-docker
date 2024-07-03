@@ -9,18 +9,6 @@ import "package:http/http.dart" as http;
 import "package:provider/provider.dart";
 
 void main() {
-  group("CasesScreen", () {
-    testWidgets("Returns one CasesView", (widgetTester) async {
-      await widgetTester.pumpWidget(
-        ChangeNotifierProvider<CaseProvider>(
-          create: (_) => CaseProvider(HttpService(http.Client())),
-          child: const CasesScreen(),
-        ),
-      );
-      final Finder casesViewFinder = find.byType(CasesView);
-      expect(casesViewFinder, findsOneWidget);
-    });
-  });
   group("PageNotFoundScreen", () {
     testWidgets("uses pageNotFound.title string", (widgetTester) async {
       await widgetTester.pumpWidget(
