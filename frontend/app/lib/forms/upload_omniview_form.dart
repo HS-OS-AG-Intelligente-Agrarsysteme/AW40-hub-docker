@@ -18,87 +18,82 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
   //final Logger _logger = Logger("UploadOmniviewForm");
   Uint8List? _file;
   String? _filename;
-  final TextEditingController _controllerFilename = TextEditingController();
   final TextEditingController _componentController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
   final TextEditingController _samplingRateController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return BaseUploadForm(
-      content: Column(
-        children: [
-          FileUploadFormComponent(onFileDrop: (Uint8List file, String name) {
-            _file = file;
-            _filename = name;
-          }),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _controllerFilename,
-            minLines: 1,
-            maxLines: null,
-            //keyboardType: TextInputType.multiline,
-            decoration: const InputDecoration(
-              labelText: "Filename",
-              hintText: "Enter a Filename.",
-              border: OutlineInputBorder(),
+    return Form(
+      key: _formKey,
+      child: BaseUploadForm(
+        content: Column(
+          children: [
+            FileUploadFormComponent(
+              onFileDrop: (Uint8List file, String name) {
+                _file = file;
+                _filename = name;
+              },
             ),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _componentController,
-            minLines: 1,
-            maxLines: null,
-            //keyboardType: TextInputType.multiline,
-            decoration: const InputDecoration(
-              labelText: "Components",
-              hintText: "Enter a Component.",
-              border: OutlineInputBorder(),
+            const SizedBox(height: 16),
+            TextFormField(
+              validator: _validation,
+              controller: _componentController,
+              minLines: 1,
+              maxLines: null,
+              //keyboardType: TextInputType.multiline,
+              decoration: const InputDecoration(
+                labelText: "Components",
+                hintText: "Enter a Component.",
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _durationController,
-            minLines: 1,
-            //keyboardType: TextInputType.multiline,
-            decoration: const InputDecoration(
-              labelText: "Duration",
-              hintText: "Enter a Duration.",
-              border: OutlineInputBorder(),
+            const SizedBox(height: 16),
+            TextFormField(
+              validator: _validation,
+              controller: _durationController,
+              minLines: 1,
+              //keyboardType: TextInputType.multiline,
+              decoration: const InputDecoration(
+                labelText: "Duration",
+                hintText: "Enter a Duration.",
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _samplingRateController,
-            minLines: 1,
-            //keyboardType: TextInputType.multiline,
-            decoration: const InputDecoration(
-              labelText: "Sampling Rate",
-              hintText: "Enter a Sampling Rate.",
-              border: OutlineInputBorder(),
+            const SizedBox(height: 16),
+            TextFormField(
+              validator: _validation,
+              controller: _samplingRateController,
+              minLines: 1,
+              //keyboardType: TextInputType.multiline,
+              decoration: const InputDecoration(
+                labelText: "Sampling Rate",
+                hintText: "Enter a Sampling Rate.",
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
+        onSubmit: _onSubmit,
       ),
-      onSubmit: _onSubmit,
     );
   }
 
+  String? _validation(String? value) {
+    if (value == null || value.isEmpty) {
+      return "Please enter some text";
+    }
+    return null;
+  }
+
   Future<void> _onSubmit() async {
+    if (!_formKey.currentState!.validate()) return;
+
     final provider = Provider.of<DiagnosisProvider>(context, listen: false);
     final messengerState = ScaffoldMessenger.of(context);
-
-    if (_controllerFilename.text.isEmpty ||
-        _componentController.text.isEmpty ||
-        _samplingRateController.text.isEmpty ||
-        _durationController.text.isEmpty) {
-      messengerState.showSnackBar(
-        SnackBar(content: Text(tr("Please fill in all fields."))),
-      );
-      return;
-    }
-
     final String? filename = _filename;
+
     if (filename == null) return;
     final String component = _componentController.text;
     final int? samplingRate = int.tryParse(_samplingRateController.text);
