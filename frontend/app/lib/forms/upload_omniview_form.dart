@@ -97,7 +97,9 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
       );
       return;
     }
-    final String filename = _controllerFilename.text;
+
+    final String? filename = _filename;
+    if (filename == null) return;
     final String component = _componentController.text;
     final int? samplingRate = int.tryParse(_samplingRateController.text);
     final int? duration = int.tryParse(_durationController.text);
