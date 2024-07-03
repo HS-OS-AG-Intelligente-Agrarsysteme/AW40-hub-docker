@@ -39,6 +39,7 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
             const SizedBox(height: 16),
             TextFormField(
               validator: _validation,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _componentController,
               minLines: 1,
               maxLines: null,
@@ -52,6 +53,7 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
             const SizedBox(height: 16),
             TextFormField(
               validator: _validation,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _durationController,
               minLines: 1,
               //keyboardType: TextInputType.multiline,
@@ -64,6 +66,7 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
             const SizedBox(height: 16),
             TextFormField(
               validator: _validation,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _samplingRateController,
               minLines: 1,
               //keyboardType: TextInputType.multiline,
@@ -98,16 +101,16 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
       );
       return;
     }
-
     if (!_formKey.currentState!.validate()) return;
 
     final provider = Provider.of<DiagnosisProvider>(context, listen: false);
     final String? filename = _filename;
-
     if (filename == null) return;
+
     final String component = _componentController.text;
     final int? samplingRate = int.tryParse(_samplingRateController.text);
     final int? duration = int.tryParse(_durationController.text);
+
     if (samplingRate == null || duration == null) {
       messengerState.showSnackBar(
         SnackBar(content: Text(tr("Invalid numbers in fields."))),
