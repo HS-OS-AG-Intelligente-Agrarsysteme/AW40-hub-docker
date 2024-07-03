@@ -2,7 +2,8 @@ import "package:aw40_hub_frontend/dtos/symptom_dto.dart";
 import "package:aw40_hub_frontend/models/symptom_model.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("SymptomDto fromJson constructor", () {
     final timestamp = DateTime.utc(2021);
     const String component = "some_component";

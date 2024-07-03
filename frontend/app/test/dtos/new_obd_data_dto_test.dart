@@ -1,6 +1,7 @@
 import "package:aw40_hub_frontend/dtos/new_obd_data_dto.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("NewOBDDataDto primary constructor", () {
     final obdSpecs = <dynamic>[1, 2, 3];
     final dtcs = <String>["some_component"];

@@ -1,7 +1,8 @@
 import "package:aw40_hub_frontend/dtos/new_timeseries_data_dto.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("NewTimeseriesDataDto fromJson constructor", () {
     const String component = "some_component";
     const TimeseriesDataLabel label = TimeseriesDataLabel.norm;
@@ -20,7 +21,7 @@ void main(){
       "signal": signal,
     };
     final NewTimeseriesDataDto newTimeseriesDataDto =
-    NewTimeseriesDataDto.fromJson(json);
+        NewTimeseriesDataDto.fromJson(json);
     test("correctly assigns component", () {
       expect(newTimeseriesDataDto.component, component);
     });

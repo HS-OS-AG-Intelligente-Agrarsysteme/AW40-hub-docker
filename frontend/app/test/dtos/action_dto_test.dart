@@ -2,7 +2,8 @@ import "package:aw40_hub_frontend/dtos/action_dto.dart";
 import "package:aw40_hub_frontend/models/action_model.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("ActionDto primary constructor", () {
     const String id = "some_id";
     const String instruction = "some_customer_id";

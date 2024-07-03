@@ -4,7 +4,8 @@ import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:collection/collection.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:logging/logging.dart";
-void main(){
+
+void main() {
   group("ConfigService", () {
     final ConfigService configService = ConfigService();
     setUp(configService.reset);
@@ -72,16 +73,16 @@ void main(){
     });
     test("calling getConfigValue() before initialize() throws exception", () {
       expect(
-            () => configService.getConfigValue(ConfigKey.apiAddress),
+        () => configService.getConfigValue(ConfigKey.apiAddress),
         throwsA(isA<AppException>()),
       );
     });
     test(
       "calling getConfigValue() after initialize() does not throw exception",
-          () async {
+      () async {
         await configService.initialize();
         expect(
-              () => configService.getConfigValue(ConfigKey.apiAddress),
+          () => configService.getConfigValue(ConfigKey.apiAddress),
           returnsNormally,
         );
       },

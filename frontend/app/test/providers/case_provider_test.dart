@@ -1,10 +1,8 @@
 import "dart:convert";
 
 import "package:aw40_hub_frontend/dtos/new_case_dto.dart";
-import "package:aw40_hub_frontend/models/diagnosis_model.dart";
 import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/providers/case_provider.dart";
-import "package:aw40_hub_frontend/providers/diagnosis_provider.dart";
 import "package:aw40_hub_frontend/services/config_service.dart";
 import "package:aw40_hub_frontend/services/http_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
@@ -53,10 +51,10 @@ void main() {
     test("toggleShowSharedCases toggles showSharedCases", () async {
       final mockHttpService = MockHttpService();
       when(mockHttpService.getSharedCases(any)).thenAnswer(
-            (_) async => http.Response("[]", 200),
+        (_) async => http.Response("[]", 200),
       );
       when(mockHttpService.getCases(any, any)).thenAnswer(
-            (_) async => http.Response("[]", 200),
+        (_) async => http.Response("[]", 200),
       );
 
       final caseProvider = CaseProvider(mockHttpService);
@@ -68,11 +66,11 @@ void main() {
     group("getCurrentCases()", () {
       test(
         "getCurrentCases() calls HttpService.getSharedCases() "
-            "when showSharedCases=true",
-            () async {
+        "when showSharedCases=true",
+        () async {
           final mockHttpService = MockHttpService();
           when(mockHttpService.getSharedCases(any)).thenAnswer(
-                (_) async => http.Response("[]", 200),
+            (_) async => http.Response("[]", 200),
           );
           final caseProvider = CaseProvider(mockHttpService);
           await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
@@ -87,10 +85,10 @@ void main() {
       );
       test(
           "getCurrentCases() calls HttpService.getCases() "
-              "when showSharedCases=false", () async {
+          "when showSharedCases=false", () async {
         final mockHttpService = MockHttpService();
         when(mockHttpService.getCases(any, any)).thenAnswer(
-              (_) async => http.Response("[]", 200),
+          (_) async => http.Response("[]", 200),
         );
         final caseProvider = CaseProvider(mockHttpService);
         await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
@@ -110,7 +108,7 @@ void main() {
       test("calls HttpService.addCase()", () async {
         final mockHttpService = MockHttpService();
         when(mockHttpService.addCase(any, any, any)).thenAnswer(
-              (_) async => http.Response(jsonEncode(dummyCaseDtoJson), 201),
+          (_) async => http.Response(jsonEncode(dummyCaseDtoJson), 201),
         );
         final caseProvider = CaseProvider(mockHttpService);
         await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
@@ -123,7 +121,7 @@ void main() {
       test("calls HttpService.deleteCase()", () async {
         final mockHttpService = MockHttpService();
         when(mockHttpService.deleteCase(any, any, any)).thenAnswer(
-              (_) async => http.Response("{}", 201),
+          (_) async => http.Response("{}", 201),
         );
         final caseProvider = CaseProvider(mockHttpService);
         await caseProvider.fetchAndSetAuthToken(mockAuthProvider);

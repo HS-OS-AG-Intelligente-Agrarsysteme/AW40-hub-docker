@@ -1,7 +1,8 @@
 import "package:aw40_hub_frontend/services/auth_service.dart";
 import "package:aw40_hub_frontend/services/config_service.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("AuthService", () {
     late AuthService authService;
     setUp(() async {
@@ -26,7 +27,7 @@ void main(){
     });
     test("createCodeChallenge returns correct code challenge", () async {
       const String verifier =
-      // ignore: lines_longer_than_80_chars
+          // ignore: lines_longer_than_80_chars
           "DWugXmMJCpVkcN9p_qNI-T5.CrBfwiKh.0ofAmmQ3dp1qgCLzKpy1IXB52vpKEKeNa~RQGigrTTCgFoZOHCybQQULmho~uoZASgpCKha9JdIDaRJP4jG5Ssqdsn0UkPN";
       expect(
         authService.createCodeChallenge(verifier),
@@ -38,7 +39,7 @@ void main(){
         final String actual = authService.webGetKeycloakLogoutUrl(null);
         assert(actual.endsWith("logout"));
         assert(
-        !(actual.contains("redirect") || actual.contains("id_token_hint")),
+          !(actual.contains("redirect") || actual.contains("id_token_hint")),
         );
       });
       test("returns logout url with redirect if idToken != null", () {
@@ -46,9 +47,9 @@ void main(){
         final String actual = authService.webGetKeycloakLogoutUrl(idToken);
         assert(!actual.endsWith("logout"));
         assert(
-        actual.contains("post_logout_redirect") &&
-            actual.contains("id_token_hint") &&
-            actual.contains(idToken),
+          actual.contains("post_logout_redirect") &&
+              actual.contains("id_token_hint") &&
+              actual.contains(idToken),
         );
       });
     });

@@ -2,7 +2,8 @@ import "package:aw40_hub_frontend/dtos/timeseries_data_dto.dart";
 import "package:aw40_hub_frontend/models/timeseries_data_model.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("TimeseriesDataDto fromJson constructor", () {
     final timestamp = DateTime.utc(2021);
     const String component = "some_component";
@@ -25,7 +26,7 @@ void main(){
       "signal_id": signalId,
     };
     final TimeseriesDataDto timeseriesDataDto =
-    TimeseriesDataDto.fromJson(json);
+        TimeseriesDataDto.fromJson(json);
     test("correctly assigns timestamp", () {
       expect(timeseriesDataDto.timestamp, timestamp);
     });

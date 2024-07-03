@@ -1,11 +1,12 @@
 import "package:aw40_hub_frontend/models/state_machine_log_entry_model.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("StateMachineLogEntryModel", () {
     const String message = "some_message";
     const String attachment = "some_attachment";
     final StateMachineLogEntryModel stateMachineLogEntryModel =
-    StateMachineLogEntryModel(
+        StateMachineLogEntryModel(
       message: message,
       attachment: attachment,
     );

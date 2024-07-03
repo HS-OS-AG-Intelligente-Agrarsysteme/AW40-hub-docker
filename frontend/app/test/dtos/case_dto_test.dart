@@ -8,7 +8,8 @@ import "package:aw40_hub_frontend/models/symptom_model.dart";
 import "package:aw40_hub_frontend/models/timeseries_data_model.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("CaseDto primary constructor", () {
     const id = "test_id";
     final timeStamp = DateTime.utc(2021);

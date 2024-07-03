@@ -1,6 +1,7 @@
 import "package:aw40_hub_frontend/models/obd_data_model.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("ObdDataModel", () {
     final timestamp = DateTime.now();
     final obdSpecs = <dynamic>[1, 2, 3];

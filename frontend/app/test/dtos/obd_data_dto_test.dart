@@ -1,7 +1,8 @@
 import "package:aw40_hub_frontend/dtos/obd_data_dto.dart";
 import "package:aw40_hub_frontend/models/obd_data_model.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("ObdDataDto fromJson constructor", () {
     final timestamp = DateTime.utc(2021);
     final obdSpecs = <dynamic>[1, 2, 3];

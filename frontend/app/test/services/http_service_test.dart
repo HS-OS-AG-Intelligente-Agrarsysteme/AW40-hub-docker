@@ -5,7 +5,8 @@ import "package:enum_to_string/enum_to_string.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:http/http.dart" as http;
 import "package:http/testing.dart";
-void main(){
+
+void main() {
   group("HttpService", () {
     setUp(() async {
       await ConfigService().initialize();
@@ -17,7 +18,7 @@ void main(){
           "Authorization": "Bearer some-token==",
         };
         final Map<String, String> actual =
-        HttpService(http.Client()).getAuthHeaderWith(token);
+            HttpService(http.Client()).getAuthHeaderWith(token);
         expect(actual, expected);
       });
       test("returns map of all headers if `otherHeaders` is not null", () {
@@ -28,7 +29,7 @@ void main(){
           "another": "header",
         };
         final Map<String, String> actual =
-        HttpService(http.Client()).getAuthHeaderWith(token, otherHeaders);
+            HttpService(http.Client()).getAuthHeaderWith(token, otherHeaders);
         expect(actual, expected);
       });
     });
@@ -250,7 +251,7 @@ void main(){
           request.url.toString(),
           endsWith("/$workshopId/cases/$caseId/diag"),
           reason:
-          "Request URL does not end with /{workshopId}/cases/{caseId}/diag",
+              "Request URL does not end with /{workshopId}/cases/{caseId}/diag",
         );
         return http.Response('{"status": "success"}', 200);
       });
@@ -278,7 +279,7 @@ void main(){
           request.url.toString(),
           endsWith("/$workshopId/cases/$caseId/diag"),
           reason:
-          "Request URL does not end with /{workshopId}/cases/{caseId}/diag",
+              "Request URL does not end with /{workshopId}/cases/{caseId}/diag",
         );
         return http.Response('{"status": "success"}', 200);
       });
@@ -306,7 +307,7 @@ void main(){
           request.url.toString(),
           endsWith("/$workshopId/cases/$caseId/diag"),
           reason:
-          "Request URL does not end with /{workshopId}/cases/{caseId}/diag",
+              "Request URL does not end with /{workshopId}/cases/{caseId}/diag",
         );
         return http.Response('{"status": "success"}', 200);
       });
@@ -339,7 +340,7 @@ void main(){
           request.url.toString(),
           endsWith("/$workshopId/cases/$caseId/obd_data"),
           reason:
-          "Request URL does not end with /{workshopId}/cases/{caseId}/obd_data",
+              "Request URL does not end with /{workshopId}/cases/{caseId}/obd_data",
         );
         return http.Response('{"status": "success"}', 200);
       });
@@ -393,7 +394,7 @@ void main(){
             "/$workshopId/cases/$caseId/timeseries_data/upload/picoscope",
           ),
           reason:
-          "Request URL does not end with /{workshopId}/cases/{caseId}/timeseries_data/upload/picoscope",
+              "Request URL does not end with /{workshopId}/cases/{caseId}/timeseries_data/upload/picoscope",
         );
         return http.Response('{"status": "success"}', 200);
       });
@@ -436,7 +437,7 @@ void main(){
           request.url.toString(),
           endsWith("/$workshopId/cases/$caseId/symptoms"),
           reason:
-          "Request URL does not end with /{workshopId}/cases/{caseId}/symptoms",
+              "Request URL does not end with /{workshopId}/cases/{caseId}/symptoms",
         );
         return http.Response('{"status": "success"}', 200);
       });
@@ -482,7 +483,7 @@ void main(){
             "/$workshopId/cases/$caseId/timeseries_data/upload/omniview",
           ),
           reason:
-          "Request URL does not end with /{workshopId}/cases/{caseId}/timeseries_data/upload/omniview",
+              "Request URL does not end with /{workshopId}/cases/{caseId}/timeseries_data/upload/omniview",
         );
         return http.Response('{"status": "success"}', 200);
       });

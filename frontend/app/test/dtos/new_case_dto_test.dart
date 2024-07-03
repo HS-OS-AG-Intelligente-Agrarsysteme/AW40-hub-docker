@@ -1,7 +1,8 @@
 import "package:aw40_hub_frontend/dtos/new_case_dto.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("NewCaseDto primary constructor", () {
     const String vehicleVin = "12345678901234567";
     const String customerId = "some_customer_id";

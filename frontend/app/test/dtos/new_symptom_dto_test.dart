@@ -1,7 +1,8 @@
 import "package:aw40_hub_frontend/dtos/new_symptom_dto.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("NewSymptomDto primary constructor", () {
     const String component = "some_component";
     const SymptomLabel label = SymptomLabel.ok;

@@ -3,7 +3,8 @@ import "package:aw40_hub_frontend/models/diagnosis_model.dart";
 import "package:aw40_hub_frontend/models/state_machine_log_entry_model.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("DiagnosisModel", () {
     const id = "test_id";
     final timestamp = DateTime.now();

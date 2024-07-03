@@ -1,9 +1,7 @@
 import "dart:convert";
 
-import "package:aw40_hub_frontend/dtos/new_case_dto.dart";
 import "package:aw40_hub_frontend/models/diagnosis_model.dart";
 import "package:aw40_hub_frontend/providers/auth_provider.dart";
-import "package:aw40_hub_frontend/providers/case_provider.dart";
 import "package:aw40_hub_frontend/providers/diagnosis_provider.dart";
 import "package:aw40_hub_frontend/services/config_service.dart";
 import "package:aw40_hub_frontend/services/http_service.dart";

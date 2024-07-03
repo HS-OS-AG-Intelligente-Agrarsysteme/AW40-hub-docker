@@ -2,7 +2,8 @@ import "package:aw40_hub_frontend/models/navigation_item_model.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter/material.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("NavigationItemModel", () {
     const title = "Test Title";
     const icon = Icon(Icons.add);

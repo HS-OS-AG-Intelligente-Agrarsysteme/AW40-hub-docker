@@ -1,7 +1,8 @@
 import "package:aw40_hub_frontend/models/timeseries_data_model.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("TimeseriesDataModel", () {
     final timestamp = DateTime.now();
     const String component = "some_component";

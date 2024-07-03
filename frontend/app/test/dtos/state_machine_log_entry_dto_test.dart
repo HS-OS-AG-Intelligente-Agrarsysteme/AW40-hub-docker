@@ -1,12 +1,13 @@
 import "package:aw40_hub_frontend/dtos/state_machine_log_entry_dto.dart";
 import "package:aw40_hub_frontend/models/state_machine_log_entry_model.dart";
 import "package:flutter_test/flutter_test.dart";
-void main(){
+
+void main() {
   group("StateMachineLogEntryDto primary constructor", () {
     const String message = "some_message";
     const String attachment = "some_attachment";
     final StateMachineLogEntryDto stateMachineLogEntryDto =
-    StateMachineLogEntryDto(
+        StateMachineLogEntryDto(
       message,
       attachment,
     );
@@ -25,7 +26,7 @@ void main(){
       "attachment": attachment,
     };
     final StateMachineLogEntryDto stateMachineLogEntryDto =
-    StateMachineLogEntryDto.fromJson(json);
+        StateMachineLogEntryDto.fromJson(json);
     test("correctly assigns message", () {
       expect(stateMachineLogEntryDto.message, equals(message));
     });
@@ -37,7 +38,7 @@ void main(){
     const String message = "some_message";
     const String attachment = "some_attachment";
     final StateMachineLogEntryDto stateMachineLogEntryDto =
-    StateMachineLogEntryDto(
+        StateMachineLogEntryDto(
       message,
       attachment,
     );
@@ -53,12 +54,12 @@ void main(){
     const String message = "some_message";
     const String attachment = "some_attachment";
     final StateMachineLogEntryDto stateMachineLogEntryDto =
-    StateMachineLogEntryDto(
+        StateMachineLogEntryDto(
       message,
       attachment,
     );
     final StateMachineLogEntryModel stateMachineLogEntryModel =
-    stateMachineLogEntryDto.toModel();
+        stateMachineLogEntryDto.toModel();
     test("correctly assigns message", () {
       expect(stateMachineLogEntryModel.message, equals(message));
     });

@@ -1,7 +1,8 @@
 import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:logging/logging.dart";
-void main(){
+
+void main() {
   group("HelperService", () {
     group("stringToLogLevel", () {
       test("returns Level.FINEST for 'finest'", () {
