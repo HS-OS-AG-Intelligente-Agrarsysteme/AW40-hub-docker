@@ -14,7 +14,6 @@ class UploadOmniviewForm extends StatefulWidget {
 }
 
 class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
-  //final Logger _logger = Logger("UploadOmniviewForm");
   Uint8List? _file;
   String? _filename;
   final TextEditingController _componentController = TextEditingController();
@@ -42,7 +41,6 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
               controller: _componentController,
               minLines: 1,
               maxLines: null,
-              //keyboardType: TextInputType.multiline,
               decoration: const InputDecoration(
                 labelText: "Components",
                 hintText: "Enter a Component.",
@@ -55,7 +53,6 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _durationController,
               minLines: 1,
-              //keyboardType: TextInputType.multiline,
               decoration: const InputDecoration(
                 labelText: "Duration",
                 hintText: "Enter a Duration.",
@@ -68,7 +65,6 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _samplingRateController,
               minLines: 1,
-              //keyboardType: TextInputType.multiline,
               decoration: const InputDecoration(
                 labelText: "Sampling Rate",
                 hintText: "Enter a Sampling Rate.",
