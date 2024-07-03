@@ -1,4 +1,4 @@
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter/material.dart";
 
 class NavigationMenuItemModel {

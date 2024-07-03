@@ -1,8 +1,8 @@
 import "dart:convert";
 import "dart:math";
-import "package:aw40_hub_frontend/exceptions/exceptions.dart";
-import "package:aw40_hub_frontend/services/services.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/exceptions/app_exception.dart";
+import "package:aw40_hub_frontend/services/config_service.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:crypto/crypto.dart";
 import "package:logging/logging.dart";
 

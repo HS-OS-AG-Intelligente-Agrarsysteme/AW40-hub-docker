@@ -1,4 +1,4 @@
-import "package:aw40_hub_frontend/views/views.dart";
+import "package:aw40_hub_frontend/views/cases_view.dart";
 import "package:flutter/material.dart";
 
 class CasesScreen extends StatelessWidget {

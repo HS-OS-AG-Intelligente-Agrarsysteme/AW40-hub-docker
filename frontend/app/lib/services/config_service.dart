@@ -1,9 +1,9 @@
 import "dart:collection";
 
 import "package:aw40_hub_frontend/env/env.dart";
-import "package:aw40_hub_frontend/exceptions/exceptions.dart";
-import "package:aw40_hub_frontend/services/services.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/exceptions/app_exception.dart";
+import "package:aw40_hub_frontend/services/environment_service.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:logging/logging.dart";
 
 class ConfigService {

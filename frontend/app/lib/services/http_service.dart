@@ -1,7 +1,7 @@
 import "dart:convert";
 
-import "package:aw40_hub_frontend/services/services.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/services/config_service.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:collection/collection.dart";
 import "package:enum_to_string/enum_to_string.dart";
 import "package:http/http.dart" as http;

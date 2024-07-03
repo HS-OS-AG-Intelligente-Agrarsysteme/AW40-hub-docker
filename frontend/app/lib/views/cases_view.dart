@@ -1,9 +1,9 @@
-import "package:aw40_hub_frontend/data_sources/data_sources.dart";
-import "package:aw40_hub_frontend/exceptions/exceptions.dart";
-import "package:aw40_hub_frontend/models/models.dart";
-import "package:aw40_hub_frontend/providers/providers.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
-import "package:aw40_hub_frontend/views/views.dart";
+import "package:aw40_hub_frontend/data_sources/cases_data_table_source.dart";
+import "package:aw40_hub_frontend/exceptions/app_exception.dart";
+import "package:aw40_hub_frontend/models/case_model.dart";
+import "package:aw40_hub_frontend/providers/case_provider.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/views/case_detail_view.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";

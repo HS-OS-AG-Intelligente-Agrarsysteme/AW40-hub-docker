@@ -1,6 +1,9 @@
-import "package:aw40_hub_frontend/components/components.dart";
-import "package:aw40_hub_frontend/models/models.dart";
-import "package:aw40_hub_frontend/providers/providers.dart";
+import "package:aw40_hub_frontend/components/company_avatar.dart";
+import "package:aw40_hub_frontend/components/desktop_app_bar.dart";
+import "package:aw40_hub_frontend/components/user_settings_popup_button.dart";
+import "package:aw40_hub_frontend/models/logged_in_user_model.dart";
+import "package:aw40_hub_frontend/models/navigation_item_model.dart";
+import "package:aw40_hub_frontend/providers/theme_provider.dart";
 import "package:aw40_hub_frontend/utils/constants.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";

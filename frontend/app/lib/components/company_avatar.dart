@@ -1,4 +1,4 @@
-import "package:aw40_hub_frontend/providers/providers.dart";
+import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 

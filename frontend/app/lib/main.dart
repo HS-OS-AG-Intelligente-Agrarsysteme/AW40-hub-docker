@@ -1,5 +1,8 @@
 import "package:aw40_hub_frontend/aw_hub_app.dart";
-import "package:aw40_hub_frontend/services/services.dart";
+import "package:aw40_hub_frontend/services/config_service.dart";
+import "package:aw40_hub_frontend/services/environment_service.dart";
+import "package:aw40_hub_frontend/services/helper_service.dart";
+import "package:aw40_hub_frontend/services/http_service.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:easy_logger/easy_logger.dart";
 import "package:flutter/foundation.dart";

@@ -1,9 +1,10 @@
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 
 /// `Exception`s are for expected cases and should be handled.
 /// `Error`s should crash your code because you messed up.
 class AppException implements Exception {
   AppException({required this.exceptionType, required this.exceptionMessage});
+
   ExceptionType exceptionType;
   String exceptionMessage;
 

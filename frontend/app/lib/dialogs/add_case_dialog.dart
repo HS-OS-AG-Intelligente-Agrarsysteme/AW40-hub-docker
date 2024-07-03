@@ -1,9 +1,9 @@
 import "dart:async";
 
 import "package:aw40_hub_frontend/dtos/new_case_dto.dart";
-import "package:aw40_hub_frontend/exceptions/exceptions.dart";
-import "package:aw40_hub_frontend/text_input_formatters/text_input_formatters.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/exceptions/app_exception.dart";
+import "package:aw40_hub_frontend/text_input_formatters/upper_case_text_input_formatter.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:enum_to_string/enum_to_string.dart";
 import "package:flutter/material.dart";
