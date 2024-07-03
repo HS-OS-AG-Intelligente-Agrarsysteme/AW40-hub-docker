@@ -96,7 +96,8 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
       );
       return;
     }
-    if (!_formKey.currentState!.validate()) return;
+    final FormState? formState = _formKey.currentState;
+    if (formState != null && !formState.validate()) return;
 
     final provider = Provider.of<DiagnosisProvider>(context, listen: false);
     final String? filename = _filename;
