@@ -4,7 +4,6 @@ import "package:aw40_hub_frontend/providers/diagnosis_provider.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
-import "package:logging/logging.dart";
 import "package:provider/provider.dart";
 
 class UploadOmniviewForm extends StatefulWidget {
