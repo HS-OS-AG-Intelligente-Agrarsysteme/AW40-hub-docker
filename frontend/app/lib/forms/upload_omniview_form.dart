@@ -88,10 +88,20 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
   }
 
   Future<void> _onSubmit() async {
+    final messengerState = ScaffoldMessenger.of(context);
+    final Uint8List? file = _file;
+    if (file == null) {
+      messengerState.showSnackBar(
+        SnackBar(
+          content: Text(tr("diagnoses.details.uploadDataErrorMessage")),
+        ),
+      );
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) return;
 
     final provider = Provider.of<DiagnosisProvider>(context, listen: false);
-    final messengerState = ScaffoldMessenger.of(context);
     final String? filename = _filename;
 
     if (filename == null) return;
@@ -101,16 +111,6 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
     if (samplingRate == null || duration == null) {
       messengerState.showSnackBar(
         SnackBar(content: Text(tr("Invalid numbers in fields."))),
-      );
-      return;
-    }
-
-    final Uint8List? file = _file;
-    if (file == null) {
-      messengerState.showSnackBar(
-        SnackBar(
-          content: Text(tr("diagnoses.details.uploadDataErrorMessage")),
-        ),
       );
       return;
     }
