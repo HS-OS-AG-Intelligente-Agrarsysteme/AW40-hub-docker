@@ -19,7 +19,7 @@ import "package:logging/logging.dart";
 class FileUploadFormComponent extends StatefulWidget {
   const FileUploadFormComponent({required this.onFileDrop, super.key});
 
-  final void Function(Uint8List) onFileDrop;
+  final void Function(Uint8List, String) onFileDrop;
 
   @override
   State<FileUploadFormComponent> createState() =>
@@ -80,6 +80,6 @@ class _FileUploadFormComponentState extends State<FileUploadFormComponent> {
       return;
     }
     setState(() => fileName = file.name);
-    widget.onFileDrop(bytes);
+    widget.onFileDrop(bytes, file.name);
   }
 }

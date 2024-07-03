@@ -20,8 +20,9 @@ class _UploadVcdsFormState extends State<UploadVcdsForm> {
   @override
   Widget build(BuildContext context) {
     return BaseUploadForm(
-      content:
-          FileUploadFormComponent(onFileDrop: (Uint8List file) => _file = file),
+      content: FileUploadFormComponent(
+        onFileDrop: (Uint8List file, String name) => _file = file,
+      ),
       onSubmit: _onSubmit,
     );
   }

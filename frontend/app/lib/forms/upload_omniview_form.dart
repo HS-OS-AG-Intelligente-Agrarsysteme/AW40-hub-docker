@@ -17,17 +17,21 @@ class UploadOmniviewForm extends StatefulWidget {
 class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
   //final Logger _logger = Logger("UploadOmniviewForm");
   Uint8List? _file;
+  String? _filename;
   final TextEditingController _controllerFilename = TextEditingController();
-  final TextEditingController _controllerComponent = TextEditingController();
-  final TextEditingController _controllerDuration = TextEditingController();
-  final TextEditingController _controllerSamplingRate = TextEditingController();
+  final TextEditingController _componentController = TextEditingController();
+  final TextEditingController _durationController = TextEditingController();
+  final TextEditingController _samplingRateController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return BaseUploadForm(
       content: Column(
         children: [
-          FileUploadFormComponent(onFileDrop: (Uint8List file) => _file = file),
+          FileUploadFormComponent(onFileDrop: (Uint8List file, String name) {
+            _file = file;
+            _filename = name;
+          }),
           const SizedBox(height: 16),
           TextFormField(
             controller: _controllerFilename,
@@ -42,7 +46,7 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
           ),
           const SizedBox(height: 16),
           TextFormField(
-            controller: _controllerComponent,
+            controller: _componentController,
             minLines: 1,
             maxLines: null,
             //keyboardType: TextInputType.multiline,
@@ -54,7 +58,7 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
           ),
           const SizedBox(height: 16),
           TextFormField(
-            controller: _controllerDuration,
+            controller: _durationController,
             minLines: 1,
             //keyboardType: TextInputType.multiline,
             decoration: const InputDecoration(
@@ -65,7 +69,7 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
           ),
           const SizedBox(height: 16),
           TextFormField(
-            controller: _controllerSamplingRate,
+            controller: _samplingRateController,
             minLines: 1,
             //keyboardType: TextInputType.multiline,
             decoration: const InputDecoration(
@@ -85,18 +89,18 @@ class _UploadOmniviewFormState extends State<UploadOmniviewForm> {
     final messengerState = ScaffoldMessenger.of(context);
 
     if (_controllerFilename.text.isEmpty ||
-        _controllerComponent.text.isEmpty ||
-        _controllerSamplingRate.text.isEmpty ||
-        _controllerDuration.text.isEmpty) {
+        _componentController.text.isEmpty ||
+        _samplingRateController.text.isEmpty ||
+        _durationController.text.isEmpty) {
       messengerState.showSnackBar(
         SnackBar(content: Text(tr("Please fill in all fields."))),
       );
       return;
     }
     final String filename = _controllerFilename.text;
-    final String component = _controllerComponent.text;
-    final int? samplingRate = int.tryParse(_controllerSamplingRate.text);
-    final int? duration = int.tryParse(_controllerDuration.text);
+    final String component = _componentController.text;
+    final int? samplingRate = int.tryParse(_samplingRateController.text);
+    final int? duration = int.tryParse(_durationController.text);
     if (samplingRate == null || duration == null) {
       messengerState.showSnackBar(
         SnackBar(content: Text(tr("Invalid numbers in fields."))),
