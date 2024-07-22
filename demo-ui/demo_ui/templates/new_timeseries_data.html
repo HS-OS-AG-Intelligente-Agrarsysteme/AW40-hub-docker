@@ -9,9 +9,9 @@
 {% block content %}
 <h1> Neues Oszillogramm hochladen <a class="linkbutton" href="/ui/{{ request.path_params['workshop_id'] }}/cases/{{ request.path_params['case_id'] }}">Abbrechen</a></h1>
 <label for="file_format">Datei Format</label>
-<select id="file_format", name="file_format">
-    <option value="omniview_csv">Omniview (.csv)</option>
+<select id="file_format", name="file_format" disabled>
     <option value="picoscope_csv">Picoscope (.csv)</option>
+    <option value="omniview_csv">Omniview (.csv)</option>
 </select>
 <script>
 // Form is choosen based on selected file format
@@ -20,16 +20,16 @@ file_format.onchange = function() {
     var omniview_csv_div = document.getElementById("omniview_csv_div");
     var picoscope_csv_div = document.getElementById("picoscope_csv_div");
     if (this.selectedIndex == 0) {
-        omniview_csv_div.style.display = "block";
-        picoscope_csv_div.style.display = "none";
-    }
-    else {
         omniview_csv_div.style.display = "none";
         picoscope_csv_div.style.display = "block";
     }
+    else {
+        omniview_csv_div.style.display = "block";
+        picoscope_csv_div.style.display = "none";
+    }
 }
 </script>
-<div id="omniview_csv_div" style="display: block;">
+<div id="omniview_csv_div" style="display: none;">
     <h2> Upload Omniview CSV Export </h2>
     <form method="post" enctype="multipart/form-data" action="new/omniview">
         <p>
@@ -72,7 +72,7 @@ file_format.onchange = function() {
         </p>
     </form>
 </div>
-<div id="picoscope_csv_div" style="display: none;">
+<div id="picoscope_csv_div" style="display: block;">
     <h2> Upload Picoscope CSV Export </h2>
     <form method="post" enctype="multipart/form-data" action="new/picoscope">
         {% for channel in ["A", "B", "C", "D"] %}
