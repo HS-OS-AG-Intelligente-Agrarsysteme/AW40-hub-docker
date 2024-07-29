@@ -72,7 +72,7 @@ diagnoses:
     noFaultPathFound: "No fault path found"
   todos:
     noTodosFound: "No todos found"
-    noTodosFoundDescription: "The diagnosis has status action_required, but no associated todos. This is likely a mistake in the backend.",
+    noTodosFoundDescription: "The diagnosis has status action_required, but no associated todos. This is likely a mistake in the backend."
     unknownDatasetType: "Unknown data type"
     unknownDatasetTypeDescription: "The diagnosis has status action_required, but the data type is unknown. This is likely a mistake in the backend."
 cases:
