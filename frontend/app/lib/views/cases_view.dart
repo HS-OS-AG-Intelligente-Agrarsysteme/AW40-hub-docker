@@ -33,43 +33,44 @@ class _CasesViewState extends State<CasesView> {
       // ignore: discarded_futures
       future: caseProvider.getCurrentCases(),
       builder: (BuildContext context, AsyncSnapshot<List<CaseModel>> snapshot) {
-        if (snapshot.connectionState != ConnectionState.done ||
-            !snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasData) {
+          final List<CaseModel>? caseModels = snapshot.data;
+          if (caseModels == null) {
+            throw AppException(
+              exceptionType: ExceptionType.notFound,
+              exceptionMessage: "Received no case data.",
+            );
+          }
+          return Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: CasesTable(
+                  caseIndexNotifier: currentCaseIndexNotifier,
+                  caseModel: caseModels,
+                ),
+              ),
+
+              // Show detail view if a case is selected.
+              ValueListenableBuilder(
+                valueListenable: currentCaseIndexNotifier,
+                builder: (context, value, child) {
+                  if (value == null) return const SizedBox.shrink();
+                  return Expanded(
+                    flex: 2,
+                    child: CaseDetailView(
+                      caseModel: caseModels[value],
+                      onClose: () => currentCaseIndexNotifier.value = null,
+                    ),
+                  );
+                },
+              )
+            ],
+          );
+        } else {
           return const Center(child: CircularProgressIndicator());
         }
-        final List<CaseModel>? caseModels = snapshot.data;
-        if (caseModels == null) {
-          throw AppException(
-            exceptionType: ExceptionType.notFound,
-            exceptionMessage: "Received no case data.",
-          );
-        }
-        return Row(
-          children: [
-            Expanded(
-              flex: 3,
-              child: CasesTable(
-                caseIndexNotifier: currentCaseIndexNotifier,
-                caseModel: caseModels,
-              ),
-            ),
-
-            // Show detail view if a case is selected.
-            ValueListenableBuilder(
-              valueListenable: currentCaseIndexNotifier,
-              builder: (context, value, child) {
-                if (value == null) return const SizedBox.shrink();
-                return Expanded(
-                  flex: 2,
-                  child: CaseDetailView(
-                    caseModel: caseModels[value],
-                    onClose: () => currentCaseIndexNotifier.value = null,
-                  ),
-                );
-              },
-            )
-          ],
-        );
       },
     );
   }
