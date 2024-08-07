@@ -56,9 +56,9 @@ class AWHubApp extends StatelessWidget {
           ),
           ChangeNotifierProxyProvider<AuthProvider, DiagnosisProvider>(
             create: (_) => DiagnosisProvider(httpService),
-            update: (_, authProvider, caseProvider) =>
+            update: (_, authProvider, diagnosisProvider) =>
                 // ignore: discarded_futures
-                caseProvider!..fetchAndSetAuthToken(authProvider),
+                diagnosisProvider!..fetchAndSetAuthToken(authProvider),
           ),
           ChangeNotifierProvider<ThemeProvider>(
             create: (_) => ThemeProvider(),
