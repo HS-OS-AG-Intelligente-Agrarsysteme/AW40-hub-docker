@@ -1,6 +1,7 @@
 from typing import List
 
 import httpx
+import logging
 from fastapi import FastAPI, Request, Form, UploadFile, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -11,6 +12,15 @@ from .keycloak import Keycloak
 from . import template_filters
 from .messages import get_flashed_messages, flash_message
 from .settings import settings
+
+
+class EndpointLogFilter(logging.Filter):
+    def __init__(self, prefix: str) -> None:
+        self.prefix = prefix
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return record.getMessage().find(self.prefix) == -1
+
 
 app = FastAPI()
 app.add_middleware(
@@ -190,6 +200,14 @@ def get_components(
     """Retrieve list of alphabetically sorted components from the API."""
     components = get_from_api(url, access_token)
     return sorted(components)
+
+
+@app.get("/health/ping", status_code=200)
+def ping():
+    return {"msg": "ok"}
+
+
+logging.getLogger("uvicorn.access").addFilter(EndpointLogFilter("/health"))
 
 
 @app.get("/ui", response_class=HTMLResponse)
