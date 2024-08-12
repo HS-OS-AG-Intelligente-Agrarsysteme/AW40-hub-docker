@@ -144,18 +144,6 @@ class HttpService {
     );
   }
 
-  Future<http.Response> uploadVcdsData(
-    String token,
-    String workshopId,
-    String caseId,
-    List<int> vcdsData,
-  ) {
-    // TODO: implement uploadVcdsData
-    // I added it with what I hope will be the actual signature so I can mock it
-    // in the MockHttpService.
-    throw UnimplementedError();
-  }
-
   Future<http.Response> addTimeseriesData(
     String token,
     String workshopId,
@@ -256,6 +244,33 @@ class HttpService {
       }),
       body: jsonEncode(requestBody),
     );
+  }
+
+  Future<http.Response> uploadVcdsData(
+    String token,
+    String workshopId,
+    String caseId,
+    List<int> vcdsData,
+  ) async {
+    final request = http.MultipartRequest(
+      "POST",
+      Uri.parse(
+        "$backendUrl/$workshopId/cases/$caseId/obd_data/upload/vcds",
+      ),
+    );
+
+    request.files.add(
+      http.MultipartFile.fromBytes("upload", vcdsData),
+    );
+
+    request.fields["file_format"] = "VCDS TXT";
+
+    final Map<String, String> authHeader = getAuthHeaderWith(token);
+    assert(authHeader.length == 1);
+    request.headers[authHeader.keys.first] = authHeader.values.first;
+
+    final response = await _client.send(request);
+    return http.Response.fromStream(response);
   }
 
   Future<http.Response> uploadOmniviewData(
