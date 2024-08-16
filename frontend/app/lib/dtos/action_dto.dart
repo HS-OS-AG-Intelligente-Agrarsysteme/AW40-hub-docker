@@ -1,4 +1,5 @@
 import "package:aw40_hub_frontend/models/action_model.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:json_annotation/json_annotation.dart";
 
 part "action_dto.g.dart";
@@ -16,6 +17,7 @@ class ActionDto {
   factory ActionDto.fromJson(Map<String, dynamic> json) {
     return _$ActionDtoFromJson(json);
   }
+
   Map<String, dynamic> toJson() => _$ActionDtoToJson(this);
 
   ActionModel toModel() {
@@ -33,6 +35,6 @@ class ActionDto {
   @JsonKey(name: "action_type")
   String actionType;
   @JsonKey(name: "data_type")
-  String dataType;
+  DatasetType dataType;
   String? component;
 }

@@ -1,6 +1,6 @@
 import "dart:io";
 
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:enum_to_string/enum_to_string.dart";
 import "package:flutter/foundation.dart";
 

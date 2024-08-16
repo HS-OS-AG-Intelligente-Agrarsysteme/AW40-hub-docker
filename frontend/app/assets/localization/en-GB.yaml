@@ -4,7 +4,9 @@ general:
   close: "Close"
   customer: "Customer"
   customerId: "Customer id"
+  dataType: "Data Type"
   date: "Date"
+  datasets: "Datasets"
   delete: "Delete"
   edit: "Edit"
   filter: "Filter"
@@ -17,12 +19,16 @@ general:
   obligatoryField: "Obligatory"
   occasion: "Occasion"
   problem: "Problem"
+  previous: "Previous"
   repair: "Repair"
   save: "Save"
   saveChanges: "Save changes"
   service: "Service"
   sort: "Sort"
+  state: "State"
   status: "Status"
+  then: "Then"
+  transition: "Transition"
   unnamed: "Unnamed"
   vehicle: "Vehicle"
   vehicleVin: "Vehicle vin"
@@ -30,6 +36,7 @@ general:
   workshopId: "Workshop id"
   yes: "Yes"
   no:
+    data: "No data available"
     date: "No Date"
     customerId: "No customer id"
     vehiclevin: "No vehicle vin"
@@ -59,8 +66,16 @@ diagnoses:
     uploadFile: "Upload a file"
     uploadFileTooltip: "Upload file"
     dragAndDrop: "Drag and drop the file here"
+    dropFileError: "The file could not be captured."
     uploadDataSuccessMessage: "The data has been uploaded successfully."
     uploadDataErrorMessage: "The data could not be uploaded."
+    noFaultPathFound: "No fault path found"
+    noStateMachineLog: "No state machine log available"
+  todos:
+    noTodosFound: "No todos found"
+    noTodosFoundDescription: "The diagnosis has status action_required, but no associated todos. This is likely a mistake in the backend."
+    unknownDatasetType: "Unknown data type"
+    unknownDatasetTypeDescription: "The diagnosis has status action_required, but the data type is unknown. This is likely a mistake in the backend."
 cases:
   title: "Cases"
   actions:
@@ -97,13 +112,78 @@ cases:
     status:
       open: "Open"
       closed: "Closed"
+    dataTypes:
+      obdData: "OBD Data"
+      symptoms: "Symptoms"
+      timeseriesData: "Timeseries Data"
+uploadData: 
+  label: "Upload data"
 customers:
   title: "Customers"
+  headlines: 
+    id: "ID"
 vehicles:
   title: "Vehicles"
+  headlines: 
+    id: "ID"
+    vin: "VIN"
+    tsn: "TSN"
+    yearBuild: "Year built"
 training:
   title: "Training"
 pageNotFound:
   title: "Page @:general.notFound"
-noAuthorization :
+noAuthorization:
   title: "No Authorization"
+forms:
+  submit: "Submit"
+  optional: "optional"
+  validation:
+    enterText: "Please enter some text"
+    enterNumber: "Please enter a number"
+    enterValidNumber: "Please enter a valid number"
+    enterSignal: "Please enter a signal"
+    separateWithComma: "Each value must be a valid integer separated by commas"
+    invalidNumber: "Invalid numbers in fields"
+  obd:
+    label: "Diagnostic Trouble Codes"
+    hint: "Enter codes, separated by commas"
+    suffix: "e.g., P0001, U0001, U0002"
+  omniview:
+    component:
+      label: "Component"
+      hint: "Enter a Component"
+    duration:
+      label: "Duration"
+      hint: "Enter a Duration"
+    samplingRate:
+      label: "Sampling Rate"
+      hint: "Enter a Sampling Rate"
+  picoscope:
+    component:
+      labelA: "Component A"
+      labelB: "Component B"
+      labelC: "Component C"
+      label: "Label"
+      hint: "Enter a Component"
+  timeseries:
+    label: "Label"
+    component:
+      label: "Component"
+      hint: "Enter a Component"
+    duration:
+      label: "Duration"
+      hint: "Enter a Duration"
+    samplingRate:
+      label: "Sampling Rate"
+      hint: "Enter a Sampling Rate"
+    signal:
+      label: "Signal"
+      hint: "Enter Signals, seperated by commas"
+      suffix: "e.g., 1, 2, 3"
+  symptom:
+    label: "Label"
+    component:
+      label: "Component"
+      hint: "Enter a Component"
+

@@ -4,7 +4,9 @@ general:
   close: "Schließen"
   customer: "Kunde"
   customerId: "Kunden ID"
+  dataType: "Datentyp"
   date: "Datum"
+  datasets: "Datensätze"
   delete: "Löschen"
   edit: "Bearbeiten"
   filter: "Filtern"
@@ -16,13 +18,17 @@ general:
   notSpecified: "keine Angabe"
   obligatoryField: "Pflichtfeld"
   occasion: "Anlass"
+  previous: "Vorher"
   problem: "Problem"
   repair: "Reparatur"
   save: "Speichern"
   saveChanges: "Änderungen speichern"
   service: "Service"
   sort: "Sortieren"
+  state: "Zustand"
   status: "Status"
+  then: "Dann"
+  transition: "Übergang"
   unnamed: "Unbenannt"
   vehicle: "Fahrzeug"
   vehicleVin: "Fahrzeug VIN"
@@ -30,6 +36,7 @@ general:
   workshopId: "Werkstatt ID"
   yes: "Ja"
   no:
+    data: "Keine Daten verfügbar"
     date: "Kein Datum"
     customerId: "Keine Kunden ID"
     vehicleVin: "Keine @:general.vehicleVin"
@@ -59,8 +66,16 @@ diagnoses:
     uploadFile: "Laden Sie eine Datei hoch"
     uploadFileTooltip: "Datei hochladen"
     dragAndDrop: "Datei per Drag & Drop hier ablegen"
+    dropFileError: "Die Datei konnte nicht erfasst werden"
     uploadDataSuccessMessage: "Die Daten wurden erfolgreich hochgeladen."
     uploadDataErrorMessage: "Die Daten konnten nicht hochgeladen werden."
+    noFaultPathFound: "Kein Fehlerpfad gefunden"
+    noStateMachineLog: "Kein State-Machine-Protokoll verfügbar"
+  todos:
+    noTodosFound: "Keine Todos gefunden"
+    noTodosFoundDescription: "Die Diagnose hat Status 'Aktion erforderlich', aber keine zugehörigen Todos. Dies ist wahrscheinlich ein Fehler im Backend."
+    unknownDatasetType: "Unbekannter Datentyp"
+    unknownDatasetTypeDescription: "Die Diagnose hat Status 'Aktion erforderlich', aber der Datentyp ist unbekannt. Dies ist wahrscheinlich ein Fehler im Backend."
 cases:
   title: "Fälle"
   actions:
@@ -97,13 +112,78 @@ cases:
     status:
       open: "Offen"
       closed: "Geschlossen"
+    dataTypes:
+      obdData: "OBD Daten"
+      symptoms: "Symptome"
+      timeseriesData: "Zeitreihendaten"
+uploadData: 
+  label: "Daten-Upload"
 customers:
   title: "Kunden"
+  headlines: 
+    id: "ID"
 vehicles:
   title: "Fahrzeuge"
+  headlines: 
+    id: "ID"
+    vin: "VIN"
+    tsn: "TSN"
+    yearBuild: "Baujahr"
 training:
   title: "Schulung"
 pageNotFound:
   title: "Seite @:general.notFound"
 noAuthorization :
   title: "Keine Autorisierung"
+forms:
+  submit: "Hochladen"
+  optional: "optional"
+  validation:
+    enterText: "Bitte geben Sie einen Text ein"
+    enterNumber: "Bitte geben Sie eine Nummer ein"
+    enterValidNumber: "Bitte geben Sie eine gültige Nummer ein"
+    enterSignal: "Bitte geben Sie ein Signal ein"
+    separateWithComma: "Jeder Wert muss eine gültige Zahl sein und durch Kommas getrennt sein"
+    invalidNumber: "Ungültige Zahlen in Feldern"
+  obd:
+    label: "Diagnose-Fehlercodes"
+    hint: "Geben Sie Codes getrennt durch Kommas ein"
+    suffix: "z.B. P0001, U0001, U0002"
+  omniview:
+    component:
+      label: "Komponente"
+      hint: "Geben Sie eine Komponente ein"
+    duration:
+      label: "Dauer"
+      hint: "Geben Sie eine Dauer ein"
+    samplingRate:
+      label: "Abtastrate"
+      hint: "Geben Sie eine Abtastrate ein"
+  picoscope:
+    component:
+      labelA: "Komponente A"
+      labelB: "Komponente B"
+      labelC: "Komponente C"
+      label: "Label"
+      hint: "Komponente eingeben"
+  timeseries:
+    label: "Label"
+    component:
+      label: "Komponente"
+      hint: "Geben Sie eine Komponente ein"
+    duration:
+      label: "Dauer"
+      hint: "Geben Sie eine Dauer ein"
+    samplingRate:
+      label: "Abtastrate"
+      hint: "Geben Sie eine Abtastrate ein"
+    signal:
+      label: "Signal"
+      hint: "Geben Sie ein Signal getrennt durch Kommas ein"
+      suffix: "z.B. 1, 2, 3"
+  symptom:
+    label: "Label"
+    component:
+      label: "Komponente"
+      hint: "Geben Sie eine Komponente ein"
+

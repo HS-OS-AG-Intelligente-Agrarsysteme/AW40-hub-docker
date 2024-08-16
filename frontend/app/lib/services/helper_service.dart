@@ -1,9 +1,9 @@
 import "dart:convert";
 
-import "package:aw40_hub_frontend/exceptions/exceptions.dart";
+import "package:aw40_hub_frontend/exceptions/app_exception.dart";
 import "package:aw40_hub_frontend/main.dart";
-import "package:aw40_hub_frontend/services/services.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/services/config_service.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:collection/collection.dart";
 import "package:flutter/material.dart";
 import "package:http/http.dart";
@@ -73,13 +73,14 @@ class HelperService {
     }
   }
 
-  static Color getDiagnosisStatusContainerColor(
+  static Color getDiagnosisStatusIconColor(
     ColorScheme colorScheme,
     DiagnosisStatus diagnosisStatus,
   ) {
     switch (diagnosisStatus) {
-      case DiagnosisStatus.processing:
       case DiagnosisStatus.scheduled:
+        return colorScheme.onBackground;
+      case DiagnosisStatus.processing:
         return colorScheme.primary;
       case DiagnosisStatus.finished:
         return colorScheme.secondary;
@@ -90,20 +91,39 @@ class HelperService {
     }
   }
 
+  static Color getDiagnosisStatusContainerColor(
+    ColorScheme colorScheme,
+    DiagnosisStatus diagnosisStatus,
+  ) {
+    switch (diagnosisStatus) {
+      case DiagnosisStatus.scheduled:
+        return colorScheme.onBackground;
+      case DiagnosisStatus.processing:
+        return colorScheme.primaryContainer;
+      case DiagnosisStatus.finished:
+        return colorScheme.secondaryContainer;
+      case DiagnosisStatus.action_required:
+        return colorScheme.tertiaryContainer;
+      case DiagnosisStatus.failed:
+        return colorScheme.errorContainer;
+    }
+  }
+
   static Color getDiagnosisStatusOnContainerColor(
     ColorScheme colorScheme,
     DiagnosisStatus diagnosisStatus,
   ) {
     switch (diagnosisStatus) {
-      case DiagnosisStatus.processing:
       case DiagnosisStatus.scheduled:
-        return colorScheme.onPrimary;
+        return colorScheme.background;
+      case DiagnosisStatus.processing:
+        return colorScheme.onPrimaryContainer;
       case DiagnosisStatus.finished:
-        return colorScheme.onSecondary;
+        return colorScheme.onSecondaryContainer;
       case DiagnosisStatus.action_required:
-        return colorScheme.onTertiary;
+        return colorScheme.onTertiaryContainer;
       case DiagnosisStatus.failed:
-        return colorScheme.onError;
+        return colorScheme.onErrorContainer;
     }
   }
 
@@ -133,5 +153,16 @@ class HelperService {
       "${response.statusCode}: ${response.reasonPhrase}",
     );
     return false;
+  }
+
+  static Iterable<T> getDuplicates<T>(Iterable<T> iterable) {
+    final Set<T> seen = {};
+    final Set<T> duplicates = {};
+
+    for (final T item in iterable) {
+      if (!seen.add(item)) duplicates.add(item);
+    }
+
+    return duplicates;
   }
 }

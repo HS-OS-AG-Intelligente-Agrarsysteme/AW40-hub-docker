@@ -1,15 +1,15 @@
 import "dart:async";
-import "dart:convert";
 
-import "package:aw40_hub_frontend/components/components.dart";
-import "package:aw40_hub_frontend/dtos/dtos.dart";
-import "package:aw40_hub_frontend/exceptions/app_exception.dart";
-import "package:aw40_hub_frontend/models/models.dart";
-import "package:aw40_hub_frontend/providers/providers.dart";
-import "package:aw40_hub_frontend/services/services.dart";
+import "package:aw40_hub_frontend/components/dataset_upload_area.dart";
+import "package:aw40_hub_frontend/components/state_machine_log_view.dart";
+import "package:aw40_hub_frontend/models/action_model.dart";
+import "package:aw40_hub_frontend/models/diagnosis_model.dart";
+import "package:aw40_hub_frontend/models/state_machine_log_entry_model.dart";
+import "package:aw40_hub_frontend/providers/diagnosis_provider.dart";
+import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
-import "package:cross_file/cross_file.dart";
-import "package:desktop_drop/desktop_drop.dart";
+import "package:aw40_hub_frontend/utils/extensions.dart";
+import "package:collection/collection.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:logging/logging.dart";
@@ -28,14 +28,14 @@ class DiagnosisDetailView extends StatefulWidget {
 }
 
 class _DiagnosisDetailView extends State<DiagnosisDetailView> {
-  XFile? _file;
   final Logger _logger = Logger("diagnosis detail view");
+  static const double _spacing = 16;
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme colorScheme = theme.colorScheme;
-    final TextTheme textTheme = theme.textTheme;
+    _updateCaseId();
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
     final DiagnosisStatus status = widget.diagnosisModel.status;
 
     final diagnosisStatusContainerColor =
@@ -55,7 +55,7 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     return SizedBox.expand(
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(_spacing),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -80,18 +80,19 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: _spacing),
               // Case ID
               Text(
                 "${tr('general.case')}: ${widget.diagnosisModel.caseId}",
                 style: textTheme.titleMedium,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: _spacing),
               // Coloured card for current State
               Card(
                 color: diagnosisStatusContainerColor,
                 child: Column(
                   children: [
+                    // State icon, name, description.
                     ListTile(
                       leading: Icon(diagnosisStatusIconData),
                       title: Text(
@@ -101,18 +102,28 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
                       textColor: diagnosisStatusOnContainerColor,
                       iconColor: diagnosisStatusOnContainerColor,
                     ),
+                    // If diagnosis requires file upload, show FileUploadArea.
                     if (status == DiagnosisStatus.action_required)
-                      DiagnosisDragAndDropArea(
-                        fileName: _file?.name,
-                        onUploadFile: _uploadFile,
-                        onDragDone: _onDragDone,
+                      DatasetUploadArea(
+                        caseId: widget.diagnosisModel.caseId,
+                        todos: widget.diagnosisModel.todos,
                       ),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
-              // TBD: State Machine Log
-              const Expanded(child: Placeholder()),
+              const SizedBox(height: _spacing),
+              // State Machine Log
+              Expanded(
+                child: widget.diagnosisModel.stateMachineLog.isEmpty
+                    ? Center(
+                        child: Text(
+                          tr("diagnoses.details.noStateMachineLog"),
+                        ),
+                      )
+                    : StateMachineLogView(
+                        stateMachineLog: widget.diagnosisModel.stateMachineLog,
+                      ),
+              ),
             ],
           ),
         ),
@@ -120,100 +131,50 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
     );
   }
 
-  void _onDragDone(DropDoneDetails dropDoneDetails) {
-    setState(() {
-      final files = dropDoneDetails.files;
-      if (files.isEmpty) {
-        throw AppException(
-          exceptionType: ExceptionType.unexpectedNullValue,
-          exceptionMessage: "`dropDoneDetails.files` is empty.",
-        );
-      }
-      _file = files.first;
-    });
+  void _updateCaseId() {
+    Provider.of<DiagnosisProvider>(
+      context,
+      listen: false,
+    ).diagnosisCaseId = widget.diagnosisModel.caseId;
   }
 
   Text? get _getSubtitle {
     final DiagnosisStatus status = widget.diagnosisModel.status;
-    if (status != DiagnosisStatus.action_required) return null;
-
-    return Text(
-      HelperService.convertIso88591ToUtf8(
-        widget.diagnosisModel.todos[0].instruction,
-      ),
-      softWrap: true,
-      overflow: TextOverflow.ellipsis,
-    );
-  }
-
-  Future<void> _uploadFile() async {
-    final ScaffoldMessengerState scaffoldMessengerState =
-        ScaffoldMessenger.of(context);
-    final diagnosisProvider = Provider.of<DiagnosisProvider>(
-      context,
-      listen: false,
-    );
-
-    try {
-      final XFile file = _file!;
-      final String fileContent = await file.readAsString();
-      bool result = false;
-
-      switch (widget.diagnosisModel.todos.first.dataType) {
-        case "obd":
-          final Map<String, dynamic> jsonMap = jsonDecode(fileContent);
-          final NewOBDDataDto newOBDDataDto = NewOBDDataDto.fromJson(jsonMap);
-
-          result = await diagnosisProvider.uploadObdData(
-            widget.diagnosisModel.caseId,
-            newOBDDataDto,
+    switch (status) {
+      case DiagnosisStatus.finished:
+        final String? faultPath = _getFaultPathFromStateMachineLog(
+          widget.diagnosisModel.stateMachineLog,
+        );
+        return Text(
+          faultPath == null
+              ? "tr('diagnoses.details.noFaultPathFound')"
+              : "Fault path: $faultPath",
+        );
+      case DiagnosisStatus.action_required:
+        final ActionModel? todo = widget.diagnosisModel.todos.firstOrNull;
+        if (todo == null) {
+          _logger.warning(
+            "Status is action_required, but found empty todo list.",
           );
           break;
-        case "oscillogram":
-          final List<int> byteData = utf8.encode(fileContent);
-          result = await diagnosisProvider.uploadPicoscopeData(
-            widget.diagnosisModel.caseId,
-            byteData,
-            file.name,
-          );
-          break;
-        case "symptom":
-          final Map<String, dynamic> jsonMap = jsonDecode(fileContent);
-          final NewSymptomDto newSymptomDto = NewSymptomDto.fromJson(jsonMap);
-
-          result = await diagnosisProvider.uploadSymtomData(
-            widget.diagnosisModel.caseId,
-            newSymptomDto,
-          );
-          break;
-        // TODO: Add case for omniview data.
-        default:
-          throw AppException(
-            exceptionType: ExceptionType.unexpectedNullValue,
-            exceptionMessage: "Unknown data type: "
-                "${widget.diagnosisModel.todos.first.dataType}",
-          );
-      }
-
-      _showMessage(
-        result
-            ? tr("diagnoses.details.uploadDataSuccessMessage")
-            : tr("diagnoses.details.uploadDataErrorMessage"),
-        scaffoldMessengerState,
-      );
-      // ignore: avoid_catches_without_on_clauses
-    } catch (e) {
-      _logger.info("Exception during file upload: $e");
-      _showMessage(
-        tr("diagnoses.details.uploadObdDataErrorMessage"),
-        scaffoldMessengerState,
-      );
+        }
+        return Text(
+          HelperService.convertIso88591ToUtf8(
+            todo.instruction,
+          ),
+          softWrap: true,
+          overflow: TextOverflow.ellipsis,
+        );
+      case DiagnosisStatus.scheduled:
+        break;
+      case DiagnosisStatus.processing:
+        break;
+      case DiagnosisStatus.failed:
+        break;
     }
+    return null;
   }
 
-//***
-// ab hier ist doppelt
-//***
   static Future<bool?> _showConfirmDeleteDialog(BuildContext context) {
     return showDialog<bool>(
       context: context,
@@ -268,5 +229,20 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       content: Center(child: Text(text)),
     );
     state.showSnackBar(snackBar);
+  }
+
+  String? _getFaultPathFromStateMachineLog(
+    List<StateMachineLogEntryModel> stateMachineLog,
+  ) {
+    for (final StateMachineLogEntryModel entry in stateMachineLog) {
+      if (entry.message.contains("FAULT_PATHS")) {
+        final String message = entry.message;
+        return message.substringBetween(
+          startDelimiter: "['",
+          endDelimiter: "']",
+        );
+      }
+    }
+    return "tr('diagnoses.details.noFaultPathFound')";
   }
 }

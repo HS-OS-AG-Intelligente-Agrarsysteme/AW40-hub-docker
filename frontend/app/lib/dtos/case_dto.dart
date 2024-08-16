@@ -1,5 +1,8 @@
+import "package:aw40_hub_frontend/dtos/obd_data_dto.dart";
+import "package:aw40_hub_frontend/dtos/symptom_dto.dart";
+import "package:aw40_hub_frontend/dtos/timeseries_data_dto.dart";
 import "package:aw40_hub_frontend/models/case_model.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:json_annotation/json_annotation.dart";
 
 part "case_dto.g.dart";
@@ -40,9 +43,12 @@ class CaseDto {
       vehicleVin: vehicleVin,
       workshopId: workshopId,
       diagnosisId: diagnosisId,
-      timeseriesData: timeseriesData,
-      obdData: obdData,
-      symptoms: symptoms,
+      timeseriesData: timeseriesData.map((e) => e.toModel()).toList(),
+      obdData: obdData.map((e) => e.toModel()).toList(),
+      symptoms: symptoms.map((e) => e.toModel()).toList(),
+      timeseriesDataAdded: timeseriesDataAdded,
+      obdDataAdded: obdDataAdded,
+      symptomsAdded: symptomsAdded,
     );
   }
 
@@ -61,10 +67,10 @@ class CaseDto {
   @JsonKey(name: "diagnosis_id")
   String? diagnosisId;
   @JsonKey(name: "timeseries_data")
-  List<dynamic> timeseriesData;
+  List<TimeseriesDataDto> timeseriesData;
   @JsonKey(name: "obd_data")
-  List<dynamic> obdData;
-  List<dynamic> symptoms;
+  List<ObdDataDto> obdData;
+  List<SymptomDto> symptoms;
   @JsonKey(name: "timeseries_data_added")
   int timeseriesDataAdded;
   @JsonKey(name: "obd_data_added")

@@ -1,4 +1,7 @@
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/models/obd_data_model.dart";
+import "package:aw40_hub_frontend/models/symptom_model.dart";
+import "package:aw40_hub_frontend/models/timeseries_data_model.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 
 class CaseModel {
   CaseModel({
@@ -14,6 +17,9 @@ class CaseModel {
     required this.timeseriesData,
     required this.obdData,
     required this.symptoms,
+    required this.timeseriesDataAdded,
+    required this.obdDataAdded,
+    required this.symptomsAdded,
   });
 
   String id;
@@ -25,7 +31,10 @@ class CaseModel {
   String vehicleVin;
   String workshopId;
   String? diagnosisId;
-  List<dynamic> timeseriesData;
-  List<dynamic> obdData;
-  List<dynamic> symptoms;
+  List<TimeseriesDataModel> timeseriesData;
+  List<ObdDataModel> obdData;
+  List<SymptomModel> symptoms;
+  int? timeseriesDataAdded;
+  int? obdDataAdded;
+  int? symptomsAdded;
 }
