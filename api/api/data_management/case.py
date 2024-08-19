@@ -7,7 +7,6 @@ from beanie import (
 )
 from pydantic import BaseModel, Field, NonNegativeInt
 
-from .customer import Customer, AnonymousCustomerId
 from .diagnosis import Diagnosis
 from .obd_data import NewOBDData, OBDData, OBDDataUpdate
 from .symptom import NewSymptom, Symptom, SymptomUpdate
@@ -42,7 +41,7 @@ class NewCase(BaseModel):
         }
 
     vehicle_vin: str
-    customer_id: AnonymousCustomerId = Customer.unknown_id
+    customer_id: Optional[PydanticObjectId] = None
     occasion: Occasion = Occasion.unknown
     milage: int = None
 
@@ -72,7 +71,7 @@ class Case(Document):
     status: Status = Status.open
 
     # foreign keys
-    customer_id: Indexed(str, unique=False) = Customer.unknown_id
+    customer_id: Optional[Indexed(str, unique=False)]
     vehicle_vin: Indexed(str, unique=False)
     workshop_id: Indexed(str, unique=False)
     diagnosis_id: Optional[Indexed(PydanticObjectId)]
@@ -99,17 +98,6 @@ class Case(Document):
         if vehicle is None:
             vehicle = Vehicle(vin=self.vehicle_vin)
             await vehicle.insert()
-
-    @before_event(Insert)
-    async def insert_customer(self):
-        """
-        Create the customer if non-existent, e.g. if it is the first case for
-        this customer.
-        """
-        customer = await Customer.get(self.customer_id)
-        if customer is None:
-            customer = Customer(id=self.customer_id)
-            await customer.insert()
 
     @classmethod
     async def find_in_hub(
