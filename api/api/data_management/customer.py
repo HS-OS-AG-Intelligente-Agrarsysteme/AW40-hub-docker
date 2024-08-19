@@ -1,22 +1,28 @@
-from enum import Enum
-from typing import ClassVar
+from datetime import datetime
+from typing import Optional
 
 from beanie import Document
+from pydantic import BaseModel, Field
 
 
-class AnonymousCustomerId(str, Enum):
-    unknown = "unknown"
-    anonymous = "anonymous"
+class CustomerBase(BaseModel):
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "first_name": "FirstName",
+                "last_name": "LastName"
+            }
+        }
+
+    first_name: Optional[str]
+    last_name: Optional[str]
+    address: Optional[str] = None
+    contacts: Optional[dict] = None
 
 
-class Customer(Document):
+class Customer(CustomerBase, Document):
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
 
     class Settings:
         name = "customers"
-
-    # As this is a research project, only allow anonymous customers to avoid
-    # accidental storage of personal information
-    id: AnonymousCustomerId
-
-    # An unknown id is needed to allow indexing cases by customer
-    unknown_id: ClassVar[str] = AnonymousCustomerId.unknown.value
