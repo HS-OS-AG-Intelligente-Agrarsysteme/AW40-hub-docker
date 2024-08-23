@@ -34,7 +34,6 @@ class NewCase(BaseModel):
         schema_extra = {
             "example": {
                 "vehicle_vin": "VIN42",
-                "customer_id": "unknown",
                 "occasion": Occasion.service_routine,
                 "milage": 42
             }
