@@ -111,7 +111,7 @@ class Case(Document):
         """
         filter = {}
         if customer_id is not None:
-            filter["customer_id"] = customer_id
+            filter["customer_id"] = PydanticObjectId(customer_id)
         if vin is not None:
             filter["vehicle_vin"] = vin
         if workshop_id is not None:
