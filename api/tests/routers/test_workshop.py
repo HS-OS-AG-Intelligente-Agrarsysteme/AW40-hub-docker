@@ -191,7 +191,6 @@ def test_list_cases_with_filters(
 def test_add_case(authenticated_client, workshop_id):
     new_case = {
         "vehicle_vin": "test-vin",
-        "customer_id": "unknown",
         "occasion": "unknown",
         "milage": 42
     }
