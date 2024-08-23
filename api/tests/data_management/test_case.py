@@ -21,7 +21,6 @@ def new_case():
     """Valid meta data for a new case"""
     return {
         "vehicle_vin": "test-vin",
-        "customer_id": "unknown",
         "occasion": "unknown",
         "milage": 42
     }
@@ -119,7 +118,7 @@ class TestCase:
             case_3 = dict(**new_case)
 
             # alter customer for case 1 and create
-            case_1_customer_id = "anonymous"
+            case_1_customer_id = "5eb7cf5a86d9755df3a6c593"
             case_1["customer_id"] = case_1_customer_id
             case_1 = Case(**case_1)
             await case_1.create()
@@ -155,7 +154,7 @@ class TestCase:
             assert len(case_3_result) == 1
 
             # confirm expected data
-            assert case_1_result[0].customer_id == case_1_customer_id
+            assert str(case_1_result[0].customer_id) == case_1_customer_id
             assert case_2_result[0].vehicle_vin == case_2_vin
             assert case_3_result[0].workshop_id == case_3_workshop_id
 
