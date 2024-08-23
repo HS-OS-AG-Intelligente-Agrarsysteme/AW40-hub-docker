@@ -15,10 +15,14 @@ class CustomerBase(BaseModel):
             }
         }
 
-    first_name: Optional[str]
-    last_name: Optional[str]
-    address: Optional[str] = None
-    contacts: Optional[dict] = None
+    first_name: str
+    last_name: str
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    postcode: Optional[str] = None
+    city: Optional[str] = None
+    street: Optional[str] = None
+    house_number: Optional[str] = None
 
 
 class Customer(CustomerBase, Document):
