@@ -70,7 +70,7 @@ class Case(Document):
     status: Status = Status.open
 
     # foreign keys
-    customer_id: Optional[Indexed(str, unique=False)]
+    customer_id: Optional[Indexed(PydanticObjectId, unique=False)]
     vehicle_vin: Indexed(str, unique=False)
     workshop_id: Indexed(str, unique=False)
     diagnosis_id: Optional[Indexed(PydanticObjectId)]
