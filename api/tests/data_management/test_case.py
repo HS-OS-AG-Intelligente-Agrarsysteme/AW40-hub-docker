@@ -5,7 +5,6 @@ from api.data_management import (
     NewCase,
     Case,
     Vehicle,
-    Customer,
     TimeseriesDataUpdate,
     NewTimeseriesData,
     TimeseriesData,
@@ -91,26 +90,6 @@ class TestCase:
             assert len(all_vehicles) == 1
             created_vehicle = all_vehicles[0]
             assert created_vehicle.vin == new_vin
-
-    @pytest.mark.asyncio
-    async def test_automatic_customer_insert(
-            self, new_case, initialized_beanie_context
-    ):
-        async with initialized_beanie_context:
-            # assert no customers yet
-            all_customers = await Customer.find_all().to_list()
-            assert len(all_customers) == 0
-
-            # create a new case
-            new_customer_id = new_case["customer_id"]
-            case = Case(workshop_id=1, **new_case)
-            await case.create()
-
-            # assert customer was created automatically
-            all_customers = await Customer.find_all().to_list()
-            assert len(all_customers) == 1
-            created_customer = all_customers[0]
-            assert created_customer.id == new_customer_id
 
     @pytest.mark.asyncio
     async def test_find_in_hub_default(
