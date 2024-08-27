@@ -19,14 +19,17 @@ class BaseSignalStore(ABC):
 
     async def create(self, signal: List[float]) -> str:
         """Store the signal and return the storage id."""
+        del signal
         raise NotImplementedError
 
     async def get(self, id: str) -> List[float]:
         """Get a signal by storage id."""
+        del id
         raise NotImplementedError
 
     async def delete(self, id: str):
         """Delete a signal by storage id."""
+        del id
         raise NotImplementedError
 
 
