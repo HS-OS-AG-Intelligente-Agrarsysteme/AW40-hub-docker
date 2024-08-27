@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+from api.data_management.symptom import SymptomLabel
 from api.data_management import (
     NewCase,
     Case,
@@ -57,7 +58,7 @@ class TestNewCase:
 
 class TestCase:
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_validation_fails_without_workshop_id(
             self, new_case, initialized_beanie_context
     ):
@@ -65,14 +66,14 @@ class TestCase:
             with pytest.raises(ValidationError):
                 Case(**new_case)
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_validation_with_workshop_id(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
-            Case(workshop_id=1, **new_case)
+            Case(workshop_id="1", **new_case)
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_automatic_vehicle_insert(
             self, new_case, initialized_beanie_context
     ):
@@ -83,7 +84,7 @@ class TestCase:
 
             # create a new case
             new_vin = new_case["vehicle_vin"]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             await case.create()
 
             # assert vehicle was created automatically
@@ -92,7 +93,7 @@ class TestCase:
             created_vehicle = all_vehicles[0]
             assert created_vehicle.vin == new_vin
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_automatic_customer_insert(
             self, new_case, initialized_beanie_context
     ):
@@ -103,7 +104,7 @@ class TestCase:
 
             # create a new case
             new_customer_id = new_case["customer_id"]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             await case.create()
 
             # assert customer was created automatically
@@ -112,7 +113,7 @@ class TestCase:
             created_customer = all_customers[0]
             assert created_customer.id == new_customer_id
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_find_in_hub_default(
             self, new_case, initialized_beanie_context
     ):
@@ -122,19 +123,19 @@ class TestCase:
             assert len(all_cases) == 0
 
             # insert a case
-            await Case(workshop_id=1, **new_case).create()
+            await Case(workshop_id="1", **new_case).create()
 
             # find_in_hub without args should work and return all cases
             all_cases = await Case.find_in_hub()
             assert len(all_cases) == 1
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_find_in_hub(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
             # three cases are identical at the beginning
-            new_case["workshop_id"] = 1
+            new_case["workshop_id"] = "1"
             case_1 = dict(**new_case)
             case_2 = dict(**new_case)
             case_3 = dict(**new_case)
@@ -180,18 +181,18 @@ class TestCase:
             assert case_2_result[0].vehicle_vin == case_2_vin
             assert case_3_result[0].workshop_id == case_3_workshop_id
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_data_counter_are_correctly_initilialized(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             # confirm that all dataset counters are initilized with 0
             assert case.timeseries_data_added == 0
             assert case.obd_data_added == 0
             assert case.symptoms_added == 0
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_add_timeseries_data(
             self, new_case, initialized_beanie_context
     ):
@@ -214,12 +215,12 @@ class TestCase:
             """
             async def to_timeseries_data(self):
                 signal_id = test_signal_id
-                meta_data = self.dict(exclude={"signal"})
+                meta_data = self.model_dump(exclude={"signal"})
                 meta_data["signal_id"] = signal_id
                 return TimeseriesData(**meta_data)
 
         async with initialized_beanie_context:
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             # specify non-zero number of previous additions of datasets
             previous_adds = 10
             case.timeseries_data_added = previous_adds
@@ -233,6 +234,7 @@ class TestCase:
             # refetch case and assert existence of single timeseries with
             # expected signal_id
             case_retrieved = await Case.get(case.id)
+            assert case_retrieved != None
             assert len(case_retrieved.timeseries_data) == 1
             timeseries_data_retrieved = case_retrieved.timeseries_data[0]
             assert str(timeseries_data_retrieved.signal_id) == test_signal_id
@@ -245,12 +247,12 @@ class TestCase:
             assert case.timeseries_data_added == previous_adds + 1
             assert case_retrieved.timeseries_data_added == previous_adds + 1
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_add_obd_data(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             # specify non-zero number of previous additions of datasets
             previous_adds = 10
             case.obd_data_added = previous_adds
@@ -261,6 +263,7 @@ class TestCase:
 
             # refetch case and assert existence of single obd_data set
             case_retrieved = await Case.get(case.id)
+            assert case_retrieved != None
             assert len(case_retrieved.obd_data) == 1
 
             # confirm that previous obd_data_added is used as data id
@@ -271,22 +274,23 @@ class TestCase:
             assert case.obd_data_added == previous_adds + 1
             assert case_retrieved.obd_data_added == previous_adds + 1
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_add_symptom(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             # specify non-zero number of previous additions of datasets
             previous_adds = 10
             case.symptoms_added = previous_adds
 
             await case.add_symptom(
-                NewSymptom(**{"component": "battery", "label": "defect"})
+                NewSymptom(**{"component": "battery", "label": SymptomLabel("defect")})
             )
 
             # refetch case and assert existence of single symptom
             case_retrieved = await Case.get(case.id)
+            assert case_retrieved != None
             assert len(case_retrieved.symptoms) == 1
 
             # confirm that previous symptoms_added is used as data id
@@ -297,16 +301,16 @@ class TestCase:
             assert case.symptoms_added == previous_adds + 1
             assert case_retrieved.symptoms_added == previous_adds + 1
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_get_timeseries_data_non_existent(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             retrieved_timeseries_data = case.get_timeseries_data(0)
             assert retrieved_timeseries_data is None
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_get_timeseries_data(
             self, new_case, timeseries_data, initialized_beanie_context
     ):
@@ -314,21 +318,21 @@ class TestCase:
             data_id = 14
             timeseries_data["data_id"] = data_id
             new_case["timeseries_data"] = [timeseries_data]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             retrieved_timeseries_data = case.get_timeseries_data(data_id)
             assert str(retrieved_timeseries_data.signal_id) == \
                    timeseries_data["signal_id"]
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_get_obd_data_non_existent(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             retrieved_obd_data = case.get_obd_data(0)
             assert retrieved_obd_data is None
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_get_obd_data(
             self, new_case, initialized_beanie_context
     ):
@@ -336,20 +340,20 @@ class TestCase:
             data_id = 2
             dtcs = ["P0001", "U0001"]
             new_case["obd_data"] = [{"dtcs": dtcs, "data_id": 2}]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             retrieved_obd_data = case.get_obd_data(data_id)
             assert retrieved_obd_data.dtcs == dtcs
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_get_symptom_non_existent(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             retrieved_symptom = case.get_symptom(0)
             assert retrieved_symptom is None
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_get_symptom(
             self, new_case, initialized_beanie_context
     ):
@@ -359,22 +363,22 @@ class TestCase:
                 "component": "battery", "label": "defect", "data_id": data_id
             }
             new_case["symptoms"] = [symptom]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             retrieved_symptom = case.get_symptom(data_id)
-            assert retrieved_symptom.dict(exclude={"timestamp"}) == symptom
+            assert retrieved_symptom.model_dump(exclude={"timestamp"}) == symptom
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_delete_timeseries_data_non_existent(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             await case.delete_timeseries_data(0)
 
     @mock.patch(
         "api.data_management.case.TimeseriesData.delete_signal", autospec=True
     )
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_delete_timeseries_data(
             self,
             delete_signal,
@@ -392,7 +396,7 @@ class TestCase:
 
             # seed case with timeseries_data and save to db
             new_case["timeseries_data"] = [timeseries_data]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             await case.save()
 
             # delete and confirm removal from instance
@@ -401,20 +405,21 @@ class TestCase:
 
             # refetch case and assert deletion in database
             case_retrieved = await Case.get(case.id)
+            assert case_retrieved != None
             assert case_retrieved.timeseries_data == []
 
             # confirm that TimeseriesData.delete_signal was awaited
             delete_signal.assert_awaited()
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_delete_obd_data_non_existent(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             await case.delete_obd_data(0)
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_delete_obd_data(
             self, new_case, initialized_beanie_context
     ):
@@ -424,7 +429,7 @@ class TestCase:
             # seed case with obd_data and save to db
             dtcs = ["P0001", "U0001"]
             new_case["obd_data"] = [{"dtcs": dtcs, "data_id": data_id}]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             await case.save()
 
             # delete and confirm removal from instance
@@ -433,17 +438,18 @@ class TestCase:
 
             # refetch case and assert deletion in database
             case_retrieved = await Case.get(case.id)
+            assert case_retrieved != None
             assert case_retrieved.obd_data == []
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_delete_symptom_non_existent(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             await case.delete_symptom(0)
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_delete_symptoms(
             self, new_case, initialized_beanie_context
     ):
@@ -455,7 +461,7 @@ class TestCase:
                 "component": "battery", "label": "defect", "data_id": data_id
             }
             new_case["symptoms"] = [symptom]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             await case.save()
 
             # delete and confirm removal from instance
@@ -464,17 +470,18 @@ class TestCase:
 
             # refetch case and assert deletion in database
             case_retrieved = await Case.get(case.id)
+            assert case_retrieved != None
             assert case_retrieved.symptoms == []
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_update_timeseries_data_non_existent(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             assert await case.update_timeseries_data(0, update={}) is None
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_update_timeseries_data(
             self,
             new_case,
@@ -490,7 +497,7 @@ class TestCase:
 
             # seed case with timeseries datasets that has old label
             new_case["timeseries_data"] = [timeseries_data]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             await case.save()
 
             # update the timeseries dataset with new_label
@@ -502,17 +509,18 @@ class TestCase:
 
             # refetch case and assert update in database
             case_retrieved = await Case.get(case.id)
+            assert case_retrieved != None
             assert case_retrieved.timeseries_data[0].label == new_label
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_update_obd_data_non_existent(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             assert await case.update_obd_data(0, update={}) is None
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_update_obd_data(
             self,
             new_case,
@@ -528,7 +536,7 @@ class TestCase:
 
             # seed case with obd dataset that has old specs
             new_case["obd_data"] = [obd_data]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             await case.save()
 
             # update obd dataset with new_specs
@@ -540,17 +548,18 @@ class TestCase:
 
             # refetch case and assert update in database
             case_retrieved = await Case.get(case.id)
+            assert case_retrieved != None
             assert case_retrieved.obd_data[0].obd_specs == new_specs
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_update_symptom_non_existent(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             assert await case.update_symptom(0, update={}) is None
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_update_symptom(
             self,
             new_case,
@@ -565,11 +574,11 @@ class TestCase:
 
             # seed case with symptom that has old label
             new_case["symptoms"] = [symptom]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             await case.save()
 
             # update symptom with new_label
-            update = SymptomUpdate(**{"label": new_label})
+            update = SymptomUpdate(**{"label": SymptomLabel(new_label)})
             await case.update_symptom(data_id=data_id, update=update)
 
             # confirm correct update of instance
@@ -577,9 +586,10 @@ class TestCase:
 
             # refetch case and assert update in database
             case_retrieved = await Case.get(case.id)
+            assert case_retrieved != None
             assert case_retrieved.symptoms[0].label == new_label
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_available_timeseries_data(
             self, new_case, timeseries_data, initialized_beanie_context
     ):
@@ -588,10 +598,10 @@ class TestCase:
             ts_data_1 = dict(**timeseries_data, data_id=data_ids[0])
             ts_data_2 = dict(**timeseries_data, data_id=data_ids[1])
             new_case["timeseries_data"] = [ts_data_1, ts_data_2]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             assert case.available_timeseries_data == data_ids
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_available_obd_data(
             self, new_case, initialized_beanie_context
     ):
@@ -601,10 +611,10 @@ class TestCase:
                 {"dtcs": ["P0000"], "data_id": d_id}
                 for d_id in data_ids
             ]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             assert case.available_obd_data == data_ids
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_available_symptoms(
             self, new_case, initialized_beanie_context
     ):
@@ -614,13 +624,13 @@ class TestCase:
                 {"component": "battery", "label": "defect", "data_id": d_id}
                 for d_id in data_ids
             ]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             assert case.available_symptoms == data_ids
 
     @mock.patch(
         "api.data_management.case.TimeseriesData.delete_signal", autospec=True
     )
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_delete_all_timeseries_signals(
             self,
             delete_signal,
@@ -637,7 +647,7 @@ class TestCase:
             new_case["timeseries_data"] = [
                 timeseries_data, timeseries_data
             ]
-            case = Case(workshop_id=1, **new_case)
+            case = Case(workshop_id="1", **new_case)
             await case.save()
             await case._delete_all_timeseries_signals()
 
