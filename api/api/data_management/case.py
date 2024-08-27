@@ -3,9 +3,12 @@ from enum import Enum
 from typing import List, Union, Optional
 
 from beanie import (
-    Document, Indexed, before_event, Insert, Delete, PydanticObjectId
+from pydantic import (
+    BaseModel,
+    Field,
+    NonNegativeInt,
+    ConfigDict
 )
-from pydantic import BaseModel, Field, NonNegativeInt
 
 from .customer import Customer, AnonymousCustomerId
 from .diagnosis import Diagnosis
@@ -31,8 +34,8 @@ class Status(str, Enum):
 class NewCase(BaseModel):
     """Schema for new cases added via the api."""
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "vehicle_vin": "VIN42",
                 "customer_id": "unknown",
@@ -40,6 +43,7 @@ class NewCase(BaseModel):
                 "milage": 42
             }
         }
+    )
 
     vehicle_vin: str
     customer_id: AnonymousCustomerId = Customer.unknown_id
@@ -58,9 +62,11 @@ class CaseUpdate(BaseModel):
 class Case(Document):
     """Complete case schema and major db interfacing class."""
 
-    class Config:
-        validate_assignment = True
-        fields = {"schema_version": {"exclude": True}}
+    model_config = ConfigDict(
+        validate_assignment=True
+        # fields = {"schema_version": {"exclude": True}}
+        # TODO: Find new solution to exclude field
+    )
 
     class Settings:
         name = "cases"

@@ -6,7 +6,12 @@ from typing import List, ClassVar, Literal
 import numpy as np
 from beanie import PydanticObjectId
 from motor import motor_asyncio
-from pydantic import BaseModel, Field, NonNegativeInt
+from pydantic import (
+    BaseModel,
+    Field,
+    NonNegativeInt,
+    ConfigDict
+)
 
 
 class BaseSignalStore(ABC):
@@ -58,8 +63,9 @@ class TimeseriesDataLabel(str, Enum):
 class TimeseriesMetaData(BaseModel):
     """Schema for timeseries meta data."""
 
-    class Config:
-        validate_assignment = True
+    model_config = ConfigDict(
+        validate_assignment=True
+    )
 
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     component: str
@@ -77,12 +83,13 @@ class TimeseriesMetaData(BaseModel):
 class TimeseriesDataUpdate(BaseModel):
     """Schema for updating timeseries meta data."""
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "label": "anomaly",
             }
         }
+    )
 
     timestamp: datetime = None
     component: str = None
@@ -96,11 +103,11 @@ class TimeseriesDataUpdate(BaseModel):
 class TimeseriesData(TimeseriesMetaData):
     """Schema for existing timeseries data."""
 
-    class Config:
-        json_encoders = {
+    model_config = ConfigDict(
+        json_encoders={
             PydanticObjectId: str,
-        }
-        json_schema_extra = {
+        },
+        json_schema_extra={
             "example": {
                 "timestamp": "2023-04-04T07:07:22.643103",
                 "component": "battery",
@@ -113,6 +120,7 @@ class TimeseriesData(TimeseriesMetaData):
                 "signal_id": "642bccaa392b553201b2ac9f"
             }
         }
+    )
 
     data_id: NonNegativeInt = None
 
@@ -131,8 +139,8 @@ class TimeseriesData(TimeseriesMetaData):
 class NewTimeseriesData(TimeseriesMetaData):
     """Schema for new timeseries data added via the api."""
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "component": "battery",
                 "label": "norm",
@@ -142,6 +150,7 @@ class NewTimeseriesData(TimeseriesMetaData):
                 "signal": [0., 1., 2.]
             }
         }
+    )
 
     signal: List[float]
 

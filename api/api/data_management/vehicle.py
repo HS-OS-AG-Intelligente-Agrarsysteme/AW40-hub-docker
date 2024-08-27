@@ -19,9 +19,9 @@ class Component(str, Enum):
 
 class Vehicle(Document):
 
-    class Config:
-        # 'vin' is used instead of 'id'
-        fields = {"id": {"exclude": True}}
+    # class Config:
+    # 'vin' is used instead of 'id'
+    #    fields = {"id": {"exclude": True}} # Deprecated
 
     class Settings:
         name = "vehicles"
