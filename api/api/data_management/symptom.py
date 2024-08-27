@@ -1,5 +1,6 @@
 from datetime import datetime, UTC
 from enum import Enum
+from typing import Optional
 
 from pydantic import (
     BaseModel,
@@ -44,7 +45,7 @@ class Symptom(NewSymptom):
         }
     )
 
-    data_id: NonNegativeInt = None
+    data_id: Optional[NonNegativeInt] = None
 
 
 class SymptomUpdate(BaseModel):
@@ -58,6 +59,6 @@ class SymptomUpdate(BaseModel):
         }
     )
 
-    timestamp: datetime = None
-    component: str = None
-    label: SymptomLabel = None
+    timestamp: Optional[datetime] = None
+    component: Optional[str] = None
+    label: Optional[SymptomLabel] = None

@@ -1,4 +1,5 @@
 from enum import Enum
+from typing_extensions import Annotated, Optional
 
 from beanie import Document, Indexed
 from pydantic import BaseModel
@@ -26,11 +27,11 @@ class Vehicle(Document):
     class Settings:
         name = "vehicles"
 
-    vin: Indexed(str, unique=True)
-    tsn: str = None
-    year_build: int = None
+    vin: Annotated[str, Indexed(str, unique=True)]
+    tsn: Optional[str] = None
+    year_build: Optional[int] = None
 
 
 class VehicleUpdate(BaseModel):
-    tsn: str = None
-    year_build: int = None
+    tsn: Optional[str] = None
+    year_build: Optional[int] = None

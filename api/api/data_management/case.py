@@ -1,8 +1,21 @@
 from datetime import datetime, UTC
 from enum import Enum
-from typing import List, Union, Optional
+from typing import (
+    Annotated,
+    List,
+    Optional,
+    Tuple,
+    Any
+)
 
 from beanie import (
+    Document,
+    Indexed,
+    before_event,
+    Insert,
+    Delete,
+    PydanticObjectId
+)
 from pydantic import (
     BaseModel,
     Field,
@@ -46,17 +59,17 @@ class NewCase(BaseModel):
     )
 
     vehicle_vin: str
-    customer_id: AnonymousCustomerId = Customer.unknown_id
+    customer_id: AnonymousCustomerId = AnonymousCustomerId.unknown
     occasion: Occasion = Occasion.unknown
-    milage: int = None
+    milage: Optional[int] = None
 
 
 class CaseUpdate(BaseModel):
     """Metadata of a case that can be updated after creation."""
-    timestamp: datetime = None
-    occasion: Occasion = None
-    milage: int = None
-    status: Status = None
+    timestamp: Optional[datetime] = None
+    occasion: Optional[Occasion] = None
+    milage: Optional[int] = None
+    status: Optional[Status] = None
 
 
 class Case(Document):
@@ -74,14 +87,14 @@ class Case(Document):
     # case descriptions
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     occasion: Occasion = Occasion.unknown
-    milage: int = None
+    milage: Optional[int] = None
     status: Status = Status.open
 
     # foreign keys
-    customer_id: Indexed(str, unique=False) = Customer.unknown_id
-    vehicle_vin: Indexed(str, unique=False)
-    workshop_id: Indexed(str, unique=False)
-    diagnosis_id: Optional[Indexed(PydanticObjectId)]
+    customer_id: Annotated[str, Indexed(str, unique=False)] = Customer.unknown_id
+    vehicle_vin: Annotated[str, Indexed(str, unique=False)]
+    workshop_id: Annotated[str, Indexed(str, unique=False)]
+    diagnosis_id: Optional[Annotated[PydanticObjectId, Indexed(PydanticObjectId)]] = None
 
     # diagnostic data
     timeseries_data: List[TimeseriesData] = []
@@ -120,9 +133,9 @@ class Case(Document):
     @classmethod
     async def find_in_hub(
             cls,
-            customer_id: str = None,
-            vin: str = None,
-            workshop_id: str = None
+            customer_id: Optional[str] = None,
+            vin: Optional[str] = None,
+            workshop_id: Optional[str] = None
     ):
         """
         Get list of all cases filtered by customer_id, vehicle_vin and
@@ -168,7 +181,7 @@ class Case(Document):
     @staticmethod
     def find_data_in_array(
             data_array: list, data_id: NonNegativeInt
-    ) -> (NonNegativeInt, Union[TimeseriesData, OBDData, Symptom]):
+    ) -> Tuple[NonNegativeInt, Any] | Tuple[None, None]:
         for i, d in enumerate(data_array):
             if d.data_id == data_id:
                 return i, d

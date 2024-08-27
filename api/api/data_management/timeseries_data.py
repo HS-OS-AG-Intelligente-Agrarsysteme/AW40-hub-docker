@@ -1,7 +1,7 @@
 from abc import ABC
 from datetime import datetime, UTC
 from enum import Enum
-from typing import List, ClassVar, Literal
+from typing import List, ClassVar, Literal, Optional
 
 import numpy as np
 from beanie import PydanticObjectId
@@ -73,7 +73,7 @@ class TimeseriesMetaData(BaseModel):
     sampling_rate: int
     duration: int
     type: Literal["oscillogram"] = "oscillogram"
-    device_specs: dict = None
+    device_specs: Optional[dict] = None
 
     # signal_store to convert between actual signal data and signal data
     # references in subclasses
@@ -91,13 +91,13 @@ class TimeseriesDataUpdate(BaseModel):
         }
     )
 
-    timestamp: datetime = None
-    component: str = None
-    label: TimeseriesDataLabel = None
-    sampling_rate: int = None
-    duration: int = None
-    type: str = None
-    device_specs: dict = None
+    timestamp: Optional[datetime] = None
+    component: Optional[str] = None
+    label: Optional[TimeseriesDataLabel] = None
+    sampling_rate: Optional[int] = None
+    duration: Optional[int] = None
+    type: Optional[str] = None
+    device_specs: Optional[dict] = None
 
 
 class TimeseriesData(TimeseriesMetaData):
@@ -122,18 +122,18 @@ class TimeseriesData(TimeseriesMetaData):
         }
     )
 
-    data_id: NonNegativeInt = None
+    data_id: Optional[NonNegativeInt] = None
 
     # Ref to signal data instead of actual data
     signal_id: PydanticObjectId
 
     async def get_signal(self):
         """Fetches the actual signal data on demand."""
-        return await self.signal_store.get(self.signal_id)
+        return await self.signal_store.get(str(self.signal_id))
 
     async def delete_signal(self):
         """Delete the actual signal data."""
-        await self.signal_store.delete(self.signal_id)
+        await self.signal_store.delete(str(self.signal_id))
 
 
 class NewTimeseriesData(TimeseriesMetaData):

@@ -1,5 +1,5 @@
-from typing import List
 from datetime import datetime, UTC
+from typing import List, Optional, Annotated
 
 from pydantic import (
     BaseModel,
@@ -11,8 +11,8 @@ from pydantic import (
 
 
 class OBDMetaData(BaseModel):
-    obd_specs: dict = None
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    obd_specs: Optional[dict] = None
 
 
 class NewOBDData(OBDMetaData):
@@ -41,8 +41,9 @@ class OBDData(NewOBDData):
                 "data_id": 0
             }
         }
+    )
 
-    data_id: NonNegativeInt = None
+    data_id: Optional[NonNegativeInt] = None
 
 
 class OBDDataUpdate(BaseModel):
@@ -56,5 +57,5 @@ class OBDDataUpdate(BaseModel):
         }
     )
 
-    timestamp: datetime = None
-    obd_specs: dict = None
+    timestamp: Optional[datetime] = None
+    obd_specs: Optional[dict] = None
