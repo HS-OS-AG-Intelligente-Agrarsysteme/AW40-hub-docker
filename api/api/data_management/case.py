@@ -150,14 +150,16 @@ class Case(Document):
         return self
 
     async def add_obd_data(self, new_obd_data: NewOBDData) -> "Case":
-        obd_data = OBDData(data_id=self.obd_data_added, **new_obd_data.dict())
+        obd_data = OBDData(data_id=self.obd_data_added,
+                           **new_obd_data.model_dump())
         self.obd_data.append(obd_data)
         self.obd_data_added += 1
         await self.save()
         return self
 
     async def add_symptom(self, new_symptom: NewSymptom) -> "Case":
-        symptom = Symptom(data_id=self.symptoms_added, **new_symptom.dict())
+        symptom = Symptom(data_id=self.symptoms_added,
+                          **new_symptom.model_dump())
         self.symptoms.append(symptom)
         self.symptoms_added += 1
         await self.save()
@@ -223,8 +225,8 @@ class Case(Document):
             data_array=self.timeseries_data, data_id=data_id
         )
         if timeseries_data is not None:
-            timeseries_data = timeseries_data.dict()
-            timeseries_data.update(update.dict(exclude_unset=True))
+            timeseries_data = timeseries_data.model_dump()
+            timeseries_data.update(update.model_dump(exclude_unset=True))
             timeseries_data = TimeseriesData(**timeseries_data)
             self.timeseries_data[idx] = timeseries_data
             await self.save()
@@ -237,8 +239,8 @@ class Case(Document):
             data_array=self.obd_data, data_id=data_id
         )
         if obd_data is not None:
-            obd_data = obd_data.dict()
-            obd_data.update(update.dict(exclude_unset=True))
+            obd_data = obd_data.model_dump()
+            obd_data.update(update.model_dump(exclude_unset=True))
             obd_data = OBDData(**obd_data)
             self.obd_data[idx] = obd_data
             await self.save()
@@ -251,8 +253,8 @@ class Case(Document):
             data_array=self.symptoms, data_id=data_id
         )
         if symptom is not None:
-            symptom = symptom.dict()
-            symptom.update(update.dict(exclude_unset=True))
+            symptom = symptom.model_dump()
+            symptom.update(update.model_dump(exclude_unset=True))
             symptom = Symptom(**symptom)
             self.symptoms[idx] = symptom
             await self.save()

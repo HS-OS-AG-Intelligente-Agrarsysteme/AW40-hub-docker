@@ -161,7 +161,7 @@ class NewTimeseriesData(TimeseriesMetaData):
         data.
         """
         signal_id = await self.signal_store.create(self.signal)
-        meta_data = self.dict(exclude={"signal"})
+        meta_data = self.model_dump(exclude={"signal"})
         meta_data["signal_id"] = signal_id
         return TimeseriesData(**meta_data)
 
