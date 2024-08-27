@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from enum import Enum
 
 from pydantic import (
@@ -26,7 +26,7 @@ class NewSymptom(BaseModel):
         }
     )
 
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     component: str
     label: SymptomLabel
 

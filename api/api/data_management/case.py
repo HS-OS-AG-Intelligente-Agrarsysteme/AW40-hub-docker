@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from enum import Enum
 from typing import List, Union, Optional
 
@@ -72,7 +72,7 @@ class Case(Document):
         name = "cases"
 
     # case descriptions
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     occasion: Occasion = Occasion.unknown
     milage: int = None
     status: Status = Status.open

@@ -1,5 +1,5 @@
-from datetime import datetime
 from typing import List
+from datetime import datetime, UTC
 
 from pydantic import (
     BaseModel,
@@ -11,8 +11,8 @@ from pydantic import (
 
 
 class OBDMetaData(BaseModel):
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
     obd_specs: dict = None
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class NewOBDData(OBDMetaData):

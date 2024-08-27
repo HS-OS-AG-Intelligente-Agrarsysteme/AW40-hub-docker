@@ -1,5 +1,5 @@
 from abc import ABC
-from datetime import datetime
+from datetime import datetime, UTC
 from enum import Enum
 from typing import List, ClassVar, Literal
 
@@ -67,7 +67,7 @@ class TimeseriesMetaData(BaseModel):
         validate_assignment=True
     )
 
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     component: str
     label: TimeseriesDataLabel
     sampling_rate: int

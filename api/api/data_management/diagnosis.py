@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from enum import Enum
 from typing import List, Optional
 
@@ -51,8 +51,8 @@ class Diagnosis(Document):
     class Settings:
         name = "diagnosis"
 
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
     status: DiagnosisStatus = None
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     state_machine_log: List[DiagnosisLogEntry] = []
     case_id: Indexed(PydanticObjectId, unique=True)
     todos: List[Action] = []
