@@ -13,7 +13,7 @@ class NewOBDData(OBDMetaData):
     """Schema for new obd data added via the api."""
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "dtcs": ["P0001", "U0001"]
             }
@@ -26,7 +26,7 @@ class OBDData(NewOBDData):
     """Schema for existing timeseries data."""
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "timestamp": "2023-04-04T07:11:24.032000",
                 "obd_specs": None,
@@ -42,7 +42,7 @@ class OBDDataUpdate(BaseModel):
     """Schema for updating obd meta data."""
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "obd_specs": {"device": "VCDS"},
             }

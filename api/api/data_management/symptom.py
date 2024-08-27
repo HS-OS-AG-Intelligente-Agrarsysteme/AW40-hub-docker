@@ -13,7 +13,7 @@ class SymptomLabel(str, Enum):
 class NewSymptom(BaseModel):
     """Schema for a new symptom added via the api."""
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "component": "battery",
                 "label": "defect"
@@ -28,7 +28,7 @@ class NewSymptom(BaseModel):
 class Symptom(NewSymptom):
     """Schema for existing symptom."""
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "timestamp": "2023-04-04T07:15:22.887633",
                 "component": "battery",
@@ -44,7 +44,7 @@ class SymptomUpdate(BaseModel):
     """Schema to update a symptom."""
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "label": "defect"
             }

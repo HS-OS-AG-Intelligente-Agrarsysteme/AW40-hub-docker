@@ -32,7 +32,7 @@ class NewCase(BaseModel):
     """Schema for new cases added via the api."""
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "vehicle_vin": "VIN42",
                 "customer_id": "unknown",

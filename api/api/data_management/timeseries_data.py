@@ -78,7 +78,7 @@ class TimeseriesDataUpdate(BaseModel):
     """Schema for updating timeseries meta data."""
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "label": "anomaly",
             }
@@ -100,7 +100,7 @@ class TimeseriesData(TimeseriesMetaData):
         json_encoders = {
             PydanticObjectId: str,
         }
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "timestamp": "2023-04-04T07:07:22.643103",
                 "component": "battery",
@@ -132,7 +132,7 @@ class NewTimeseriesData(TimeseriesMetaData):
     """Schema for new timeseries data added via the api."""
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "component": "battery",
                 "label": "norm",
