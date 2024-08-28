@@ -1,7 +1,7 @@
 from abc import ABC
 from datetime import datetime, UTC
 from enum import Enum
-from typing import List, ClassVar, Literal, Optional
+from typing import List, ClassVar, Literal, Optional, Any
 
 import numpy as np
 from beanie import PydanticObjectId
@@ -17,17 +17,17 @@ from pydantic import (
 class BaseSignalStore(ABC):
     """Interface definition for a signal store."""
 
-    async def create(self, signal: List[float]) -> str:
+    async def create(self, signal: List[float]) -> Any:
         """Store the signal and return the storage id."""
         del signal
         raise NotImplementedError
 
-    async def get(self, id: str) -> List[float]:
+    async def get(self, id: Any) -> List[float]:
         """Get a signal by storage id."""
         del id
         raise NotImplementedError
 
-    async def delete(self, id: str):
+    async def delete(self, id: Any):
         """Delete a signal by storage id."""
         del id
         raise NotImplementedError
@@ -39,7 +39,7 @@ class GridFSSignalStore(BaseSignalStore):
     def __init__(self, bucket: motor_asyncio.AsyncIOMotorGridFSBucket):
         self._bucket = bucket
 
-    async def create(self, signal: List[float]) -> str:
+    async def create(self, signal: List[float]) -> Any:
         signal_bytes = np.array(signal).tobytes()
         id = await self._bucket.upload_from_stream(
             filename="",
@@ -47,13 +47,13 @@ class GridFSSignalStore(BaseSignalStore):
         )
         return id
 
-    async def get(self, id: str) -> List[float]:
+    async def get(self, id: Any) -> List[float]:
         grid_out = await self._bucket.open_download_stream(id)
         signal_bytes = await grid_out.read()
         signal = np.frombuffer(signal_bytes, dtype=float).tolist()
         return signal
 
-    async def delete(self, id: str):
+    async def delete(self, id: Any):
         await self._bucket.delete(id)
 
 
@@ -132,11 +132,11 @@ class TimeseriesData(TimeseriesMetaData):
 
     async def get_signal(self):
         """Fetches the actual signal data on demand."""
-        return await self.signal_store.get(str(self.signal_id))
+        return await self.signal_store.get(self.signal_id)
 
     async def delete_signal(self):
         """Delete the actual signal data."""
-        await self.signal_store.delete(str(self.signal_id))
+        await self.signal_store.delete(self.signal_id)
 
 
 class NewTimeseriesData(TimeseriesMetaData):
