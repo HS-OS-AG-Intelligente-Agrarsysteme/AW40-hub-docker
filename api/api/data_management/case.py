@@ -92,10 +92,10 @@ class Case(Document):
     status: Status = Status.open
 
     # foreign keys
-    customer_id: Annotated[str, Indexed(str, unique=False)] = Customer.unknown_id
-    vehicle_vin: Annotated[str, Indexed(str, unique=False)]
-    workshop_id: Annotated[str, Indexed(str, unique=False)]
-    diagnosis_id: Optional[Annotated[PydanticObjectId, Indexed(PydanticObjectId)]] = None
+    customer_id: Annotated[str, Indexed(unique=False)] = Customer.unknown_id
+    vehicle_vin: Annotated[str, Indexed(unique=False)]
+    workshop_id: Annotated[str, Indexed(unique=False)]
+    diagnosis_id: Optional[Annotated[PydanticObjectId, Indexed()]] = None
 
     # diagnostic data
     timeseries_data: List[TimeseriesData] = []
