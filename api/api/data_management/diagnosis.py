@@ -33,7 +33,7 @@ class DiagnosisLogEntry(BaseModel):
 
 
 class AttachmentBucket:
-    bucket: motor_asyncio.AsyncIOMotorGridFSBucket = None
+    bucket: Optional[motor_asyncio.AsyncIOMotorGridFSBucket] = None
 
     @classmethod
     def create(cls):
