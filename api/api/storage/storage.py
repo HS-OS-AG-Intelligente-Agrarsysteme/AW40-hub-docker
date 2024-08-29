@@ -29,7 +29,7 @@ class Storage(ABC):
     def put_data(self, key: str, **attributes):
         raise NotImplementedError
 
-    def get_download_link(self, key: str, data: BinaryIO, **attributes):
+    def get_download_link(self, key: str, **attributes):
         raise NotImplementedError
 
     def get_upload_link(self, key: str, **attributes):
