@@ -5,7 +5,8 @@ from typing import (
     List,
     Optional,
     Tuple,
-    Any
+    Any,
+    Self
 )
 
 from beanie import (
@@ -152,7 +153,7 @@ class Case(Document):
         cases = await cls.find(filter).to_list()
         return cases
 
-    async def add_timeseries_data(self, new_data: NewTimeseriesData) -> "Case":
+    async def add_timeseries_data(self, new_data: NewTimeseriesData) -> Self:
         # signal data is stored and converted to ref
         timeseries_data = await new_data.to_timeseries_data()
         # append to data array
@@ -162,7 +163,7 @@ class Case(Document):
         await self.save()
         return self
 
-    async def add_obd_data(self, new_obd_data: NewOBDData) -> "Case":
+    async def add_obd_data(self, new_obd_data: NewOBDData) -> Self:
         obd_data = OBDData(data_id=self.obd_data_added,
                            **new_obd_data.model_dump())
         self.obd_data.append(obd_data)
@@ -170,7 +171,7 @@ class Case(Document):
         await self.save()
         return self
 
-    async def add_symptom(self, new_symptom: NewSymptom) -> "Case":
+    async def add_symptom(self, new_symptom: NewSymptom) -> Self:
         symptom = Symptom(data_id=self.symptoms_added,
                           **new_symptom.model_dump())
         self.symptoms.append(symptom)
