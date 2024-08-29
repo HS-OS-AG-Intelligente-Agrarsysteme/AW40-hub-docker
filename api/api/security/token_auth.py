@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, status, Path
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import jwt, JWTError
-from pydantic import BaseModel, Field, root_validator
+from pydantic import BaseModel, Field, model_validator
 
 
 from .keycloak import Keycloak
@@ -24,7 +24,7 @@ class TokenData(BaseModel):
     username: str = Field(alias="preferred_username")
     roles: list[str]
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
     @classmethod
     def parse_roles_from_keycloak_token(cls, values):
         values["roles"] = values.get("realm_access", {}).get("roles", [])
