@@ -1,4 +1,10 @@
-from typing import List, Literal, Callable
+from typing import (
+    List,
+    Literal,
+    Callable,
+    Optional,
+    Sequence
+)
 
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -26,10 +32,10 @@ router = APIRouter(
 
 @router.get("/cases", status_code=200, response_model=List[Case])
 async def list_cases(
-        customer_id: str = None,
-        vin: str = None,
-        workshop_id: str = None
-) -> List[Case]:
+        customer_id: Optional[str] = None,
+        vin: Optional[str] = None,
+        workshop_id: Optional[str] = None
+) -> Sequence[Case]:
     """
     List all cases in Hub. Query params can be used to filter by `customer_id`,
     `vin` and `workshop_id`.
@@ -48,12 +54,12 @@ async def case_by_id(case_id: str) -> Case:
         status_code=404, detail=f"No case with id `{case_id}`."
     )
     try:
-        case_id = ObjectId(case_id)
+        _case_id = ObjectId(case_id)
     except InvalidId:
         # invalid id reports not found to user
         raise no_case_exception
 
-    case = await Case.get(case_id)
+    case = await Case.get(_case_id)
     if case is not None:
         return case
     else:
