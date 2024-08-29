@@ -6,6 +6,7 @@ from typing import (
     Optional,
     Tuple,
     Any,
+    Sequence,
     Self
 )
 
@@ -128,7 +129,7 @@ class Case(Document):
         """
         customer = await Customer.get(self.customer_id)
         if customer is None:
-            customer = Customer(id=self.customer_id)
+            customer = Customer(id=AnonymousCustomerId(self.customer_id))
             await customer.insert()
 
     @classmethod
@@ -137,7 +138,7 @@ class Case(Document):
             customer_id: Optional[str] = None,
             vin: Optional[str] = None,
             workshop_id: Optional[str] = None
-    ):
+    ) -> Sequence[Self]:
         """
         Get list of all cases filtered by customer_id, vehicle_vin and
         workshop_id.
@@ -189,19 +190,20 @@ class Case(Document):
 
         return None, None
 
-    def get_timeseries_data(self, data_id: NonNegativeInt) -> TimeseriesData:
+    def get_timeseries_data(self, data_id: NonNegativeInt
+    ) -> TimeseriesData | None:
         _, timeseries_data = self.find_data_in_array(
             data_array=self.timeseries_data, data_id=data_id
         )
         return timeseries_data
 
-    def get_obd_data(self, data_id: NonNegativeInt) -> OBDData:
+    def get_obd_data(self, data_id: NonNegativeInt) -> OBDData | None:
         _, obd_data = self.find_data_in_array(
             data_array=self.obd_data, data_id=data_id
         )
         return obd_data
 
-    def get_symptom(self, data_id: NonNegativeInt) -> Symptom:
+    def get_symptom(self, data_id: NonNegativeInt) -> Symptom | None:
         _, symptom = self.find_data_in_array(
             data_array=self.symptoms, data_id=data_id
         )
@@ -211,7 +213,7 @@ class Case(Document):
         idx, timeseries_data = self.find_data_in_array(
             data_array=self.timeseries_data, data_id=data_id
         )
-        if timeseries_data is not None:
+        if timeseries_data is not None and idx is not None:
             await timeseries_data.delete_signal()
             self.timeseries_data.pop(idx)
             await self.save()
@@ -234,11 +236,11 @@ class Case(Document):
 
     async def update_timeseries_data(
             self, data_id: NonNegativeInt, update: TimeseriesDataUpdate
-    ) -> TimeseriesData:
+    ) -> TimeseriesData | None:
         idx, timeseries_data = self.find_data_in_array(
             data_array=self.timeseries_data, data_id=data_id
         )
-        if timeseries_data is not None:
+        if timeseries_data is not None and idx is not None:
             timeseries_data = timeseries_data.model_dump()
             timeseries_data.update(update.model_dump(exclude_unset=True))
             timeseries_data = TimeseriesData(**timeseries_data)
@@ -248,11 +250,11 @@ class Case(Document):
 
     async def update_obd_data(
             self, data_id: NonNegativeInt, update: OBDDataUpdate
-    ) -> OBDData:
+    ) -> OBDData | None:
         idx, obd_data = self.find_data_in_array(
             data_array=self.obd_data, data_id=data_id
         )
-        if obd_data is not None:
+        if obd_data is not None and idx is not None:
             obd_data = obd_data.model_dump()
             obd_data.update(update.model_dump(exclude_unset=True))
             obd_data = OBDData(**obd_data)
@@ -262,11 +264,11 @@ class Case(Document):
 
     async def update_symptom(
             self, data_id: NonNegativeInt, update: SymptomUpdate
-    ) -> Symptom:
+    ) -> Symptom | None:
         idx, symptom = self.find_data_in_array(
             data_array=self.symptoms, data_id=data_id
         )
-        if symptom is not None:
+        if symptom is not None and idx is not None:
             symptom = symptom.model_dump()
             symptom.update(update.model_dump(exclude_unset=True))
             symptom = Symptom(**symptom)
@@ -305,4 +307,5 @@ class Case(Document):
             # delete via instance to make sure Diagnosis event handlers
             # are also executed
             diag = await Diagnosis.get(self.diagnosis_id)
-            await diag.delete()
+            if diag is not None:
+                await diag.delete()
