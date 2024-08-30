@@ -24,7 +24,10 @@ from beanie import init_beanie
 from bson import ObjectId
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
-from httpx import AsyncClient
+from httpx import (
+    AsyncClient,
+    ASGITransport
+)
 from jose import jws
 
 
@@ -1371,7 +1374,7 @@ def authenticated_async_client(
 
     # Client with valid auth header
     client = AsyncClient(
-        app=test_app,
+        transport=ASGITransport(app=test_app),
         base_url="http://",
         headers={"Authorization": f"Bearer {signed_jwt}"}
     )

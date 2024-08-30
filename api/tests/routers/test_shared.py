@@ -1,6 +1,10 @@
 from datetime import datetime, timedelta, UTC
 
-import httpx
+from httpx import (
+    AsyncClient,
+    ASGITransport
+)
+
 import pytest
 from api.data_management import (
     Case, NewTimeseriesData, TimeseriesMetaData, GridFSSignalStore, NewOBDData,
@@ -72,8 +76,8 @@ def authenticated_async_client(
     """
 
     # Client with valid auth header
-    client = httpx.AsyncClient(
-        app=test_app,
+    client = AsyncClient(
+        transport=ASGITransport(app=test_app),
         base_url="http://",
         headers={"Authorization": f"Bearer {signed_jwt}"}
     )
