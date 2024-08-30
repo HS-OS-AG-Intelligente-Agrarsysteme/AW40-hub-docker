@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request, Header, Depends
 from fastapi.responses import StreamingResponse
 from tempfile import SpooledTemporaryFile
-from typing import Union
 import logging
 from ..storage.storage_factory import StorageFactory
 from ..security.api_key_auth import APIKeyAuth
@@ -24,7 +23,7 @@ router = APIRouter(tags=["MinIO"], dependencies=[Depends(api_key_auth)])
 async def get_file_download_link(
     bucket_name: str,
     key_name: str
-):
+) -> str:
     storage = StorageFactory().get_storage("MinIO")
     try:
         url = storage.get_download_link(key=key_name,
@@ -41,7 +40,7 @@ async def get_file_download_link(
 async def get_file_upload_link(
     bucket_name: str,
     key_name: str
-):
+) -> str:
     storage = StorageFactory().get_storage("MinIO")
     try:
         url = storage.get_upload_link(key=key_name,
@@ -58,7 +57,7 @@ async def get_file_upload_link(
 async def get_file(
     bucket_name: str,
     key_name: str
-):
+) -> StreamingResponse:
     storage = StorageFactory().get_storage("MinIO")
     try:
         data = storage.get_data(key=key_name,
@@ -82,8 +81,8 @@ async def upload_file(
     bucket_name: str,
     key_name: str,
     request: Request,
-    content_type: Union[str, None] = Header(default='application/octet-stream')
-):
+    content_type: str = Header(default='application/octet-stream')
+) -> str:
     storage = StorageFactory().get_storage("MinIO")
     try:
         file = SpooledTemporaryFile(1024*1024)
