@@ -1,5 +1,5 @@
 from collections import namedtuple
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from tempfile import TemporaryFile
 from unittest import mock
 
@@ -103,8 +103,8 @@ def test_app(motor_db):
 @pytest.fixture
 def jwt_payload(workshop_id):
     return {
-        "iat": datetime.utcnow().timestamp(),
-        "exp": (datetime.utcnow() + timedelta(60)).timestamp(),
+        "iat": datetime.now(UTC).timestamp(),
+        "exp": (datetime.now(UTC) + timedelta(60)).timestamp(),
         "preferred_username": workshop_id,
         "realm_access": {"roles": ["workshop"]}
     }
@@ -1625,8 +1625,8 @@ def test_invalid_jwt_signature(
 @pytest.fixture
 def expired_jwt_payload(workshop_id):
     return {
-        "iat": (datetime.utcnow() - timedelta(60)).timestamp(),
-        "exp": datetime.utcnow().timestamp(),
+        "iat": (datetime.now(UTC) - timedelta(60)).timestamp(),
+        "exp": datetime.now(UTC).timestamp(),
         "preferred_username": workshop_id
     }
 

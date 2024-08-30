@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 import httpx
 import pytest
@@ -18,8 +18,8 @@ from motor import motor_asyncio
 @pytest.fixture
 def jwt_payload():
     return {
-        "iat": datetime.utcnow().timestamp(),
-        "exp": (datetime.utcnow() + timedelta(60)).timestamp(),
+        "iat": datetime.now(UTC).timestamp(),
+        "exp": (datetime.now(UTC) + timedelta(60)).timestamp(),
         "preferred_username": "some-user-with-shared-access",
         "realm_access": {"roles": ["shared"]}
     }
@@ -631,8 +631,8 @@ def test_invalid_jwt_signature(
 @pytest.fixture
 def expired_jwt_payload():
     return {
-        "iat": (datetime.utcnow() - timedelta(60)).timestamp(),
-        "exp": (datetime.utcnow() - timedelta(1)).timestamp(),
+        "iat": (datetime.now(UTC) - timedelta(60)).timestamp(),
+        "exp": (datetime.now(UTC) - timedelta(1)).timestamp(),
         "preferred_username": "user",
         "realm_access": {"roles": ["shared"]}
     }
