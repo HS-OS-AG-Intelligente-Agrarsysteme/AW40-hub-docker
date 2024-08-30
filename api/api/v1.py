@@ -36,7 +36,7 @@ logging.getLogger("uvicorn.access").addFilter(EndpointLogFilter("/health"))
 api_v1.include_router(shared.router, prefix="/shared")
 api_v1.include_router(knowledge.router, prefix="/knowledge")
 api_v1.include_router(workshop.router)
-api_v1.include_router(customers.router)
+api_v1.include_router(customers.router, prefix="/customers")
 if not settings.exclude_minio_router:
     api_v1.include_router(minio.router, prefix="/minio")
 else:

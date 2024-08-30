@@ -2,7 +2,6 @@ from typing import List
 
 from bson import ObjectId
 from bson.errors import InvalidId
-
 from fastapi import APIRouter, Depends, HTTPException
 
 from ..data_management import (
@@ -23,14 +22,14 @@ router = APIRouter(
 )
 
 
-@router.get("/customers", status_code=200, response_model=List[Customer])
+@router.get("/", status_code=200, response_model=List[Customer])
 async def list_customers():
     """Retrieve list of customers."""
     customers = await Customer.find().to_list()
     return customers
 
 
-@router.post("/customers", status_code=201, response_model=Customer)
+@router.post("/", status_code=201, response_model=Customer)
 async def add_customer(customer: CustomerBase):
     """Add a new customer."""
     customer = await Customer(**customer.dict()).create()
@@ -59,7 +58,7 @@ async def customer_by_id(customer_id: str) -> Customer:
 
 
 @router.get(
-    "/customers/{customer_id}",
+    "/{customer_id}",
     status_code=200,
     response_model=Customer
 )
@@ -69,7 +68,7 @@ async def get_customer(customer: Customer = Depends(customer_by_id)):
 
 
 @router.patch(
-    "/customers/{customer_id}",
+    "/{customer_id}",
     status_code=200,
     response_model=Customer
 )
@@ -82,7 +81,7 @@ async def update_customer(
 
 
 @router.delete(
-    "/customers/{customer_id}",
+    "/{customer_id}",
     status_code=200,
     response_model=None
 )
