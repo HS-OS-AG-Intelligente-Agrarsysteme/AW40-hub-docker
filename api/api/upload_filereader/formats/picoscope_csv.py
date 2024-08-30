@@ -34,8 +34,8 @@ class PicoscopeCSVReader(FileReader):
         if not validated:
             raise FileReaderException("conversion failed: wrong format")
         data = self.__csv_to_dict(file, delimiter)
-        duration = self.__calculate_duration(data)
-        sampling_rate = self.__calculate_sampling_rate(data)[0]
+        duration: int = round(self.__calculate_duration(data))
+        sampling_rate: int = round(self.__calculate_sampling_rate(data)[0])
         for key in data.keys():
             if key.startswith('Channel'):
                 result.append({
