@@ -115,10 +115,11 @@ class PicoscopeCSVReader(FileReader):
     def __cast_to_float(self, value: str) -> float:
         return float(value.replace(",", "."))
 
-    def __calculate_sampling_rate(self, data: dict
+    def __calculate_sampling_rate(
+        self, data: dict
     ) -> Tuple[float, float, float]:
         sr_arr: List[float] = []
-        last:float = 0
+        last: float = 0
         for cnt, ent in enumerate(data['Time']):
             if cnt > 0:
                 # Check aroung Time 0 since Picoscope start with negative time
