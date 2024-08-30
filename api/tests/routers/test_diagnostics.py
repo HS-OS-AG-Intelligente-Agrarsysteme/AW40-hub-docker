@@ -1,4 +1,5 @@
 import pytest
+import asyncio
 from api.data_management import (
     Case, NewOBDData, NewSymptom, NewTimeseriesData,
     TimeseriesMetaData, Action, AttachmentBucket, Diagnosis
@@ -131,7 +132,7 @@ async def test_get_vehicle_404(diag_id, initialized_beanie_context):
         assert response.status_code == 404
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="module")
 async def test_get_oscillograms(
         diag_id,
         case_id,
