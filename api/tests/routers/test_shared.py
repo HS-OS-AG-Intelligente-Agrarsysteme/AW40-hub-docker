@@ -186,13 +186,13 @@ def data_context(motor_db, case_data, timeseries_data, obd_data, symptom_data):
     # Yield context instance to the test function
     yield DataContext()
     # Reset timeseries signal store after test
-    TimeseriesMetaData.signal_store = None
+    TimeseriesMetaData.signal_store = None # TODO: This is not allowed!
     # Drop signal collections from test database
     signal_files = motor_db[
-        bucket.collection.name + ".files"
+        bucket.collection.name + ".files" # TODO: How is bucket.collection a thing?
         ]
     signal_chunks = motor_db[
-        bucket.collection.name + ".chunks"
+        bucket.collection.name + ".chunks" # TODO: How is bucket.collection a thing?
         ]
     signal_files.drop()
     signal_files.drop_indexes()
