@@ -148,7 +148,12 @@ def symptom_data():
 
 @pytest.fixture
 def data_context(
-        motor_db, case_data, timeseries_data, obd_data, symptom_data, customer_id
+        motor_db,
+        case_data,
+        timeseries_data,
+        obd_data,
+        symptom_data,
+        customer_id
 ):
     """
     Seed db with test data.
