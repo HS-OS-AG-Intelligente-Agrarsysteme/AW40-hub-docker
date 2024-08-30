@@ -1,5 +1,6 @@
 from typing import List
 
+import asyncio
 import pytest
 from api.data_management.timeseries_data import (
     BaseSignalStore, GridFSSignalStore, NewTimeseriesData, TimeseriesData,
@@ -11,7 +12,7 @@ from pydantic import ValidationError
 
 class TestGridFSSignalStore:
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_create_and_get(self, signal_bucket):
         signal_store = GridFSSignalStore(signal_bucket)
         signal = [-1., 0., 1]
@@ -19,7 +20,7 @@ class TestGridFSSignalStore:
         retrieved_signal = await signal_store.get(signal_id)
         assert signal == retrieved_signal
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_delete(self, signal_bucket):
         # seed test bucket with empty bytes and keep id
         signal_id = await signal_bucket.upload_from_stream(
@@ -64,7 +65,7 @@ class TestTimeseriesData:
     def test_validation_succeeds_with_signal_id(self, timeseries_data):
         TimeseriesData(**timeseries_data)
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_get_signal(self, timeseries_signal, timeseries_meta_data):
         # init a MockSignalStore and manually add a signal
         signal_store = MockSignalStore()
@@ -82,7 +83,7 @@ class TestTimeseriesData:
         retrieved_signal = await timeseries_data.get_signal()
         assert retrieved_signal == timeseries_signal
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_delete_signal(
             self, timeseries_signal, timeseries_meta_data
     ):
@@ -112,7 +113,7 @@ class TestNewTimeseriesData:
     def test_validation_succeeds_with_signal(self, new_timeseries_data):
         NewTimeseriesData(**new_timeseries_data)
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(loop_scope="class")
     async def test_to_timeseries_data(self, new_timeseries_data):
         # configure class to use MockSignalStore
         signal_store = MockSignalStore()

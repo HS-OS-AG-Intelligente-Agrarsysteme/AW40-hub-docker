@@ -1,17 +1,18 @@
 import pytest
+import pytest_asyncio
 
 from api.data_management import Case, Diagnosis
 
 
 class TestDiagnosis:
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio(loop_scope="function")
     async def test_find_in_hub_without_data(self, initialized_beanie_context):
         async with initialized_beanie_context:
             diagnoses = await Diagnosis.find_in_hub(workshop_id="any")
             assert diagnoses == [], "Expected empty list."
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio(loop_scope="function")
     async def test_find_in_hub(self, initialized_beanie_context):
         async with initialized_beanie_context:
             # Seed db with 2 cases for workshop "1"
