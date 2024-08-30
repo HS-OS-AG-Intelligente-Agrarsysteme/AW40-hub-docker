@@ -27,6 +27,11 @@ class CustomerBase(BaseModel):
     house_number: Optional[str] = None
 
 
+class CustomerUpdate(CustomerBase):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+
+
 class Customer(CustomerBase, Document):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 

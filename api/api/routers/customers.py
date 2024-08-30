@@ -5,7 +5,7 @@ from bson.errors import InvalidId
 from fastapi import APIRouter, Depends, HTTPException
 
 from ..data_management import (
-    Customer, CustomerBase
+    Customer, CustomerBase, CustomerUpdate
 )
 from ..security.token_auth import authorized_customers_access
 
@@ -73,7 +73,7 @@ async def get_customer(customer: Customer = Depends(customer_by_id)):
     response_model=Customer
 )
 async def update_customer(
-        update: CustomerBase, customer: Customer = Depends(customer_by_id)
+        update: CustomerUpdate, customer: Customer = Depends(customer_by_id)
 ):
     """Update a specific customer."""
     await customer.set(update.dict(exclude_unset=True))

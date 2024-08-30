@@ -4,6 +4,7 @@ __all__ = [
     "CaseUpdate",
     "Customer",
     "CustomerBase",
+    "CustomerUpdate",
     "DiagnosisLogEntry",
     "AttachmentBucket",
     "Diagnosis",
@@ -29,7 +30,7 @@ __all__ = [
 ]
 
 from .case import NewCase, Case, CaseUpdate
-from .customer import Customer, CustomerBase
+from .customer import Customer, CustomerBase, CustomerUpdate
 from .diagnosis import (
     Diagnosis, Action, DiagnosisStatus, DiagnosisLogEntry,
     AttachmentBucket
