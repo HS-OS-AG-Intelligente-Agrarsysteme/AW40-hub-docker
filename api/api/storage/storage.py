@@ -26,7 +26,7 @@ class Storage(ABC):
     def get_data_stream(self, key: str, **attributes):
         raise NotImplementedError
 
-    def put_data(self, key: str, **attributes):
+    def put_data(self, key: str, data: BinaryIO, **attributes):
         raise NotImplementedError
 
     def get_download_link(self, key: str, **attributes):
