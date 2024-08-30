@@ -19,9 +19,9 @@ class PicoscopeMATReader(FileReader):
             raise FileReaderException("conversion error: missing Tinterval")
         if 'Length' not in f.keys():
             raise FileReaderException("conversion error: missing Length")
-        sampling_rate = 1.0/f['Tinterval'].item(0)
-        duration = f['Tinterval'].item(0) * f['Length'].item(0)
         channels = [x for x in f.keys() if len(x) == 1]
+        sampling_rate: int = round(1.0/f['Tinterval'].item(0))
+        duration: int = round(f['Tinterval'].item(0) * f['Length'].item(0))
         if len(channels) == 0:
             raise FileReaderException("conversion error: no channels found")
         for channel in channels:
