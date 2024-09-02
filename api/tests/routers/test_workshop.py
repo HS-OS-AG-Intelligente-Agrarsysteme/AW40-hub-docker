@@ -378,7 +378,7 @@ def mock_add_timeseries_data(signal_id):
 
     async def add_timeseries_data(self, new_data: NewTimeseriesData):
         # exchange signal and signal_id without accessing signal store
-        meta_data = new_data.dict(exclude={"signal"})
+        meta_data = new_data.model_dump(exclude={"signal"})
         meta_data["signal_id"] = signal_id
         timeseries_data = TimeseriesData(**meta_data)
 
@@ -936,7 +936,7 @@ def mock_add_obd_data():
     """
 
     async def add_obd_data(self, new_obd_data: NewOBDData):
-        obd_data = OBDData(data_id=self.obd_data_added, **new_obd_data.dict())
+        obd_data = OBDData(data_id=self.obd_data_added, **new_obd_data.model_dump())
         self.obd_data.append(obd_data)
         self.obd_data_added += 1
         return self
