@@ -54,8 +54,8 @@ def test_download_link():
     assert response.text == testval2
 
 
-test_app = FastAPI()
-test_app.include_router(minio.router)
+app = FastAPI()
+app.include_router(minio.router)
 
 # API keyauth needs to be configured for the module under test
 test_api_key = "valid key"
@@ -72,7 +72,7 @@ def test_missing_api_key(route):
     assert len(route.methods) == 1, "Test assumes one method per route."
     path = route.path.replace("{bucket_name}", "any-bucket")
     method = next(iter(route.methods))
-    test_client = TestClient(test_app)
+    test_client = TestClient(app)
     response = test_client.request(method=method, url=path)
     assert response.status_code == 403
     assert list(response.json().keys()) == ["detail"], \
@@ -89,7 +89,7 @@ def test_invalid_api_key(route):
     assert len(route.methods) == 1, "Test assumes one method per route."
     path = route.path.replace("{bucket_name}", "any-bucket")
     method = next(iter(route.methods))
-    test_client = TestClient(test_app)
+    test_client = TestClient(app)
     test_client.headers["x-api-key"] = test_api_key[1:]
     response = test_client.request(method=method, url=path)
     assert response.status_code == 401

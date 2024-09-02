@@ -67,13 +67,13 @@ def symptom():
 
 
 @pytest.fixture
-def test_app(motor_db):
+def app(motor_db):
     """
-    Request this fixture to test routes via TestClient(test_app) as described
+    Request this fixture to test routes via TestClient(app) as described
     in https://fastapi.tiangolo.com/tutorial/testing/.
     If a test requires beanie initialization, (e.g. because a non-mock
     instance of a beanie doc is created at some point) this fixture needs to
-    be used in a with statement (e.g. with TestClient(test_app) as client: ...)
+    be used in a with statement (e.g. with TestClient(app) as client: ...)
     Using a with statement ensures execution of the test applications startup
     and shutdown handlers used for beanie/mongo setup and teardown
     (see https://fastapi.tiangolo.com/advanced/testing-events/).
@@ -85,8 +85,8 @@ def test_app(motor_db):
         yield
         await teardown_mongo()
 
-    test_app = FastAPI(lifespan=lifespan)
-    test_app.include_router(router)
+    app = FastAPI(lifespan=lifespan)
+    app.include_router(router)
 
     models = [
         Case, Vehicle, Customer, Workshop, Diagnosis
@@ -107,7 +107,7 @@ def test_app(motor_db):
             await model.get_motor_collection().drop()
             await model.get_motor_collection().drop_indexes()
 
-    yield test_app
+    yield app
 
 
 @pytest.fixture
@@ -127,9 +127,9 @@ def signed_jwt(jwt_payload, rsa_private_key_pem: bytes):
 
 
 @pytest.fixture
-def unauthenticated_client(test_app):
+def unauthenticated_client(app):
     """Unauthenticated client, e.g. no bearer token in header."""
-    yield TestClient(test_app)
+    yield TestClient(app)
 
 
 @pytest.fixture
@@ -1373,7 +1373,7 @@ def test_get_diagnosis_no_diag(case_data, authenticated_client):
 
 @pytest.fixture
 def authenticated_async_client(
-        test_app, rsa_public_key_pem, signed_jwt
+        app, rsa_public_key_pem, signed_jwt
 ):
     """
     Authenticated async client for tests that require mongodb access via beanie
@@ -1381,13 +1381,13 @@ def authenticated_async_client(
 
     # Client with valid auth header
     client = AsyncClient(
-        transport=ASGITransport(app=test_app),
+        transport=ASGITransport(app=app),
         base_url="http://",
         headers={"Authorization": f"Bearer {signed_jwt}"}
     )
 
     # Make app use public key from fixture for token validation
-    test_app.dependency_overrides[
+    app.dependency_overrides[
         Keycloak.get_public_key_for_workshop_realm
     ] = lambda: rsa_public_key_pem.decode()
 

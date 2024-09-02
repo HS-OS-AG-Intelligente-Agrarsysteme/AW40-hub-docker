@@ -45,10 +45,10 @@ def data_context(diag_id, case_id):
     return DataContext()
 
 
-test_app = FastAPI()
-test_app.include_router(diagnostics.router)
+app = FastAPI()
+app.include_router(diagnostics.router)
 
-client = AsyncClient(app=test_app, base_url="http://")
+client = AsyncClient(app=app, base_url="http://")
 
 # The test client needs to use a header for API key authentication
 test_api_key = "valid key"
@@ -425,7 +425,7 @@ def test_missing_api_key(route):
     assert len(route.methods) == 1, "Test assumes one method per route."
     path = route.path.replace("{diag_id}", "any-id")
     method = next(iter(route.methods))
-    test_client = TestClient(test_app)
+    test_client = TestClient(app)
     response = test_client.request(method=method, url=path)
     assert response.status_code == 403
     assert list(response.json().keys()) == ["detail"], \
@@ -442,7 +442,7 @@ def test_invalid_api_key(route):
     assert len(route.methods) == 1, "Test assumes one method per route."
     path = route.path.replace("{diag_id}", "any-id")
     method = next(iter(route.methods))
-    test_client = TestClient(test_app)
+    test_client = TestClient(app)
     test_client.headers["x-api-key"] = test_api_key[1:]
     response = test_client.request(method=method, url=path)
     assert response.status_code == 401

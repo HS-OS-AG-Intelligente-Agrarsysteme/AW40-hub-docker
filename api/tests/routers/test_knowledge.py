@@ -34,21 +34,21 @@ def signed_jwt(jwt_payload, rsa_private_key_pem: bytes):
 
 
 @pytest.fixture
-def test_app(kg_url, kg_obd_dataset_name, kg_prefilled):
-    test_app = FastAPI()
-    test_app.include_router(knowledge.router)
+def app(kg_url, kg_obd_dataset_name, kg_prefilled):
+    app = FastAPI()
+    app.include_router(knowledge.router)
 
     # All tests use the prefilled test knowledge graph
     KnowledgeGraph.set_kg_url(kg_url)
     KnowledgeGraph.obd_dataset_name = kg_obd_dataset_name
 
-    yield test_app
+    yield app
 
 
 @pytest.fixture
-def unauthenticated_client(test_app):
+def unauthenticated_client(app):
     """Unauthenticated client, e.g. no bearer token in header."""
-    yield TestClient(test_app)
+    yield TestClient(app)
 
 
 @pytest.fixture
