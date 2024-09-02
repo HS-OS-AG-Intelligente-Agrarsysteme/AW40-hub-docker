@@ -84,6 +84,7 @@ class TestKeycloak:
     ):
         Keycloak.configure(keycloak_url, workshop_realm)
         retrieved_pubkey = Keycloak.get_public_key_for_workshop_realm()
+        assert retrieved_pubkey
         lines = retrieved_pubkey.split("\n")
         assert lines[0] == "-----BEGIN PUBLIC KEY-----"
         assert lines[-1] == "-----END PUBLIC KEY-----"
