@@ -251,6 +251,26 @@ async def test_list_customers_pagination_invalid_page_size_limits(
         "Expected response to indicate unprocessable content."
 
 
+@pytest.mark.asyncio
+async def test_list_customers_out_of_range_page(
+        authenticated_async_client,
+        initialized_beanie_context,
+        data_context,
+        n_customers_in_data_context
+):
+    page_size = 1
+    max_page_index = n_customers_in_data_context - 1
+    out_of_range_page = max_page_index + 1
+    async with initialized_beanie_context, data_context:
+        response = await authenticated_async_client.get(
+            f"/?page_size={page_size}&page={out_of_range_page}"
+        )
+    assert response.status_code == 400
+    assert response.json()["detail"] == \
+           f"Valid pages for the selected page_size={page_size} are 0, ..., " \
+           f"{max_page_index}."
+
+
 @pytest.mark.parametrize("page_size", [1, 2, 3, 4])
 @pytest.mark.asyncio
 async def test_list_customers_pagination_links(
