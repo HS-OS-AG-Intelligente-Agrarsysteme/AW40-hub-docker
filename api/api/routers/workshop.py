@@ -82,9 +82,9 @@ async def list_cases(
     tags=["Workshop - Case Management"]
 )
 async def add_case(workshop_id: str, case: NewCase) -> Case:
-    case = Case(workshop_id=workshop_id, **case.dict())
-    case = await case.insert()
-    return case
+    _case = Case(workshop_id=workshop_id, **case.model_dump())
+    _case = await _case.insert()
+    return _case
 
 
 async def case_from_workshop(workshop_id: str, case_id: str) -> Case:
@@ -102,12 +102,12 @@ async def case_from_workshop(workshop_id: str, case_id: str) -> Case:
     )
 
     try:
-        case_id = ObjectId(case_id)
+        document_id: ObjectId = ObjectId(case_id)
     except InvalidId:
         # invalid id reports not found to user
         raise no_case_with_id_exception
 
-    case = await Case.get(case_id)
+    case = await Case.get(document_id)
 
     if case is None or case.workshop_id != workshop_id:
         # No case for THIS workshop
@@ -180,9 +180,17 @@ async def get_vehicle(case: Case = Depends(case_from_workshop)
 async def update_vehicle(
         update: VehicleUpdate, case: Case = Depends(case_from_workshop)
 ) -> Vehicle:
+    no_vehicle_with_id_exception = HTTPException(
+        status_code=404,
+        detail=f"No vehicle with vin '{case.vehicle_vin}' found "
+               f"for workshop '{case.workshop_id}'."
+    )
     vehicle = await Vehicle.find_one({"vin": case.vehicle_vin})
-    await vehicle.set(update.dict(exclude_unset=True))
-    return vehicle
+    if vehicle is not None:
+        await vehicle.set(update.model_dump(exclude_unset=True))
+        return vehicle
+    else:
+        raise no_vehicle_with_id_exception
 
 
 @router.get(
@@ -656,16 +664,20 @@ async def start_diagnosis(
         diag = await Diagnosis.get(case.diagnosis_id)
     else:
         # New diagnosis is initialized
-        diag = Diagnosis(
-            case_id=case.id,
-            status="scheduled"
-        )
-        await diag.create()
-        case.diagnosis_id = diag.id
-        await case.save()
+        if case.id is None:
+            exception_detail = f"Case is missing an ID"
+            raise HTTPException(status_code=404, detail=exception_detail)
+        else:
+            diag = Diagnosis(
+                case_id=case.id,
+                status=DiagnosisStatus("scheduled")
+            )
+            await diag.create()
+            case.diagnosis_id = diag.id
+            await case.save()
 
-        # New diagnosis is handed over to diagnostic backend
-        await manage_diagnostic_task(case.diagnosis_id)
+            # New diagnosis is handed over to diagnostic backend
+            await manage_diagnostic_task(case.diagnosis_id)
 
     return diag
 
@@ -680,9 +692,10 @@ async def delete_diagnosis(case: Case = Depends(case_from_workshop)
 ) -> None:
     """Stop the diagnosis process for this case."""
     diag = await Diagnosis.get(case.diagnosis_id)
-    await diag.delete()
-    case.diagnosis_id = None
-    await case.save()
+    if diag is not None:
+        await diag.delete()
+        case.diagnosis_id = None
+        await case.save()
     return None
 
 
