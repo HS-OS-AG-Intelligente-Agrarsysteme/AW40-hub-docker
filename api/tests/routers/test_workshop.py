@@ -15,7 +15,8 @@ from api.data_management import (
     Vehicle,
     Customer,
     Workshop,
-    Diagnosis
+    Diagnosis,
+    DiagnosisStatus
 )
 from api.routers.workshop import (
     router, case_from_workshop, DiagnosticTaskManager
@@ -1504,6 +1505,8 @@ async def test_start_diagnosis(
         # confirm expected state in db
         case_db = await Case.get(case_id)
         diag = await Diagnosis.get(diag_response["_id"])
+        assert case_db
+        assert diag
         assert case_db.diagnosis_id == diag.id
 
 
@@ -1538,6 +1541,7 @@ async def test_delete_diagnosis(
         # confirm expected state in db
         case_db = await Case.get(case_id)
         diag = await Diagnosis.get(diag.id)
+        assert case_db
         assert case_db.diagnosis_id is None
         assert diag is None
 
@@ -1566,8 +1570,10 @@ async def test_list_diagnoses(
         assert response.json() == []
 
         # Add diagnosis for each case
-        diag_1 = await Diagnosis(case_id=case_1.id, status="scheduled").insert()  # noqa F841
-        diag_2 = await Diagnosis(case_id=case_2.id, status="finished").insert()
+        assert case_1.id
+        diag_1 = await Diagnosis(case_id=case_1.id, status=DiagnosisStatus("scheduled")).insert()  # noqa F841
+        assert case_2.id
+        diag_2 = await Diagnosis(case_id=case_2.id, status=DiagnosisStatus("finished")).insert()
 
         # There are two diagnoses now
         response = await authenticated_async_client.get(
