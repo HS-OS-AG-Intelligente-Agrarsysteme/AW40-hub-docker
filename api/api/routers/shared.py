@@ -54,12 +54,12 @@ async def case_by_id(case_id: str) -> Case:
         status_code=404, detail=f"No case with id `{case_id}`."
     )
     try:
-        _case_id = ObjectId(case_id)
+        document_id = ObjectId(case_id)
     except InvalidId:
         # invalid id reports not found to user
         raise no_case_exception
 
-    case = await Case.get(_case_id)
+    case = await Case.get(document_id)
     if case is not None:
         return case
     else:
@@ -77,7 +77,8 @@ async def get_case(case: Case = Depends(case_by_id)) -> Case:
     status_code=200,
     response_model=List[TimeseriesData]
 )
-def list_timeseries_data(case: Case = Depends(case_by_id)):
+def list_timeseries_data(case: Case = Depends(case_by_id)
+) -> Sequence[TimeseriesData]:
     """List all available timeseries datasets for a case."""
     return case.timeseries_data
 
