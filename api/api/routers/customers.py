@@ -4,11 +4,11 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from fastapi import APIRouter, Depends, HTTPException, Response, Request, Query
 
+from .utils import pagination
 from ..data_management import (
     Customer, CustomerBase, CustomerUpdate
 )
 from ..security.token_auth import authorized_customers_access
-from .utils.pagination import pagination_link_header
 
 tags_metadata = [
     {
@@ -43,6 +43,18 @@ async def list_customers(
     exist, that is, if the requested page is not the first or last page,
     respectively.
     """  # noqa: E501
+    # Raise 400 Bas Request for out-of-range request with non-zero page index
+    customer_count = await Customer.count()
+    last_page = pagination.last_page_index(
+        page_size=page_size, document_count=customer_count
+    )
+    if page > last_page:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Valid pages for the selected page_size={page_size} are "
+                   f"0, ..., {last_page}."
+        )
+    # Fetch requested chunk of customers in alphabetic order
     customers = await Customer \
         .find() \
         .sort(Customer.last_name, Customer.first_name) \
@@ -50,8 +62,7 @@ async def list_customers(
         .limit(page_size) \
         .to_list()
     # Set link headers to aid with pagination
-    customer_count = await Customer.count()
-    response.headers["link"] = pagination_link_header(
+    response.headers["link"] = pagination.link_header(
         page=page,
         page_size=page_size,
         document_count=customer_count,

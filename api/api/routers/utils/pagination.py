@@ -1,4 +1,18 @@
-def pagination_link_header(
+def last_page_index(page_size: int, document_count: int):
+    """
+    Determine last page index based on requested page size and document
+    count.
+    """
+    if document_count == 0:
+        return 0
+    idx = document_count // page_size
+    if document_count % page_size == 0:
+        # No remainder. Page index is reduced by one due to zero-indexing.
+        idx -= 1
+    return idx
+
+
+def link_header(
         page: int,
         page_size: int,
         document_count: int,
@@ -23,7 +37,7 @@ def pagination_link_header(
     -------
     str
         Entry to place in the `link` header field.
-    """    # noqa: E501
+    """  # noqa: E501
     link_header = ""
     if document_count == 0:
         # No data to navigate
@@ -44,12 +58,12 @@ def pagination_link_header(
             query += f"&{requested_page_size_query}"
         url = url_without_query + "?" + query.strip("&")
 
-    # Pages are zero indexed
+    # Pages are zero-indexed
     first_page = 0
-    # Determine last page based on requested page size
-    last_page = document_count // page_size
-    if document_count % page_size == 0:
-        last_page -= 1
+    # Determine last page
+    last_page = last_page_index(
+        page_size=page_size, document_count=document_count
+    )
 
     # If previous page exists add a link
     prev_page = page - 1
