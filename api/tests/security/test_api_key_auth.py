@@ -26,4 +26,4 @@ class TestAPIKeyAuth:
         key_auth.valid_key = valid_key
         with pytest.raises(HTTPException) as e:
             key_auth(invalid_key)
-            assert e.status_code == 401
+            assert e.value.status_code == 401
