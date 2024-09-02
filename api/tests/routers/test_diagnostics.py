@@ -79,6 +79,7 @@ async def test_get_obd_data(
 ):
     async with initialized_beanie_context, data_context:
         case = await Case.get(case_id)
+        assert case
         obd_data = {"dtcs": ["P1234"]}
         await case.add_obd_data(
             NewOBDData(**obd_data)
@@ -117,6 +118,7 @@ async def test_get_vehicle(
 ):
     async with initialized_beanie_context, data_context:
         case = await Case.get(case_id)
+        assert case
         response = await client.get(
             f"/{diag_id}/vehicle"
         )
@@ -154,6 +156,7 @@ async def test_get_oscillograms(
             "sampling_rate": 1,
             "duration": 2
         }
+        assert case
         await case.add_timeseries_data(
             NewTimeseriesData(**oscillogram_data)
         )
@@ -201,6 +204,7 @@ async def test_get_symptoms(
             "label": "defect"
         }
         case = await Case.get(case_id)
+        assert case
         await case.add_symptom(
             NewSymptom(**symptom_data)
         )
@@ -261,6 +265,7 @@ async def test_create_todo(diag_id, data_context, initialized_beanie_context):
 
         # confirm expected new state in db
         diag = await Diagnosis.get(response_data["_id"])
+        assert diag
         assert diag.todos[-1] == Action(**new_action_data)
 
 
@@ -276,6 +281,7 @@ async def test_delete_todo(diag_id, data_context, initialized_beanie_context):
     async with initialized_beanie_context, data_context:
         # seed db diagnosis with an action
         diag = await Diagnosis.get(diag_id)
+        assert diag
         action_id = "test-action"
         diag.todos.append(Action(id=action_id, instruction="Do something"))
         await diag.save()
@@ -289,6 +295,7 @@ async def test_delete_todo(diag_id, data_context, initialized_beanie_context):
 
         # confirm expected new state in db
         diag = await Diagnosis.get(diag_id)
+        assert diag
         assert diag.todos == []
 
 
@@ -326,6 +333,7 @@ async def test_add_message_to_state_machine_log_no_attachment(
 
         # confirm expected change of db state
         diag = await Diagnosis.get(diag_id)
+        assert diag
         assert diag.state_machine_log[-1].message == msg
 
 
@@ -354,6 +362,7 @@ async def test_add_message_to_state_machine_log_with_attachment(
 
         # confirm expected change of db state
         diag = await Diagnosis.get(diag_id)
+        assert diag
         assert diag.state_machine_log[-1].message == msg
 
         attachment_id = response_data[-1]["attachment"]
@@ -383,6 +392,7 @@ async def test_set_state_machine_status(
     async with initialized_beanie_context, data_context:
         # double check that diag in data_context does not have the new status
         diag = await Diagnosis.get(diag_id)
+        assert diag
         assert diag.status != new_status
 
         # test request and confirm expected response data
@@ -392,6 +402,7 @@ async def test_set_state_machine_status(
 
         # confirm expected state in db
         diag = await Diagnosis.get(diag_id)
+        assert diag
         assert diag.status == new_status
 
 
