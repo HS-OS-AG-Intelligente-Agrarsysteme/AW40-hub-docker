@@ -2,12 +2,13 @@ from typing import List
 
 from bson import ObjectId
 from bson.errors import InvalidId
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response, Request, Query
 
 from ..data_management import (
     Customer, CustomerBase, CustomerUpdate
 )
 from ..security.token_auth import authorized_customers_access
+from .utils.pagination import pagination_link_header
 
 tags_metadata = [
     {
@@ -23,9 +24,39 @@ router = APIRouter(
 
 
 @router.get("/", status_code=200, response_model=List[Customer])
-async def list_customers():
-    """Retrieve list of customers."""
-    customers = await Customer.find().to_list()
+async def list_customers(
+        response: Response,
+        request: Request,
+        page: int = Query(default=0, ge=0),
+        page_size: int = Query(default=30, ge=1, le=30)
+):
+    """
+    Retrieve list of customers.
+
+    Pagination:
+    Pages are zero-index and page size can be varied between 1 and 30.
+    To aid navigation of pages, response headers will contain the `link` field
+    as specified in [RFC5988](https://datatracker.ietf.org/doc/html/rfc5988#section-5)
+    and as used by the [GitHub API](https://docs.github.com/en/rest/using-the-rest-api/using-pagination-in-the-rest-api?apiVersion=2022-11-28).
+    It will contain URLs for the first and last available page as well as the
+    next and and previous page. Next and previous are only included if they
+    exist, that is, if the requested page is not the first or last page,
+    respectively.
+    """  # noqa: E501
+    customers = await Customer \
+        .find() \
+        .sort(Customer.last_name, Customer.first_name) \
+        .skip(page * page_size) \
+        .limit(page_size) \
+        .to_list()
+    # Set link headers to aid with pagination
+    customer_count = await Customer.count()
+    response.headers["link"] = pagination_link_header(
+        page=page,
+        page_size=page_size,
+        document_count=customer_count,
+        url=str(request.url)
+    )
     return customers
 
 
