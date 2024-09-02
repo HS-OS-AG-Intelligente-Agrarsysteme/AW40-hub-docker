@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
+import pymongo
 from beanie import Document, after_event, Delete
 from pydantic import BaseModel, Field
 
@@ -37,6 +38,12 @@ class Customer(CustomerBase, Document):
 
     class Settings:
         name = "customers"
+        indexes = [
+            [
+                ("last_name", pymongo.ASCENDING),
+                ("first_name", pymongo.ASCENDING),
+            ]
+        ]
 
     @after_event(Delete)
     async def _remove_id_from_cases(self):
