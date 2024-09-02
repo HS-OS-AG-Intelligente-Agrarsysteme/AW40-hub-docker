@@ -1,4 +1,5 @@
 from collections import namedtuple
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, UTC
 from tempfile import TemporaryFile
 from unittest import mock
@@ -76,14 +77,20 @@ def test_app(motor_db):
     and shutdown handlers used for beanie/mongo setup and teardown
     (see https://fastapi.tiangolo.com/advanced/testing-events/).
     """
-    test_app = FastAPI()
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI):
+        await init_mongo()
+        yield
+        await teardown_mongo()
+
+    test_app = FastAPI(lifespan=lifespan)
     test_app.include_router(router)
 
     models = [
         Case, Vehicle, Customer, Workshop, Diagnosis
     ]
 
-    @test_app.on_event("startup")
     async def init_mongo():
         await init_beanie(
             motor_db,
@@ -94,7 +101,6 @@ def test_app(motor_db):
             # test
             await model.delete_all()
 
-    @test_app.on_event("shutdown")
     async def teardown_mongo():
         for model in models:
             await model.get_motor_collection().drop()
