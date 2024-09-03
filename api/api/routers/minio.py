@@ -94,7 +94,7 @@ async def upload_file(
         storage.put_data(key=key_name,
                          bucket=bucket_name,
                          content_type=content_type,
-                         data=file,
+                         data=file,  # type: ignore
                          size=size)
         return key_name
     except Exception as e:
