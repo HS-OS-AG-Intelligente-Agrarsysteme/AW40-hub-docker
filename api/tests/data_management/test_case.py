@@ -320,6 +320,7 @@ class TestCase:
             new_case["timeseries_data"] = [timeseries_data]
             case = Case(workshop_id="1", **new_case)
             retrieved_timeseries_data = case.get_timeseries_data(data_id)
+            assert retrieved_timeseries_data
             assert str(retrieved_timeseries_data.signal_id) == \
                    timeseries_data["signal_id"]
 
@@ -342,6 +343,7 @@ class TestCase:
             new_case["obd_data"] = [{"dtcs": dtcs, "data_id": 2}]
             case = Case(workshop_id="1", **new_case)
             retrieved_obd_data = case.get_obd_data(data_id)
+            assert retrieved_obd_data
             assert retrieved_obd_data.dtcs == dtcs
 
     @pytest.mark.asyncio(loop_scope="class")
@@ -365,6 +367,7 @@ class TestCase:
             new_case["symptoms"] = [symptom]
             case = Case(workshop_id="1", **new_case)
             retrieved_symptom = case.get_symptom(data_id)
+            assert retrieved_symptom
             assert retrieved_symptom.model_dump(exclude={"timestamp"}) == symptom
 
     @pytest.mark.asyncio(loop_scope="class")
@@ -479,7 +482,7 @@ class TestCase:
     ):
         async with initialized_beanie_context:
             case = Case(workshop_id="1", **new_case)
-            assert await case.update_timeseries_data(0, update={}) is None
+            assert await case.update_timeseries_data(0, update=TimeseriesDataUpdate()) is None
 
     @pytest.mark.asyncio(loop_scope="class")
     async def test_update_timeseries_data(
@@ -518,7 +521,7 @@ class TestCase:
     ):
         async with initialized_beanie_context:
             case = Case(workshop_id="1", **new_case)
-            assert await case.update_obd_data(0, update={}) is None
+            assert await case.update_obd_data(0, update=OBDDataUpdate()) is None
 
     @pytest.mark.asyncio(loop_scope="class")
     async def test_update_obd_data(
@@ -557,7 +560,7 @@ class TestCase:
     ):
         async with initialized_beanie_context:
             case = Case(workshop_id="1", **new_case)
-            assert await case.update_symptom(0, update={}) is None
+            assert await case.update_symptom(0, update=SymptomUpdate()) is None
 
     @pytest.mark.asyncio(loop_scope="class")
     async def test_update_symptom(
