@@ -191,7 +191,8 @@ class Case(Document):
 
         return None, None
 
-    def get_timeseries_data(self, data_id: NonNegativeInt
+    def get_timeseries_data(
+            self, data_id: NonNegativeInt
     ) -> TimeseriesData | None:
         _, timeseries_data = self.find_data_in_array(
             data_array=self.timeseries_data, data_id=data_id

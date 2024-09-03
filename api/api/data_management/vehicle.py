@@ -2,7 +2,7 @@ from enum import Enum
 from typing_extensions import Annotated, Optional
 
 from beanie import Document, Indexed, PydanticObjectId
-from pydantic import BaseModel,Field
+from pydantic import BaseModel, Field
 
 
 class Component(str, Enum):
@@ -29,7 +29,7 @@ class Vehicle(Document):
     class Settings:
         name = "vehicles"
 
-    vin: Annotated[str, Indexed(str, unique=True)]
+    vin: Annotated[str, Indexed(unique=True)]
     tsn: Optional[str] = None
     year_build: Optional[int] = None
 

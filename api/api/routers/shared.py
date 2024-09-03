@@ -77,7 +77,8 @@ async def get_case(case: Case = Depends(case_by_id)) -> Case:
     status_code=200,
     response_model=List[TimeseriesData]
 )
-def list_timeseries_data(case: Case = Depends(case_by_id)
+def list_timeseries_data(
+        case: Case = Depends(case_by_id)
 ) -> Sequence[TimeseriesData]:
     """List all available timeseries datasets for a case."""
     return case.timeseries_data

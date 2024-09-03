@@ -145,7 +145,8 @@ async def update_case(
     response_model=None,
     tags=["Workshop - Case Management"]
 )
-async def delete_case(case: Case = Depends(case_from_workshop)
+async def delete_case(
+        case: Case = Depends(case_from_workshop)
 ) -> None:
     await case.delete()
 
@@ -155,7 +156,8 @@ async def delete_case(case: Case = Depends(case_from_workshop)
     status_code=200,
     response_model=Customer, tags=["Workshop - Case Management"]
 )
-async def get_customer(case: Case = Depends(case_from_workshop)
+async def get_customer(
+        case: Case = Depends(case_from_workshop)
 ) -> Customer | None:
     customer = await Customer.get(case.customer_id)
     return customer
@@ -166,7 +168,8 @@ async def get_customer(case: Case = Depends(case_from_workshop)
     status_code=200,
     response_model=Vehicle, tags=["Workshop - Case Management"]
 )
-async def get_vehicle(case: Case = Depends(case_from_workshop)
+async def get_vehicle(
+        case: Case = Depends(case_from_workshop)
 ) -> Vehicle | None:
     vehicle = await Vehicle.find_one({"vin": case.vehicle_vin})
     return vehicle
@@ -198,7 +201,8 @@ async def update_vehicle(
     status_code=200,
     response_model=List[TimeseriesData], tags=["Workshop - Data Management"]
 )
-def list_timeseries_data(case: Case = Depends(case_from_workshop)
+def list_timeseries_data(
+        case: Case = Depends(case_from_workshop)
 ) -> Sequence[TimeseriesData]:
     """List all available timeseries datasets for a case."""
     return case.timeseries_data
@@ -637,7 +641,8 @@ async def delete_symptom(
     response_model=Union[Diagnosis, None],
     tags=["Workshop - Diagnostics"]
 )
-async def get_diagnosis(case: Case = Depends(case_from_workshop)
+async def get_diagnosis(
+        case: Case = Depends(case_from_workshop)
 ) -> Diagnosis | None:
     """Get diagnosis data for this case."""
     if case.diagnosis_id is None:
@@ -665,7 +670,7 @@ async def start_diagnosis(
     else:
         # New diagnosis is initialized
         if case.id is None:
-            exception_detail = f"Case is missing an ID"
+            exception_detail = "Case is missing an ID"
             raise HTTPException(status_code=404, detail=exception_detail)
         else:
             diag = Diagnosis(
@@ -688,7 +693,8 @@ async def start_diagnosis(
     response_model=None,
     tags=["Workshop - Diagnostics"]
 )
-async def delete_diagnosis(case: Case = Depends(case_from_workshop)
+async def delete_diagnosis(
+        case: Case = Depends(case_from_workshop)
 ) -> None:
     """Stop the diagnosis process for this case."""
     diag = await Diagnosis.get(case.diagnosis_id)

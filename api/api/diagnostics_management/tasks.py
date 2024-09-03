@@ -1,6 +1,7 @@
 from celery import Celery
 from typing import Optional
 
+
 class DiagnosticTaskManager:
     """
     Manages handing over tasks to the diagnostics service.

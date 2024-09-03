@@ -56,7 +56,8 @@ async def _case_by_diag_id_or_404(diag_id: str) -> Case:
     status_code=200,
     response_model=Diagnosis
 )
-async def get_diagnosis(diag: Diagnosis = Depends(_diag_by_id_or_404)
+async def get_diagnosis(
+        diag: Diagnosis = Depends(_diag_by_id_or_404)
 ) -> Diagnosis:
     """Get data of a diagnosis."""
     return diag
@@ -67,7 +68,8 @@ async def get_diagnosis(diag: Diagnosis = Depends(_diag_by_id_or_404)
     status_code=200,
     response_model=List[OBDData]
 )
-async def get_obd_data(case: Case = Depends(_case_by_diag_id_or_404)
+async def get_obd_data(
+        case: Case = Depends(_case_by_diag_id_or_404)
 ) -> Sequence[OBDData]:
     """Get OBD data for a diagnosis."""
     return case.obd_data
@@ -78,7 +80,8 @@ async def get_obd_data(case: Case = Depends(_case_by_diag_id_or_404)
     status_code=200,
     response_model=Vehicle
 )
-async def get_vehicle(case: Case = Depends(_case_by_diag_id_or_404)
+async def get_vehicle(
+        case: Case = Depends(_case_by_diag_id_or_404)
 ) -> Vehicle:
     """Get vehicle data for a diagnosis."""
     vehicle = await Vehicle.find_one({"vin": case.vehicle_vin})
@@ -100,7 +103,7 @@ async def get_oscillograms(
         case: Case = Depends(_case_by_diag_id_or_404)
 ) -> Sequence[TimeseriesDataFull]:
     """Get all oscillograms for a specific component."""
-    output_data:List[TimeseriesDataFull] = []
+    output_data: List[TimeseriesDataFull] = []
     for tsd in case.timeseries_data:
         if tsd.component == component:
             signal = await tsd.get_signal()
@@ -186,7 +189,7 @@ async def add_message_to_state_machine_log(
         if attachment.filename is None:
             raise HTTPException(
                 status_code=400,
-                detail=f"Attachment is missing filename"
+                detail="Attachment is missing filename"
             )
         attachment_id = PydanticObjectId(
             await attachment_bucket.upload_from_stream(

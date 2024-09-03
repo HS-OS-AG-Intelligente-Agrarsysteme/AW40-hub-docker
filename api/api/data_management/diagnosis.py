@@ -55,7 +55,7 @@ class Diagnosis(Document):
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     status: Optional[DiagnosisStatus] = None
     state_machine_log: List[DiagnosisLogEntry] = []
-    case_id: Annotated[PydanticObjectId, Indexed(PydanticObjectId, unique=True)]
+    case_id: Annotated[PydanticObjectId, Indexed(unique=True)]
     todos: List[Action] = []
 
     @classmethod

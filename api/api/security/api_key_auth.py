@@ -5,6 +5,7 @@ from fastapi.security import APIKeyHeader
 
 from typing import Optional
 
+
 class APIKeyAuth:
 
     _api_key_header_name = "x-api-key"
