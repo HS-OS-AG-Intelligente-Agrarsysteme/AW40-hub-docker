@@ -189,10 +189,10 @@ def data_context(motor_db, case_data, timeseries_data, obd_data, symptom_data):
     TimeseriesMetaData.signal_store = BaseSignalStore()
     # Drop signal collections from test database
     signal_files = motor_db[
-        bucket.collection.name + ".files" # TODO: How is bucket.collection a thing?
+        bucket.collection.name + ".files" # type: ignore[attr-defined]
         ]
     signal_chunks = motor_db[
-        bucket.collection.name + ".chunks" # TODO: How is bucket.collection a thing?
+        bucket.collection.name + ".chunks" # type: ignore[attr-defined]
         ]
     signal_files.drop()
     signal_files.drop_indexes()
