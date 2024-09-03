@@ -79,8 +79,6 @@ class Case(Document):
 
     model_config = ConfigDict(
         validate_assignment=True
-        # fields = {"schema_version": {"exclude": True}}
-        # TODO: Find new solution to exclude field
     )
 
     class Settings:
@@ -108,7 +106,10 @@ class Case(Document):
     obd_data_added: NonNegativeInt = 0
     symptoms_added: NonNegativeInt = 0
 
-    schema_version: int = 0
+    schema_version: int = Field(
+        default=0,
+        exclude=True
+    )
 
     @before_event(Insert)
     async def insert_vehicle(self):
