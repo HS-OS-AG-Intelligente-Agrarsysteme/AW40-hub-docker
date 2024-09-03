@@ -1,5 +1,4 @@
 import pytest
-import pytest_asyncio
 
 from api.data_management import (
     Case,

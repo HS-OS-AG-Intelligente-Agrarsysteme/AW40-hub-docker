@@ -1,6 +1,5 @@
 from typing import List
 
-import asyncio
 import pytest
 from api.data_management.timeseries_data import (
     BaseSignalStore, GridFSSignalStore, NewTimeseriesData, TimeseriesData,
@@ -24,8 +23,8 @@ class TestGridFSSignalStore:
         signal = [-1., 0., 1]
         signal_id = await signal_store.create(signal)
         retrieved_signal = await signal_store.get(signal_id)
-        motor_db.drop_collection(f"signals-pytest.files")
-        motor_db.drop_collection(f"signals-pytest.chunks")
+        motor_db.drop_collection("signals-pytest.files")
+        motor_db.drop_collection("signals-pytest.chunks")
         assert signal == retrieved_signal
 
     @pytest.mark.asyncio(loop_scope="class")

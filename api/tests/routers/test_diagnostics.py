@@ -1,5 +1,4 @@
 import pytest
-import asyncio
 from api.data_management import (
     Case, NewOBDData, NewSymptom, NewTimeseriesData,
     TimeseriesMetaData, Action, AttachmentBucket, Diagnosis

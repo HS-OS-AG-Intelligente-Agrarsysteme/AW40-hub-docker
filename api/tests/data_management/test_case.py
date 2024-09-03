@@ -234,7 +234,7 @@ class TestCase:
             # refetch case and assert existence of single timeseries with
             # expected signal_id
             case_retrieved = await Case.get(case.id)
-            assert case_retrieved != None
+            assert case_retrieved is not None
             assert len(case_retrieved.timeseries_data) == 1
             timeseries_data_retrieved = case_retrieved.timeseries_data[0]
             assert str(timeseries_data_retrieved.signal_id) == test_signal_id
@@ -263,7 +263,7 @@ class TestCase:
 
             # refetch case and assert existence of single obd_data set
             case_retrieved = await Case.get(case.id)
-            assert case_retrieved != None
+            assert case_retrieved is not None
             assert len(case_retrieved.obd_data) == 1
 
             # confirm that previous obd_data_added is used as data id
@@ -285,12 +285,15 @@ class TestCase:
             case.symptoms_added = previous_adds
 
             await case.add_symptom(
-                NewSymptom(**{"component": "battery", "label": SymptomLabel("defect")})
+                NewSymptom(**{
+                    "component": "battery",
+                    "label": SymptomLabel("defect")
+                })
             )
 
             # refetch case and assert existence of single symptom
             case_retrieved = await Case.get(case.id)
-            assert case_retrieved != None
+            assert case_retrieved is not None
             assert len(case_retrieved.symptoms) == 1
 
             # confirm that previous symptoms_added is used as data id
@@ -368,7 +371,8 @@ class TestCase:
             case = Case(workshop_id="1", **new_case)
             retrieved_symptom = case.get_symptom(data_id)
             assert retrieved_symptom
-            assert retrieved_symptom.model_dump(exclude={"timestamp"}) == symptom
+            dump = retrieved_symptom.model_dump(exclude={"timestamp"})
+            assert dump == symptom
 
     @pytest.mark.asyncio(loop_scope="class")
     async def test_delete_timeseries_data_non_existent(
@@ -408,7 +412,7 @@ class TestCase:
 
             # refetch case and assert deletion in database
             case_retrieved = await Case.get(case.id)
-            assert case_retrieved != None
+            assert case_retrieved is not None
             assert case_retrieved.timeseries_data == []
 
             # confirm that TimeseriesData.delete_signal was awaited
@@ -441,7 +445,7 @@ class TestCase:
 
             # refetch case and assert deletion in database
             case_retrieved = await Case.get(case.id)
-            assert case_retrieved != None
+            assert case_retrieved is not None
             assert case_retrieved.obd_data == []
 
     @pytest.mark.asyncio(loop_scope="class")
@@ -473,7 +477,7 @@ class TestCase:
 
             # refetch case and assert deletion in database
             case_retrieved = await Case.get(case.id)
-            assert case_retrieved != None
+            assert case_retrieved is not None
             assert case_retrieved.symptoms == []
 
     @pytest.mark.asyncio(loop_scope="class")
@@ -482,7 +486,10 @@ class TestCase:
     ):
         async with initialized_beanie_context:
             case = Case(workshop_id="1", **new_case)
-            assert await case.update_timeseries_data(0, update=TimeseriesDataUpdate()) is None
+            timeseries_data = await case.update_timeseries_data(
+                0, update=TimeseriesDataUpdate()
+            )
+            assert timeseries_data is None
 
     @pytest.mark.asyncio(loop_scope="class")
     async def test_update_timeseries_data(
@@ -512,7 +519,7 @@ class TestCase:
 
             # refetch case and assert update in database
             case_retrieved = await Case.get(case.id)
-            assert case_retrieved != None
+            assert case_retrieved is not None
             assert case_retrieved.timeseries_data[0].label == new_label
 
     @pytest.mark.asyncio(loop_scope="class")
@@ -521,7 +528,8 @@ class TestCase:
     ):
         async with initialized_beanie_context:
             case = Case(workshop_id="1", **new_case)
-            assert await case.update_obd_data(0, update=OBDDataUpdate()) is None
+            obd_data = await case.update_obd_data(0, update=OBDDataUpdate())
+            assert obd_data is None
 
     @pytest.mark.asyncio(loop_scope="class")
     async def test_update_obd_data(
@@ -551,7 +559,7 @@ class TestCase:
 
             # refetch case and assert update in database
             case_retrieved = await Case.get(case.id)
-            assert case_retrieved != None
+            assert case_retrieved is not None
             assert case_retrieved.obd_data[0].obd_specs == new_specs
 
     @pytest.mark.asyncio(loop_scope="class")
@@ -589,7 +597,7 @@ class TestCase:
 
             # refetch case and assert update in database
             case_retrieved = await Case.get(case.id)
-            assert case_retrieved != None
+            assert case_retrieved is not None
             assert case_retrieved.symptoms[0].label == new_label
 
     @pytest.mark.asyncio(loop_scope="class")

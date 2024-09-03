@@ -936,7 +936,10 @@ def mock_add_obd_data():
     """
 
     async def add_obd_data(self, new_obd_data: NewOBDData):
-        obd_data = OBDData(data_id=self.obd_data_added, **new_obd_data.model_dump())
+        obd_data = OBDData(
+            data_id=self.obd_data_added,
+            **new_obd_data.model_dump()
+        )
         self.obd_data.append(obd_data)
         self.obd_data_added += 1
         return self
@@ -1571,9 +1574,15 @@ async def test_list_diagnoses(
 
         # Add diagnosis for each case
         assert case_1.id
-        diag_1 = await Diagnosis(case_id=case_1.id, status=DiagnosisStatus("scheduled")).insert()  # noqa F841
+        diag_1 = await Diagnosis(  # noqa F841
+            case_id=case_1.id,
+            status=DiagnosisStatus("scheduled")
+        ).insert()  # noqa F841
         assert case_2.id
-        diag_2 = await Diagnosis(case_id=case_2.id, status=DiagnosisStatus("finished")).insert()
+        diag_2 = await Diagnosis(
+            case_id=case_2.id,
+            status=DiagnosisStatus("finished")
+        ).insert()
 
         # There are two diagnoses now
         response = await authenticated_async_client.get(

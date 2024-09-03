@@ -1,5 +1,4 @@
 import pytest
-import pytest_asyncio
 from api.security.api_key_auth import APIKeyAuth
 from fastapi import HTTPException
 
