@@ -35,8 +35,9 @@ class MinIOStorageData(StorageData):
             yield chunk
 
     def __file_iter(self):
-        for chunk in self.file_buffer.read(1024*1024):
-            yield chunk
+        if self.file_buffer is not None:
+            for chunk in self.file_buffer.read(1024*1024):
+                yield chunk
 
     def __to_buffer(self):
         if not self.file_buffer:
