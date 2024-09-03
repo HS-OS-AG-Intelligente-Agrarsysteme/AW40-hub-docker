@@ -8,7 +8,7 @@ from httpx import (
 import pytest
 from api.data_management import (
     Case, NewTimeseriesData, TimeseriesMetaData, GridFSSignalStore, NewOBDData,
-    NewSymptom
+    NewSymptom, BaseSignalStore
 )
 from api.routers import shared
 from api.security.keycloak import Keycloak
@@ -186,7 +186,7 @@ def data_context(motor_db, case_data, timeseries_data, obd_data, symptom_data):
     # Yield context instance to the test function
     yield DataContext()
     # Reset timeseries signal store after test
-    TimeseriesMetaData.signal_store = None # TODO: This is not allowed!
+    TimeseriesMetaData.signal_store = BaseSignalStore()
     # Drop signal collections from test database
     signal_files = motor_db[
         bucket.collection.name + ".files" # TODO: How is bucket.collection a thing?

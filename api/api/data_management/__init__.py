@@ -24,7 +24,8 @@ __all__ = [
     "Vehicle",
     "VehicleUpdate",
     "Workshop",
-    "TimeseriesDataFull"
+    "TimeseriesDataFull",
+    "BaseSignalStore"
 ]
 
 from .case import NewCase, Case, CaseUpdate
@@ -42,7 +43,8 @@ from .timeseries_data import (
     TimeseriesData,
     GridFSSignalStore,
     TimeseriesDataLabel,
-    TimeseriesDataFull
+    TimeseriesDataFull,
+    BaseSignalStore
 )
 from .vehicle import Vehicle, VehicleUpdate
 from .workshop import Workshop
