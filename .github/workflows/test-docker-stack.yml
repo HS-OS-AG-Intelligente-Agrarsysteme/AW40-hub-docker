@@ -11,7 +11,7 @@ on:
 jobs:
   docker:
     timeout-minutes: 20
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       # Overwrite dev.env to use http
       PROXY_DEFAULT_ENTRYPOINTS: web
@@ -34,11 +34,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12.2"
 
       - name: Login to GitHub Container Registry
         if: ${{ !env.ACT }}
