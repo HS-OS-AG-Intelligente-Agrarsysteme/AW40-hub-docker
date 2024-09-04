@@ -13,17 +13,17 @@ def DiagnosticTaskManager():
 
 class TestDiagnosticTaskManager:
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_set_celery(self, DiagnosticTaskManager):
         DiagnosticTaskManager.set_celery(Celery())
         DiagnosticTaskManager()
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_init_fails_without_celery(self, DiagnosticTaskManager):
         with pytest.raises(AttributeError):
             DiagnosticTaskManager()
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_call(
             self,
             DiagnosticTaskManager,

@@ -16,10 +16,11 @@ from bson import ObjectId
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from motor import motor_asyncio
+import pytest_asyncio
 
 
-@pytest.fixture
-def motor_client():
+@pytest_asyncio.fixture
+async def motor_client():
     """
     Assume a local mongodb instance is available with credentials as in dev.env
     """
@@ -28,8 +29,8 @@ def motor_client():
     return motor_asyncio.AsyncIOMotorClient(mongo_uri)
 
 
-@pytest.fixture
-def motor_db(motor_client):
+@pytest_asyncio.fixture
+async def motor_db(motor_client):
     """
     Use database 'aw40-hub-test'. Database 'aw40-hub' ist defined in dev.env
     and hence mongo/init-users.sh should have created readWrite role for
@@ -38,8 +39,8 @@ def motor_db(motor_client):
     yield motor_client["aw40-hub-test"]
 
 
-@pytest.fixture
-def initialized_beanie_context(motor_db):
+@pytest_asyncio.fixture
+async def initialized_beanie_context(motor_db):
     """
     Could not get standard pytest fixture setup and teardown to work for
     beanie initialization. As a workaround this fixture creates an async
@@ -69,8 +70,8 @@ def initialized_beanie_context(motor_db):
     return InitializedBeanieContext()
 
 
-@pytest.fixture
-def signal_bucket(motor_db):
+@pytest_asyncio.fixture
+async def signal_bucket(motor_db):
     test_bucket_name = "signals-pytest"  # dedicated test bucket
     test_bucket = motor_asyncio.AsyncIOMotorGridFSBucket(
         motor_db, bucket_name=test_bucket_name

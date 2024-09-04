@@ -58,7 +58,7 @@ class TestNewCase:
 
 class TestCase:
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_validation_fails_without_workshop_id(
             self, new_case, initialized_beanie_context
     ):
@@ -66,14 +66,14 @@ class TestCase:
             with pytest.raises(ValidationError):
                 Case(**new_case)
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_validation_with_workshop_id(
             self, new_case, initialized_beanie_context
     ):
         async with initialized_beanie_context:
             Case(workshop_id="1", **new_case)
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_automatic_vehicle_insert(
             self, new_case, initialized_beanie_context
     ):
@@ -93,7 +93,7 @@ class TestCase:
             created_vehicle = all_vehicles[0]
             assert created_vehicle.vin == new_vin
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_automatic_customer_insert(
             self, new_case, initialized_beanie_context
     ):
@@ -113,7 +113,7 @@ class TestCase:
             created_customer = all_customers[0]
             assert created_customer.id == new_customer_id
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_find_in_hub_default(
             self, new_case, initialized_beanie_context
     ):
@@ -129,7 +129,7 @@ class TestCase:
             all_cases = await Case.find_in_hub()
             assert len(all_cases) == 1
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_find_in_hub(
             self, new_case, initialized_beanie_context
     ):
@@ -181,7 +181,7 @@ class TestCase:
             assert case_2_result[0].vehicle_vin == case_2_vin
             assert case_3_result[0].workshop_id == case_3_workshop_id
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_data_counter_are_correctly_initilialized(
             self, new_case, initialized_beanie_context
     ):
@@ -192,7 +192,7 @@ class TestCase:
             assert case.obd_data_added == 0
             assert case.symptoms_added == 0
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_add_timeseries_data(
             self, new_case, initialized_beanie_context
     ):
@@ -247,7 +247,7 @@ class TestCase:
             assert case.timeseries_data_added == previous_adds + 1
             assert case_retrieved.timeseries_data_added == previous_adds + 1
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_add_obd_data(
             self, new_case, initialized_beanie_context
     ):
@@ -274,7 +274,7 @@ class TestCase:
             assert case.obd_data_added == previous_adds + 1
             assert case_retrieved.obd_data_added == previous_adds + 1
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_add_symptom(
             self, new_case, initialized_beanie_context
     ):
@@ -304,7 +304,7 @@ class TestCase:
             assert case.symptoms_added == previous_adds + 1
             assert case_retrieved.symptoms_added == previous_adds + 1
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_get_timeseries_data_non_existent(
             self, new_case, initialized_beanie_context
     ):
@@ -313,7 +313,7 @@ class TestCase:
             retrieved_timeseries_data = case.get_timeseries_data(0)
             assert retrieved_timeseries_data is None
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_get_timeseries_data(
             self, new_case, timeseries_data, initialized_beanie_context
     ):
@@ -327,7 +327,7 @@ class TestCase:
             assert str(retrieved_timeseries_data.signal_id) == \
                    timeseries_data["signal_id"]
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_get_obd_data_non_existent(
             self, new_case, initialized_beanie_context
     ):
@@ -336,7 +336,7 @@ class TestCase:
             retrieved_obd_data = case.get_obd_data(0)
             assert retrieved_obd_data is None
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_get_obd_data(
             self, new_case, initialized_beanie_context
     ):
@@ -349,7 +349,7 @@ class TestCase:
             assert retrieved_obd_data
             assert retrieved_obd_data.dtcs == dtcs
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_get_symptom_non_existent(
             self, new_case, initialized_beanie_context
     ):
@@ -358,7 +358,7 @@ class TestCase:
             retrieved_symptom = case.get_symptom(0)
             assert retrieved_symptom is None
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_get_symptom(
             self, new_case, initialized_beanie_context
     ):
@@ -374,7 +374,7 @@ class TestCase:
             dump = retrieved_symptom.model_dump(exclude={"timestamp"})
             assert dump == symptom
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_delete_timeseries_data_non_existent(
             self, new_case, initialized_beanie_context
     ):
@@ -385,7 +385,7 @@ class TestCase:
     @mock.patch(
         "api.data_management.case.TimeseriesData.delete_signal", autospec=True
     )
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_delete_timeseries_data(
             self,
             delete_signal,
@@ -418,7 +418,7 @@ class TestCase:
             # confirm that TimeseriesData.delete_signal was awaited
             delete_signal.assert_awaited()
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_delete_obd_data_non_existent(
             self, new_case, initialized_beanie_context
     ):
@@ -426,7 +426,7 @@ class TestCase:
             case = Case(workshop_id="1", **new_case)
             await case.delete_obd_data(0)
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_delete_obd_data(
             self, new_case, initialized_beanie_context
     ):
@@ -448,7 +448,7 @@ class TestCase:
             assert case_retrieved is not None
             assert case_retrieved.obd_data == []
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_delete_symptom_non_existent(
             self, new_case, initialized_beanie_context
     ):
@@ -456,7 +456,7 @@ class TestCase:
             case = Case(workshop_id="1", **new_case)
             await case.delete_symptom(0)
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_delete_symptoms(
             self, new_case, initialized_beanie_context
     ):
@@ -480,7 +480,7 @@ class TestCase:
             assert case_retrieved is not None
             assert case_retrieved.symptoms == []
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_update_timeseries_data_non_existent(
             self, new_case, initialized_beanie_context
     ):
@@ -491,7 +491,7 @@ class TestCase:
             )
             assert timeseries_data is None
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_update_timeseries_data(
             self,
             new_case,
@@ -522,7 +522,7 @@ class TestCase:
             assert case_retrieved is not None
             assert case_retrieved.timeseries_data[0].label == new_label
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_update_obd_data_non_existent(
             self, new_case, initialized_beanie_context
     ):
@@ -531,7 +531,7 @@ class TestCase:
             obd_data = await case.update_obd_data(0, update=OBDDataUpdate())
             assert obd_data is None
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_update_obd_data(
             self,
             new_case,
@@ -562,7 +562,7 @@ class TestCase:
             assert case_retrieved is not None
             assert case_retrieved.obd_data[0].obd_specs == new_specs
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_update_symptom_non_existent(
             self, new_case, initialized_beanie_context
     ):
@@ -570,7 +570,7 @@ class TestCase:
             case = Case(workshop_id="1", **new_case)
             assert await case.update_symptom(0, update=SymptomUpdate()) is None
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_update_symptom(
             self,
             new_case,
@@ -600,7 +600,7 @@ class TestCase:
             assert case_retrieved is not None
             assert case_retrieved.symptoms[0].label == new_label
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_available_timeseries_data(
             self, new_case, timeseries_data, initialized_beanie_context
     ):
@@ -612,7 +612,7 @@ class TestCase:
             case = Case(workshop_id="1", **new_case)
             assert case.available_timeseries_data == data_ids
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_available_obd_data(
             self, new_case, initialized_beanie_context
     ):
@@ -625,7 +625,7 @@ class TestCase:
             case = Case(workshop_id="1", **new_case)
             assert case.available_obd_data == data_ids
 
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_available_symptoms(
             self, new_case, initialized_beanie_context
     ):
@@ -641,7 +641,7 @@ class TestCase:
     @mock.patch(
         "api.data_management.case.TimeseriesData.delete_signal", autospec=True
     )
-    @pytest.mark.asyncio(loop_scope="class")
+    @pytest.mark.asyncio
     async def test_delete_all_timeseries_signals(
             self,
             delete_signal,

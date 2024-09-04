@@ -22,7 +22,7 @@ def case_id():
     return str(ObjectId())
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def data_context(diag_id, case_id):
     # Prefill database with diagnosis and associated case.
     # Usage: `with initialized_beanie_context, data_context: ...`
@@ -55,7 +55,7 @@ diagnostics.api_key_auth.valid_key = test_api_key
 client.headers["x-api-key"] = test_api_key
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_diagnosis(
         diag_id, case_id, data_context, initialized_beanie_context
 ):
@@ -65,14 +65,14 @@ async def test_get_diagnosis(
         assert response.json()["case_id"] == case_id
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_diagnosis_404(diag_id, initialized_beanie_context):
     async with initialized_beanie_context:
         response = await client.get(f"{diag_id}")
         assert response.status_code == 404
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_obd_data(
         diag_id, case_id, data_context, initialized_beanie_context
 ):
@@ -89,7 +89,7 @@ async def test_get_obd_data(
         assert response.json()[0]["dtcs"] == obd_data["dtcs"]
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_obd_data_no_data(
         diag_id, case_id, data_context, initialized_beanie_context
 ):
@@ -104,14 +104,14 @@ async def test_get_obd_data_no_data(
         assert response.json() == []
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_obd_data_404(diag_id, initialized_beanie_context):
     async with initialized_beanie_context:
         response = await client.get(f"{diag_id}/obd_data")
         assert response.status_code == 404
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_vehicle(
         diag_id, case_id, data_context, initialized_beanie_context
 ):
@@ -126,14 +126,14 @@ async def test_get_vehicle(
         assert response.json()["vin"] == case.vehicle_vin
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_vehicle_404(diag_id, initialized_beanie_context):
     async with initialized_beanie_context:
         response = await client.get(f"{diag_id}/vehicle")
         assert response.status_code == 404
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_oscillograms(
         diag_id,
         case_id,
@@ -169,7 +169,7 @@ async def test_get_oscillograms(
         assert response.json()[0]["signal"] == oscillogram_data["signal"]
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_oscillograms_no_data(
         diag_id, case_id, data_context, initialized_beanie_context
 ):
@@ -184,14 +184,14 @@ async def test_get_oscillograms_no_data(
         assert response.json() == []
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_oscillograms_404(diag_id, initialized_beanie_context):
     async with initialized_beanie_context:
         response = await client.get(f"{diag_id}/oscillograms")
         assert response.status_code == 404
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_symptoms(
         diag_id, case_id, data_context, initialized_beanie_context
 ):
@@ -217,7 +217,7 @@ async def test_get_symptoms(
         assert response.json()[0]["label"] == symptom_data["label"]
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_symptoms_no_data(
         diag_id, data_context, initialized_beanie_context
 ):
@@ -232,14 +232,14 @@ async def test_get_symptoms_no_data(
         assert response.json() == []
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_symptoms_404(diag_id, initialized_beanie_context):
     async with initialized_beanie_context:
         response = await client.get(f"{diag_id}/symptoms")
         assert response.status_code == 404
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_create_todo(diag_id, data_context, initialized_beanie_context):
     async with initialized_beanie_context, data_context:
 
@@ -268,14 +268,14 @@ async def test_create_todo(diag_id, data_context, initialized_beanie_context):
         assert diag.todos[-1] == Action(**new_action_data)
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_create_todo_no_diag_404(diag_id, initialized_beanie_context):
     async with initialized_beanie_context:
         response = await client.put(f"{diag_id}/todos/a-id")
         assert response.status_code == 404
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_delete_todo(diag_id, data_context, initialized_beanie_context):
     async with initialized_beanie_context, data_context:
         # seed db diagnosis with an action
@@ -298,7 +298,7 @@ async def test_delete_todo(diag_id, data_context, initialized_beanie_context):
         assert diag.todos == []
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_delete_non_existent_todo(
         diag_id, data_context, initialized_beanie_context
 ):
@@ -308,7 +308,7 @@ async def test_delete_non_existent_todo(
         assert response.json() is None
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_add_message_to_state_machine_log_no_attachment(
         diag_id, data_context, initialized_beanie_context, motor_db
 ):
@@ -336,7 +336,7 @@ async def test_add_message_to_state_machine_log_no_attachment(
         assert diag.state_machine_log[-1].message == msg
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_add_message_to_state_machine_log_with_attachment(
         diag_id, data_context, initialized_beanie_context, motor_db
 ):
@@ -374,7 +374,7 @@ async def test_add_message_to_state_machine_log_with_attachment(
         assert bucket_content == attachment_content
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_add_message_to_state_machine_log_404(
         diag_id, initialized_beanie_context
 ):
@@ -383,7 +383,7 @@ async def test_add_message_to_state_machine_log_404(
         assert response.status_code == 404
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_set_state_machine_status(
         diag_id, data_context, initialized_beanie_context
 ):
@@ -405,7 +405,7 @@ async def test_set_state_machine_status(
         assert diag.status == new_status
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_set_state_machine_status_404(
         diag_id, initialized_beanie_context
 ):

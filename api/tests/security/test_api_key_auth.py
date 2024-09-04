@@ -4,20 +4,20 @@ from fastapi import HTTPException
 
 
 class TestAPIKeyAuth:
-    @pytest.mark.asyncio(loop_scope="function")
+    @pytest.mark.asyncio
     async def test_no_valid_key_specified(self):
         key_auth = APIKeyAuth()
         with pytest.raises(AttributeError):
             key_auth("any key")
 
-    @pytest.mark.asyncio(loop_scope="function")
+    @pytest.mark.asyncio
     async def test_successful_validation(self):
         valid_key = "42!"
         key_auth = APIKeyAuth()
         key_auth.valid_key = valid_key
         assert key_auth(valid_key)
 
-    @pytest.mark.asyncio(loop_scope="function")
+    @pytest.mark.asyncio
     async def test_failed_validation(self):
         valid_key = "42!"
         invalid_key = valid_key[1:]

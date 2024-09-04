@@ -200,7 +200,7 @@ def data_context(motor_db, case_data, timeseries_data, obd_data, symptom_data):
     signal_chunks.drop_indexes()
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_list_cases_in_empty_db(
         authenticated_async_client, initialized_beanie_context
 ):
@@ -210,7 +210,7 @@ async def test_list_cases_in_empty_db(
     assert response.json() == []
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_list_cases(
         authenticated_async_client, initialized_beanie_context, data_context,
         case_id
@@ -224,7 +224,7 @@ async def test_list_cases(
 
 
 @pytest.mark.parametrize("query_param", ["customer_id", "vin", "workshop_id"])
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_list_cases_with_single_filter(
         authenticated_async_client, initialized_beanie_context, data_context,
         case_id, query_param, request
@@ -241,7 +241,7 @@ async def test_list_cases_with_single_filter(
         assert response_data[0]["_id"] == case_id
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_list_cases_with_multiple_filters(
         authenticated_async_client, initialized_beanie_context, data_context,
         case_id, customer_id, vin, workshop_id
@@ -260,7 +260,7 @@ async def test_list_cases_with_multiple_filters(
 
 
 @pytest.mark.parametrize("query_param", ["customer_id", "vin", "workshop_id"])
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_list_cases_with_unmatched_filters(
         authenticated_async_client, initialized_beanie_context, data_context,
         query_param
@@ -281,7 +281,7 @@ def test_get_case_invalid_id(authenticated_client):
     assert "detail" in response.json()
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_case_non_existent(
         authenticated_async_client, case_id, initialized_beanie_context
 ):
@@ -292,7 +292,7 @@ async def test_get_case_non_existent(
     assert response.status_code == 404
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_case(
         authenticated_async_client, case_data, case_id,
         initialized_beanie_context
@@ -306,7 +306,7 @@ async def test_get_case(
     assert response.json()["_id"] == case_id
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_list_timeseries_data(
         authenticated_async_client, case_id, timeseries_data,
         initialized_beanie_context, data_context
@@ -323,7 +323,7 @@ async def test_list_timeseries_data(
            timeseries_data["sampling_rate"]
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_timeseries_data(
         authenticated_async_client, case_id, timeseries_data,
         initialized_beanie_context, data_context
@@ -341,7 +341,7 @@ async def test_get_timeseries_data(
     assert response_data["data_id"] == data_id
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_timeseries_data_not_found(
         authenticated_async_client, case_id, timeseries_data,
         initialized_beanie_context, data_context
@@ -359,7 +359,7 @@ async def test_get_timeseries_data_not_found(
     assert response.json()["detail"] == expected_exception_detail
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_timeseries_data_signal(
         authenticated_async_client, case_id, timeseries_data,
         initialized_beanie_context, data_context
@@ -374,7 +374,7 @@ async def test_get_timeseries_data_signal(
     assert response.json() == timeseries_data["signal"]
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_timeseries_data_signal_not_found(
         authenticated_async_client, case_id, timeseries_data,
         initialized_beanie_context, data_context
@@ -392,7 +392,7 @@ async def test_get_timeseries_data_signal_not_found(
     assert response.json()["detail"] == expected_exception_detail
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_list_obd_data(
         authenticated_async_client, case_id, obd_data,
         initialized_beanie_context, data_context
@@ -408,7 +408,7 @@ async def test_list_obd_data(
     assert response_data[0]["dtcs"] == obd_data["dtcs"]
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_obd_data(
         authenticated_async_client, case_id, obd_data,
         initialized_beanie_context, data_context
@@ -425,7 +425,7 @@ async def test_get_obd_data(
     assert response_data["data_id"] == data_id
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_obd_data_not_found(
         authenticated_async_client, case_id, obd_data,
         initialized_beanie_context, data_context
@@ -443,7 +443,7 @@ async def test_get_obd_data_not_found(
     assert response.json()["detail"] == expected_exception_detail
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_list_symptoms(
         authenticated_async_client, case_id, symptom_data,
         initialized_beanie_context, data_context
@@ -459,7 +459,7 @@ async def test_list_symptoms(
     assert response_data[0]["label"] == symptom_data["label"]
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_symptom(
         authenticated_async_client, case_id, symptom_data,
         initialized_beanie_context, data_context
@@ -476,7 +476,7 @@ async def test_get_symptom(
     assert response_data["data_id"] == data_id
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_symptom_not_found(
         authenticated_async_client, case_id, symptom_data,
         initialized_beanie_context, data_context
@@ -494,7 +494,7 @@ async def test_get_symptom_not_found(
     assert response.json()["detail"] == expected_exception_detail
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_list_customers(
         authenticated_async_client, initialized_beanie_context, data_context,
         customer_id
@@ -506,7 +506,7 @@ async def test_list_customers(
         "One customer in data context expected."
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_customer(
         authenticated_async_client, initialized_beanie_context, data_context,
         customer_id
@@ -519,7 +519,7 @@ async def test_get_customer(
     assert response.json() == {"_id": customer_id}
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_customer_not_found(
         authenticated_async_client, initialized_beanie_context, data_context
 ):
@@ -531,7 +531,7 @@ async def test_get_customer_not_found(
     assert response.status_code == 404
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_list_vehicles(
         authenticated_async_client, initialized_beanie_context, data_context,
         vin
@@ -544,7 +544,7 @@ async def test_list_vehicles(
     assert response_data[0]["vin"] == vin
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_vehicle(
         authenticated_async_client, initialized_beanie_context, data_context,
         vin
@@ -557,7 +557,7 @@ async def test_get_vehicle(
     assert response.json()["vin"] == vin
 
 
-@pytest.mark.asyncio(loop_scope="module")
+@pytest.mark.asyncio
 async def test_get_vehicle_not_found(
         authenticated_async_client, initialized_beanie_context, data_context,
 ):
