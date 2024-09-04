@@ -3,10 +3,10 @@ name: Test Docker Stack
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
-    - main
+      - main
 
 jobs:
   docker:
@@ -28,12 +28,17 @@ jobs:
       COMPOSE_PROFILES: full
 
     steps:
-    # Setup environment
+      # Setup environment
       - name: Checkout
         uses: actions/checkout@v1
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.2"
 
       - name: Login to GitHub Container Registry
         if: ${{ !env.ACT }}
@@ -50,7 +55,7 @@ jobs:
       - name: Install python dependencies
         run: pip install -r requirements.txt
 
-    # Tag Containers
+      # Tag Containers
       - name: Build containers and save cache (only on main)
         if: ${{ github.ref_name == 'main' && github.ref_type == 'branch'}}
         run: |
@@ -70,7 +75,7 @@ jobs:
           -f cache-from-override.yml \
           build
 
-    # Start Containers
+      # Start Containers
       - name: Start containers and wait for healthy state
         run: |
           docker compose \
@@ -79,11 +84,11 @@ jobs:
           -f cache-from-override.yml \
           up -d --wait
 
-    # Wait for Traefik to generate routes
+      # Wait for Traefik to generate routes
       - name: Proxy setup delay
         run: sleep 10s
 
-    # Test API
+      # Test API
       - name: Check if API is healthy
         run: |
           curl -fs -o /dev/null -w 'http_code:%{http_code}' \
@@ -99,49 +104,49 @@ jobs:
       - name: Run pytest
         run: pytest ./api
 
-    # Test documentation
+      # Test documentation
       - name: Check if documentation is reachable
         run: |
           curl -fs -o /dev/null -w 'http_code:%{http_code}' \
           $PROXY_DEFAULT_SCHEME://$DOCS_ADDRESS \
           || exit 1
 
-    # Test MongoDB
+      # Test MongoDB
       - name: Check if MongoDB is reachable
         run: |
           curl -fs -o /dev/null -w 'http_code:%{http_code}' \
           http://localhost:27017 \
           || exit 1
 
-    # Test Keycloak
+      # Test Keycloak
       - name: Check if Keycloak is healthy
         run: |
           curl -fs -o /dev/null -w 'http_code:%{http_code}' \
           $PROXY_DEFAULT_SCHEME://$KEYCLOAK_ADDRESS/health/live \
           || exit 1
 
-    # Test MinIO
+      # Test MinIO
       - name: Check if MinIO is healthy
         run: |
           curl -fs -o /dev/null -w 'http_code:%{http_code}' \
           $PROXY_DEFAULT_SCHEME://$MINIO_ADDRESS/minio/health/live \
           || exit 1
 
-    # Test EDC
+      # Test EDC
       - name: Check if EDC is healthy
         run: |
-            curl -fs -o /dev/null -w 'http_code:%{http_code}' \
-            $PROXY_DEFAULT_SCHEME://$EDC_ADDRESS/api/health \
-            || exit 1
+          curl -fs -o /dev/null -w 'http_code:%{http_code}' \
+          $PROXY_DEFAULT_SCHEME://$EDC_ADDRESS/api/health \
+          || exit 1
 
-    # Test Frontend
+      # Test Frontend
       - name: Check if Frontend is reachable
         run: |
           curl -fs -o /dev/null -w 'http_code:%{http_code}' \
           $PROXY_DEFAULT_SCHEME://$FRONTEND_ADDRESS \
           || exit 1
 
-    # Clean up
+      # Clean up
       - name: Stop containers
         if: always()
         run: docker compose --env-file=dev.env down -v
