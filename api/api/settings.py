@@ -57,4 +57,4 @@ class Settings(BaseSettings):
         return self.minio_scheme == "https"
 
 
-settings = Settings()
+settings = Settings()  # type: ignore
