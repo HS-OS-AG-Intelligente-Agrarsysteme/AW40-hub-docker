@@ -1,12 +1,13 @@
 from enum import Enum
-from typing_extensions import Annotated, Optional
 
 from beanie import Document, Indexed, PydanticObjectId
 from pydantic import BaseModel, Field
+from typing_extensions import Annotated, Optional
 
 
 class Component(str, Enum):
     """All the components that a vehicle can have."""
+
     battery = "battery"
     maf_sensor = "maf_sensor"
     lambda_sensor_before_cat = "lambda_sensor_before_cat"
@@ -19,11 +20,8 @@ class Component(str, Enum):
 
 
 class Vehicle(Document):
-
     id: Optional[PydanticObjectId] = Field(
-        default=None,
-        description="MongoDB document ObjectID",
-        exclude=True
+        default=None, description="MongoDB document ObjectID", exclude=True
     )
 
     class Settings:

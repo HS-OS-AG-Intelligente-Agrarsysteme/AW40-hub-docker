@@ -1,13 +1,11 @@
 import secrets
-
-from fastapi import Depends, status, HTTPException
-from fastapi.security import APIKeyHeader
-
 from typing import Optional
+
+from fastapi import Depends, HTTPException, status
+from fastapi.security import APIKeyHeader
 
 
 class APIKeyAuth:
-
     _api_key_header_name = "x-api-key"
 
     def __init__(self):
@@ -15,7 +13,7 @@ class APIKeyAuth:
         self.valid_key: Optional[str] = None
 
     def __call__(
-            self, key: str = Depends(APIKeyHeader(name=_api_key_header_name))
+        self, key: str = Depends(APIKeyHeader(name=_api_key_header_name))
     ) -> bool:
         """
         Verify that an api key passed in a header matches the registered

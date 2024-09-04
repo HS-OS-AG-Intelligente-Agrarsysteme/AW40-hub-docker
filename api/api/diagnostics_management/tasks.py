@@ -1,5 +1,6 @@
-from celery import Celery
 from typing import Optional
+
+from celery import Celery
 
 
 class DiagnosticTaskManager:

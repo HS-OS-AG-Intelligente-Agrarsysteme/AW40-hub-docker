@@ -1,5 +1,6 @@
-import httpx
 from typing import Optional
+
+import httpx
 
 
 class Keycloak:
@@ -24,9 +25,11 @@ class Keycloak:
         response = httpx.get(f"{cls._url}/realms/{realm}")
         response.raise_for_status()
         pubkey_raw = response.json()["public_key"]
-        pubkey = f"-----BEGIN PUBLIC KEY-----\n" \
-                 f"{pubkey_raw}\n" \
-                 f"-----END PUBLIC KEY-----"
+        pubkey = (
+            f"-----BEGIN PUBLIC KEY-----\n"
+            f"{pubkey_raw}\n"
+            f"-----END PUBLIC KEY-----"
+        )
         return pubkey
 
     @classmethod

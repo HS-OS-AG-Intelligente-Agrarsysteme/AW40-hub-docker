@@ -4,19 +4,14 @@ import sys
 
 import httpx
 import pytest
-from api.data_management import (
-    Case,
-    Vehicle,
-    Customer,
-    Workshop,
-    Diagnosis
-)
+import pytest_asyncio
 from beanie import init_beanie
 from bson import ObjectId
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from motor import motor_asyncio
-import pytest_asyncio
+
+from api.data_management import Case, Customer, Diagnosis, Vehicle, Workshop
 
 
 @pytest_asyncio.fixture
@@ -24,8 +19,10 @@ async def motor_client():
     """
     Assume a local mongodb instance is available with credentials as in dev.env
     """
-    mongo_uri = "mongodb://mongo-api-user:mongo-api-pw@127.0.0.1:27017/" \
-                "?authSource=admin"
+    mongo_uri = (
+        "mongodb://mongo-api-user:mongo-api-pw@127.0.0.1:27017/"
+        "?authSource=admin"
+    )
     return motor_asyncio.AsyncIOMotorClient(mongo_uri)
 
 
@@ -46,16 +43,11 @@ async def initialized_beanie_context(motor_db):
     beanie initialization. As a workaround this fixture creates an async
     context manager to handle test setup and teardown.
     """
-    models = [
-        Case, Vehicle, Customer, Workshop, Diagnosis
-    ]
+    models = [Case, Vehicle, Customer, Workshop, Diagnosis]
 
     class InitializedBeanieContext:
         async def __aenter__(self):
-            await init_beanie(
-                motor_db,
-                document_models=models
-            )
+            await init_beanie(motor_db, document_models=models)
             for model in models:
                 # make sure all collections are empty at the beginning of each
                 # test
@@ -91,7 +83,7 @@ def timeseries_meta_data():
         "label": "unknown",
         "sampling_rate": 1,
         "duration": 3,
-        "type": "oscillogram"
+        "type": "oscillogram",
     }
 
 
@@ -122,11 +114,7 @@ def new_timeseries_data(timeseries_meta_data, timeseries_signal):
 
 @pytest.fixture
 def files_dir():
-    main_test_dir = os.path.dirname(
-        inspect.getfile(
-            sys.modules[__name__]
-        )
-    )
+    main_test_dir = os.path.dirname(inspect.getfile(sys.modules[__name__]))
     return os.path.join(main_test_dir, "files")
 
 
@@ -257,9 +245,7 @@ def kg_components():
 
 
 @pytest.fixture
-def kg_prefilled(
-        kg_url, kg_obd_dataset_name, kg_file
-):
+def kg_prefilled(kg_url, kg_obd_dataset_name, kg_file):
     """Prefill the local knowledge graph for testing."""
     # create a fresh dataset for testing
     httpx.post(
@@ -267,13 +253,13 @@ def kg_prefilled(
         data={
             "dbType": "mem",
             "dbName": f"/{kg_obd_dataset_name}",
-        }
+        },
     )
     # load content from knowledge_graph_file fixture into the test dataset
     httpx.put(
         url=f"{kg_url}/{kg_obd_dataset_name}",
         content=kg_file,
-        headers={"Content-Type": "text/turtle"}
+        headers={"Content-Type": "text/turtle"},
     )
     yield
     # remove the dataset after testing
@@ -287,11 +273,11 @@ def _create_rsa_key_pair() -> tuple[bytes, bytes]:
     private_key_pem = private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.TraditionalOpenSSL,
-        encryption_algorithm=serialization.NoEncryption()
+        encryption_algorithm=serialization.NoEncryption(),
     )
     public_key_pem = private_key.public_key().public_bytes(
         encoding=serialization.Encoding.PEM,
-        format=serialization.PublicFormat.SubjectPublicKeyInfo
+        format=serialization.PublicFormat.SubjectPublicKeyInfo,
     )
     return private_key_pem, public_key_pem
 

@@ -1,22 +1,24 @@
-from datetime import datetime, timedelta, UTC
-
-from httpx import (
-    AsyncClient,
-    ASGITransport
-)
+from datetime import UTC, datetime, timedelta
 
 import pytest
-from api.data_management import (
-    Case, NewTimeseriesData, TimeseriesMetaData, GridFSSignalStore, NewOBDData,
-    NewSymptom, BaseSignalStore
-)
-from api.routers import shared
-from api.security.keycloak import Keycloak
 from bson import ObjectId
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from httpx import ASGITransport, AsyncClient
 from jose import jws
 from motor import motor_asyncio
+
+from api.data_management import (
+    BaseSignalStore,
+    Case,
+    GridFSSignalStore,
+    NewOBDData,
+    NewSymptom,
+    NewTimeseriesData,
+    TimeseriesMetaData,
+)
+from api.routers import shared
+from api.security.keycloak import Keycloak
 
 
 @pytest.fixture
@@ -25,7 +27,7 @@ def jwt_payload():
         "iat": datetime.now(UTC).timestamp(),
         "exp": (datetime.now(UTC) + timedelta(60)).timestamp(),
         "preferred_username": "some-user-with-shared-access",
-        "realm_access": {"roles": ["shared"]}
+        "realm_access": {"roles": ["shared"]},
     }
 
 
@@ -50,7 +52,7 @@ def unauthenticated_client(app):
 
 @pytest.fixture
 def authenticated_client(
-        unauthenticated_client, rsa_public_key_pem, signed_jwt
+    unauthenticated_client, rsa_public_key_pem, signed_jwt
 ):
     """Turn unauthenticated client into authenticated client."""
 
@@ -60,17 +62,15 @@ def authenticated_client(
 
     # Make app use public key from fixture for token validation
     app = client.app
-    app.dependency_overrides[
-        Keycloak.get_public_key_for_workshop_realm
-    ] = lambda: rsa_public_key_pem.decode()
+    app.dependency_overrides[Keycloak.get_public_key_for_workshop_realm] = (
+        lambda: rsa_public_key_pem.decode()
+    )
 
     return client
 
 
 @pytest.fixture
-def authenticated_async_client(
-        app, rsa_public_key_pem, signed_jwt
-):
+def authenticated_async_client(app, rsa_public_key_pem, signed_jwt):
     """
     Authenticated async client for tests that require mongodb access via beanie
     """
@@ -79,13 +79,13 @@ def authenticated_async_client(
     client = AsyncClient(
         transport=ASGITransport(app=app),
         base_url="http://",
-        headers={"Authorization": f"Bearer {signed_jwt}"}
+        headers={"Authorization": f"Bearer {signed_jwt}"},
     )
 
     # Make app use public key from fixture for token validation
-    app.dependency_overrides[
-        Keycloak.get_public_key_for_workshop_realm
-    ] = lambda: rsa_public_key_pem.decode()
+    app.dependency_overrides[Keycloak.get_public_key_for_workshop_realm] = (
+        lambda: rsa_public_key_pem.decode()
+    )
 
     return client
 
@@ -130,23 +130,18 @@ def timeseries_data():
         "sampling_rate": 1,
         "duration": 3,
         "type": "oscillogram",
-        "signal": [0., 1., 2.]
+        "signal": [0.0, 1.0, 2.0],
     }
 
 
 @pytest.fixture
 def obd_data():
-    return {
-        "dtcs": ["P0001", "U0001"]
-    }
+    return {"dtcs": ["P0001", "U0001"]}
 
 
 @pytest.fixture
 def symptom_data():
-    return {
-        "component": "battery",
-        "label": "defect"
-    }
+    return {"component": "battery", "label": "defect"}
 
 
 @pytest.fixture
@@ -172,13 +167,9 @@ def data_context(motor_db, case_data, timeseries_data, obd_data, symptom_data):
                 NewTimeseriesData(**timeseries_data)
             )
             # Add obd data to the case
-            await case.add_obd_data(
-                NewOBDData(**obd_data)
-            )
+            await case.add_obd_data(NewOBDData(**obd_data))
             # Add symptom to the case
-            await case.add_symptom(
-                NewSymptom(**symptom_data)
-            )
+            await case.add_symptom(NewSymptom(**symptom_data))
 
         async def __aexit__(self, exc_type, exc, tb):
             pass
@@ -190,10 +181,10 @@ def data_context(motor_db, case_data, timeseries_data, obd_data, symptom_data):
     # Drop signal collections from test database
     signal_files = motor_db[
         bucket.collection.name + ".files"  # type: ignore[attr-defined]
-        ]
+    ]
     signal_chunks = motor_db[
         bucket.collection.name + ".chunks"  # type: ignore[attr-defined]
-        ]
+    ]
     signal_files.drop()
     signal_files.drop_indexes()
     signal_chunks.drop()
@@ -202,7 +193,7 @@ def data_context(motor_db, case_data, timeseries_data, obd_data, symptom_data):
 
 @pytest.mark.asyncio
 async def test_list_cases_in_empty_db(
-        authenticated_async_client, initialized_beanie_context
+    authenticated_async_client, initialized_beanie_context
 ):
     async with initialized_beanie_context:
         response = await authenticated_async_client.get("/cases")
@@ -212,8 +203,10 @@ async def test_list_cases_in_empty_db(
 
 @pytest.mark.asyncio
 async def test_list_cases(
-        authenticated_async_client, initialized_beanie_context, data_context,
-        case_id
+    authenticated_async_client,
+    initialized_beanie_context,
+    data_context,
+    case_id,
 ):
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get("/cases")
@@ -226,8 +219,12 @@ async def test_list_cases(
 @pytest.mark.parametrize("query_param", ["customer_id", "vin", "workshop_id"])
 @pytest.mark.asyncio
 async def test_list_cases_with_single_filter(
-        authenticated_async_client, initialized_beanie_context, data_context,
-        case_id, query_param, request
+    authenticated_async_client,
+    initialized_beanie_context,
+    data_context,
+    case_id,
+    query_param,
+    request,
 ):
     """Test filtering by a single query param."""
     query_param_value = request.getfixturevalue(query_param)
@@ -243,13 +240,20 @@ async def test_list_cases_with_single_filter(
 
 @pytest.mark.asyncio
 async def test_list_cases_with_multiple_filters(
-        authenticated_async_client, initialized_beanie_context, data_context,
-        case_id, customer_id, vin, workshop_id
+    authenticated_async_client,
+    initialized_beanie_context,
+    data_context,
+    case_id,
+    customer_id,
+    vin,
+    workshop_id,
 ):
     """Test filtering by multiple query params."""
-    query_string = f"?customer_id={customer_id}&" \
-                   f"vin={vin}&" \
-                   f"workshop_id={workshop_id}"
+    query_string = (
+        f"?customer_id={customer_id}&"
+        f"vin={vin}&"
+        f"workshop_id={workshop_id}"
+    )
     url = f"/cases{query_string}"
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get(url)
@@ -262,8 +266,10 @@ async def test_list_cases_with_multiple_filters(
 @pytest.mark.parametrize("query_param", ["customer_id", "vin", "workshop_id"])
 @pytest.mark.asyncio
 async def test_list_cases_with_unmatched_filters(
-        authenticated_async_client, initialized_beanie_context, data_context,
-        query_param
+    authenticated_async_client,
+    initialized_beanie_context,
+    data_context,
+    query_param,
 ):
     """Test filtering using query params not in test data_context."""
     query_string = f"?{query_param}=VALUE_NOT_IN_DATA_CONTEXT"
@@ -283,7 +289,7 @@ def test_get_case_invalid_id(authenticated_client):
 
 @pytest.mark.asyncio
 async def test_get_case_non_existent(
-        authenticated_async_client, case_id, initialized_beanie_context
+    authenticated_async_client, case_id, initialized_beanie_context
 ):
     async with initialized_beanie_context:
         # Try to get case from an empty db
@@ -294,8 +300,7 @@ async def test_get_case_non_existent(
 
 @pytest.mark.asyncio
 async def test_get_case(
-        authenticated_async_client, case_data, case_id,
-        initialized_beanie_context
+    authenticated_async_client, case_data, case_id, initialized_beanie_context
 ):
     async with initialized_beanie_context:
         # Seed db with a case and try to get it
@@ -308,8 +313,11 @@ async def test_get_case(
 
 @pytest.mark.asyncio
 async def test_list_timeseries_data(
-        authenticated_async_client, case_id, timeseries_data,
-        initialized_beanie_context, data_context
+    authenticated_async_client,
+    case_id,
+    timeseries_data,
+    initialized_beanie_context,
+    data_context,
 ):
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get(
@@ -319,14 +327,18 @@ async def test_list_timeseries_data(
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data) == 1
-    assert response_data[0]["sampling_rate"] == \
-           timeseries_data["sampling_rate"]
+    assert (
+        response_data[0]["sampling_rate"] == timeseries_data["sampling_rate"]
+    )
 
 
 @pytest.mark.asyncio
 async def test_get_timeseries_data(
-        authenticated_async_client, case_id, timeseries_data,
-        initialized_beanie_context, data_context
+    authenticated_async_client,
+    case_id,
+    timeseries_data,
+    initialized_beanie_context,
+    data_context,
 ):
     data_id = 0  # id in data_context
     async with initialized_beanie_context, data_context:
@@ -336,19 +348,22 @@ async def test_get_timeseries_data(
 
     assert response.status_code == 200
     response_data = response.json()
-    assert response_data["sampling_rate"] == \
-           timeseries_data["sampling_rate"]
+    assert response_data["sampling_rate"] == timeseries_data["sampling_rate"]
     assert response_data["data_id"] == data_id
 
 
 @pytest.mark.asyncio
 async def test_get_timeseries_data_not_found(
-        authenticated_async_client, case_id, timeseries_data,
-        initialized_beanie_context, data_context
+    authenticated_async_client,
+    case_id,
+    timeseries_data,
+    initialized_beanie_context,
+    data_context,
 ):
     data_id = 1  # id not in data_context
-    expected_exception_detail = f"No timeseries_data with data_id " \
-                                f"`{data_id}` in case {case_id}."
+    expected_exception_detail = (
+        f"No timeseries_data with data_id " f"`{data_id}` in case {case_id}."
+    )
 
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get(
@@ -361,8 +376,11 @@ async def test_get_timeseries_data_not_found(
 
 @pytest.mark.asyncio
 async def test_get_timeseries_data_signal(
-        authenticated_async_client, case_id, timeseries_data,
-        initialized_beanie_context, data_context
+    authenticated_async_client,
+    case_id,
+    timeseries_data,
+    initialized_beanie_context,
+    data_context,
 ):
     data_id = 0  # id in data_context
     async with initialized_beanie_context, data_context:
@@ -376,12 +394,16 @@ async def test_get_timeseries_data_signal(
 
 @pytest.mark.asyncio
 async def test_get_timeseries_data_signal_not_found(
-        authenticated_async_client, case_id, timeseries_data,
-        initialized_beanie_context, data_context
+    authenticated_async_client,
+    case_id,
+    timeseries_data,
+    initialized_beanie_context,
+    data_context,
 ):
     data_id = 1  # id not in data_context
-    expected_exception_detail = f"No timeseries_data with data_id " \
-                                f"`{data_id}` in case {case_id}."
+    expected_exception_detail = (
+        f"No timeseries_data with data_id " f"`{data_id}` in case {case_id}."
+    )
 
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get(
@@ -394,8 +416,11 @@ async def test_get_timeseries_data_signal_not_found(
 
 @pytest.mark.asyncio
 async def test_list_obd_data(
-        authenticated_async_client, case_id, obd_data,
-        initialized_beanie_context, data_context
+    authenticated_async_client,
+    case_id,
+    obd_data,
+    initialized_beanie_context,
+    data_context,
 ):
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get(
@@ -410,8 +435,11 @@ async def test_list_obd_data(
 
 @pytest.mark.asyncio
 async def test_get_obd_data(
-        authenticated_async_client, case_id, obd_data,
-        initialized_beanie_context, data_context
+    authenticated_async_client,
+    case_id,
+    obd_data,
+    initialized_beanie_context,
+    data_context,
 ):
     data_id = 0  # id in data_context
     async with initialized_beanie_context, data_context:
@@ -427,12 +455,16 @@ async def test_get_obd_data(
 
 @pytest.mark.asyncio
 async def test_get_obd_data_not_found(
-        authenticated_async_client, case_id, obd_data,
-        initialized_beanie_context, data_context
+    authenticated_async_client,
+    case_id,
+    obd_data,
+    initialized_beanie_context,
+    data_context,
 ):
     data_id = 1  # id not in data_context
-    expected_exception_detail = f"No obd_data with data_id " \
-                                f"`{data_id}` in case {case_id}."
+    expected_exception_detail = (
+        f"No obd_data with data_id " f"`{data_id}` in case {case_id}."
+    )
 
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get(
@@ -445,8 +477,11 @@ async def test_get_obd_data_not_found(
 
 @pytest.mark.asyncio
 async def test_list_symptoms(
-        authenticated_async_client, case_id, symptom_data,
-        initialized_beanie_context, data_context
+    authenticated_async_client,
+    case_id,
+    symptom_data,
+    initialized_beanie_context,
+    data_context,
 ):
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get(
@@ -461,8 +496,11 @@ async def test_list_symptoms(
 
 @pytest.mark.asyncio
 async def test_get_symptom(
-        authenticated_async_client, case_id, symptom_data,
-        initialized_beanie_context, data_context
+    authenticated_async_client,
+    case_id,
+    symptom_data,
+    initialized_beanie_context,
+    data_context,
 ):
     data_id = 0  # id in data_context
     async with initialized_beanie_context, data_context:
@@ -478,12 +516,16 @@ async def test_get_symptom(
 
 @pytest.mark.asyncio
 async def test_get_symptom_not_found(
-        authenticated_async_client, case_id, symptom_data,
-        initialized_beanie_context, data_context
+    authenticated_async_client,
+    case_id,
+    symptom_data,
+    initialized_beanie_context,
+    data_context,
 ):
     data_id = 1  # id not in data_context
-    expected_exception_detail = f"No symptom with data_id " \
-                                f"`{data_id}` in case {case_id}."
+    expected_exception_detail = (
+        f"No symptom with data_id " f"`{data_id}` in case {case_id}."
+    )
 
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get(
@@ -496,20 +538,25 @@ async def test_get_symptom_not_found(
 
 @pytest.mark.asyncio
 async def test_list_customers(
-        authenticated_async_client, initialized_beanie_context, data_context,
-        customer_id
+    authenticated_async_client,
+    initialized_beanie_context,
+    data_context,
+    customer_id,
 ):
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get("/customers")
     assert response.status_code == 200
-    assert response.json() == [{"_id": customer_id}], \
-        "One customer in data context expected."
+    assert response.json() == [
+        {"_id": customer_id}
+    ], "One customer in data context expected."
 
 
 @pytest.mark.asyncio
 async def test_get_customer(
-        authenticated_async_client, initialized_beanie_context, data_context,
-        customer_id
+    authenticated_async_client,
+    initialized_beanie_context,
+    data_context,
+    customer_id,
 ):
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get(
@@ -521,20 +568,17 @@ async def test_get_customer(
 
 @pytest.mark.asyncio
 async def test_get_customer_not_found(
-        authenticated_async_client, initialized_beanie_context, data_context
+    authenticated_async_client, initialized_beanie_context, data_context
 ):
     async with initialized_beanie_context, data_context:
         # Request the 'unknown' id not in the data context
-        response = await authenticated_async_client.get(
-            "/customers/unknown"
-        )
+        response = await authenticated_async_client.get("/customers/unknown")
     assert response.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_list_vehicles(
-        authenticated_async_client, initialized_beanie_context, data_context,
-        vin
+    authenticated_async_client, initialized_beanie_context, data_context, vin
 ):
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get("/vehicles")
@@ -546,20 +590,19 @@ async def test_list_vehicles(
 
 @pytest.mark.asyncio
 async def test_get_vehicle(
-        authenticated_async_client, initialized_beanie_context, data_context,
-        vin
+    authenticated_async_client, initialized_beanie_context, data_context, vin
 ):
     async with initialized_beanie_context, data_context:
-        response = await authenticated_async_client.get(
-            f"/vehicles/{vin}"
-        )
+        response = await authenticated_async_client.get(f"/vehicles/{vin}")
     assert response.status_code == 200
     assert response.json()["vin"] == vin
 
 
 @pytest.mark.asyncio
 async def test_get_vehicle_not_found(
-        authenticated_async_client, initialized_beanie_context, data_context,
+    authenticated_async_client,
+    initialized_beanie_context,
+    data_context,
 ):
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get(
@@ -586,17 +629,18 @@ def jwt_payload_with_unauthorized_role(jwt_payload):
 
 @pytest.fixture
 def signed_jwt_with_unauthorized_role(
-        jwt_payload_with_unauthorized_role, rsa_private_key_pem: bytes
+    jwt_payload_with_unauthorized_role, rsa_private_key_pem: bytes
 ):
     return jws.sign(
         jwt_payload_with_unauthorized_role,
-        rsa_private_key_pem, algorithm="RS256"
+        rsa_private_key_pem,
+        algorithm="RS256",
     )
 
 
 @pytest.mark.parametrize("route", shared.router.routes, ids=lambda r: r.name)
 def test_unauthorized_user(
-        route, authenticated_client, signed_jwt_with_unauthorized_role
+    route, authenticated_client, signed_jwt_with_unauthorized_role
 ):
     """
     Endpoints should not be accessible, if the user role encoded in the
@@ -614,7 +658,7 @@ def test_unauthorized_user(
 
 @pytest.mark.parametrize("route", shared.router.routes, ids=lambda r: r.name)
 def test_invalid_jwt_signature(
-        route, authenticated_client, another_rsa_public_key_pem
+    route, authenticated_client, another_rsa_public_key_pem
 ):
     """
     Endpoints should not be accessible, if the public key retrieved from
@@ -638,7 +682,7 @@ def expired_jwt_payload():
         "iat": (datetime.now(UTC) - timedelta(60)).timestamp(),
         "exp": (datetime.now(UTC) - timedelta(1)).timestamp(),
         "preferred_username": "user",
-        "realm_access": {"roles": ["shared"]}
+        "realm_access": {"roles": ["shared"]},
     }
 
 
@@ -661,7 +705,7 @@ def test_expired_jwt(route, authenticated_client, expired_jwt):
     response = authenticated_client.request(
         method=method,
         url=route.path,
-        headers={"Authorization": f"Bearer {expired_jwt}"}
+        headers={"Authorization": f"Bearer {expired_jwt}"},
     )
     assert response.status_code == 401
     assert response.json() == {"detail": "Could not validate token."}

@@ -1,13 +1,8 @@
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import (
-    BaseModel,
-    Field,
-    NonNegativeInt,
-    ConfigDict
-)
+from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 
 
 class SymptomLabel(str, Enum):
@@ -18,12 +13,10 @@ class SymptomLabel(str, Enum):
 
 class NewSymptom(BaseModel):
     """Schema for a new symptom added via the api."""
+
     model_config = ConfigDict(
         json_schema_extra={
-            "example": {
-                "component": "battery",
-                "label": "defect"
-            }
+            "example": {"component": "battery", "label": "defect"}
         }
     )
 
@@ -34,13 +27,14 @@ class NewSymptom(BaseModel):
 
 class Symptom(NewSymptom):
     """Schema for existing symptom."""
+
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
                 "timestamp": "2023-04-04T07:15:22.887633",
                 "component": "battery",
                 "label": "defect",
-                "data_id": 0
+                "data_id": 0,
             }
         }
     )
@@ -52,11 +46,7 @@ class SymptomUpdate(BaseModel):
     """Schema to update a symptom."""
 
     model_config = ConfigDict(
-        json_schema_extra={
-            "example": {
-                "label": "defect"
-            }
-        }
+        json_schema_extra={"example": {"label": "defect"}}
     )
 
     timestamp: Optional[datetime] = None

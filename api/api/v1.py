@@ -1,7 +1,9 @@
-from fastapi import FastAPI
-from .routers import health, shared, workshop, minio, diagnostics, knowledge
-from .settings import settings
 import logging
+
+from fastapi import FastAPI
+
+from .routers import diagnostics, health, knowledge, minio, shared, workshop
+from .settings import settings
 
 
 class EndpointLogFilter(logging.Filter):
@@ -17,13 +19,11 @@ all_tags_metadata = [
     *shared.tags_metadata,
     *knowledge.tags_metadata,
     *workshop.tags_metadata,
-    *diagnostics.tags_metadata
+    *diagnostics.tags_metadata,
 ]
 
 api_v1 = FastAPI(
-    title="AW4.0 Hub - API",
-    version="1",
-    openapi_tags=all_tags_metadata
+    title="AW4.0 Hub - API", version="1", openapi_tags=all_tags_metadata
 )
 
 api_v1.include_router(health.router, prefix="/health")

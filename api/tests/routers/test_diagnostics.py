@@ -1,16 +1,23 @@
 import pytest
-from api.data_management import (
-    Case, NewOBDData, NewSymptom, NewTimeseriesData,
-    TimeseriesMetaData, Action, AttachmentBucket, Diagnosis,
-    SymptomLabel
-)
-from api.data_management.timeseries_data import GridFSSignalStore
-from api.routers import diagnostics
 from bson import ObjectId
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 from motor import motor_asyncio
+
+from api.data_management import (
+    Action,
+    AttachmentBucket,
+    Case,
+    Diagnosis,
+    NewOBDData,
+    NewSymptom,
+    NewTimeseriesData,
+    SymptomLabel,
+    TimeseriesMetaData,
+)
+from api.data_management.timeseries_data import GridFSSignalStore
+from api.routers import diagnostics
 
 
 @pytest.fixture
@@ -36,7 +43,7 @@ def data_context(diag_id, case_id):
                 id=case_id,
                 diagnosis_id=diag_id,
                 vehicle_vin="test-vin",
-                workshop_id="test-workshop"
+                workshop_id="test-workshop",
             ).create()
 
         async def __aexit__(self, exc_type, exc, tb):
@@ -58,7 +65,7 @@ client.headers["x-api-key"] = test_api_key
 
 @pytest.mark.asyncio
 async def test_get_diagnosis(
-        diag_id, case_id, data_context, initialized_beanie_context
+    diag_id, case_id, data_context, initialized_beanie_context
 ):
     async with initialized_beanie_context, data_context:
         response = await client.get(f"{diag_id}")
@@ -75,7 +82,7 @@ async def test_get_diagnosis_404(diag_id, initialized_beanie_context):
 
 @pytest.mark.asyncio
 async def test_get_obd_data(
-        diag_id, case_id, data_context, initialized_beanie_context
+    diag_id, case_id, data_context, initialized_beanie_context
 ):
     async with initialized_beanie_context, data_context:
         case = await Case.get(case_id)
@@ -90,14 +97,12 @@ async def test_get_obd_data(
 
 @pytest.mark.asyncio
 async def test_get_obd_data_no_data(
-        diag_id, case_id, data_context, initialized_beanie_context
+    diag_id, case_id, data_context, initialized_beanie_context
 ):
     async with initialized_beanie_context, data_context:
         # Requesting data for case without data should return an empty
         # array in response
-        response = await client.get(
-            f"/{diag_id}/obd_data"
-        )
+        response = await client.get(f"/{diag_id}/obd_data")
         # confirm expected response
         assert response.status_code == 200
         assert response.json() == []
@@ -112,14 +117,12 @@ async def test_get_obd_data_404(diag_id, initialized_beanie_context):
 
 @pytest.mark.asyncio
 async def test_get_vehicle(
-        diag_id, case_id, data_context, initialized_beanie_context
+    diag_id, case_id, data_context, initialized_beanie_context
 ):
     async with initialized_beanie_context, data_context:
         case = await Case.get(case_id)
         assert case
-        response = await client.get(
-            f"/{diag_id}/vehicle"
-        )
+        response = await client.get(f"/{diag_id}/vehicle")
         # confirm expected response
         assert response.status_code == 200
         assert response.json()["vin"] == case.vehicle_vin
@@ -134,11 +137,7 @@ async def test_get_vehicle_404(diag_id, initialized_beanie_context):
 
 @pytest.mark.asyncio
 async def test_get_oscillograms(
-        diag_id,
-        case_id,
-        data_context,
-        initialized_beanie_context,
-        signal_bucket
+    diag_id, case_id, data_context, initialized_beanie_context, signal_bucket
 ):
     async with initialized_beanie_context, data_context:
         # initialize gridfs signal storage for the test database
@@ -152,12 +151,10 @@ async def test_get_oscillograms(
             "component": component,
             "label": "unknown",
             "sampling_rate": 1,
-            "duration": 2
+            "duration": 2,
         }
         assert case
-        await case.add_timeseries_data(
-            NewTimeseriesData(**oscillogram_data)
-        )
+        await case.add_timeseries_data(NewTimeseriesData(**oscillogram_data))
 
         # request oscillogram data
         response = await client.get(
@@ -170,7 +167,7 @@ async def test_get_oscillograms(
 
 @pytest.mark.asyncio
 async def test_get_oscillograms_no_data(
-        diag_id, case_id, data_context, initialized_beanie_context
+    diag_id, case_id, data_context, initialized_beanie_context
 ):
     async with initialized_beanie_context, data_context:
         # Requesting data for case without data should return an empty
@@ -192,14 +189,13 @@ async def test_get_oscillograms_404(diag_id, initialized_beanie_context):
 
 @pytest.mark.asyncio
 async def test_get_symptoms(
-        diag_id, case_id, data_context, initialized_beanie_context
+    diag_id, case_id, data_context, initialized_beanie_context
 ):
     async with initialized_beanie_context, data_context:
         # seed database with data
         component = "battery"
         symptom_data = NewSymptom(
-            component=component,
-            label=SymptomLabel("defect")
+            component=component, label=SymptomLabel("defect")
         )
         case = await Case.get(case_id)
         assert case
@@ -216,14 +212,12 @@ async def test_get_symptoms(
 
 @pytest.mark.asyncio
 async def test_get_symptoms_no_data(
-        diag_id, data_context, initialized_beanie_context
+    diag_id, data_context, initialized_beanie_context
 ):
     async with initialized_beanie_context, data_context:
         # Requesting data for case without data should return an empty
         # array in response
-        response = await client.get(
-            f"/{diag_id}/symptoms?component=battery"
-        )
+        response = await client.get(f"/{diag_id}/symptoms?component=battery")
         # confirm expected response
         assert response.status_code == 200
         assert response.json() == []
@@ -239,13 +233,12 @@ async def test_get_symptoms_404(diag_id, initialized_beanie_context):
 @pytest.mark.asyncio
 async def test_create_todo(diag_id, data_context, initialized_beanie_context):
     async with initialized_beanie_context, data_context:
-
         new_action_data = {
             "id": "add-data-obd",
             "instruction": "Bitte OBD Daten erstellen und hochladen.",
             "action_type": "add_data",
             "data_type": "obd",
-            "component": None
+            "component": None,
         }
 
         # test request
@@ -297,7 +290,7 @@ async def test_delete_todo(diag_id, data_context, initialized_beanie_context):
 
 @pytest.mark.asyncio
 async def test_delete_non_existent_todo(
-        diag_id, data_context, initialized_beanie_context
+    diag_id, data_context, initialized_beanie_context
 ):
     async with initialized_beanie_context, data_context:
         response = await client.delete(f"{diag_id}/todos/action-id")
@@ -307,7 +300,7 @@ async def test_delete_non_existent_todo(
 
 @pytest.mark.asyncio
 async def test_add_message_to_state_machine_log_no_attachment(
-        diag_id, data_context, initialized_beanie_context, motor_db
+    diag_id, data_context, initialized_beanie_context, motor_db
 ):
     # initialize gridfs attachment storage for the test database
     AttachmentBucket.bucket = motor_asyncio.AsyncIOMotorGridFSBucket(
@@ -318,8 +311,7 @@ async def test_add_message_to_state_machine_log_no_attachment(
         # execute test request
         msg = "This is a test"
         response = await client.post(
-            f"{diag_id}/state-machine-log",
-            data={"message": msg}
+            f"{diag_id}/state-machine-log", data={"message": msg}
         )
         # confirm expected response data
         assert response.status_code == 201
@@ -335,7 +327,7 @@ async def test_add_message_to_state_machine_log_no_attachment(
 
 @pytest.mark.asyncio
 async def test_add_message_to_state_machine_log_with_attachment(
-        diag_id, data_context, initialized_beanie_context, motor_db
+    diag_id, data_context, initialized_beanie_context, motor_db
 ):
     # initialize gridfs attachment storage for the test database
     AttachmentBucket.bucket = motor_asyncio.AsyncIOMotorGridFSBucket(
@@ -349,7 +341,7 @@ async def test_add_message_to_state_machine_log_with_attachment(
         response = await client.post(
             f"{diag_id}/state-machine-log",
             data={"message": msg},
-            files={"attachment": attachment_content}
+            files={"attachment": attachment_content},
         )
         # confirm expected response data
         assert response.status_code == 201
@@ -373,7 +365,7 @@ async def test_add_message_to_state_machine_log_with_attachment(
 
 @pytest.mark.asyncio
 async def test_add_message_to_state_machine_log_404(
-        diag_id, initialized_beanie_context
+    diag_id, initialized_beanie_context
 ):
     async with initialized_beanie_context:
         response = await client.post(f"{diag_id}/state-machine-log")
@@ -382,7 +374,7 @@ async def test_add_message_to_state_machine_log_404(
 
 @pytest.mark.asyncio
 async def test_set_state_machine_status(
-        diag_id, data_context, initialized_beanie_context
+    diag_id, data_context, initialized_beanie_context
 ):
     new_status = "processing"
     async with initialized_beanie_context, data_context:
@@ -404,7 +396,7 @@ async def test_set_state_machine_status(
 
 @pytest.mark.asyncio
 async def test_set_state_machine_status_404(
-        diag_id, initialized_beanie_context
+    diag_id, initialized_beanie_context
 ):
     async with initialized_beanie_context:
         response = await client.put(f"{diag_id}/status")
@@ -424,8 +416,9 @@ def test_missing_api_key(route):
     test_client = TestClient(app)
     response = test_client.request(method=method, url=path)
     assert response.status_code == 403
-    assert list(response.json().keys()) == ["detail"], \
-        "No data but exception details expected in response body."
+    assert list(response.json().keys()) == [
+        "detail"
+    ], "No data but exception details expected in response body."
 
 
 @pytest.mark.parametrize(
@@ -442,5 +435,6 @@ def test_invalid_api_key(route):
     test_client.headers["x-api-key"] = test_api_key[1:]
     response = test_client.request(method=method, url=path)
     assert response.status_code == 401
-    assert list(response.json().keys()) == ["detail"], \
-        "No data but exception details expected in response body."
+    assert list(response.json().keys()) == [
+        "detail"
+    ], "No data but exception details expected in response body."

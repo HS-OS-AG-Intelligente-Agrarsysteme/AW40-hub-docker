@@ -1,30 +1,36 @@
-from typing import List, Sequence, Optional
+from typing import List, Optional, Sequence
 
 from beanie.odm.fields import PydanticObjectId
 from bson import ObjectId
 from fastapi import (
-    APIRouter, HTTPException, Body, Form, Depends, UploadFile, File
+    APIRouter,
+    Body,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    UploadFile,
 )
 from motor import motor_asyncio
 
 from ..data_management import (
+    Action,
+    AttachmentBucket,
     Case,
     Diagnosis,
-    DiagnosisStatus,
     DiagnosisLogEntry,
+    DiagnosisStatus,
     OBDData,
-    Vehicle,
     Symptom,
-    AttachmentBucket,
     TimeseriesDataFull,
-    Action
+    Vehicle,
 )
 from ..security.api_key_auth import APIKeyAuth
 
 tags_metadata = [
     {
         "name": "Diagnostics",
-        "description": "Endpoints for the AI based diagnostics backend"
+        "description": "Endpoints for the AI based diagnostics backend",
     }
 ]
 
@@ -51,44 +57,34 @@ async def _case_by_diag_id_or_404(diag_id: str) -> Case:
     return case
 
 
-@router.get(
-    "/{diag_id}",
-    status_code=200,
-    response_model=Diagnosis
-)
+@router.get("/{diag_id}", status_code=200, response_model=Diagnosis)
 async def get_diagnosis(
-        diag: Diagnosis = Depends(_diag_by_id_or_404)
+    diag: Diagnosis = Depends(_diag_by_id_or_404),
 ) -> Diagnosis:
     """Get data of a diagnosis."""
     return diag
 
 
 @router.get(
-    "/{diag_id}/obd_data",
-    status_code=200,
-    response_model=List[OBDData]
+    "/{diag_id}/obd_data", status_code=200, response_model=List[OBDData]
 )
 async def get_obd_data(
-        case: Case = Depends(_case_by_diag_id_or_404)
+    case: Case = Depends(_case_by_diag_id_or_404),
 ) -> Sequence[OBDData]:
     """Get OBD data for a diagnosis."""
     return case.obd_data
 
 
-@router.get(
-    "/{diag_id}/vehicle",
-    status_code=200,
-    response_model=Vehicle
-)
+@router.get("/{diag_id}/vehicle", status_code=200, response_model=Vehicle)
 async def get_vehicle(
-        case: Case = Depends(_case_by_diag_id_or_404)
+    case: Case = Depends(_case_by_diag_id_or_404),
 ) -> Vehicle:
     """Get vehicle data for a diagnosis."""
     vehicle = await Vehicle.find_one({"vin": case.vehicle_vin})
     if vehicle is None:
         raise HTTPException(
             status_code=404,
-            detail=f"No vehicle with VIN '{case.vehicle_vin}' found"
+            detail=f"No vehicle with VIN '{case.vehicle_vin}' found",
         )
     return vehicle
 
@@ -96,11 +92,10 @@ async def get_vehicle(
 @router.get(
     "/{diag_id}/oscillograms",
     status_code=200,
-    response_model=List[TimeseriesDataFull]
+    response_model=List[TimeseriesDataFull],
 )
 async def get_oscillograms(
-        component: str,
-        case: Case = Depends(_case_by_diag_id_or_404)
+    component: str, case: Case = Depends(_case_by_diag_id_or_404)
 ) -> Sequence[TimeseriesDataFull]:
     """Get all oscillograms for a specific component."""
     output_data: List[TimeseriesDataFull] = []
@@ -114,12 +109,10 @@ async def get_oscillograms(
 
 
 @router.get(
-    "/{diag_id}/symptoms",
-    status_code=200,
-    response_model=List[Symptom]
+    "/{diag_id}/symptoms", status_code=200, response_model=List[Symptom]
 )
 async def get_symptoms(
-        component: str, case: Case = Depends(_case_by_diag_id_or_404)
+    component: str, case: Case = Depends(_case_by_diag_id_or_404)
 ) -> Sequence[Symptom]:
     """Get all symptoms for a specific component."""
     symptoms = [s for s in case.symptoms if s.component == component]
@@ -127,14 +120,12 @@ async def get_symptoms(
 
 
 @router.put(
-    "/{diag_id}/todos/{action_id}",
-    status_code=201,
-    response_model=Diagnosis
+    "/{diag_id}/todos/{action_id}", status_code=201, response_model=Diagnosis
 )
 async def set_todo(
-        action_id: str,
-        action: Action,
-        diag: Diagnosis = Depends(_diag_by_id_or_404)
+    action_id: str,
+    action: Action,
+    diag: Diagnosis = Depends(_diag_by_id_or_404),
 ) -> Diagnosis:
     """Require a user action for a diagnosis."""
     action.id = action_id
@@ -153,12 +144,10 @@ async def set_todo(
 
 
 @router.delete(
-    "/{diag_id}/todos/{action_id}",
-    status_code=200,
-    response_model=None
+    "/{diag_id}/todos/{action_id}", status_code=200, response_model=None
 )
 async def delete_todo(
-        action_id: str, diag: Diagnosis = Depends(_diag_by_id_or_404)
+    action_id: str, diag: Diagnosis = Depends(_diag_by_id_or_404)
 ) -> None:
     """Remove a required user action from a diagnosis."""
     for i, todo in enumerate(diag.todos):
@@ -172,15 +161,15 @@ async def delete_todo(
 @router.post(
     "/{diag_id}/state-machine-log",
     status_code=201,
-    response_model=List[DiagnosisLogEntry]
+    response_model=List[DiagnosisLogEntry],
 )
 async def add_message_to_state_machine_log(
-        message: str = Form(title="Message to be added to log."),
-        attachment: Optional[UploadFile] = File(default=None),
-        diag: Diagnosis = Depends(_diag_by_id_or_404),
-        attachment_bucket: motor_asyncio.AsyncIOMotorGridFSBucket = Depends(
-            AttachmentBucket.create
-        )
+    message: str = Form(title="Message to be added to log."),
+    attachment: Optional[UploadFile] = File(default=None),
+    diag: Diagnosis = Depends(_diag_by_id_or_404),
+    attachment_bucket: motor_asyncio.AsyncIOMotorGridFSBucket = Depends(
+        AttachmentBucket.create
+    ),
 ) -> Sequence[DiagnosisLogEntry]:
     attachment_id: PydanticObjectId | None = None
     # if a file attachments was uploaded, store it and generate an id
@@ -188,18 +177,16 @@ async def add_message_to_state_machine_log(
         attachment_content = await attachment.read()
         if attachment.filename is None:
             raise HTTPException(
-                status_code=400,
-                detail="Attachment is missing filename"
+                status_code=400, detail="Attachment is missing filename"
             )
         attachment_id = PydanticObjectId(
             await attachment_bucket.upload_from_stream(
-                filename=attachment.filename,
-                source=attachment_content)
+                filename=attachment.filename, source=attachment_content
+            )
         )
 
     new_log_entry = DiagnosisLogEntry(
-        message=message,
-        attachment=attachment_id
+        message=message, attachment=attachment_id
     )
     diag.state_machine_log.append(new_log_entry)
     await diag.save()
@@ -207,13 +194,11 @@ async def add_message_to_state_machine_log(
 
 
 @router.put(
-    "/{diag_id}/status",
-    status_code=201,
-    response_model=DiagnosisStatus
+    "/{diag_id}/status", status_code=201, response_model=DiagnosisStatus
 )
 async def set_state_machine_status(
-        status: DiagnosisStatus = Body(title="New status"),
-        diag: Diagnosis = Depends(_diag_by_id_or_404)
+    status: DiagnosisStatus = Body(title="New status"),
+    diag: Diagnosis = Depends(_diag_by_id_or_404),
 ) -> DiagnosisStatus:
     diag.status = status
     await diag.save()

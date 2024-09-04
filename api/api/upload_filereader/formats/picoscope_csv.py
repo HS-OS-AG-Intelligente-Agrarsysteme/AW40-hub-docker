@@ -1,7 +1,7 @@
 import codecs
 import csv
 import re
-from typing import BinaryIO, List, Tuple, Dict
+from typing import BinaryIO, Dict, List, Tuple
 
 from ..filereader import FileReader, FileReaderException
 
@@ -11,20 +11,18 @@ conv_table = {
     "(μs)": 1e-6,
     "(V)": 1e0,
     "(mV)": 1e-3,
-    "(μV)": 1e-6
+    "(μV)": 1e-6,
 }
 
-time_names = [
-    "Zeit",
-    "Time"
-]
+time_names = ["Zeit", "Time"]
 
 HEADER_CHECK = re.compile(
-    r"^.+(?P<delimiter>[,;])(?:.+ [A-Z])(?:\1.+ [A-Z])*$")
+    r"^.+(?P<delimiter>[,;])(?:.+ [A-Z])(?:\1.+ [A-Z])*$"
+)
 CONVHEADER_CHECK = re.compile(
-    r"^\((?:m|μ){0,1}(?:s|V)\)(?:[,;]\((?:m|μ){0,1}(?:s|V)\))+$")
-CHANNEL_CHECK = re.compile(
-    r"^(?P<channel_name>.+) (?P<channel>[A-Z])$")
+    r"^\((?:m|μ){0,1}(?:s|V)\)(?:[,;]\((?:m|μ){0,1}(?:s|V)\))+$"
+)
+CHANNEL_CHECK = re.compile(r"^(?P<channel_name>.+) (?P<channel>[A-Z])$")
 
 
 class PicoscopeCSVReader(FileReader):
@@ -37,16 +35,18 @@ class PicoscopeCSVReader(FileReader):
         duration: int = round(self.__calculate_duration(data))
         sampling_rate: int = round(self.__calculate_sampling_rate(data)[0])
         for key in data.keys():
-            if key.startswith('Channel'):
-                result.append({
-                    'duration': duration,
-                    'sampling_rate': sampling_rate,
-                    'signal': data[key],
-                    'device_specs': {
-                        "channel": key.replace('Channel ', ''),
-                        "type": "picoscope"
+            if key.startswith("Channel"):
+                result.append(
+                    {
+                        "duration": duration,
+                        "sampling_rate": sampling_rate,
+                        "signal": data[key],
+                        "device_specs": {
+                            "channel": key.replace("Channel ", ""),
+                            "type": "picoscope",
+                        },
                     }
-                })
+                )
         return result
 
     def __translate_header(self, header) -> List[str]:
@@ -82,8 +82,9 @@ class PicoscopeCSVReader(FileReader):
         return False, ""
 
     def __csv_to_dict(self, file, delimiter) -> Dict:
-        reader = csv.reader(codecs.iterdecode(file, 'utf-8'),
-                            delimiter=delimiter)
+        reader = csv.reader(
+            codecs.iterdecode(file, "utf-8"), delimiter=delimiter
+        )
         header = self.__translate_header(next(reader))
         data = {}
         conversion = []
@@ -102,7 +103,8 @@ class PicoscopeCSVReader(FileReader):
             for count, element in enumerate(row):
                 try:
                     data[header[count]].append(
-                        self.__cast_to_float(element) * conversion[count])
+                        self.__cast_to_float(element) * conversion[count]
+                    )
                 except Exception as e:
                     raise FileReaderException(
                         "conversion failed:{}".format(str(e))
@@ -110,7 +112,7 @@ class PicoscopeCSVReader(FileReader):
         return data
 
     def __calculate_duration(self, data: dict) -> float:
-        return abs(data['Time'][0]) + data['Time'][-1]
+        return abs(data["Time"][0]) + data["Time"][-1]
 
     def __cast_to_float(self, value: str) -> float:
         return float(value.replace(",", "."))
@@ -120,7 +122,7 @@ class PicoscopeCSVReader(FileReader):
     ) -> Tuple[float, float, float]:
         sr_arr: List[float] = []
         last: float = 0
-        for cnt, ent in enumerate(data['Time']):
+        for cnt, ent in enumerate(data["Time"]):
             if cnt > 0:
                 # Check aroung Time 0 since Picoscope start with negative time
                 if last < 0 and ent >= 0:
@@ -128,5 +130,5 @@ class PicoscopeCSVReader(FileReader):
                 else:
                     sr_arr.append(1.0 / (abs(abs(last) - abs(ent))))
             last = ent
-        sr: float = (sum(sr_arr) / len(sr_arr))
+        sr: float = sum(sr_arr) / len(sr_arr)
         return sr, min(sr_arr) - sr, max(sr_arr) - sr

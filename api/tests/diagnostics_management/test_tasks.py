@@ -1,7 +1,8 @@
 import pytest
-from api.diagnostics_management import tasks
 from bson import ObjectId
 from celery import Celery
+
+from api.diagnostics_management import tasks
 
 
 @pytest.fixture
@@ -12,7 +13,6 @@ def DiagnosticTaskManager():
 
 
 class TestDiagnosticTaskManager:
-
     @pytest.mark.asyncio
     async def test_set_celery(self, DiagnosticTaskManager):
         DiagnosticTaskManager.set_celery(Celery())
@@ -24,11 +24,7 @@ class TestDiagnosticTaskManager:
             DiagnosticTaskManager()
 
     @pytest.mark.asyncio
-    async def test_call(
-            self,
-            DiagnosticTaskManager,
-            monkeypatch
-    ):
+    async def test_call(self, DiagnosticTaskManager, monkeypatch):
         DiagnosticTaskManager.set_celery(Celery())
         send_task_args = []
 
@@ -42,6 +38,5 @@ class TestDiagnosticTaskManager:
         await DiagnosticTaskManager()(diag_id)
 
         # confirm expected call to Celery.send_task
-        assert send_task_args[0] == \
-               DiagnosticTaskManager._diagnostic_task_name
+        assert send_task_args[0] == DiagnosticTaskManager._diagnostic_task_name
         assert send_task_args[1] == (str(diag_id),)

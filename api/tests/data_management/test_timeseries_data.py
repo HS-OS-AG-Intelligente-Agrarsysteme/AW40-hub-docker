@@ -1,20 +1,23 @@
 from typing import List
 
 import pytest
-from api.data_management.timeseries_data import (
-    BaseSignalStore, GridFSSignalStore, NewTimeseriesData, TimeseriesData,
-    TimeseriesMetaData
-)
 from beanie import PydanticObjectId
 from pydantic import ValidationError
 
+from api.data_management.timeseries_data import (
+    BaseSignalStore,
+    GridFSSignalStore,
+    NewTimeseriesData,
+    TimeseriesData,
+    TimeseriesMetaData,
+)
+
 
 class TestGridFSSignalStore:
-
     @pytest.mark.asyncio
     async def test_create_and_get(self, signal_bucket):
         signal_store = GridFSSignalStore(signal_bucket)
-        signal = [-1., 0., 1]
+        signal = [-1.0, 0.0, 1]
         signal_id = await signal_store.create(signal)
         retrieved_signal = await signal_store.get(signal_id)
         assert signal == retrieved_signal
@@ -23,8 +26,7 @@ class TestGridFSSignalStore:
     async def test_delete(self, signal_bucket):
         # seed test bucket with empty bytes and keep id
         signal_id = await signal_bucket.upload_from_stream(
-            filename="",
-            source=b""
+            filename="", source=b""
         )
         # delete via GridFSSignalStore and confirm non-existence
         signal_store = GridFSSignalStore(signal_bucket)
@@ -56,7 +58,6 @@ class MockSignalStore(BaseSignalStore):
 
 
 class TestTimeseriesData:
-
     def test_validation_fails_without_signal_id(self, timeseries_meta_data):
         with pytest.raises(ValidationError):
             TimeseriesData(**timeseries_meta_data)
@@ -84,7 +85,7 @@ class TestTimeseriesData:
 
     @pytest.mark.asyncio
     async def test_delete_signal(
-            self, timeseries_signal, timeseries_meta_data
+        self, timeseries_signal, timeseries_meta_data
     ):
         # init a MockSignalStore and manually add a signal
         signal_store = MockSignalStore()
@@ -104,7 +105,6 @@ class TestTimeseriesData:
 
 
 class TestNewTimeseriesData:
-
     def test_validation_fails_without_signal(self, timeseries_meta_data):
         with pytest.raises(ValidationError):
             NewTimeseriesData(**timeseries_meta_data)

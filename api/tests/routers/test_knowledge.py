@@ -1,17 +1,18 @@
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 
 import pytest
-from api.diagnostics_management import KnowledgeGraph
-from api.routers import knowledge
-from api.security.keycloak import Keycloak
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from jose import jws
 
+from api.diagnostics_management import KnowledgeGraph
+from api.routers import knowledge
+from api.security.keycloak import Keycloak
+
 
 @pytest.fixture(
     params=[["shared"], ["workshop"], ["workshop", "shared"]],
-    ids=["role:shared", "role:workshop", "role:both"]
+    ids=["role:shared", "role:workshop", "role:both"],
 )
 def jwt_payload(request):
     """
@@ -23,7 +24,7 @@ def jwt_payload(request):
         "iat": datetime.now(UTC).timestamp(),
         "exp": (datetime.now(UTC) + timedelta(60)).timestamp(),
         "preferred_username": "some-user-with-knowledge-access",
-        "realm_access": {"roles": request.param}
+        "realm_access": {"roles": request.param},
     }
 
 
@@ -53,7 +54,7 @@ def unauthenticated_client(app):
 
 @pytest.fixture
 def authenticated_client(
-        unauthenticated_client, rsa_public_key_pem, signed_jwt
+    unauthenticated_client, rsa_public_key_pem, signed_jwt
 ):
     """Turn unauthenticated client into authenticated client."""
 
@@ -63,9 +64,9 @@ def authenticated_client(
 
     # Make app use public key from fixture for token validation
     app = client.app
-    app.dependency_overrides[
-        Keycloak.get_public_key_for_workshop_realm
-    ] = lambda: rsa_public_key_pem.decode()
+    app.dependency_overrides[Keycloak.get_public_key_for_workshop_realm] = (
+        lambda: rsa_public_key_pem.decode()
+    )
 
     return client
 
@@ -84,9 +85,7 @@ def test_list_vehicle_components_kg_not_available(authenticated_client):
     assert response.json() == []
 
 
-def test_list_vehicle_components(
-        authenticated_client, kg_components
-):
+def test_list_vehicle_components(authenticated_client, kg_components):
     response = authenticated_client.get("/components")
     assert response.status_code == 200
     assert sorted(response.json()) == sorted(kg_components)
@@ -112,11 +111,12 @@ def jwt_payload_with_unauthorized_role(jwt_payload):
 
 @pytest.fixture
 def signed_jwt_with_unauthorized_role(
-        jwt_payload_with_unauthorized_role, rsa_private_key_pem: bytes
+    jwt_payload_with_unauthorized_role, rsa_private_key_pem: bytes
 ):
     return jws.sign(
         jwt_payload_with_unauthorized_role,
-        rsa_private_key_pem, algorithm="RS256"
+        rsa_private_key_pem,
+        algorithm="RS256",
     )
 
 
@@ -124,7 +124,7 @@ def signed_jwt_with_unauthorized_role(
     "route", knowledge.router.routes, ids=lambda r: r.name
 )
 def test_unauthorized_user(
-        route, authenticated_client, signed_jwt_with_unauthorized_role
+    route, authenticated_client, signed_jwt_with_unauthorized_role
 ):
     """
     Endpoints should not be accessible, if the user role encoded in the
@@ -144,7 +144,7 @@ def test_unauthorized_user(
     "route", knowledge.router.routes, ids=lambda r: r.name
 )
 def test_invalid_jwt_signature(
-        route, authenticated_client, another_rsa_public_key_pem
+    route, authenticated_client, another_rsa_public_key_pem
 ):
     """
     Endpoints should not be accessible, if the public key retrieved from
@@ -168,7 +168,7 @@ def expired_jwt_payload():
         "iat": (datetime.now(UTC) - timedelta(60)).timestamp(),
         "exp": (datetime.now(UTC) - timedelta(1)).timestamp(),
         "preferred_username": "user",
-        "realm_access": {"roles": ["shared"]}
+        "realm_access": {"roles": ["shared"]},
     }
 
 
@@ -193,7 +193,7 @@ def test_expired_jwt(route, authenticated_client, expired_jwt):
     response = authenticated_client.request(
         method=method,
         url=route.path,
-        headers={"Authorization": f"Bearer {expired_jwt}"}
+        headers={"Authorization": f"Bearer {expired_jwt}"},
     )
     assert response.status_code == 401
     assert response.json() == {"detail": "Could not validate token."}

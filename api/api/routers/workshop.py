@@ -1,58 +1,50 @@
-from typing import (
-    List,
-    Union,
-    Literal,
-    Optional,
-    Sequence
-)
+from typing import List, Literal, Optional, Sequence, Union
 
 from bson import ObjectId
 from bson.errors import InvalidId
-from fastapi import (
-    APIRouter, HTTPException, Depends, UploadFile, File, Form
-)
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from fastapi.responses import Response
 from motor import motor_asyncio
 from pydantic import NonNegativeInt
 
 from ..data_management import (
-    NewCase,
+    AttachmentBucket,
     Case,
     CaseUpdate,
-    NewOBDData,
-    OBDDataUpdate,
-    OBDData,
-    NewSymptom,
-    Symptom,
-    SymptomUpdate,
-    TimeseriesDataUpdate,
-    NewTimeseriesData,
-    TimeseriesData,
-    TimeseriesDataLabel,
-    Vehicle,
-    VehicleUpdate,
     Customer,
     Diagnosis,
     DiagnosisStatus,
-    AttachmentBucket
+    NewCase,
+    NewOBDData,
+    NewSymptom,
+    NewTimeseriesData,
+    OBDData,
+    OBDDataUpdate,
+    Symptom,
+    SymptomUpdate,
+    TimeseriesData,
+    TimeseriesDataLabel,
+    TimeseriesDataUpdate,
+    Vehicle,
+    VehicleUpdate,
 )
 from ..diagnostics_management import DiagnosticTaskManager
 from ..security.token_auth import authorized_workshop_id
-from ..upload_filereader import filereader_factory, FileReaderException
+from ..upload_filereader import FileReaderException, filereader_factory
 
 tags_metadata = [
     {
         "name": "Workshop - Case Management",
-        "description": "Manage cases and associated meta data of a workshop."
+        "description": "Manage cases and associated meta data of a workshop.",
     },
     {
         "name": "Workshop - Data Management",
-        "description": "Manage diagnostic data of a specific case."
+        "description": "Manage diagnostic data of a specific case.",
     },
     {
         "name": "Workshop - Diagnostics",
-        "description": "Manage diagnosis of a case."
-    }
+        "description": "Manage diagnosis of a case.",
+    },
 ]
 
 router = APIRouter(dependencies=[Depends(authorized_workshop_id)])
@@ -62,12 +54,12 @@ router = APIRouter(dependencies=[Depends(authorized_workshop_id)])
     "/{workshop_id}/cases",
     status_code=200,
     response_model=List[Case],
-    tags=["Workshop - Case Management"]
+    tags=["Workshop - Case Management"],
 )
 async def list_cases(
-        workshop_id: str,
-        customer_id: Optional[str] = None,
-        vin: Optional[str] = None
+    workshop_id: str,
+    customer_id: Optional[str] = None,
+    vin: Optional[str] = None,
 ) -> Sequence[Case]:
     cases = await Case.find_in_hub(
         customer_id=customer_id, vin=vin, workshop_id=workshop_id
@@ -79,7 +71,7 @@ async def list_cases(
     "/{workshop_id}/cases",
     status_code=201,
     response_model=Case,
-    tags=["Workshop - Case Management"]
+    tags=["Workshop - Case Management"],
 )
 async def add_case(workshop_id: str, case: NewCase) -> Case:
     _case = Case(workshop_id=workshop_id, **case.model_dump())
@@ -98,7 +90,7 @@ async def case_from_workshop(workshop_id: str, case_id: str) -> Case:
     no_case_with_id_exception = HTTPException(
         status_code=404,
         detail=f"No case with id '{case_id}' found "
-               f"for workshop '{workshop_id}'."
+        f"for workshop '{workshop_id}'.",
     )
 
     try:
@@ -120,7 +112,7 @@ async def case_from_workshop(workshop_id: str, case_id: str) -> Case:
     "/{workshop_id}/cases/{case_id}",
     status_code=200,
     response_model=Case,
-    tags=["Workshop - Case Management"]
+    tags=["Workshop - Case Management"],
 )
 async def get_case(case: Case = Depends(case_from_workshop)) -> Case:
     return case
@@ -129,11 +121,10 @@ async def get_case(case: Case = Depends(case_from_workshop)) -> Case:
 @router.put(
     "/{workshop_id}/cases/{case_id}",
     status_code=200,
-    tags=["Workshop - Case Management"]
+    tags=["Workshop - Case Management"],
 )
 async def update_case(
-        update: CaseUpdate,
-        case: Case = Depends(case_from_workshop)
+    update: CaseUpdate, case: Case = Depends(case_from_workshop)
 ) -> Case:
     await case.set(update.model_dump(exclude_unset=True))
     return case
@@ -143,21 +134,20 @@ async def update_case(
     "/{workshop_id}/cases/{case_id}",
     status_code=200,
     response_model=None,
-    tags=["Workshop - Case Management"]
+    tags=["Workshop - Case Management"],
 )
-async def delete_case(
-        case: Case = Depends(case_from_workshop)
-) -> None:
+async def delete_case(case: Case = Depends(case_from_workshop)) -> None:
     await case.delete()
 
 
 @router.get(
     "/{workshop_id}/cases/{case_id}/customer",
     status_code=200,
-    response_model=Customer, tags=["Workshop - Case Management"]
+    response_model=Customer,
+    tags=["Workshop - Case Management"],
 )
 async def get_customer(
-        case: Case = Depends(case_from_workshop)
+    case: Case = Depends(case_from_workshop),
 ) -> Customer | None:
     customer = await Customer.get(case.customer_id)
     return customer
@@ -166,10 +156,11 @@ async def get_customer(
 @router.get(
     "/{workshop_id}/cases/{case_id}/vehicle",
     status_code=200,
-    response_model=Vehicle, tags=["Workshop - Case Management"]
+    response_model=Vehicle,
+    tags=["Workshop - Case Management"],
 )
 async def get_vehicle(
-        case: Case = Depends(case_from_workshop)
+    case: Case = Depends(case_from_workshop),
 ) -> Vehicle | None:
     vehicle = await Vehicle.find_one({"vin": case.vehicle_vin})
     return vehicle
@@ -178,15 +169,16 @@ async def get_vehicle(
 @router.put(
     "/{workshop_id}/cases/{case_id}/vehicle",
     status_code=200,
-    response_model=Vehicle, tags=["Workshop - Case Management"]
+    response_model=Vehicle,
+    tags=["Workshop - Case Management"],
 )
 async def update_vehicle(
-        update: VehicleUpdate, case: Case = Depends(case_from_workshop)
+    update: VehicleUpdate, case: Case = Depends(case_from_workshop)
 ) -> Vehicle:
     no_vehicle_with_id_exception = HTTPException(
         status_code=404,
         detail=f"No vehicle with vin '{case.vehicle_vin}' found "
-               f"for workshop '{case.workshop_id}'."
+        f"for workshop '{case.workshop_id}'.",
     )
     vehicle = await Vehicle.find_one({"vin": case.vehicle_vin})
     if vehicle is not None:
@@ -199,10 +191,11 @@ async def update_vehicle(
 @router.get(
     "/{workshop_id}/cases/{case_id}/timeseries_data",
     status_code=200,
-    response_model=List[TimeseriesData], tags=["Workshop - Data Management"]
+    response_model=List[TimeseriesData],
+    tags=["Workshop - Data Management"],
 )
 def list_timeseries_data(
-        case: Case = Depends(case_from_workshop)
+    case: Case = Depends(case_from_workshop),
 ) -> Sequence[TimeseriesData]:
     """List all available timeseries datasets for a case."""
     return case.timeseries_data
@@ -211,11 +204,12 @@ def list_timeseries_data(
 @router.post(
     "/{workshop_id}/cases/{case_id}/timeseries_data",
     status_code=201,
-    response_model=Case, tags=["Workshop - Data Management"]
+    response_model=Case,
+    tags=["Workshop - Data Management"],
 )
 async def add_timeseries_data(
-        timeseries_data: NewTimeseriesData,
-        case: Case = Depends(case_from_workshop)
+    timeseries_data: NewTimeseriesData,
+    case: Case = Depends(case_from_workshop),
 ) -> Case:
     """Add a new timeseries dataset to a case."""
     case = await case.add_timeseries_data(timeseries_data)
@@ -234,40 +228,40 @@ def read_file_or_400(upload: UploadFile, file_format: str) -> list:
         raise HTTPException(
             status_code=400,
             detail=f"Could not read file '{upload.filename}' with file format "
-                   f"'{file_format}'."
+            f"'{file_format}'.",
         )
     return read_result
 
 
 def channel_description_form(
-        component_A: str = Form(
-            default=None, description="The investigated vehicle component"
-        ),
-        label_A: TimeseriesDataLabel = Form(
-            default=TimeseriesDataLabel.unknown,
-            description="Label for the oscillogram"
-        ),
-        component_B: str = Form(
-            default=None, description="The investigated vehicle component"
-        ),
-        label_B: TimeseriesDataLabel = Form(
-            default=TimeseriesDataLabel.unknown,
-            description="Label for the oscillogram"
-        ),
-        component_C: str = Form(
-            default=None, description="The investigated vehicle component"
-        ),
-        label_C: TimeseriesDataLabel = Form(
-            default=TimeseriesDataLabel.unknown,
-            description="Label for the oscillogram"
-        ),
-        component_D: str = Form(
-            default=None, description="The investigated vehicle component"
-        ),
-        label_D: TimeseriesDataLabel = Form(
-            default=TimeseriesDataLabel.unknown,
-            description="Label for the oscillogram"
-        )
+    component_A: str = Form(
+        default=None, description="The investigated vehicle component"
+    ),
+    label_A: TimeseriesDataLabel = Form(
+        default=TimeseriesDataLabel.unknown,
+        description="Label for the oscillogram",
+    ),
+    component_B: str = Form(
+        default=None, description="The investigated vehicle component"
+    ),
+    label_B: TimeseriesDataLabel = Form(
+        default=TimeseriesDataLabel.unknown,
+        description="Label for the oscillogram",
+    ),
+    component_C: str = Form(
+        default=None, description="The investigated vehicle component"
+    ),
+    label_C: TimeseriesDataLabel = Form(
+        default=TimeseriesDataLabel.unknown,
+        description="Label for the oscillogram",
+    ),
+    component_D: str = Form(
+        default=None, description="The investigated vehicle component"
+    ),
+    label_D: TimeseriesDataLabel = Form(
+        default=TimeseriesDataLabel.unknown,
+        description="Label for the oscillogram",
+    ),
 ) -> dict:
     """
     Helper to retrieve required channel descriptions for picoscope uploads.
@@ -276,16 +270,16 @@ def channel_description_form(
         "A": {"component": component_A, "label": label_A},
         "B": {"component": component_B, "label": label_B},
         "C": {"component": component_C, "label": label_C},
-        "D": {"component": component_D, "label": label_D}
+        "D": {"component": component_D, "label": label_D},
     }
 
 
 def process_picoscope_upload(
-        upload: UploadFile = File(description="Picoscope Data File"),
-        file_format: Literal["Picoscope MAT", "Picoscope CSV"] = Form(
-            default="Picoscope MAT"
-        ),
-        channel_description: dict = Depends(channel_description_form)
+    upload: UploadFile = File(description="Picoscope Data File"),
+    file_format: Literal["Picoscope MAT", "Picoscope CSV"] = Form(
+        default="Picoscope MAT"
+    ),
+    channel_description: dict = Depends(channel_description_form),
 ) -> list:
     """
     Helper to preprocess picoscope upload and user-provided channel
@@ -323,8 +317,8 @@ def process_picoscope_upload(
                 raise HTTPException(
                     status_code=400,
                     detail=f"A component was specified for channel "
-                           f"'{channel}' but this channel is not found in "
-                           f"file '{upload.filename}'."
+                    f"'{channel}' but this channel is not found in "
+                    f"file '{upload.filename}'.",
                 )
 
     return selected_results
@@ -334,16 +328,14 @@ def process_picoscope_upload(
     "/{workshop_id}/cases/{case_id}/timeseries_data/upload/picoscope",
     status_code=201,
     response_model=Case,
-    tags=["Workshop - Data Management"]
+    tags=["Workshop - Data Management"],
 )
 async def upload_picoscope_data(
-        processed_upload: list = Depends(process_picoscope_upload),
-        case: Case = Depends(case_from_workshop)
+    processed_upload: list = Depends(process_picoscope_upload),
+    case: Case = Depends(case_from_workshop),
 ) -> Case:
     for data in processed_upload:
-        case = await case.add_timeseries_data(
-            NewTimeseriesData(**data)
-        )
+        case = await case.add_timeseries_data(NewTimeseriesData(**data))
     return case
 
 
@@ -351,25 +343,21 @@ async def upload_picoscope_data(
     "/{workshop_id}/cases/{case_id}/timeseries_data/upload/omniview",
     status_code=201,
     response_model=Case,
-    tags=["Workshop - Data Management"]
+    tags=["Workshop - Data Management"],
 )
 async def upload_omniview_data(
-        upload: UploadFile = File(description="Omniview Data File"),
-        file_format: Literal["Omniview CSV"] = Form(default="Omniview CSV"),
-        component: str = Form(
-            description="The investigated vehicle component"
-        ),
-        sampling_rate: NonNegativeInt = Form(
-            description="Sampling rate of measurement [Hz]"
-        ),
-        duration: NonNegativeInt = Form(
-            description="Duration of measurement [s]"
-        ),
-        label: TimeseriesDataLabel = Form(
-            default=TimeseriesDataLabel.unknown,
-            description="Label for the oscillogram"
-        ),
-        case: Case = Depends(case_from_workshop)
+    upload: UploadFile = File(description="Omniview Data File"),
+    file_format: Literal["Omniview CSV"] = Form(default="Omniview CSV"),
+    component: str = Form(description="The investigated vehicle component"),
+    sampling_rate: NonNegativeInt = Form(
+        description="Sampling rate of measurement [Hz]"
+    ),
+    duration: NonNegativeInt = Form(description="Duration of measurement [s]"),
+    label: TimeseriesDataLabel = Form(
+        default=TimeseriesDataLabel.unknown,
+        description="Label for the oscillogram",
+    ),
+    case: Case = Depends(case_from_workshop),
 ) -> Case:
     """Upload an Omniview csv export to a case."""
     data = read_file_or_400(upload, file_format)[0]
@@ -377,59 +365,62 @@ async def upload_omniview_data(
     data["sampling_rate"] = sampling_rate
     data["duration"] = duration
     data["label"] = label
-    case = await case.add_timeseries_data(
-        NewTimeseriesData(**data)
-    )
+    case = await case.add_timeseries_data(NewTimeseriesData(**data))
     return case
 
 
 @router.get(
     "/{workshop_id}/cases/{case_id}/timeseries_data/{data_id}",
     status_code=200,
-    tags=["Workshop - Data Management"]
+    tags=["Workshop - Data Management"],
 )
 async def get_timeseries_data(
-        data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
+    data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
 ) -> TimeseriesData:
     """Get a specific timeseries dataset from a case."""
     timeseries_data = case.get_timeseries_data(data_id)
     if timeseries_data is not None:
         return timeseries_data
     else:
-        exception_detail = f"No timeseries_data with data_id `{data_id}` in " \
-                           f"case '{case.id}'. Available data_ids are " \
-                           f"{case.available_timeseries_data}."
+        exception_detail = (
+            f"No timeseries_data with data_id `{data_id}` in "
+            f"case '{case.id}'. Available data_ids are "
+            f"{case.available_timeseries_data}."
+        )
         raise HTTPException(status_code=404, detail=exception_detail)
 
 
 @router.get(
     "/{workshop_id}/cases/{case_id}/timeseries_data/{data_id}/signal",
     status_code=200,
-    tags=["Workshop - Data Management"]
+    tags=["Workshop - Data Management"],
 )
 async def get_timeseries_data_signal(
-        data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
+    data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
 ) -> List[float]:
     """Get the signal of a specific timeseries dataset from a case."""
     timeseries_data = case.get_timeseries_data(data_id)
     if timeseries_data is not None:
         return await timeseries_data.get_signal()
     else:
-        exception_detail = f"No timeseries_data with data_id `{data_id}` in " \
-                           f"case '{case.id}'. Available data_ids are " \
-                           f"{case.available_timeseries_data}."
+        exception_detail = (
+            f"No timeseries_data with data_id `{data_id}` in "
+            f"case '{case.id}'. Available data_ids are "
+            f"{case.available_timeseries_data}."
+        )
         raise HTTPException(status_code=404, detail=exception_detail)
 
 
 @router.put(
     "/{workshop_id}/cases/{case_id}/timeseries_data/{data_id}",
     status_code=200,
-    response_model=TimeseriesData, tags=["Workshop - Data Management"]
+    response_model=TimeseriesData,
+    tags=["Workshop - Data Management"],
 )
 async def update_timeseries_data(
-        data_id: NonNegativeInt,
-        update: TimeseriesDataUpdate,
-        case: Case = Depends(case_from_workshop)
+    data_id: NonNegativeInt,
+    update: TimeseriesDataUpdate,
+    case: Case = Depends(case_from_workshop),
 ) -> TimeseriesData:
     """Update a specific timeseries dataset of a case."""
     timeseries_data = await case.update_timeseries_data(
@@ -438,19 +429,22 @@ async def update_timeseries_data(
     if timeseries_data is not None:
         return timeseries_data
     else:
-        exception_detail = f"No timeseries_data with data_id `{data_id}` in " \
-                           f"case '{case.id}'. Available data_ids are " \
-                           f"{case.available_timeseries_data}."
+        exception_detail = (
+            f"No timeseries_data with data_id `{data_id}` in "
+            f"case '{case.id}'. Available data_ids are "
+            f"{case.available_timeseries_data}."
+        )
         raise HTTPException(status_code=404, detail=exception_detail)
 
 
 @router.delete(
     "/{workshop_id}/cases/{case_id}/timeseries_data/{data_id}",
     status_code=200,
-    response_model=Case, tags=["Workshop - Data Management"]
+    response_model=Case,
+    tags=["Workshop - Data Management"],
 )
 async def delete_timeseries_data(
-        data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
+    data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
 ) -> Case:
     """Delete a specific timeseries dataset from a case."""
     await case.delete_timeseries_data(data_id)
@@ -460,10 +454,11 @@ async def delete_timeseries_data(
 @router.get(
     "/{workshop_id}/cases/{case_id}/obd_data",
     status_code=200,
-    response_model=List[OBDData], tags=["Workshop - Data Management"]
+    response_model=List[OBDData],
+    tags=["Workshop - Data Management"],
 )
 async def list_obd_data(
-        case: Case = Depends(case_from_workshop)
+    case: Case = Depends(case_from_workshop),
 ) -> List[OBDData]:
     """List all available obd datasets for a case."""
     return case.obd_data
@@ -472,11 +467,11 @@ async def list_obd_data(
 @router.post(
     "/{workshop_id}/cases/{case_id}/obd_data",
     status_code=201,
-    response_model=Case, tags=["Workshop - Data Management"]
+    response_model=Case,
+    tags=["Workshop - Data Management"],
 )
 async def add_obd_data(
-        obd_data: NewOBDData,
-        case: Case = Depends(case_from_workshop)
+    obd_data: NewOBDData, case: Case = Depends(case_from_workshop)
 ) -> Case:
     """Add a new obd dataset to a case."""
     case = await case.add_obd_data(obd_data)
@@ -487,70 +482,73 @@ async def add_obd_data(
     "/{workshop_id}/cases/{case_id}/obd_data/upload/vcds",
     status_code=201,
     response_model=Case,
-    tags=["Workshop - Data Management"]
+    tags=["Workshop - Data Management"],
 )
 async def upload_vcds_data(
-        upload: UploadFile = File(
-            description="VCDS Data File"
-        ),
-        file_format: Literal["VCDS TXT"] = Form(default="VCDS TXT"),
-        case: Case = Depends(case_from_workshop)
+    upload: UploadFile = File(description="VCDS Data File"),
+    file_format: Literal["VCDS TXT"] = Form(default="VCDS TXT"),
+    case: Case = Depends(case_from_workshop),
 ) -> Case:
     data = read_file_or_400(upload, file_format)[0]
     data = data["obd_data"]
-    case = await case.add_obd_data(
-        NewOBDData(**data)
-    )
+    case = await case.add_obd_data(NewOBDData(**data))
     return case
 
 
 @router.get(
     "/{workshop_id}/cases/{case_id}/obd_data/{data_id}",
     status_code=200,
-    response_model=OBDData, tags=["Workshop - Data Management"]
+    response_model=OBDData,
+    tags=["Workshop - Data Management"],
 )
 async def get_obd_data(
-        data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
+    data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
 ) -> OBDData:
     """Get a specific obd dataset from a case."""
     obd_data = case.get_obd_data(data_id)
     if obd_data is not None:
         return obd_data
     else:
-        exception_detail = f"No obd_data with data_id `{data_id}` in " \
-                           f"case '{case.id}'. Available data_ids are " \
-                           f"{case.available_obd_data}."
+        exception_detail = (
+            f"No obd_data with data_id `{data_id}` in "
+            f"case '{case.id}'. Available data_ids are "
+            f"{case.available_obd_data}."
+        )
         raise HTTPException(status_code=404, detail=exception_detail)
 
 
 @router.put(
     "/{workshop_id}/cases/{case_id}/obd_data/{data_id}",
     status_code=200,
-    response_model=OBDData, tags=["Workshop - Data Management"]
+    response_model=OBDData,
+    tags=["Workshop - Data Management"],
 )
 async def update_obd_data(
-        data_id: NonNegativeInt,
-        update: OBDDataUpdate,
-        case: Case = Depends(case_from_workshop)
+    data_id: NonNegativeInt,
+    update: OBDDataUpdate,
+    case: Case = Depends(case_from_workshop),
 ) -> OBDData:
     """Update a specific obd dataset from a case."""
     obd_data = await case.update_obd_data(data_id=data_id, update=update)
     if obd_data is not None:
         return obd_data
     else:
-        exception_detail = f"No obd_data with data_id `{data_id}` in " \
-                           f"case '{case.id}'. Available data_ids are " \
-                           f"{case.available_obd_data}."
+        exception_detail = (
+            f"No obd_data with data_id `{data_id}` in "
+            f"case '{case.id}'. Available data_ids are "
+            f"{case.available_obd_data}."
+        )
         raise HTTPException(status_code=404, detail=exception_detail)
 
 
 @router.delete(
     "/{workshop_id}/cases/{case_id}/obd_data/{data_id}",
     status_code=200,
-    response_model=Case, tags=["Workshop - Data Management"]
+    response_model=Case,
+    tags=["Workshop - Data Management"],
 )
 async def delete_obd_data(
-        data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
+    data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
 ) -> Case:
     """Delete a specific obd dataset from a case."""
     await case.delete_obd_data(data_id)
@@ -560,10 +558,11 @@ async def delete_obd_data(
 @router.get(
     "/{workshop_id}/cases/{case_id}/symptoms",
     status_code=200,
-    response_model=List[Symptom], tags=["Workshop - Data Management"]
+    response_model=List[Symptom],
+    tags=["Workshop - Data Management"],
 )
 async def list_symptoms(
-        case: Case = Depends(case_from_workshop)
+    case: Case = Depends(case_from_workshop),
 ) -> List[Symptom]:
     """List all available symptoms for a case."""
     return case.symptoms
@@ -572,10 +571,11 @@ async def list_symptoms(
 @router.post(
     "/{workshop_id}/cases/{case_id}/symptoms",
     status_code=201,
-    response_model=Case, tags=["Workshop - Data Management"]
+    response_model=Case,
+    tags=["Workshop - Data Management"],
 )
 async def add_symptom(
-        symptom: NewSymptom, case: Case = Depends(case_from_workshop)
+    symptom: NewSymptom, case: Case = Depends(case_from_workshop)
 ) -> Case:
     """Add a new symptom to a case."""
     case = await case.add_symptom(symptom)
@@ -585,50 +585,57 @@ async def add_symptom(
 @router.get(
     "/{workshop_id}/cases/{case_id}/symptoms/{data_id}",
     status_code=200,
-    response_model=Symptom, tags=["Workshop - Data Management"]
+    response_model=Symptom,
+    tags=["Workshop - Data Management"],
 )
 async def get_symptom(
-        data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
+    data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
 ) -> Symptom:
     """Get a specific symptom from a case."""
     symptom = case.get_symptom(data_id)
     if symptom is not None:
         return symptom
     else:
-        exception_detail = f"No symptom with data_id `{data_id}` in " \
-                           f"case '{case.id}'. Available data_ids are " \
-                           f"{case.available_symptoms}."
+        exception_detail = (
+            f"No symptom with data_id `{data_id}` in "
+            f"case '{case.id}'. Available data_ids are "
+            f"{case.available_symptoms}."
+        )
         raise HTTPException(status_code=404, detail=exception_detail)
 
 
 @router.put(
     "/{workshop_id}/cases/{case_id}/symptoms/{data_id}",
     status_code=200,
-    response_model=Symptom, tags=["Workshop - Data Management"]
+    response_model=Symptom,
+    tags=["Workshop - Data Management"],
 )
 async def update_symptom(
-        data_id: NonNegativeInt,
-        update: SymptomUpdate,
-        case: Case = Depends(case_from_workshop)
+    data_id: NonNegativeInt,
+    update: SymptomUpdate,
+    case: Case = Depends(case_from_workshop),
 ) -> Symptom:
     """Update a specific symptom of a case."""
     symptom = await case.update_symptom(data_id=data_id, update=update)
     if symptom is not None:
         return symptom
     else:
-        exception_detail = f"No symptom with data_id `{data_id}` in " \
-                           f"case '{case.id}'. Available data_ids are " \
-                           f"{case.available_symptoms}."
+        exception_detail = (
+            f"No symptom with data_id `{data_id}` in "
+            f"case '{case.id}'. Available data_ids are "
+            f"{case.available_symptoms}."
+        )
         raise HTTPException(status_code=404, detail=exception_detail)
 
 
 @router.delete(
     "/{workshop_id}/cases/{case_id}/symptoms/{data_id}",
     status_code=200,
-    response_model=Case, tags=["Workshop - Data Management"]
+    response_model=Case,
+    tags=["Workshop - Data Management"],
 )
 async def delete_symptom(
-        data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
+    data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
 ) -> Case:
     """Delete a specific symptom from a case."""
     await case.delete_symptom(data_id)
@@ -639,10 +646,10 @@ async def delete_symptom(
     "/{workshop_id}/cases/{case_id}/diag",
     status_code=200,
     response_model=Union[Diagnosis, None],
-    tags=["Workshop - Diagnostics"]
+    tags=["Workshop - Diagnostics"],
 )
 async def get_diagnosis(
-        case: Case = Depends(case_from_workshop)
+    case: Case = Depends(case_from_workshop),
 ) -> Diagnosis | None:
     """Get diagnosis data for this case."""
     if case.diagnosis_id is None:
@@ -655,13 +662,13 @@ async def get_diagnosis(
     "/{workshop_id}/cases/{case_id}/diag",
     status_code=201,
     response_model=Diagnosis,
-    tags=["Workshop - Diagnostics"]
+    tags=["Workshop - Diagnostics"],
 )
 async def start_diagnosis(
-        case: Case = Depends(case_from_workshop),
-        manage_diagnostic_task: DiagnosticTaskManager = Depends(
-            DiagnosticTaskManager
-        )
+    case: Case = Depends(case_from_workshop),
+    manage_diagnostic_task: DiagnosticTaskManager = Depends(
+        DiagnosticTaskManager
+    ),
 ) -> Diagnosis | None:
     """Initialize the diagnosis process for this case."""
     if case.diagnosis_id is not None:
@@ -674,8 +681,7 @@ async def start_diagnosis(
             raise HTTPException(status_code=404, detail=exception_detail)
         else:
             diag = Diagnosis(
-                case_id=case.id,
-                status=DiagnosisStatus("scheduled")
+                case_id=case.id, status=DiagnosisStatus("scheduled")
             )
             await diag.create()
             case.diagnosis_id = diag.id
@@ -691,11 +697,9 @@ async def start_diagnosis(
     "/{workshop_id}/cases/{case_id}/diag",
     status_code=200,
     response_model=None,
-    tags=["Workshop - Diagnostics"]
+    tags=["Workshop - Diagnostics"],
 )
-async def delete_diagnosis(
-        case: Case = Depends(case_from_workshop)
-) -> None:
+async def delete_diagnosis(case: Case = Depends(case_from_workshop)) -> None:
     """Stop the diagnosis process for this case."""
     diag = await Diagnosis.get(case.diagnosis_id)
     if diag is not None:
@@ -709,14 +713,14 @@ async def delete_diagnosis(
     "/{workshop_id}/cases/{case_id}/diag/attachments/{attachment_id}",
     status_code=200,
     response_class=Response,
-    tags=["Workshop - Diagnostics"]
+    tags=["Workshop - Diagnostics"],
 )
 async def get_diagnosis_attachment(
-        attachment_id: str,
-        case: Case = Depends(case_from_workshop),
-        attachment_bucket: motor_asyncio.AsyncIOMotorGridFSBucket = Depends(
-            AttachmentBucket.create
-        )
+    attachment_id: str,
+    case: Case = Depends(case_from_workshop),
+    attachment_bucket: motor_asyncio.AsyncIOMotorGridFSBucket = Depends(
+        AttachmentBucket.create
+    ),
 ) -> Response:
     """Retrieve a specific diagnosis attachment."""
     attachment = await attachment_bucket.open_download_stream(
@@ -730,10 +734,10 @@ async def get_diagnosis_attachment(
     "/{workshop_id}/diagnoses",
     status_code=200,
     response_model=List[Diagnosis],
-    tags=["Workshop - Diagnostics"]
+    tags=["Workshop - Diagnostics"],
 )
 async def list_diagnoses(
-        workshop_id: str, status: Optional[DiagnosisStatus] = None
+    workshop_id: str, status: Optional[DiagnosisStatus] = None
 ) -> List[Diagnosis]:
     """List all diagnoses of a workshop, optionally filtered by status."""
     diagnoses = await Diagnosis.find_in_hub(

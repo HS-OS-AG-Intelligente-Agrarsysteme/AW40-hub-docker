@@ -5,23 +5,27 @@ from fastapi.middleware.cors import CORSMiddleware
 from motor import motor_asyncio
 
 from .data_management import (
-    Case, Vehicle, Customer, Workshop, TimeseriesMetaData, Diagnosis,
-    AttachmentBucket
+    AttachmentBucket,
+    Case,
+    Customer,
+    Diagnosis,
+    TimeseriesMetaData,
+    Vehicle,
+    Workshop,
 )
 from .data_management.timeseries_data import GridFSSignalStore
 from .diagnostics_management import DiagnosticTaskManager, KnowledgeGraph
+from .routers import diagnostics, minio
+from .security.keycloak import Keycloak
 from .settings import settings
 from .storage.storage_factory import StorageFactory
-from .security.keycloak import Keycloak
 from .v1 import api_v1
-from .routers import diagnostics
-from .routers import minio
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
-    allow_methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -29,8 +33,9 @@ app.add_middleware(
 @app.middleware("http")
 async def add_strict_transport_security(request: Request, call_next):
     response = await call_next(request)
-    response.headers["Strict-Transport-Security"] = \
+    response.headers["Strict-Transport-Security"] = (
         "max-age=31536000; includeSubDomains"
+    )
     return response
 
 
@@ -43,9 +48,7 @@ async def init_mongo():
     client = motor_asyncio.AsyncIOMotorClient(settings.mongo_uri)
     await init_beanie(
         client[settings.mongo_db],
-        document_models=[
-            Case, Vehicle, Customer, Workshop, Diagnosis
-        ]
+        document_models=[Case, Vehicle, Customer, Workshop, Diagnosis],
     )
 
     # initialized gridfs signal storage
@@ -63,9 +66,7 @@ async def init_mongo():
 @app.on_event("startup")
 async def init_diagnostics_management():
     DiagnosticTaskManager.set_celery(
-        Celery(
-            broker=settings.redis_uri, backend=settings.redis_uri
-        )
+        Celery(broker=settings.redis_uri, backend=settings.redis_uri)
     )
 
 
@@ -76,7 +77,7 @@ def init_storages():
         minio_password=settings.minio_password,
         minio_username=settings.minio_username,
         minio_use_tls=settings.minio_use_tls,
-        minio_check_cert=settings.minio_check_cert
+        minio_check_cert=settings.minio_check_cert,
     )
 
 
@@ -89,7 +90,7 @@ def init_knowledge_graph():
 def init_keycloak():
     Keycloak.configure(
         url=settings.keycloak_url,
-        workshop_realm=settings.keycloak_workshop_realm
+        workshop_realm=settings.keycloak_workshop_realm,
     )
 
 

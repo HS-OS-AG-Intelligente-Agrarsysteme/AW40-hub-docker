@@ -1,9 +1,11 @@
 import uuid
+
 import pytest
-from httpx import Client
-from api.routers import minio
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from httpx import Client
+
+from api.routers import minio
 
 # Test run again the api container. Use the api key configured for the api's
 # minio router in dev.env
@@ -19,13 +21,13 @@ def test_upload():
     response = client.put(
         f"{base_addr}/{bucket}/test1.txt",
         content=testval,
-        headers={'Content-Type': 'text/plain'})
+        headers={"Content-Type": "text/plain"},
+    )
     assert response.status_code == 200
 
 
 def test_download():
-    response = client.get(
-        f"{base_addr}/{bucket}/test1.txt")
+    response = client.get(f"{base_addr}/{bucket}/test1.txt")
     assert response.status_code == 200
     assert response.text == testval
 
@@ -33,20 +35,17 @@ def test_download():
 def test_upload_link():
     global testval2
     testval2 = str(uuid.uuid4())
-    response = client.get(
-        f"{base_addr}/upload-link/{bucket}/test2.txt")
+    response = client.get(f"{base_addr}/upload-link/{bucket}/test2.txt")
     assert response.status_code == 200
     link = response.text.strip('"')
     response = client.put(
-        link,
-        content=testval2,
-        headers={'Content-Type': 'text/plain'})
+        link, content=testval2, headers={"Content-Type": "text/plain"}
+    )
     assert response.status_code == 200
 
 
 def test_download_link():
-    response = client.get(
-        f"{base_addr}/download-link/{bucket}/test2.txt")
+    response = client.get(f"{base_addr}/download-link/{bucket}/test2.txt")
     assert response.status_code == 200
     link = response.text.strip('"')
     response = client.get(link)
@@ -62,9 +61,7 @@ test_api_key = "valid key"
 minio.api_key_auth.valid_key = test_api_key
 
 
-@pytest.mark.parametrize(
-    "route", minio.router.routes, ids=lambda r: r.name
-)
+@pytest.mark.parametrize("route", minio.router.routes, ids=lambda r: r.name)
 def test_missing_api_key(route):
     """
     Endpoints should not be accessible, if no api key is passed.
@@ -75,13 +72,12 @@ def test_missing_api_key(route):
     test_client = TestClient(app)
     response = test_client.request(method=method, url=path)
     assert response.status_code == 403
-    assert list(response.json().keys()) == ["detail"], \
-        "No data but exception details expected in response body."
+    assert list(response.json().keys()) == [
+        "detail"
+    ], "No data but exception details expected in response body."
 
 
-@pytest.mark.parametrize(
-    "route", minio.router.routes, ids=lambda r: r.name
-)
+@pytest.mark.parametrize("route", minio.router.routes, ids=lambda r: r.name)
 def test_invalid_api_key(route):
     """
     Endpoints should not be accessible, if invalid api key is passed.
@@ -93,5 +89,6 @@ def test_invalid_api_key(route):
     test_client.headers["x-api-key"] = test_api_key[1:]
     response = test_client.request(method=method, url=path)
     assert response.status_code == 401
-    assert list(response.json().keys()) == ["detail"], \
-        "No data but exception details expected in response body."
+    assert list(response.json().keys()) == [
+        "detail"
+    ], "No data but exception details expected in response body."
