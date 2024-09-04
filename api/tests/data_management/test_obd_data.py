@@ -1,5 +1,5 @@
 import pytest
-from api.data_management.obd_data import OBDData
+from api.data_management import OBDData
 from pydantic import ValidationError
 
 

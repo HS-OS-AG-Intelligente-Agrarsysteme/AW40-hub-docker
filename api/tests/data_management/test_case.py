@@ -1,7 +1,6 @@
 from unittest import mock
 
 import pytest
-from api.data_management.symptom import SymptomLabel
 from api.data_management import (
     NewCase,
     Case,
@@ -10,10 +9,12 @@ from api.data_management import (
     TimeseriesDataUpdate,
     NewTimeseriesData,
     TimeseriesData,
+    TimeseriesDataLabel,
     NewOBDData,
     OBDDataUpdate,
     NewSymptom,
-    SymptomUpdate
+    SymptomUpdate,
+    SymptomLabel
 )
 from pydantic import ValidationError
 
@@ -258,7 +259,7 @@ class TestCase:
             case.obd_data_added = previous_adds
 
             await case.add_obd_data(
-                NewOBDData(**{"dtcs": ["P0001", "U0001"]})
+                NewOBDData(dtcs=["P0001", "U0001"])
             )
 
             # refetch case and assert existence of single obd_data set
@@ -511,7 +512,7 @@ class TestCase:
             await case.save()
 
             # update the timeseries dataset with new_label
-            update = TimeseriesDataUpdate(**{"label": new_label})
+            update = TimeseriesDataUpdate(label=TimeseriesDataLabel(new_label))
             await case.update_timeseries_data(data_id=data_id, update=update)
 
             # confirm correct update of instance
@@ -551,7 +552,7 @@ class TestCase:
             await case.save()
 
             # update obd dataset with new_specs
-            update = OBDDataUpdate(**{"obd_specs": new_specs})
+            update = OBDDataUpdate(obd_specs=new_specs)
             await case.update_obd_data(data_id=data_id, update=update)
 
             # confirm correct update of instance
@@ -589,7 +590,7 @@ class TestCase:
             await case.save()
 
             # update symptom with new_label
-            update = SymptomUpdate(**{"label": SymptomLabel(new_label)})
+            update = SymptomUpdate(label=SymptomLabel(new_label))
             await case.update_symptom(data_id=data_id, update=update)
 
             # confirm correct update of instance

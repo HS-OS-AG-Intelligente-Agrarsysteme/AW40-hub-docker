@@ -14,6 +14,7 @@ __all__ = [
     "OBDData",
     "NewSymptom",
     "Symptom",
+    "SymptomLabel",
     "SymptomUpdate",
     "TimeseriesMetaData",
     "TimeseriesDataUpdate",
@@ -35,7 +36,7 @@ from .diagnosis import (
     AttachmentBucket
 )
 from .obd_data import OBDMetaData, NewOBDData, OBDDataUpdate, OBDData
-from .symptom import NewSymptom, Symptom, SymptomUpdate
+from .symptom import NewSymptom, Symptom, SymptomUpdate, SymptomLabel
 from .timeseries_data import (
     TimeseriesMetaData,
     TimeseriesDataUpdate,

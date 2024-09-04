@@ -1,7 +1,8 @@
 import pytest
 from api.data_management import (
     Case, NewOBDData, NewSymptom, NewTimeseriesData,
-    TimeseriesMetaData, Action, AttachmentBucket, Diagnosis
+    TimeseriesMetaData, Action, AttachmentBucket, Diagnosis,
+    SymptomLabel
 )
 from api.data_management.timeseries_data import GridFSSignalStore
 from api.routers import diagnostics
@@ -79,14 +80,12 @@ async def test_get_obd_data(
     async with initialized_beanie_context, data_context:
         case = await Case.get(case_id)
         assert case
-        obd_data = {"dtcs": ["P1234"]}
-        await case.add_obd_data(
-            NewOBDData(**obd_data)
-        )
+        obd_data = NewOBDData(dtcs=["P1234"])
+        await case.add_obd_data(obd_data)
 
         response = await client.get(f"/{diag_id}/obd_data")
         assert response.status_code == 200
-        assert response.json()[0]["dtcs"] == obd_data["dtcs"]
+        assert response.json()[0]["dtcs"] == obd_data.dtcs
 
 
 @pytest.mark.asyncio
@@ -198,15 +197,13 @@ async def test_get_symptoms(
     async with initialized_beanie_context, data_context:
         # seed database with data
         component = "battery"
-        symptom_data = {
-            "component": component,
-            "label": "defect"
-        }
+        symptom_data = NewSymptom(
+            component=component,
+            label=SymptomLabel("defect")
+        )
         case = await Case.get(case_id)
         assert case
-        await case.add_symptom(
-            NewSymptom(**symptom_data)
-        )
+        await case.add_symptom(symptom_data)
 
         # request data
         response = await client.get(
@@ -214,7 +211,7 @@ async def test_get_symptoms(
         )
         # confirm expected response
         assert response.status_code == 200
-        assert response.json()[0]["label"] == symptom_data["label"]
+        assert response.json()[0]["label"] == symptom_data.label
 
 
 @pytest.mark.asyncio
