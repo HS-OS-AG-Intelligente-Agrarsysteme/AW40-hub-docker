@@ -131,4 +131,5 @@ class PicoscopeCSVReader(FileReader):
                     sr_arr.append(1.0 / (abs(abs(last) - abs(ent))))
             last = ent
         sr: float = sum(sr_arr) / len(sr_arr)
+
         return sr, min(sr_arr) - sr, max(sr_arr) - sr
