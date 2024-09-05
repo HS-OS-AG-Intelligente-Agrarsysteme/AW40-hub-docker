@@ -512,8 +512,10 @@ async def test_list_customers(
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get("/customers")
     assert response.status_code == 200
-    assert len(response.json()) == 1, \
+    response_data = response.json()
+    assert len(response_data) == 1, \
         "One customer in data context expected."
+    assert response_data[0]["_id"] == customer_id
 
 
 @pytest.mark.asyncio
