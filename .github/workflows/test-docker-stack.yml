@@ -47,6 +47,14 @@ jobs:
         if: ${{ env.ACT }}
         run: sudo apt-get update && sudo apt-get install python3-dev -y
 
+      - name: Setup python venv
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+
+      - name: Install python dependecies
+        run: pip3 install -r requirements.txt
+
       # Tag Containers
       - name: Build containers and save cache (only on main)
         if: ${{ github.ref_name == 'main' && github.ref_type == 'branch'}}
@@ -93,12 +101,8 @@ jobs:
             | grep -iq "strict-transport-security" \
             || exit 1
 
-      - name: Run pytest in venv
-        run: |
-          python3 -m venv .venv
-          source .venv/bin/activate
-          pip3 install -r requirements.txt
-          pytest ./api
+      - name: Run pytest
+        run: pytest ./api
 
       # Test documentation
       - name: Check if documentation is reachable
