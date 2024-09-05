@@ -48,12 +48,13 @@ jobs:
         run: sudo apt-get update && sudo apt-get install python3-dev -y
 
       - name: Setup python venv
-        run: |
-          python3 -m venv .venv
-          source .venv/bin/activate
+        run: python3 -m venv .venv
 
       - name: Install python dependecies
-        run: pip3 install -r requirements.txt
+        run: |
+          source .venv/bin/activate
+          pip3 install -r requirements.txt
+          deactivate
 
       # Tag Containers
       - name: Build containers and save cache (only on main)
@@ -102,7 +103,10 @@ jobs:
             || exit 1
 
       - name: Run pytest
-        run: pytest ./api
+        run: |
+          source .venv/bin/activate
+          pytest ./api
+          deactivate
 
       # Test documentation
       - name: Check if documentation is reachable
