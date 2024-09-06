@@ -43,7 +43,7 @@ class Settings(BaseSettings):
 
     @property
     def allowed_origins(self):
-        return [x for x in self.api_allow_origins.split(",") if x]
+        return [x for x in self.api_allow_origins.split(',') if x]
 
     @property
     def redis_uri(self):

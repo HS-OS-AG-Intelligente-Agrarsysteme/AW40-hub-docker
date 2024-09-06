@@ -1,12 +1,12 @@
-from datetime import UTC, datetime
-from typing import Annotated, List, Optional
+from datetime import datetime, UTC
+from typing import List, Optional, Annotated
 
 from pydantic import (
     BaseModel,
-    ConfigDict,
     Field,
     NonNegativeInt,
-    StringConstraints,
+    ConfigDict,
+    StringConstraints
 )
 
 
@@ -19,7 +19,11 @@ class NewOBDData(OBDMetaData):
     """Schema for new obd data added via the api."""
 
     model_config = ConfigDict(
-        json_schema_extra={"example": {"dtcs": ["P0001", "U0001"]}}
+        json_schema_extra={
+            "example": {
+                "dtcs": ["P0001", "U0001"]
+            }
+        }
     )
 
     dtcs: List[Annotated[str, StringConstraints(min_length=5, max_length=5)]]
@@ -34,7 +38,7 @@ class OBDData(NewOBDData):
                 "timestamp": "2023-04-04T07:11:24.032000",
                 "obd_specs": None,
                 "dtcs": ["P0001", "U0001"],
-                "data_id": 0,
+                "data_id": 0
             }
         }
     )

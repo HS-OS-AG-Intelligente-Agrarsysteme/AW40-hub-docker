@@ -1,13 +1,12 @@
-import pytest
-
 from api.diagnostics_management.knowledge_retrieval import (
-    get_components_from_knowledge_graph,
+    get_components_from_knowledge_graph
 )
+import pytest
 
 
 @pytest.mark.asyncio
 async def test_list_vehicle_components(
-    kg_url, kg_obd_dataset_name, kg_components, kg_prefilled
+        kg_url, kg_obd_dataset_name, kg_components, kg_prefilled
 ):
     retrieved_components = get_components_from_knowledge_graph(
         f"{kg_url}/{kg_obd_dataset_name}"

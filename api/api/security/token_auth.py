@@ -1,7 +1,8 @@
-from fastapi import Depends, HTTPException, Path, status
+from fastapi import Depends, HTTPException, status, Path
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
+from jose import jwt, JWTError
 from pydantic import BaseModel, Field, model_validator
+
 
 from .keycloak import Keycloak
 
@@ -20,7 +21,6 @@ failed_auth_exception = HTTPException(
 
 class TokenData(BaseModel):
     """Parses data from a decoded JWT payload."""
-
     username: str = Field(alias="preferred_username")
     roles: list[str]
 
@@ -32,17 +32,17 @@ class TokenData(BaseModel):
 
 
 async def require_token(
-    credentials: HTTPAuthorizationCredentials = Depends(
-        HTTPBearer(bearerFormat="JWT")
-    ),
+        credentials: HTTPAuthorizationCredentials = Depends(
+            HTTPBearer(bearerFormat="JWT")
+        )
 ):
     """Require an authorization header with value 'Bearer <JWT>'."""
     return credentials.credentials
 
 
 async def verify_token(
-    token: str = Depends(require_token),
-    jwt_pub_key: str = Depends(Keycloak.get_public_key_for_workshop_realm),
+        token: str = Depends(require_token),
+        jwt_pub_key: str = Depends(Keycloak.get_public_key_for_workshop_realm)
 ) -> TokenData:
     """Decode and verify a JWT and parse data from payload."""
     try:
@@ -53,7 +53,8 @@ async def verify_token(
 
 
 async def authorized_workshop_id(
-    workshop_id: str = Path(...), token_data: TokenData = Depends(verify_token)
+        workshop_id: str = Path(...),
+        token_data: TokenData = Depends(verify_token)
 ) -> str:
     """
     Authorize access to a workshop_id if it matches the username in a token and
@@ -69,7 +70,7 @@ async def authorized_workshop_id(
 
 
 async def authorized_shared_access(
-    token_data: TokenData = Depends(verify_token),
+        token_data: TokenData = Depends(verify_token)
 ) -> None:
     """
     Authorize access to shared resources if the user is assigned the respective
@@ -80,7 +81,7 @@ async def authorized_shared_access(
 
 
 async def authorized_knowledge_access(
-    token_data: TokenData = Depends(verify_token),
+        token_data: TokenData = Depends(verify_token)
 ) -> None:
     """
     Authorized access to knowledge resources if the user is assigned a workshop

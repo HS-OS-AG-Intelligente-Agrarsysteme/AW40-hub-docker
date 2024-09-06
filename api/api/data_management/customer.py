@@ -10,6 +10,7 @@ class AnonymousCustomerId(str, Enum):
 
 
 class Customer(Document):
+
     class Settings:
         name = "customers"
 

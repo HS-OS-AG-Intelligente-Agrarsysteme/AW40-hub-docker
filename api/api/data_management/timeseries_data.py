@@ -1,12 +1,17 @@
 from abc import ABC
-from datetime import UTC, datetime
+from datetime import datetime, UTC
 from enum import Enum
-from typing import Any, ClassVar, List, Literal, Optional
+from typing import List, ClassVar, Literal, Optional, Any
 
 import numpy as np
 from beanie import PydanticObjectId
 from motor import motor_asyncio
-from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
+from pydantic import (
+    BaseModel,
+    Field,
+    NonNegativeInt,
+    ConfigDict
+)
 
 
 class BaseSignalStore(ABC):
@@ -37,7 +42,8 @@ class GridFSSignalStore(BaseSignalStore):
     async def create(self, signal: List[float]) -> Any:
         signal_bytes = np.array(signal).tobytes()
         id = await self._bucket.upload_from_stream(
-            filename="", source=signal_bytes
+            filename="",
+            source=signal_bytes
         )
         return id
 
@@ -60,7 +66,9 @@ class TimeseriesDataLabel(str, Enum):
 class TimeseriesMetaData(BaseModel):
     """Schema for timeseries meta data."""
 
-    model_config = ConfigDict(validate_assignment=True)
+    model_config = ConfigDict(
+        validate_assignment=True
+    )
 
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     component: str
@@ -112,9 +120,9 @@ class TimeseriesData(TimeseriesMetaData):
                 "type": "oscillogram",
                 "device_specs": None,
                 "data_id": 0,
-                "signal_id": "642bccaa392b553201b2ac9f",
+                "signal_id": "642bccaa392b553201b2ac9f"
             }
-        },
+        }
     )
 
     data_id: Optional[NonNegativeInt] = None
@@ -142,7 +150,7 @@ class NewTimeseriesData(TimeseriesMetaData):
                 "sampling_rate": 1,
                 "duration": 3,
                 "type": "oscillogram",
-                "signal": [0.0, 1.0, 2.0],
+                "signal": [0., 1., 2.]
             }
         }
     )

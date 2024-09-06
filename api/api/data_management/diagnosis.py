@@ -1,11 +1,11 @@
-from datetime import UTC, datetime
+from datetime import datetime, UTC
 from enum import Enum
 from typing import List, Optional
+from typing_extensions import Annotated
 
 from beanie import Document, Indexed, PydanticObjectId
 from motor import motor_asyncio
 from pydantic import BaseModel, Field
-from typing_extensions import Annotated
 
 
 class Action(BaseModel):
@@ -60,9 +60,9 @@ class Diagnosis(Document):
 
     @classmethod
     async def find_in_hub(
-        cls,
-        workshop_id: Optional[str] = None,
-        status: Optional[DiagnosisStatus] = None,
+            cls,
+            workshop_id: Optional[str] = None,
+            status: Optional[DiagnosisStatus] = None
     ) -> List["Diagnosis"]:
         """
         Get list of all diagnoses of a workshop, optionally filtered by status.
@@ -77,16 +77,31 @@ class Diagnosis(Document):
                     "as": "case",
                     "pipeline": [
                         {"$match": {"workshop_id": workshop_id}},
-                        {"$project": {"_id": 1}},
-                    ],
+                        {"$project": {"_id": 1}}
+                    ]
                 }
             },
             # Indicate if a diagnosis has a matching case
-            {"$addFields": {"case_found": {"$size": "$case"}}},
+            {
+                "$addFields": {
+                    "case_found": {
+                        "$size": "$case"
+                    }
+                }
+            },
             # Only keep diagnoses with matching case
-            {"$match": {"case_found": 1}},
+            {
+                "$match": {
+                    "case_found": 1
+                }
+            },
             # Remove leftovers from lookup to recover plain diagnosis schema
-            {"$project": {"case": 0, "case_found": 0}},
+            {
+                "$project": {
+                    "case": 0,
+                    "case_found": 0
+                }
+            }
         ]
 
         if status is not None:

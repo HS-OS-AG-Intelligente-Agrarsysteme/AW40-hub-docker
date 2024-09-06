@@ -1,6 +1,5 @@
-from typing import BinaryIO, Dict, List
-
 from scipy.io import loadmat
+from typing import BinaryIO, List, Dict
 
 from ..filereader import FileReader, FileReaderException
 
@@ -16,22 +15,23 @@ class PicoscopeMATReader(FileReader):
         except Exception:
             raise FileReaderException("conversion error: failed to load file")
         result = []
-        if "Tinterval" not in f.keys():
+        if 'Tinterval' not in f.keys():
             raise FileReaderException("conversion error: missing Tinterval")
-        if "Length" not in f.keys():
+        if 'Length' not in f.keys():
             raise FileReaderException("conversion error: missing Length")
-        sampling_rate: int = round(1.0 / f["Tinterval"].item(0))
-        duration: int = round(f["Tinterval"].item(0) * f["Length"].item(0))
+        sampling_rate: int = round(1.0/f['Tinterval'].item(0))
+        duration: int = round(f['Tinterval'].item(0) * f['Length'].item(0))
         channels: List[str] = [x for x in f.keys() if len(x) == 1]
         if len(channels) == 0:
             raise FileReaderException("conversion error: no channels found")
         for channel in channels:
-            result.append(
-                {
-                    "sampling_rate": sampling_rate,
-                    "duration": duration,
-                    "signal": f[channel].ravel().tolist(),
-                    "device_specs": {"channel": channel, "type": "picoscope"},
+            result.append({
+                'sampling_rate': sampling_rate,
+                'duration': duration,
+                'signal': f[channel].ravel().tolist(),
+                'device_specs': {
+                    "channel": channel,
+                    "type": "picoscope"
                 }
-            )
+            })
         return result

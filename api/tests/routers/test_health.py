@@ -1,6 +1,5 @@
-from fastapi.testclient import TestClient
-
 from api.routers.health import router
+from fastapi.testclient import TestClient
 
 client = TestClient(router)
 

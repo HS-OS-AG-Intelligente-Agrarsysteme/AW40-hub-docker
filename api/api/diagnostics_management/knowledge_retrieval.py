@@ -1,6 +1,5 @@
-from typing import List
-
 import httpx
+from typing import List
 
 
 def get_components_from_knowledge_graph(kg_obd_url: str) -> List[str]:
@@ -15,25 +14,21 @@ def get_components_from_knowledge_graph(kg_obd_url: str) -> List[str]:
         "#", "#SuspectComponent"
     )
     name_ontology_entry = ontology_prefix.replace("#", "#component_name")
-    sparql_query = (
-        f"SELECT ?name WHERE {{?comp a {component_ontology_entry}"
-        f" . ?comp {name_ontology_entry} ?name .}}"
-    )
+    sparql_query = f"SELECT ?name WHERE {{?comp a {component_ontology_entry}" \
+                   f" . ?comp {name_ontology_entry} ?name .}}"
     # try to send sparql query via knowledge graphs http interface
     try:
         response = httpx.post(
             sparql_endpoint,
             content=sparql_query.encode(),
             headers={
-                "Content-Type": "application/sparql-query",
-                "Accept": "application/json",
-            },
+                'Content-Type': 'application/sparql-query',
+                'Accept': 'application/json'
+            }
         )
         response.raise_for_status()
     except (
-        httpx.ConnectError,
-        httpx.ConnectTimeout,
-        httpx.HTTPStatusError,
+            httpx.ConnectError, httpx.ConnectTimeout, httpx.HTTPStatusError
     ) as e:
         print("Failed to fetch data from knowledge graph with")
         print(type(e).__name__, ":", e)

@@ -1,5 +1,5 @@
-from .filereader import FileReader
 from .formats import formats
+from .filereader import FileReader
 
 
 class FilereaderFactory:

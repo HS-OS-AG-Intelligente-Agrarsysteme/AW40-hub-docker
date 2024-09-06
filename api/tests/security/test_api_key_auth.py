@@ -1,7 +1,6 @@
 import pytest
-from fastapi import HTTPException
-
 from api.security.api_key_auth import APIKeyAuth
+from fastapi import HTTPException
 
 
 class TestAPIKeyAuth:
