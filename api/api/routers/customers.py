@@ -83,18 +83,20 @@ async def customer_by_id(customer_id: str) -> Customer:
     Reusable dependency to handle retrieval of customer by ID. 404 HTTP
     exception is raised in case of invalid id.
     """
-    no_customer_with_id_exception = HTTPException(
-        status_code=404, detail=f"No customer with id '{customer_id}' found."
-    )
     # Invalid ID format causes 404
     try:
         customer_id = ObjectId(customer_id)
     except InvalidId:
-        raise no_customer_with_id_exception
+        raise HTTPException(
+            status_code=404, detail="Invalid format for customer_id."
+        )
     # Non-existing ID causes 404
     customer = await Customer.get(customer_id)
     if customer is None:
-        raise no_customer_with_id_exception
+        raise HTTPException(
+            status_code=404,
+            detail=f"No customer with id '{customer_id}' found."
+        )
 
     return customer
 
