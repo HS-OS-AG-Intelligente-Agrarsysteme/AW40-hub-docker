@@ -1,8 +1,31 @@
-def last_page_index(page_size: int, document_count: int):
+from pydantic import PositiveInt, NonNegativeInt
+
+
+def _validate_pagination_params(**kwargs):
+    valid_param_min_values = {"page": 0, "page_size": 1, "document_count": 0}
+    for pagination_param, min_value in valid_param_min_values.items():
+        passed_value = kwargs.get(pagination_param, None)
+        if passed_value is not None:
+            if not isinstance(passed_value, int):
+                raise TypeError(
+                    f"Type of pagination param {pagination_param} has to be "
+                    f"int. Got {type(passed_value)} instead."
+                )
+            if not passed_value >= min_value:
+                raise ValueError(
+                    f"Min value of pagination param {pagination_param} is "
+                    f"{min_value}. Got {passed_value} instead."
+                )
+
+
+def last_page_index(page_size: PositiveInt, document_count: NonNegativeInt):
     """
     Determine last page index based on requested page size and document
     count.
     """
+    _validate_pagination_params(
+        page_size=page_size, document_count=document_count
+    )
     if document_count == 0:
         return 0
     idx = document_count // page_size
@@ -13,9 +36,9 @@ def last_page_index(page_size: int, document_count: int):
 
 
 def link_header(
-        page: int,
-        page_size: int,
-        document_count: int,
+        page: NonNegativeInt,
+        page_size: PositiveInt,
+        document_count: NonNegativeInt,
         url: str
 ):
     """
@@ -38,6 +61,9 @@ def link_header(
     str
         Entry to place in the `link` header field.
     """  # noqa: E501
+    _validate_pagination_params(
+        page=page, page_size=page_size, document_count=document_count
+    )
     link_header = ""
     if document_count == 0:
         # No data to navigate
