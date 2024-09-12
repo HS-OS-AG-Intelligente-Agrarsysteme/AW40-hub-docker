@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from tempfile import TemporaryFile
 from unittest import mock
 
+import bson
 import pytest
 from api.data_management import (
     TimeseriesData,
@@ -191,7 +192,6 @@ def test_list_cases_with_filters(
 def test_add_case(authenticated_client, workshop_id):
     new_case = {
         "vehicle_vin": "test-vin",
-        "customer_id": "unknown",
         "occasion": "unknown",
         "milage": 42
     }
@@ -200,6 +200,24 @@ def test_add_case(authenticated_client, workshop_id):
 
     assert response.status_code == 201
     assert response.json()["_id"] is not None
+
+
+@pytest.mark.parametrize(
+    "customer_id",
+    [
+        "not-an-object-id",  # invalid format
+        str(bson.ObjectId())  # invalid as no customer with this id exists
+    ]
+)
+def test_add_case_with_invalid_customer_id(
+        authenticated_client, workshop_id, customer_id
+):
+    with authenticated_client as client:
+        response = client.post(
+            f"/{workshop_id}/cases",
+            json={"vehicle_vin": "v", "customer_id": customer_id}
+        )
+    assert response.status_code == 422
 
 
 @mock.patch("api.routers.workshop.Case.get", autospec=True)
