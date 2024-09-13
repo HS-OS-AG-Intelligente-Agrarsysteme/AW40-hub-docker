@@ -14,6 +14,6 @@ class TestCustomer:
                 ).create()
             assert case.customer_id == customer.id
             await customer.delete()
-            await case._sync()
+            await case.sync()
             assert case.customer_id is None, \
                 "Deleted customer's ID should be removed from case."

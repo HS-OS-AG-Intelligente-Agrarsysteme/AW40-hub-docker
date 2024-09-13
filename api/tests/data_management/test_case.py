@@ -92,6 +92,7 @@ class TestCase:
             created_vehicle = all_vehicles[0]
             assert created_vehicle.vin == new_vin
 
+    @pytest.mark.asyncio
     async def test_find_in_hub_default(
             self, new_case, initialized_beanie_context
     ):
