@@ -82,6 +82,15 @@ async def list_cases(
     tags=["Workshop - Case Management"]
 )
 async def add_case(workshop_id: str, case: NewCase) -> Case:
+    customer_id = case.customer_id
+    if customer_id is not None:
+        # If a customer_id is specified, confirm that it points to an existing
+        # customer
+        customer = await Customer.get(customer_id)
+        if customer is None:
+            raise HTTPException(
+                status_code=422, detail=f"Invalid customer_id '{customer_id}'"
+            )
     _case = Case(workshop_id=workshop_id, **case.model_dump())
     _case = await _case.insert()
     return _case

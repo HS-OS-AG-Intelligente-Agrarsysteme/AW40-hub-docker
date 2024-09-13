@@ -10,6 +10,8 @@ from .keycloak import Keycloak
 REQUIRED_WORKSHOP_ROLE = "workshop"
 # required role to access shared resources
 REQUIRED_SHARED_ROLE = "shared"
+# required role for customer data management
+REQUIRED_CUSTOMERS_ROLE = "customers"
 
 
 failed_auth_exception = HTTPException(
@@ -90,4 +92,15 @@ async def authorized_knowledge_access(
     required_roles = set({REQUIRED_SHARED_ROLE, REQUIRED_WORKSHOP_ROLE})
     assigned_roles = set(token_data.roles)
     if not required_roles.intersection(assigned_roles):
+        raise failed_auth_exception
+
+
+async def authorized_customers_access(
+        token_data: TokenData = Depends(verify_token)
+):
+    """
+    Authorize access to customer data management if the user is assigned the
+    respective role.
+    """
+    if REQUIRED_CUSTOMERS_ROLE not in token_data.roles:
         raise failed_auth_exception
