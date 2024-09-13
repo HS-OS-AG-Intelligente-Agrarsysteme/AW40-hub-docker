@@ -72,7 +72,7 @@ def authenticated_async_client(
     # Client with valid auth header
     client = httpx.AsyncClient(
         app=app,
-        base_url="http://",
+        base_url="http://testserver",
         headers={"Authorization": f"Bearer {signed_jwt}"}
     )
 
