@@ -89,7 +89,9 @@ class Case(Document):
     status: Status = Status.open
 
     # foreign keys
-    customer_id: Optional[Annotated[PydanticObjectId, Indexed(unique=False)]]
+    customer_id: Optional[
+        Annotated[PydanticObjectId, Indexed(unique=False)]
+    ] = None
     vehicle_vin: Annotated[str, Indexed(unique=False)]
     workshop_id: Annotated[str, Indexed(unique=False)]
     diagnosis_id: Optional[Annotated[PydanticObjectId, Indexed()]] = None
