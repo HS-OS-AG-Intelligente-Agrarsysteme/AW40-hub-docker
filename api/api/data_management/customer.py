@@ -1,22 +1,24 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 
 import pymongo
 from beanie import Document, after_event, Delete
-from pydantic import BaseModel, Field
+from beanie.odm.fields import ExpressionField
+from pydantic import BaseModel, Field, ConfigDict
 
 from .case import Case
 
 
 class CustomerBase(BaseModel):
 
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "first_name": "FirstName",
                 "last_name": "LastName"
             }
         }
+    )
 
     first_name: str
     last_name: str
@@ -34,7 +36,7 @@ class CustomerUpdate(CustomerBase):
 
 
 class Customer(CustomerBase, Document):
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     class Settings:
         name = "customers"
@@ -51,6 +53,6 @@ class Customer(CustomerBase, Document):
         Remove the customer_id foreign key from each case that points to the
         deleted customer.
         """
-        cases = await Case.find_in_hub(customer_id=self.id)
+        cases = await Case.find_in_hub(customer_id=str(self.id))
         for case in cases:
-            await case.set({Case.customer_id: None})
+            await case.set({ExpressionField(Case.customer_id): None})
