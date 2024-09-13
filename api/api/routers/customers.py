@@ -85,13 +85,13 @@ async def customer_by_id(customer_id: str) -> Customer:
     """
     # Invalid ID format causes 404
     try:
-        customer_id = ObjectId(customer_id)
+        customer_oid = ObjectId(customer_id)
     except InvalidId:
         raise HTTPException(
             status_code=404, detail="Invalid format for customer_id."
         )
     # Non-existing ID causes 404
-    customer = await Customer.get(customer_id)
+    customer = await Customer.get(customer_oid)
     if customer is None:
         raise HTTPException(
             status_code=404,
