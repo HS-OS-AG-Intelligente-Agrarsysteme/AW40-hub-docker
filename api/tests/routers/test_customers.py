@@ -320,6 +320,7 @@ async def test_add_customer(
         assert response_data["last_name"] == last_name
         # Confirm storage in db
         customer_db = await Customer.get(response_data["_id"])
+        assert customer_db
         assert customer_db.first_name == first_name
         assert customer_db.last_name == last_name
 
@@ -358,6 +359,7 @@ async def test_update_customer(
         assert response_data["city"] == update["city"]
         # Confirm storage in db
         customer_db = await Customer.get(response_data["_id"])
+        assert customer_db
         assert customer_db.first_name == update["first_name"]
         assert customer_db.city == update["city"]
 
