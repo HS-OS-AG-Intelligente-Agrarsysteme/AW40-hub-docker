@@ -74,7 +74,7 @@ async def list_customers(
 @router.post("/", status_code=201, response_model=Customer)
 async def add_customer(customer: CustomerBase):
     """Add a new customer."""
-    customer = await Customer(**customer.dict()).create()
+    customer = await Customer(**customer.model_dump()).create()
     return customer
 
 
@@ -120,7 +120,7 @@ async def update_customer(
         update: CustomerUpdate, customer: Customer = Depends(customer_by_id)
 ):
     """Update a specific customer."""
-    await customer.set(update.dict(exclude_unset=True))
+    await customer.set(update.model_dump(exclude_unset=True))
     return customer
 
 
