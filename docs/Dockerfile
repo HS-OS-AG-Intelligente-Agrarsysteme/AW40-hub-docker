@@ -13,6 +13,7 @@ RUN mkdocs build -f de/mkdocs.yml  # puts static content in de/site
 FROM nginx:alpine as serve
 
 COPY --from=build de/site/ /usr/share/nginx/html
+COPY ./nginx_templates/* /etc/nginx/templates/
 
 HEALTHCHECK --start-period=30s --start-interval=1s --interval=30s --timeout=5s --retries=5 \
   CMD curl -fs http://localhost:80|| exit 1

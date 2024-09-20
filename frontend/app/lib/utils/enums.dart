@@ -35,7 +35,17 @@ enum CaseOccasion {
   // ignore: constant_identifier_names
   service_routine,
   // ignore: constant_identifier_names
-  problem_defect,
+  problem_defect;
+
+  factory CaseOccasion.fromString(String value) {
+    final CaseOccasion? result =
+        EnumToString.fromString(CaseOccasion.values, value);
+    if (result == null) {
+      Logger("DatasetType").warning("Unknown DatasetType: $value");
+      return CaseOccasion.unknown;
+    }
+    return result;
+  }
 }
 
 enum CaseStatus { open, closed }

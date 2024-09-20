@@ -59,7 +59,7 @@ void main() {
 
       final caseProvider = CaseProvider(mockHttpService);
       await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
-      caseProvider.workShopId = "some_workshop_id";
+      caseProvider.workshopId = "some_workshop_id";
       await caseProvider.toggleShowSharedCases();
       expect(caseProvider.showSharedCases, false);
     });
@@ -92,7 +92,7 @@ void main() {
         );
         final caseProvider = CaseProvider(mockHttpService);
         await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
-        caseProvider.workShopId = "some_workshop_id";
+        caseProvider.workshopId = "some_workshop_id";
         if (caseProvider.showSharedCases == true) {
           // First call to `getCases()`.
           await caseProvider.toggleShowSharedCases();
@@ -112,7 +112,7 @@ void main() {
         );
         final caseProvider = CaseProvider(mockHttpService);
         await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
-        caseProvider.workShopId = "some_workshop_id";
+        caseProvider.workshopId = "some_workshop_id";
         await caseProvider.addCase(dummyNewCaseDto);
         verify(mockHttpService.addCase(any, any, any)).called(1);
       });
@@ -125,7 +125,7 @@ void main() {
         );
         final caseProvider = CaseProvider(mockHttpService);
         await caseProvider.fetchAndSetAuthToken(mockAuthProvider);
-        caseProvider.workShopId = "some_workshop_id";
+        caseProvider.workshopId = "some_workshop_id";
         await caseProvider.deleteCase("some_case_id");
         verify(mockHttpService.deleteCase(any, any, any)).called(1);
       });

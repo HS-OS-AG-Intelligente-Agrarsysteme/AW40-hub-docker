@@ -682,10 +682,30 @@ class MockHttpService implements HttpService {
     )
   ];
   final List<CustomerDto> _customerDtos = [
-    CustomerDto(AnonymousCustomerId.unknown)
+    CustomerDto(
+      "some_id",
+      "some_firstname",
+      "some_lastname",
+      "some_email",
+      "some_phone",
+      "some_street",
+      "some_housenumber",
+      "some_postcode",
+      "some_city",
+    )
   ];
   final List<CustomerDto> _sharedCustomerDtos = [
-    CustomerDto(AnonymousCustomerId.anonymous)
+    CustomerDto(
+      "some_id",
+      "some_firstname",
+      "some_lastname",
+      "some_email",
+      "some_phone",
+      "some_street",
+      "some_housenumber",
+      "some_postcode",
+      "some_city",
+    )
   ];
 
   Future<void> _demoDiagnosisStage0() async {
@@ -866,6 +886,16 @@ class MockHttpService implements HttpService {
   }
 
   @override
+  Future<Response> getCasesByVehicleVin(
+    String token,
+    String workshopId,
+    String vehicleVin,
+  ) {
+    // TODO implement getCasesByVehicleVin
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Response> getDiagnoses(String token, String workshopId) {
     final List<DiagnosisDto> diagnosisDtos = _demoDiagnosisStage > 0
         ? _diagnosisDtos + [_demoDiagnosisDto]
@@ -923,13 +953,13 @@ class MockHttpService implements HttpService {
   }
 
   @override
-  Future<Response> getCustomers(
+  Future<Response> getCustomer(
     String token,
     String workshopId,
     String caseId,
   ) {
     // ignore: lines_longer_than_80_chars
-    // TODO maybe adjust regarding params in the future when getCustomers is used in the customer provider
+    // TODO maybe adjust regarding params in the future when getCustomer is used in the customer provider
     return Future.delayed(
       Duration(milliseconds: delay),
       () => Response(
@@ -1365,13 +1395,39 @@ class MockHttpService implements HttpService {
   }
 
   @override
-  Future<Response> updateVehicles(
+  Future<Response> updateVehicle(
     String token,
     String workshopId,
     String caseId,
     Map<String, dynamic> requestBody,
   ) {
     // TODO: implement updateVehicles
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> getCustomers(
+    String token,
+    int? page,
+    int? pageSize,
+  ) {
+    // TODO: implement getCustomers
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> updateCustomer(
+    String token,
+    String customerId,
+    Map<String, dynamic> requestBody,
+  ) {
+    // TODO: implement updateCustomer
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> addCustomer(String token, Map<String, dynamic> requestBody) {
+    // TODO: implement addCustomer
     throw UnimplementedError();
   }
 }

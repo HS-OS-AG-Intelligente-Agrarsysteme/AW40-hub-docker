@@ -1,7 +1,7 @@
 import codecs
 import csv
 import re
-from typing import BinaryIO, List
+from typing import BinaryIO, List, Tuple, Dict
 
 from ..filereader import FileReader, FileReaderException
 
@@ -33,9 +33,9 @@ class PicoscopeCSVReader(FileReader):
         validated, delimiter = self.__probe(file)
         if not validated:
             raise FileReaderException("conversion failed: wrong format")
-        data = self.__csv_to_dict(file, delimiter)
-        duration = self.__calculate_duration(data)
-        sampling_rate = self.__calculate_sampling_rate(data)[0]
+        data: Dict = self.__csv_to_dict(file, delimiter)
+        duration: int = round(self.__calculate_duration(data))
+        sampling_rate: int = round(self.__calculate_sampling_rate(data)[0])
         for key in data.keys():
             if key.startswith('Channel'):
                 result.append({
@@ -49,7 +49,7 @@ class PicoscopeCSVReader(FileReader):
                 })
         return result
 
-    def __translate_header(self, header):
+    def __translate_header(self, header) -> List[str]:
         translated = []
         for item in header:
             if item in time_names:
@@ -65,7 +65,7 @@ class PicoscopeCSVReader(FileReader):
             )
         return translated
 
-    def __probe(self, file):
+    def __probe(self, file) -> Tuple[bool, str]:
         try:
             file_iter = codecs.iterdecode(file, "utf-8")
             header = next(file_iter).strip()
@@ -81,7 +81,7 @@ class PicoscopeCSVReader(FileReader):
             return True, header_check["delimiter"]
         return False, ""
 
-    def __csv_to_dict(self, file, delimiter):
+    def __csv_to_dict(self, file, delimiter) -> Dict:
         reader = csv.reader(codecs.iterdecode(file, 'utf-8'),
                             delimiter=delimiter)
         header = self.__translate_header(next(reader))
@@ -109,15 +109,17 @@ class PicoscopeCSVReader(FileReader):
                     )
         return data
 
-    def __calculate_duration(self, data):
+    def __calculate_duration(self, data: dict) -> float:
         return abs(data['Time'][0]) + data['Time'][-1]
 
-    def __cast_to_float(self, value: str):
+    def __cast_to_float(self, value: str) -> float:
         return float(value.replace(",", "."))
 
-    def __calculate_sampling_rate(self, data):
-        sr_arr = []
-        last = 0
+    def __calculate_sampling_rate(
+        self, data: dict
+    ) -> Tuple[float, float, float]:
+        sr_arr: List[float] = []
+        last: float = 0
         for cnt, ent in enumerate(data['Time']):
             if cnt > 0:
                 # Check aroung Time 0 since Picoscope start with negative time
@@ -126,5 +128,5 @@ class PicoscopeCSVReader(FileReader):
                 else:
                     sr_arr.append(1.0 / (abs(abs(last) - abs(ent))))
             last = ent
-        sr = (sum(sr_arr) / len(sr_arr))
+        sr: float = (sum(sr_arr) / len(sr_arr))
         return sr, min(sr_arr) - sr, max(sr_arr) - sr

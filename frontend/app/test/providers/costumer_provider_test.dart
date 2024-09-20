@@ -6,7 +6,6 @@ import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/providers/customer_provider.dart";
 import "package:aw40_hub_frontend/services/config_service.dart";
 import "package:aw40_hub_frontend/services/http_service.dart";
-import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:http/http.dart" as http;
 import "package:mockito/annotations.dart";
@@ -22,7 +21,7 @@ void main() {
           .thenAnswer((_) async => "some_token");
       await ConfigService().initialize();
     });
-    group("getVehicles", () {
+    group("getSharedCustomers", () {
       test("calls HttpService.getSharedCostumers()", () async {
         // Arrange.
         final mockHttpService = MockHttpService();
@@ -43,10 +42,14 @@ void main() {
       test("converts json response to List<CostumerModel>", () async {
         // Arrange.
         final mockHttpService = MockHttpService();
-        const id = AnonymousCustomerId.anonymous;
+        const id = "some_id";
+        const firstname = "some_firstname";
+        const lastname = "some_lastname";
         final List<Map<String, dynamic>> json = [
           {
-            "_id": id.name,
+            "_id": id,
+            "first_name": firstname,
+            "last_name": lastname,
           },
         ];
         when(mockHttpService.getSharedCustomers(any)).thenAnswer(
@@ -57,18 +60,18 @@ void main() {
         //const String costumerId = "some_id";
         await costumerProvider.fetchAndSetAuthToken(mockAuthProvider);
         // Act.
-        final List<CustomerModel> diagnoses =
+        final List<CustomerModel> customers =
             await costumerProvider.getSharedCustomers();
         // Assert.
         expect(
-          diagnoses.length,
+          customers.length,
           equals(1),
           reason: "should return one diagnosis",
         );
-        final CustomerModel diagnosis = diagnoses[0];
+        final CustomerModel customer = customers[0];
         expect(
-          diagnosis.id,
-          equals(AnonymousCustomerId.anonymous),
+          customer.id,
+          equals("some_id"),
           reason: "should have correct id",
         );
       });

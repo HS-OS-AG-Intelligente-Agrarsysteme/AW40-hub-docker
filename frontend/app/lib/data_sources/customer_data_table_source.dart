@@ -27,9 +27,15 @@ class CustomerDataTableSource extends DataTableSource {
         return null; // Use the default value.
       }),
       cells: [
-        DataCell(
-          Text(customerModel.id.name),
-        ),
+        DataCell(Text(customerModel.id ?? "")),
+        DataCell(Text(customerModel.firstname)),
+        DataCell(Text(customerModel.lastname)),
+        DataCell(Text(customerModel.email ?? "")),
+        DataCell(Text(customerModel.phone ?? "")),
+        DataCell(Text(customerModel.street ?? "")),
+        DataCell(Text(customerModel.housenumber ?? "")),
+        DataCell(Text(customerModel.postcode ?? "")),
+        DataCell(Text(customerModel.city ?? "")),
       ],
     );
   }

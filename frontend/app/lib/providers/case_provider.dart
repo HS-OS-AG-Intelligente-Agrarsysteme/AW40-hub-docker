@@ -19,7 +19,7 @@ class CaseProvider with ChangeNotifier {
   final HttpService _httpService;
 
   final Logger _logger = Logger("case_provider");
-  late String workShopId;
+  late String workshopId;
   bool _showSharedCases = true;
   bool get showSharedCases => _showSharedCases;
   String? _authToken;
@@ -37,12 +37,31 @@ class CaseProvider with ChangeNotifier {
     if (_showSharedCases) {
       response = await _httpService.getSharedCases(authToken);
     } else {
-      response = await _httpService.getCases(authToken, workShopId);
+      response = await _httpService.getCases(authToken, workshopId);
     }
     final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       200,
       "Could not get ${_showSharedCases ? 'shared ' : ''}cases. "
+      "${response.statusCode}: ${response.reasonPhrase}",
+      response,
+      _logger,
+    );
+    if (!verifyStatusCode) return [];
+    return _jsonBodyToCaseModelList(response.body);
+  }
+
+  Future<List<CaseModel>> getCasesByVehicleVin(String vehicleVin) async {
+    final String authToken = _getAuthToken();
+    final Response response = await _httpService.getCasesByVehicleVin(
+      authToken,
+      workshopId,
+      vehicleVin,
+    );
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
+      response.statusCode,
+      200,
+      "Could not get cases by vehicle vin. "
       "${response.statusCode}: ${response.reasonPhrase}",
       response,
       _logger,
@@ -66,7 +85,7 @@ class CaseProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Map<String, dynamic> newCaseJson = newCaseDto.toJson();
     final Response response =
-        await _httpService.addCase(authToken, workShopId, newCaseJson);
+        await _httpService.addCase(authToken, workshopId, newCaseJson);
     final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       201,
@@ -93,7 +112,7 @@ class CaseProvider with ChangeNotifier {
     final Map<String, dynamic> updateCaseJson = updateCaseDto.toJson();
     final Response response = await _httpService.updateCase(
       authToken,
-      workShopId,
+      workshopId,
       caseId,
       updateCaseJson,
     );
@@ -112,7 +131,7 @@ class CaseProvider with ChangeNotifier {
   Future<bool> deleteCase(String caseId) async {
     final String authToken = _getAuthToken();
     final Response response =
-        await _httpService.deleteCase(authToken, workShopId, caseId);
+        await _httpService.deleteCase(authToken, workshopId, caseId);
     final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       200,
@@ -141,7 +160,7 @@ class CaseProvider with ChangeNotifier {
     final Map<String, dynamic> obdDataJson = obdDataDto.toJson();
     final Response response = await _httpService.uploadObdData(
       authToken,
-      workShopId,
+      workshopId,
       caseId,
       obdDataJson,
     );
@@ -160,7 +179,7 @@ class CaseProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response = await _httpService.uploadVcdsData(
       authToken,
-      workShopId,
+      workshopId,
       caseId,
       vcdsData,
     );
@@ -184,7 +203,7 @@ class CaseProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response = await _httpService.addTimeseriesData(
       authToken,
-      workShopId,
+      workshopId,
       caseId,
       component,
       label,
@@ -218,7 +237,7 @@ class CaseProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response = await _httpService.uploadPicoscopeData(
       authToken,
-      workShopId,
+      workshopId,
       caseId,
       picoscopeData,
       filename,
@@ -252,7 +271,7 @@ class CaseProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response = await _httpService.uploadOmniviewData(
       authToken,
-      workShopId,
+      workshopId,
       caseId,
       component,
       samplingRate,
@@ -280,7 +299,7 @@ class CaseProvider with ChangeNotifier {
     final String authToken = _getAuthToken();
     final Response response = await _httpService.uploadSymptomData(
       authToken,
-      workShopId,
+      workshopId,
       caseId,
       component,
       label,

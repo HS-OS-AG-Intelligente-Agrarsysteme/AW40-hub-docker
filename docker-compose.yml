@@ -249,7 +249,7 @@ services:
       context: ./api
     <<: *default_restart_policy
     # DEVELOPMENT: run with reload and mount api package code
-    command: uvicorn --host 0.0.0.0 --reload api.main:app
+    command: uvicorn --reload api.main:app
     profiles:
       - full
       - rollout1

@@ -21,3 +21,6 @@ build/
 
 edc/build
 edc/.gradle
+
+# Ignore temporary MS Office files.
+~$*

@@ -41,6 +41,7 @@ RUN flutter build web
 FROM nginx:alpine AS serve
 
 COPY --from=build /home/flutter/app/build/web /usr/share/nginx/html
+COPY ./nginx_templates/* /etc/nginx/templates/
 
 HEALTHCHECK --start-period=30s --start-interval=1s --interval=30s --timeout=5s --retries=5 \
   CMD curl -fs http://localhost:80 || exit 1

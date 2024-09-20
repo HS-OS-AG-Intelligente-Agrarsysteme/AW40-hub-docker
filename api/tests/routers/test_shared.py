@@ -4,7 +4,7 @@ import httpx
 import pytest
 from api.data_management import (
     Case, NewTimeseriesData, TimeseriesMetaData, GridFSSignalStore, NewOBDData,
-    NewSymptom
+    NewSymptom, Customer
 )
 from api.routers import shared
 from api.security.keycloak import Keycloak
@@ -94,7 +94,8 @@ def case_id():
 
 @pytest.fixture
 def customer_id():
-    return "anonymous"
+    """Valid customer_id, e.g. needs to work with PydanticObjectId"""
+    return str(ObjectId())
 
 
 @pytest.fixture
@@ -146,7 +147,14 @@ def symptom_data():
 
 
 @pytest.fixture
-def data_context(motor_db, case_data, timeseries_data, obd_data, symptom_data):
+def data_context(
+        motor_db,
+        case_data,
+        timeseries_data,
+        obd_data,
+        symptom_data,
+        customer_id
+):
     """
     Seed db with test data.
 
@@ -160,6 +168,10 @@ def data_context(motor_db, case_data, timeseries_data, obd_data, symptom_data):
 
     class DataContext:
         async def __aenter__(self):
+            # Seed the db with a customer
+            await Customer(
+                id=customer_id, first_name="f", last_name="l"
+            ).create()
             # Seed the db with a case
             case = Case(**case_data)
             await case.create()
@@ -262,7 +274,9 @@ async def test_list_cases_with_unmatched_filters(
         query_param
 ):
     """Test filtering using query params not in test data_context."""
-    query_string = f"?{query_param}=VALUE_NOT_IN_DATA_CONTEXT"
+    # Use a fresh object id which is certain to be value not in the data
+    # context for any of the filter params
+    query_string = f"?{query_param}={str(ObjectId())}"
     url = f"/cases{query_string}"
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get(url)
@@ -498,8 +512,10 @@ async def test_list_customers(
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get("/customers")
     assert response.status_code == 200
-    assert response.json() == [{"_id": customer_id}], \
+    response_data = response.json()
+    assert len(response_data) == 1, \
         "One customer in data context expected."
+    assert response_data[0]["_id"] == customer_id
 
 
 @pytest.mark.asyncio
@@ -512,7 +528,7 @@ async def test_get_customer(
             f"/customers/{customer_id}"
         )
     assert response.status_code == 200
-    assert response.json() == {"_id": customer_id}
+    assert response.json()["_id"] == customer_id
 
 
 @pytest.mark.asyncio
@@ -520,9 +536,9 @@ async def test_get_customer_not_found(
         authenticated_async_client, initialized_beanie_context, data_context
 ):
     async with initialized_beanie_context, data_context:
-        # Request the 'unknown' id not in the data context
+        # Request fresh id not in the data context
         response = await authenticated_async_client.get(
-            "/customers/unknown"
+            f"/customers/{str(ObjectId())}"
         )
     assert response.status_code == 404
 

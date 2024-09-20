@@ -46,6 +46,23 @@ class HttpService {
     );
   }
 
+  Future<http.Response> getCasesByVehicleVin(
+    String token,
+    String workshopId,
+    String vehicleVin,
+  ) {
+    final uri = Uri.parse("$backendUrl/$workshopId/cases").replace(
+      queryParameters: {
+        "vin": vehicleVin,
+      },
+    );
+
+    return _client.get(
+      uri,
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
   Future<http.Response> addCase(
     String token,
     String workshopId,
@@ -313,7 +330,7 @@ class HttpService {
     );
   }
 
-  Future<http.Response> getCustomers(
+  Future<http.Response> getCustomer(
     String token,
     String workshopId,
     String caseId,
@@ -321,6 +338,54 @@ class HttpService {
     return _client.get(
       Uri.parse("$backendUrl/$workshopId/cases/$caseId/customer"),
       headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> getCustomers(
+    String token,
+    int? page,
+    int? pageSize,
+  ) {
+    final int pageNumber = page ?? 0;
+    final int pageSizeNumber = pageSize ?? 30;
+
+    final uri = Uri.parse("$backendUrl/customers").replace(
+      queryParameters: {
+        "page": pageNumber.toString(),
+        "pageSize": pageSizeNumber.toString(),
+      },
+    );
+
+    return _client.get(
+      uri,
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> addCustomer(
+    String token,
+    Map<String, dynamic> requestBody,
+  ) {
+    return _client.post(
+      Uri.parse("$backendUrl/customers"),
+      headers: getAuthHeaderWith(token, {
+        "Content-Type": "application/json; charset=UTF-8",
+      }),
+      body: jsonEncode(requestBody),
+    );
+  }
+
+  Future<http.Response> updateCustomer(
+    String token,
+    String customerId,
+    Map<String, dynamic> requestBody,
+  ) {
+    return _client.patch(
+      Uri.parse("$backendUrl/customers/$customerId"),
+      headers: getAuthHeaderWith(token, {
+        "Content-Type": "application/json; charset=UTF-8",
+      }),
+      body: jsonEncode(requestBody),
     );
   }
 
@@ -342,14 +407,14 @@ class HttpService {
     );
   }
 
-  Future<http.Response> updateVehicles(
+  Future<http.Response> updateVehicle(
     String token,
     String workshopId,
     String caseId,
     Map<String, dynamic> requestBody,
   ) {
     return _client.put(
-      Uri.parse("$backendUrl/$workshopId/cases/$caseId/vehicles"),
+      Uri.parse("$backendUrl/$workshopId/cases/$caseId/vehicle"),
       headers: getAuthHeaderWith(token, {
         "Content-Type": "application/json; charset=UTF-8",
       }),

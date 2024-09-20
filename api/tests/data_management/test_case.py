@@ -5,7 +5,6 @@ from api.data_management import (
     NewCase,
     Case,
     Vehicle,
-    Customer,
     TimeseriesDataUpdate,
     NewTimeseriesData,
     TimeseriesData,
@@ -22,7 +21,6 @@ def new_case():
     """Valid meta data for a new case"""
     return {
         "vehicle_vin": "test-vin",
-        "customer_id": "unknown",
         "occasion": "unknown",
         "milage": 42
     }
@@ -93,26 +91,6 @@ class TestCase:
             assert created_vehicle.vin == new_vin
 
     @pytest.mark.asyncio
-    async def test_automatic_customer_insert(
-            self, new_case, initialized_beanie_context
-    ):
-        async with initialized_beanie_context:
-            # assert no customers yet
-            all_customers = await Customer.find_all().to_list()
-            assert len(all_customers) == 0
-
-            # create a new case
-            new_customer_id = new_case["customer_id"]
-            case = Case(workshop_id=1, **new_case)
-            await case.create()
-
-            # assert customer was created automatically
-            all_customers = await Customer.find_all().to_list()
-            assert len(all_customers) == 1
-            created_customer = all_customers[0]
-            assert created_customer.id == new_customer_id
-
-    @pytest.mark.asyncio
     async def test_find_in_hub_default(
             self, new_case, initialized_beanie_context
     ):
@@ -140,7 +118,7 @@ class TestCase:
             case_3 = dict(**new_case)
 
             # alter customer for case 1 and create
-            case_1_customer_id = "anonymous"
+            case_1_customer_id = "5eb7cf5a86d9755df3a6c593"
             case_1["customer_id"] = case_1_customer_id
             case_1 = Case(**case_1)
             await case_1.create()
@@ -176,7 +154,7 @@ class TestCase:
             assert len(case_3_result) == 1
 
             # confirm expected data
-            assert case_1_result[0].customer_id == case_1_customer_id
+            assert str(case_1_result[0].customer_id) == case_1_customer_id
             assert case_2_result[0].vehicle_vin == case_2_vin
             assert case_3_result[0].workshop_id == case_3_workshop_id
 

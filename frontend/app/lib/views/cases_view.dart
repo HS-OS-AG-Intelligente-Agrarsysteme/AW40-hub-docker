@@ -106,7 +106,7 @@ class CasesTable extends StatelessWidget {
           ),
           DataColumn(label: Text(tr("general.status"))),
           DataColumn(label: Text(tr("general.customer"))),
-          DataColumn(label: Text("${tr('general.vehicle')} VIN")),
+          DataColumn(label: Text(tr("general.vehicleVin"))),
           DataColumn(
             label: Text(tr("general.workshop")),
             numeric: true,
