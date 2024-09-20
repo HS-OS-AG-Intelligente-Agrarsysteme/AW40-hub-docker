@@ -1,4 +1,4 @@
-from typing import List, Sequence, Optional
+from typing import List, Optional
 
 from beanie.odm.fields import PydanticObjectId
 from bson import ObjectId
@@ -70,7 +70,7 @@ async def get_diagnosis(
 )
 async def get_obd_data(
         case: Case = Depends(_case_by_diag_id_or_404)
-) -> Sequence[OBDData]:
+) -> List[OBDData]:
     """Get OBD data for a diagnosis."""
     return case.obd_data
 
@@ -101,7 +101,7 @@ async def get_vehicle(
 async def get_oscillograms(
         component: str,
         case: Case = Depends(_case_by_diag_id_or_404)
-) -> Sequence[TimeseriesDataFull]:
+) -> List[TimeseriesDataFull]:
     """Get all oscillograms for a specific component."""
     output_data: List[TimeseriesDataFull] = []
     for tsd in case.timeseries_data:
@@ -120,7 +120,7 @@ async def get_oscillograms(
 )
 async def get_symptoms(
         component: str, case: Case = Depends(_case_by_diag_id_or_404)
-) -> Sequence[Symptom]:
+) -> List[Symptom]:
     """Get all symptoms for a specific component."""
     symptoms = [s for s in case.symptoms if s.component == component]
     return symptoms
@@ -181,7 +181,7 @@ async def add_message_to_state_machine_log(
         attachment_bucket: motor_asyncio.AsyncIOMotorGridFSBucket = Depends(
             AttachmentBucket.create
         )
-) -> Sequence[DiagnosisLogEntry]:
+) -> List[DiagnosisLogEntry]:
     attachment_id: PydanticObjectId | None = None
     # if a file attachments was uploaded, store it and generate an id
     if attachment is not None:

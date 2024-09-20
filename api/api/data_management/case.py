@@ -6,7 +6,6 @@ from typing import (
     Optional,
     Tuple,
     Any,
-    Sequence,
     Self
 )
 
@@ -128,7 +127,7 @@ class Case(Document):
             customer_id: Optional[str] = None,
             vin: Optional[str] = None,
             workshop_id: Optional[str] = None
-    ) -> Sequence[Self]:
+    ) -> List[Self]:
         """
         Get list of all cases filtered by customer_id, vehicle_vin and
         workshop_id.

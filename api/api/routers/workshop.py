@@ -2,8 +2,7 @@ from typing import (
     List,
     Union,
     Literal,
-    Optional,
-    Sequence
+    Optional
 )
 
 from bson import ObjectId
@@ -68,7 +67,7 @@ async def list_cases(
         workshop_id: str,
         customer_id: Optional[str] = None,
         vin: Optional[str] = None
-) -> Sequence[Case]:
+) -> List[Case]:
     cases = await Case.find_in_hub(
         customer_id=customer_id, vin=vin, workshop_id=workshop_id
     )
@@ -212,7 +211,7 @@ async def update_vehicle(
 )
 def list_timeseries_data(
         case: Case = Depends(case_from_workshop)
-) -> Sequence[TimeseriesData]:
+) -> List[TimeseriesData]:
     """List all available timeseries datasets for a case."""
     return case.timeseries_data
 

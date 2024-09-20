@@ -2,8 +2,7 @@ from typing import (
     List,
     Literal,
     Callable,
-    Optional,
-    Sequence
+    Optional
 )
 
 from bson import ObjectId
@@ -35,7 +34,7 @@ async def list_cases(
         customer_id: Optional[str] = None,
         vin: Optional[str] = None,
         workshop_id: Optional[str] = None
-) -> Sequence[Case]:
+) -> List[Case]:
     """
     List all cases in Hub. Query params can be used to filter by `customer_id`,
     `vin` and `workshop_id`.
@@ -79,7 +78,7 @@ async def get_case(case: Case = Depends(case_by_id)) -> Case:
 )
 def list_timeseries_data(
         case: Case = Depends(case_by_id)
-) -> Sequence[TimeseriesData]:
+) -> List[TimeseriesData]:
     """List all available timeseries datasets for a case."""
     return case.timeseries_data
 
