@@ -192,8 +192,8 @@ async def update_vehicle(
         update: VehicleUpdate, case: Case = Depends(case_from_workshop)
 ) -> Vehicle:
     no_vehicle_with_id_exception = HTTPException(
-        status_code=404,
-        detail=f"No vehicle with vin '{case.vehicle_vin}' found "
+        status_code=500,
+        detail=f"No vehicle with VIN '{case.vehicle_vin}' found "
                f"for workshop '{case.workshop_id}'."
     )
     vehicle = await Vehicle.find_one({"vin": case.vehicle_vin})
@@ -679,7 +679,7 @@ async def start_diagnosis(
         # New diagnosis is initialized
         if case.id is None:
             exception_detail = "Case is missing an ID"
-            raise HTTPException(status_code=404, detail=exception_detail)
+            raise HTTPException(status_code=500, detail=exception_detail)
         else:
             diag = Diagnosis(
                 case_id=case.id,
