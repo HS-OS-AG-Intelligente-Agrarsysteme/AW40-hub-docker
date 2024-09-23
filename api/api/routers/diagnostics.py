@@ -87,8 +87,9 @@ async def get_vehicle(
     vehicle = await Vehicle.find_one({"vin": case.vehicle_vin})
     if vehicle is None:
         raise HTTPException(
-            status_code=404,
-            detail=f"No vehicle with VIN '{case.vehicle_vin}' found"
+            status_code=500,
+            detail=f"Vehicle with VIN '{case.vehicle_vin}' "
+                   f"from case '{case.id}' not found in database."
         )
     return vehicle
 
