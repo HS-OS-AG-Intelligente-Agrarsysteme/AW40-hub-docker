@@ -68,7 +68,7 @@ class CaseDetailView extends StatelessWidget {
     );
   }
 
-  static Future<void> _onDeleteButtonPress(
+  Future<void> _onDeleteButtonPress(
     BuildContext context,
     LoggedInUserModel loggedInUserModel,
     String caseModelId,
@@ -88,6 +88,8 @@ class CaseDetailView extends StatelessWidget {
           : tr("cases.details.deleteCaseErrorMessage");
       _showMessage(message, scaffoldMessengerState);
     });
+
+    onClose();
   }
 
   static void _showMessage(String text, ScaffoldMessengerState state) {

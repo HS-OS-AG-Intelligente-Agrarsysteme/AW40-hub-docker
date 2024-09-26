@@ -45,8 +45,8 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
   }
 
   Future<void> _showFilterDiagnosesDialog() async {
-    // TODO implement in a later story
-    _logger.warning("Unimplemented: _showFilterDiagnosesDialog()");
+    // TODO implement _showFilterDiagnosesDialog
+    throw UnimplementedError();
   }
 
   Future<void> _showFilterCasesDialog() async {
@@ -91,7 +91,6 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
         actions: [
           IconButton(
             onPressed: () async {
-              // TODO maybe fetch customers here and pass it to add case dialog?
               final NewCaseDto? newCase = await _showAddCaseDialog();
               if (newCase == null) return;
               await caseProvider.addCase(newCase);

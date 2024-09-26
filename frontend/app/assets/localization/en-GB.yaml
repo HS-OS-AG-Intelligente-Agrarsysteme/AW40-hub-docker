@@ -1,6 +1,7 @@
 general:
   cancel: "Cancel"
   case: "Case"
+  city: "City"
   close: "Close"
   customer: "Customer"
   customerId: "Customer id"
@@ -9,16 +10,31 @@ general:
   datasets: "Datasets"
   delete: "Delete"
   edit: "Edit"
+  email: "Email"
   filter: "Filter"
+  firstname: "First Name"
+  housenumber: "House number"
   id: "ID"
   yearBuild: "Year built"
   language: "Language"
+  lastname: "Last Name"
   logout: "Logout"
   milage: "Milage"
+  no: "No"
+  noCustomerId: "No customer id"
+  noData: "No data available"
+  noDate: "No Date"
+  noDiagnoses: "There is currently no information about ongoing diagnoses."
+  noVehicles: "There is currently no information about the vehicles."
+  noVehicleVin: "No vehicle vin"
+  noWorkshopId: "No workshop id"
   notFound: "Not found"
   notSpecified: "Not specified"
+  number: "No."
   obligatoryField: "Obligatory"
   occasion: "Occasion"
+  phone: "Phone"
+  postcode: "Postcode"
   problem: "Problem"
   previous: "Previous"
   repair: "Repair"
@@ -28,6 +44,7 @@ general:
   sort: "Sort"
   state: "State"
   status: "Status"
+  street: "Street"
   then: "Then"
   transition: "Transition"
   tsn: "TSN"
@@ -38,13 +55,6 @@ general:
   workshop: "Workshop"
   workshopId: "Workshop id"
   yes: "Yes"
-  no: "No"
-  noData: "No data available"
-  noDate: "No Date"
-  noCustomerId: "No customer id"
-  noVehicleVin: "No vehicle vin"
-  noWorkshopId: "No workshop id"
-  noDiagnoses: "There is currently no information about ongoing diagnoses."
 diagnoses:
   title: "Diagnosis"
   actions:
@@ -99,6 +109,7 @@ cases:
   addCaseDialog:
     customerTooltip: "Assign case to a customer"
     createNewCustomerTooltip: "Create new customer"
+    cancelCreateNewCustomerTooltip: "Cancel creating new customer"
     vinCharactersInvalid: "The @:general.vehicleVin must not contain I, O, or Q"
     vinLengthInvalid: "The @:general.vehicleVin must be 17 characters long"
     confirmDialog:
@@ -130,6 +141,8 @@ customers:
   title: "Customers"
   headlines: 
     id: "ID"
+  actions:
+    updateCustomer: "Update customer"
 vehicles:
   title: "Vehicles"
   actions:

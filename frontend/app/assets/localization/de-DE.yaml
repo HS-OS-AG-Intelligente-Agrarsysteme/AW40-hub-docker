@@ -1,6 +1,7 @@
 general:
   cancel: "Abbrechen"
   case: "Fall"
+  city: "Stadt"
   close: "Schließen"
   customer: "Kunde"
   customerId: "Kunden ID"
@@ -9,16 +10,30 @@ general:
   datasets: "Datensätze"
   delete: "Löschen"
   edit: "Bearbeiten"
+  email: "E-Mail"
   filter: "Filtern"
+  firstname: "Vorname"
+  housenumber: "Hausnummer"
   id: "ID"
   yearBuild: "Baujahr"
   language: "Sprache"
+  lastname: "Nachname"
   logout: "Logout"
   milage: "Kilometerstand"
+  no: "Nein"
+  noCustomerId: "Keine Kunden ID"
+  noData: "Keine Daten verfügbar"
+  noDate: "Kein Datum"
+  noDiagnoses: "Aktuell sind keine Informationen zu laufenden Diagnosen vorhanden."
+  noVehicles: "Aktuell sind keine Informationen zu den Fahrzeugen vorhanden."
+  noVehicleVin: "Keine @:general.vehicleVin"
+  noWorkshopId: "Keine @:general.workshop ID"
   notFound: "nicht gefunden"
   notSpecified: "keine Angabe"
   obligatoryField: "Pflichtfeld"
   occasion: "Anlass"
+  phone: "Telefon"
+  postcode: "PLZ"
   previous: "Vorher"
   problem: "Problem"
   repair: "Reparatur"
@@ -28,6 +43,7 @@ general:
   sort: "Sortieren"
   state: "Zustand"
   status: "Status"
+  street: "Straße"
   then: "Dann"
   transition: "Übergang"
   tsn: "TSN"
@@ -38,13 +54,6 @@ general:
   workshop: "Werkstatt"
   workshopId: "Werkstatt ID"
   yes: "Ja"
-  no: "Nein"
-  noData: "Keine Daten verfügbar"
-  noDate: "Kein Datum"
-  noCustomerId: "Keine Kunden ID"
-  noVehicleVin: "Keine @:general.vehicleVin"
-  noWorkshopId: "Keine @:general.workshop ID"
-  noDiagnoses: "Aktuell sind keine Informationen zu laufenden Diagnosen vorhanden."
 diagnoses:
   title: "Diagnosen"
   actions:
@@ -99,6 +108,7 @@ cases:
   addCaseDialog:
     customerTooltip: "Fall einem Kunden zuordnen"
     createNewCustomerTooltip: "Neuen Kunden erstellen"
+    cancelCreateNewCustomerTooltip: "Erstellung eines neuen Kundens abbrechen"
     vinCharactersInvalid: "@:general.vehicleVin darf nicht I, O oder Q enthalten"
     vinLengthInvalid: "@:general.vehicleVin muss 17 Zeichen lang sein"
     confirmDialog:
@@ -130,6 +140,8 @@ customers:
   title: "Kunden"
   headlines: 
     id: "ID"
+  actions:
+    updateCustomer: "Kunden bearbeiten"
 vehicles:
   title: "Fahrzeuge"
   actions:

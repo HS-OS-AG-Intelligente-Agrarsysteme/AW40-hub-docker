@@ -1,9 +1,22 @@
-import "package:aw40_hub_frontend/utils/enums.dart";
-
 class CustomerModel {
   CustomerModel({
     required this.id,
+    required this.firstname,
+    required this.lastname,
+    this.email,
+    this.phone,
+    this.street,
+    this.housenumber,
+    this.postcode,
+    this.city,
   });
-  AnonymousCustomerId id;
+  String? id;
+  String firstname;
+  String lastname;
+  String? email;
+  String? phone;
+  String? street;
+  String? housenumber;
+  String? postcode;
+  String? city;
 }
-// TODO adjust data model
