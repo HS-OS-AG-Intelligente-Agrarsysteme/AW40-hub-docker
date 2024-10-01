@@ -15,6 +15,7 @@ from api.data_management import (
     SymptomUpdate,
     SymptomLabel
 )
+from bson import ObjectId
 from pydantic import ValidationError
 
 
@@ -34,9 +35,9 @@ def case_with_diagnostic_data(new_case, timeseries_data):
     new_case["timeseries_data"] = timeseries_data
     new_case["obd_data"] = {"dtcs": ["P0001"]}
     new_case["symptoms"] = {
-                "component": "battery",
-                "label": "defect"
-            }
+        "component": "battery",
+        "label": "defect"
+    }
     return new_case
 
 
@@ -238,6 +239,69 @@ class TestCase:
             retrieved_cases = await Case.find_in_hub(obd_data_dtc=query_dtc)
             assert [_.id for _ in retrieved_cases] == [case.id]
 
+    @pytest.mark.parametrize(
+        "query_component,expected_cases",
+        [
+            ("Comp-A", [0, 1]),
+            ("Comp-B", [1]),
+            ("Comp-C", [])
+        ]
+    )
+    @pytest.mark.asyncio
+    async def test_find_in_hub_by_timeseries_data_component(
+            self,
+            monkeypatch,
+            initialized_beanie_context,
+            query_component,
+            expected_cases
+    ):
+        # Patch to_timeseries_data to avoid signal store configuration
+        async def mock_to_timeseries_data(self):
+            # Just exchange signal for signal_id without storing the signal
+            meta_data = self.model_dump(exclude={"signal"})
+            meta_data["signal_id"] = ObjectId()
+            return TimeseriesData(**meta_data)
+
+        monkeypatch.setattr(
+            NewTimeseriesData, "to_timeseries_data", mock_to_timeseries_data
+        )
+
+        async with initialized_beanie_context:
+            workshop_id = "test-workshop"
+            vin = "test-vin"
+            # Three cases are put into the db
+            cases = []
+            for _ in range(3):
+                case = await Case(
+                    vehicle_vin=vin, workshop_id=workshop_id
+                ).create()
+                cases.append(case)
+
+            common_kwargs = {
+                "signal": [.42],
+                "sampling_rate": 1,
+                "duration": 1,
+                "label": "unknown"
+            }
+            # One dataset is added to first case
+            await cases[0].add_timeseries_data(
+                NewTimeseriesData(component="Comp-A", **common_kwargs)
+            )
+            # Two datasets are added to second case
+            await cases[1].add_timeseries_data(
+                NewTimeseriesData(component="Comp-B", **common_kwargs)
+            )
+            await cases[1].add_timeseries_data(
+                NewTimeseriesData(component="Comp-A", **common_kwargs)
+            )
+
+            retrieved_cases = await Case.find_in_hub(
+                timeseries_data_component=query_component
+            )
+            retrieved_case_ids = sorted([_.id for _ in retrieved_cases])
+            expected_case_ids = sorted([cases[i].id for i in expected_cases])
+            assert retrieved_case_ids == expected_case_ids
+
     @pytest.mark.asyncio
     async def test_data_counter_are_correctly_initilialized(
             self, new_case, initialized_beanie_context
@@ -270,6 +334,7 @@ class TestCase:
             A mock for NewTimeseriesData that does not interact with a
             signal store when executing to_timeseries_data.
             """
+
             async def to_timeseries_data(self):
                 signal_id = test_signal_id
                 meta_data = self.model_dump(exclude={"signal"})
@@ -342,10 +407,12 @@ class TestCase:
             case.symptoms_added = previous_adds
 
             await case.add_symptom(
-                NewSymptom(**{
-                    "component": "battery",
-                    "label": SymptomLabel("defect")
-                })
+                NewSymptom(
+                    **{
+                        "component": "battery",
+                        "label": SymptomLabel("defect")
+                    }
+                    )
             )
 
             # refetch case and assert existence of single symptom
