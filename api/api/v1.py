@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from .routers import (
     health, shared, workshop, minio, diagnostics, knowledge,
-    customers
+    customers, assets
 )
 from .settings import settings
 import logging
@@ -37,6 +37,7 @@ api_v1.include_router(shared.router, prefix="/shared")
 api_v1.include_router(knowledge.router, prefix="/knowledge")
 api_v1.include_router(workshop.router)
 api_v1.include_router(customers.router, prefix="/customers")
+api_v1.include_router(assets.router, prefix="/dataspace/assets")
 if not settings.exclude_minio_router:
     api_v1.include_router(minio.router, prefix="/minio")
 else:

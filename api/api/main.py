@@ -6,7 +6,7 @@ from motor import motor_asyncio
 
 from .data_management import (
     Case, Vehicle, Customer, Workshop, TimeseriesMetaData, Diagnosis,
-    AttachmentBucket
+    AttachmentBucket, Asset
 )
 from .data_management.timeseries_data import GridFSSignalStore
 from .diagnostics_management import DiagnosticTaskManager, KnowledgeGraph
@@ -44,7 +44,7 @@ async def init_mongo():
     await init_beanie(
         client[settings.mongo_db],
         document_models=[
-            Case, Vehicle, Customer, Workshop, Diagnosis
+            Case, Vehicle, Customer, Workshop, Diagnosis, Asset
         ]
     )
 
