@@ -66,10 +66,24 @@ router = APIRouter(dependencies=[Depends(authorized_workshop_id)])
 async def list_cases(
         workshop_id: str,
         customer_id: Optional[str] = None,
-        vin: Optional[str] = None
+        vin: Optional[str] = None,
+        obd_data_dtc: Optional[str] = None,
+        timeseries_data_component: Optional[str] = None
 ) -> List[Case]:
+    """
+    List all cases in Hub. Query params can be used to filter by `customer_id`,
+    (partial) `vin`, `workshop_id`, `obd_data_dtc` or
+    `timeseries_data_component`.
+
+    The specified `vin` is matched against the beginning of the stored vehicle
+    vins.
+    """
     cases = await Case.find_in_hub(
-        customer_id=customer_id, vin=vin, workshop_id=workshop_id
+        customer_id=customer_id,
+        vin=vin,
+        workshop_id=workshop_id,
+        obd_data_dtc=obd_data_dtc,
+        timeseries_data_component=timeseries_data_component
     )
     return cases
 
