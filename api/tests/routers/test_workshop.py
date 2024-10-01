@@ -200,9 +200,16 @@ def test_list_cases_with_filters(
     # request with filter params
     customer_id = "test customer"
     vin = "test vin"
+    obd_data_dtc = "P0001"
+    timeseries_data_component = "Test-Comp"
     response = authenticated_client.get(
         f"/{workshop_id}/cases",
-        params={"customer_id": customer_id, "vin": vin}
+        params={
+            "customer_id": customer_id,
+            "vin": vin,
+            "obd_data_dtc": obd_data_dtc,
+            "timeseries_data_component": timeseries_data_component
+        }
     )
 
     # confirm expected response and usage of db interface
@@ -212,8 +219,8 @@ def test_list_cases_with_filters(
         customer_id=customer_id,
         vin=vin,
         workshop_id=workshop_id,
-        obd_data_dtc=None,
-        timeseries_data_component=None
+        obd_data_dtc=obd_data_dtc,
+        timeseries_data_component=timeseries_data_component
     )
 
 
