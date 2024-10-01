@@ -183,6 +183,61 @@ class TestCase:
             retrieved_vins = sorted([_.vehicle_vin for _ in retrieved_cases])
             assert retrieved_vins == expected_vins
 
+    @pytest.mark.parametrize(
+        "query_dtc,expected_cases",
+        [
+            ("P0001", [0, 1]),
+            ("Q0002", [1]),
+            ("Z0001", [])
+        ]
+    )
+    @pytest.mark.asyncio
+    async def test_find_in_hub_by_obd_data_dtc(
+            self, initialized_beanie_context, query_dtc, expected_cases
+    ):
+        async with initialized_beanie_context:
+            workshop_id = "test-workshop"
+            vin = "test-vin"
+            # Three cases are put into the db
+            cases = []
+            for _ in range(3):
+                case = await Case(
+                    vehicle_vin=vin, workshop_id=workshop_id
+                ).create()
+                cases.append(case)
+            # OBD data with dtcs is added to two of the three cases
+            await cases[0].add_obd_data(
+                NewOBDData(dtcs=["P0001"])
+            )
+            await cases[1].add_obd_data(
+                NewOBDData(dtcs=["P0001", "Q0002"])
+            )
+
+            retrieved_cases = await Case.find_in_hub(obd_data_dtc=query_dtc)
+            retrieved_case_ids = sorted([_.id for _ in retrieved_cases])
+            expected_case_ids = sorted([cases[i].id for i in expected_cases])
+            assert retrieved_case_ids == expected_case_ids
+
+    @pytest.mark.parametrize("query_dtc", ["P0001", "Q0001", "Z0002"])
+    @pytest.mark.asyncio
+    async def test_find_in_hub_by_obd_data_dtc_with_multiple_datasets(
+            self, initialized_beanie_context, query_dtc
+    ):
+        """Test non-standard situation with multiple obd datasets in a case."""
+        async with initialized_beanie_context:
+            case = await Case(workshop_id="42", vehicle_vin="42").create()
+            await case.add_obd_data(
+                NewOBDData(dtcs=["P0001", "Z0002"])
+            )
+            await case.add_obd_data(
+                NewOBDData(dtcs=["Q0001", "Z0002"])
+            )
+            await case.add_obd_data(
+                NewOBDData(dtcs=[])
+            )
+            retrieved_cases = await Case.find_in_hub(obd_data_dtc=query_dtc)
+            assert [_.id for _ in retrieved_cases] == [case.id]
+
     @pytest.mark.asyncio
     async def test_data_counter_are_correctly_initilialized(
             self, new_case, initialized_beanie_context
