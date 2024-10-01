@@ -160,6 +160,29 @@ class TestCase:
             assert case_2_result[0].vehicle_vin == case_2_vin
             assert case_3_result[0].workshop_id == case_3_workshop_id
 
+    @pytest.mark.parametrize(
+        "query_vin,expected_vins",
+        [
+            ("AB", ["ABC", "ABCD"]),
+            ("ABC", ["ABC", "ABCD"]),
+            ("ABCD", ["ABCD"]),
+            ("BC", [])
+        ]
+    )
+    @pytest.mark.asyncio
+    async def test_find_in_hub_with_partial_vin(
+            self, initialized_beanie_context, query_vin, expected_vins
+    ):
+        async with initialized_beanie_context:
+            workshop_id = "test-workshop"
+            await Case(vehicle_vin="ABC", workshop_id=workshop_id).create()
+            await Case(vehicle_vin="ABCD", workshop_id=workshop_id).create()
+            await Case(vehicle_vin="ZABC", workshop_id=workshop_id).create()
+
+            retrieved_cases = await Case.find_in_hub(vin=query_vin)
+            retrieved_vins = sorted([_.vehicle_vin for _ in retrieved_cases])
+            assert retrieved_vins == expected_vins
+
     @pytest.mark.asyncio
     async def test_data_counter_are_correctly_initilialized(
             self, new_case, initialized_beanie_context
