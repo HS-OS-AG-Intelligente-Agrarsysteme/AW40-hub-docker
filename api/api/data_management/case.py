@@ -131,12 +131,17 @@ class Case(Document):
         """
         Get list of all cases filtered by customer_id, vehicle_vin and
         workshop_id.
+
+        The specified vin is matched against the beginning of the stored vins.
+        This allows partial vin specification e.g. to search for cases with
+        vehicles by a specific manufacturer.
         """
         filter = {}
         if customer_id is not None:
             filter["customer_id"] = PydanticObjectId(customer_id)
         if vin is not None:
-            filter["vehicle_vin"] = vin
+            # VIN is matched against beginning of stored vins
+            filter["vehicle_vin"] = {"$regex": f"^{vin}"}
         if workshop_id is not None:
             filter["workshop_id"] = workshop_id
 
