@@ -1,6 +1,6 @@
 from datetime import datetime, UTC
 from enum import Enum
-from typing import Optional, Annotated
+from typing import Optional, Annotated, List
 
 from beanie import Document
 from pydantic import BaseModel, StringConstraints, Field
@@ -38,16 +38,35 @@ class AssetDefinition(BaseModel):
     )
 
 
+class Publication(BaseModel):
+    """Publication information for an asset."""
+    market: str = Field(
+        description="Market that an asset is available in via this publication"
+    )
+    did: str = Field(
+        description="Id of this publication provided by the market."
+    )
+    asset_url: str = Field(
+        description="URL to access asset data within the market."
+    )
+    asset_key: str = Field(
+        description="Publication specific key to access data via `asset_url`."
+    )
+
+
 class Asset(Document):
     """DB schema and interface for assets."""
 
     class Settings:
         name = "assets"
 
+    name: str
     definition: AssetDefinition
-    description: Optional[str]
+    description: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     data_status: AssetDataStatus = AssetDataStatus.defined
+
+    publications: List[Publication] = []
 
     async def process_definition(self):
         """
@@ -63,5 +82,6 @@ class Asset(Document):
 
 class NewAsset(BaseModel):
     """Schema for new asset added via the api."""
+    name: str
     definition: Optional[AssetDefinition] = AssetDefinition()
-    description: Optional[str] = None
+    description: str
