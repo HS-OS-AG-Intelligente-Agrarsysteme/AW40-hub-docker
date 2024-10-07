@@ -50,7 +50,8 @@ class Publication(BaseModel):
         description="URL to access asset data within the market."
     )
     asset_key: str = Field(
-        description="Publication specific key to access data via `asset_url`."
+        description="Publication specific key to access data via `asset_url`.",
+        exclude=True
     )
 
 
