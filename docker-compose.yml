@@ -365,7 +365,7 @@ services:
 
   # utilized by the diagnostics service
   knowledge-graph:
-    build: 
+    build:
       context: ./knowledge-graph
     <<: *default_restart_policy
     profiles:
@@ -377,6 +377,19 @@ services:
     networks:
       - hubintranet
       - hubnet
+
+  nautilus:
+    build:
+      context: ./nautilus
+    profiles:
+      - full
+    env_file: ./nautilus/nautilus.env
+    hostname: "nautilus"
+    ports:
+      - 127.0.0.1:3000:3000
+    networks:
+      hubintranet:
+      hubnet:
 
 networks:
   hubnet:
