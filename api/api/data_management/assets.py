@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Optional, Annotated, ClassVar
 from zipfile import ZipFile
 
-from beanie import Document
+from beanie import Document, before_event, Delete
 from pydantic import BaseModel, StringConstraints, Field
 
 from .case import Case
@@ -143,6 +143,11 @@ class Asset(AssetMetaData, Document):
 
         self.data_status = AssetDataStatus.ready
         await self.save()
+
+    @before_event(Delete)
+    def _delete_asset_data(self):
+        """Remove associated data when asset is deleted."""
+        os.remove(self.data_file_path)
 
 
 class NewAsset(BaseModel):
