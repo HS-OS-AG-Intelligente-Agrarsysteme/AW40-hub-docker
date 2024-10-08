@@ -9,6 +9,7 @@ from .data_management import (
     AttachmentBucket, Asset
 )
 from .data_management.timeseries_data import GridFSSignalStore
+from .dataspace_management import Nautilus
 from .diagnostics_management import DiagnosticTaskManager, KnowledgeGraph
 from .settings import settings
 from .storage.storage_factory import StorageFactory
@@ -97,3 +98,10 @@ def init_keycloak():
 def set_api_keys():
     diagnostics.api_key_auth.valid_key = settings.api_key_diagnostics
     minio.api_key_auth.valid_key = settings.api_key_minio
+
+
+@app.on_event("startup")
+def init_nautilus():
+    Nautilus.configure(
+        publication_url=settings.nautilus_publication_url
+    )
