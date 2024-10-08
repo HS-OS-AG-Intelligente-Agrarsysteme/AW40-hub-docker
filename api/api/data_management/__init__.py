@@ -2,7 +2,9 @@ __all__ = [
     "NewAsset",
     "Asset",
     "AssetDefinition",
+    "AssetMetaData",
     "Publication",
+    "AssetDataStatus",
     "NewCase",
     "Case",
     "CaseUpdate",
@@ -35,7 +37,10 @@ __all__ = [
     "BaseSignalStore"
 ]
 
-from .assets import NewAsset, AssetDefinition, Asset, Publication
+from .assets import (
+    NewAsset, AssetDefinition, Asset, AssetMetaData, Publication,
+    AssetDataStatus
+)
 from .case import NewCase, Case, CaseUpdate
 from .customer import Customer, CustomerBase, CustomerUpdate
 from .diagnosis import (
