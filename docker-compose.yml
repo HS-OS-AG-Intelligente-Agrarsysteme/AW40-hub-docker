@@ -279,6 +279,7 @@ services:
       - 127.0.0.1:8000:8000 # For pytest
     volumes:
       - ./api/api/:/home/api/api/
+      - asset-data:/home/api/asset-data
 
   frontend:
     build:
@@ -393,3 +394,4 @@ volumes:
   minio-data:
   edc-db-data:
   proxy-certs:
+  asset-data:
