@@ -49,6 +49,12 @@ $kcadm create roles \
 	-s description="Role for API customers endpoints"
 
 
+$kcadm create roles \
+	-r werkstatt-hub \
+	-s name=assets \
+	-s description="Role for API assets endpoints"
+
+
 # Add groups and set roles
 $kcadm create groups \
     -r werkstatt-hub \
@@ -200,7 +206,8 @@ then
         --uusername aw40hub-dev-workshop \
         --rolename workshop \
         --rolename shared \
-        --rolename customers
+        --rolename customers \
+        --rolename assets
 
     $kcadm create clients \
         -r werkstatt-hub \

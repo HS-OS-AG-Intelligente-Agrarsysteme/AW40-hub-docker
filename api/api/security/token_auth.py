@@ -12,6 +12,8 @@ REQUIRED_WORKSHOP_ROLE = "workshop"
 REQUIRED_SHARED_ROLE = "shared"
 # required role for customer data management
 REQUIRED_CUSTOMERS_ROLE = "customers"
+# required role for asset data management
+REQUIRED_ASSETS_ROLE = "assets"
 
 
 failed_auth_exception = HTTPException(
@@ -103,4 +105,15 @@ async def authorized_customers_access(
     respective role.
     """
     if REQUIRED_CUSTOMERS_ROLE not in token_data.roles:
+        raise failed_auth_exception
+
+
+async def authorized_assets_access(
+        token_data: TokenData = Depends(verify_token)
+):
+    """
+    Authorize access to asset data management if the user is assigned the
+    respective role.
+    """
+    if REQUIRED_ASSETS_ROLE not in token_data.roles:
         raise failed_auth_exception
