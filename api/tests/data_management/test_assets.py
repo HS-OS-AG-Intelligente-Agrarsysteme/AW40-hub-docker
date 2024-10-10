@@ -23,11 +23,6 @@ def vin():
 
 
 @pytest.fixture(autouse=True)
-def set_asset_data_dir_path_to_temporary_test_dir(tmp_path):
-    Asset.asset_data_dir_path = tmp_path
-
-
-@pytest.fixture(autouse=True)
 def set_timeseries_data_signal_store_to_mock():
     TimeseriesMetaData.signal_store = MockSignalStore()
 
