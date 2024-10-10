@@ -246,3 +246,19 @@ class TestAsset:
             # Test non-existence of archive file after deleting asset from db
             await asset.delete()
             assert not os.path.exists(asset.data_file_path)
+
+    @pytest.mark.asyncio
+    async def test__delete_asset_data_without_file(
+            self, initialized_beanie_context
+    ):
+        """
+        Confirm that asset deletion passes without an existing archive file.
+        """
+        async with initialized_beanie_context:
+            asset = await Asset(
+                name="Test Asset",
+                description="This is an test asset.",
+                definition=AssetDefinition()
+            ).create()
+            # Delete before an archive file was created
+            await asset.delete()

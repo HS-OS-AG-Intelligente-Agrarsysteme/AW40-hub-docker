@@ -147,7 +147,9 @@ class Asset(AssetMetaData, Document):
     @before_event(Delete)
     def _delete_asset_data(self):
         """Remove associated data when asset is deleted."""
-        os.remove(self.data_file_path)
+        # If there is an archive file associated with this asset, delete it.
+        if os.path.exists(self.data_file_path):
+            os.remove(self.data_file_path)
 
 
 class NewAsset(BaseModel):
