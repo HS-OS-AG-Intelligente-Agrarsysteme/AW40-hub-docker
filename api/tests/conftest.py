@@ -9,7 +9,8 @@ from api.data_management import (
     Vehicle,
     Customer,
     Workshop,
-    Diagnosis
+    Diagnosis,
+    Asset
 )
 from beanie import init_beanie
 from bson import ObjectId
@@ -47,7 +48,7 @@ async def initialized_beanie_context(motor_db):
     context manager to handle test setup and teardown.
     """
     models = [
-        Case, Vehicle, Customer, Workshop, Diagnosis
+        Case, Vehicle, Customer, Workshop, Diagnosis, Asset
     ]
 
     class InitializedBeanieContext:
