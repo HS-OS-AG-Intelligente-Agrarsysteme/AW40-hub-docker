@@ -16,6 +16,10 @@ export const publishSchema = {
       options: { min: 0 }
     }
   },
+  'service_descr.network': {
+    isString: true,
+    toUpperCase: true
+  },
   asset_descr: {
     isObject: true
   },
@@ -35,8 +39,15 @@ export const publishSchema = {
     isString: true
   },
   'asset_descr.price': {
+    isObject: true
+  },
+  'asset_descr.price.value': {
     isFloat: {
       options: { min: 0.0 }
     }
+  },
+  'asset_descr.price.currency': {
+    isString: true,
+    toUpperCase: true
   }
 }

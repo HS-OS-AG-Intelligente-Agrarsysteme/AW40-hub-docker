@@ -36,17 +36,15 @@ export async function publishAccessDataset(
       DATA_KEY: data_key
     }
   }
-
-  var pc = pricingConfig.FREE
-  if (price > 0.0) {
-    pc = pricingConfig.FIXED_EUROE
-    pc.freCreationParams.fixedRate = price
+  var pricing = pricingConfig
+  if (!(pricing.type === 'free')) {
+    pricing.freCreationParams.fixedRate = price
   }
   const service = serviceBuilder
     .setServiceEndpoint(networkConfig.providerUri)
     .setTimeout(timeout)
     .addFile(urlFile)
-    .setPricing(pc)
+    .setPricing(pricing)
     .setDatatokenNameAndSymbol('Data Access Token', 'DAT') // important for following access token transactions in the explorer
     .build()
 
@@ -62,9 +60,6 @@ export async function publishAccessDataset(
     //.addCredentialAddresses(CredentialListTypes.ALLOW, [owner]) // OPTIONAL Configure access control to only allow the owner-address (0xabc...) to access the asset
     .build()
 
-  //const result = await nautilus.publish(asset)
-  //return result
-  console.log(service)
-  console.log(asset)
-  return
+  const result = await nautilus.publish(asset)
+  return result
 }

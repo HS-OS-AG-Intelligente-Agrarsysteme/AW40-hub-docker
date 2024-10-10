@@ -1,41 +1,18 @@
 import { Router, Request, Response } from 'express'
 import { json } from 'body-parser'
-import { checkSchema, validationResult } from 'express-validator'
-import { LogLevel, Nautilus, LifecycleStates } from '@deltadao/nautilus'
-import { Network, NETWORK_CONFIGS, PRICING_CONFIGS } from '../config'
-import { Wallet, providers } from 'ethers'
+import {
+  checkSchema,
+  header,
+  param,
+  query,
+  validationResult
+} from 'express-validator'
+import { Network } from '../config'
 import { publishSchema } from '../schemas'
-import * as dotenv from 'dotenv'
-import { revoke, publishAccessDataset } from '../utils'
+import { revoke, publishAccessDataset, initNautilus } from '../utils'
 
-dotenv.config()
-
-// load config based on selected network
-if (!process.env.NETWORK) {
-  throw new Error(
-    `Set your networn in the .env file. Supported networks are ${Object.values(
-      Network
-    ).join(', ')}.`
-  )
-}
-const selectedEnvNetwork = process.env.NETWORK.toUpperCase()
-if (!(selectedEnvNetwork in Network)) {
-  throw new Error(
-    `Invalid network selection: ${selectedEnvNetwork}. Supported networks are ${Object.values(
-      Network
-    ).join(', ')}.`
-  )
-}
-console.log(`Your selected NETWORK is ${Network[selectedEnvNetwork]}`)
-const networkConfig = NETWORK_CONFIGS[selectedEnvNetwork]
-const pricingConfig = PRICING_CONFIGS[selectedEnvNetwork]
-
-// Setting up ethers wallet
-const provider = new providers.JsonRpcProvider(networkConfig.nodeUri)
-
-const assetdid_regex = new RegExp('did:op:[0-9a-z]{64}', 'g')
-
-Nautilus.setLogLevel(LogLevel.Verbose)
+const assetdid_regex = new RegExp('^did:op:[0-9a-z]{64}$', 'g')
+const privkey_regex = new RegExp('^[0-9a-z]{64}$', 'g')
 
 export const nautilusrouter = Router()
 nautilusrouter.use(json())
@@ -43,58 +20,89 @@ nautilusrouter.use(json())
 nautilusrouter.post(
   '/publish',
   checkSchema(publishSchema),
+  header('priv_key').matches(privkey_regex),
   async (req: Request, res: Response) => {
-    const privateKey = req.get('priv_key')
-    var err = validationResult(req)
-    if (!err.isEmpty()) {
-      res.send(err.mapped())
-      return
-    }
-    const wallet = new Wallet(privateKey, provider)
-    const nautilus = await Nautilus.create(wallet, networkConfig)
-    const { asset_descr, service_descr } = req.body
-    const result = await publishAccessDataset(
-      nautilus,
-      networkConfig,
-      pricingConfig,
-      wallet,
-      service_descr,
-      asset_descr
-    )
+    try {
+      validationResult(req).throw()
+      const privateKey = req.get('priv_key')
+      const { asset_descr, service_descr } = req.body
+      const network = service_descr.network
+      if (!(network in Network)) {
+        res.send({ error: `Unknown Network: '${network}'` })
+        return
+      }
+      const { networkConfig, pricingConfigs, wallet, nautilus } =
+        await initNautilus(Network[network], privateKey)
+      const currency = asset_descr.price.currency
+      if (!(currency in pricingConfigs)) {
+        res.send({ error: `Unknown Currency: '${currency}'` })
+        return
+      }
+      const pricingConfig = pricingConfigs[currency]
+      const result = await publishAccessDataset(
+        nautilus,
+        networkConfig,
+        pricingConfig,
+        wallet,
+        service_descr,
+        asset_descr
+      )
 
-    res.send({ result: result })
+      res.send({ result: result })
+    } catch (err) {
+      res.send({ error: err.mapped() })
+    }
   }
 )
 nautilusrouter.post(
-  '/revoke/:assetdid',
+  '/revoke/:network/:assetdid',
+  param('assetdid').matches(assetdid_regex),
+  header('priv_key').matches(privkey_regex),
+  param('network')
+    .toUpperCase()
+    .custom(async (network) => {
+      if (!(network in Network)) {
+        throw new Error(`Unknown Network: '${network}'`)
+      }
+    }),
   async (req: Request, res: Response) => {
-    const privateKey = req.get('priv_key')
-    const assetdid = req.params.assetdid
-    if (!assetdid_regex.test(assetdid)) {
-      res.send({ error: 'Invalid asset did' })
-      return
+    try {
+      validationResult(req).throw()
+      const privateKey = req.get('priv_key')
+      const { assetdid, network } = req.params
+      const { nautilus } = await initNautilus(Network[network], privateKey)
+      const result = await revoke(nautilus, assetdid)
+      res.send({ result: result })
+    } catch (err) {
+      res.send({ error: err.mapped() })
     }
-    const wallet = new Wallet(privateKey, provider)
-    const nautilus = await Nautilus.create(wallet, networkConfig)
-    const result = await revoke(nautilus, assetdid)
-    res.send({ result: result })
   }
 )
 
 nautilusrouter.get(
-  '/download_url/:assetdid',
+  '/download_url/:network/:assetdid',
+  param('assetdid').matches(assetdid_regex),
+  header('priv_key').matches(privkey_regex),
+  param('network')
+    .toUpperCase()
+    .custom(async (network) => {
+      if (!(network in Network)) {
+        throw new Error(`Unknown Network: '${network}'`)
+      }
+    }),
   async (req: Request, res: Response) => {
-    const privateKey = req.get('priv_key')
-    const assetdid = req.params.assetdid
-    if (!assetdid_regex.test(assetdid)) {
-      res.send({ error: 'Invalid asset did' })
-      return
+    try {
+      validationResult(req).throw()
+      const privateKey = req.get('priv_key')
+      const network = req.params.network
+      const assetdid = req.params.assetdid
+      const { nautilus } = await initNautilus(Network[network], privateKey)
+      const url = await nautilus.access({
+        assetDid: assetdid
+      })
+      res.send({ url: url })
+    } catch (err) {
+      res.send({ error: err.mapped() })
     }
-    const wallet = new Wallet(privateKey, provider)
-    const nautilus = await Nautilus.create(wallet, networkConfig)
-    const url = await nautilus.access({
-      assetDid: assetdid
-    })
-    res.send({ url: url })
   }
 )
