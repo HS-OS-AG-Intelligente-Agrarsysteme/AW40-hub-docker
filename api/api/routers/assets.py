@@ -4,7 +4,7 @@ from typing import List
 from bson import ObjectId
 from bson.errors import InvalidId
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.security import APIKeyHeader
 
 from ..data_management import NewAsset, Asset, Publication, AssetDataStatus
@@ -137,7 +137,9 @@ async def publish_asset(
     # If asset is already published, respond with publication information and
     # 200 instead of 201 to indicate that no new resource was created.
     if asset.publication is not None:
-        return asset.publication, 200
+        return JSONResponse(
+            content=asset.publication.model_dump(), status_code=200
+        )
 
     # New publication
     # The full URL for data access depends on deployment and mounting prefixes.
@@ -169,8 +171,8 @@ async def publish_asset(
     response_class=FileResponse
 )
 async def get_published_dataset(
-        asset: Asset = Depends(asset_by_id),
-        asset_key: str = Depends(APIKeyHeader(name="asset_key"))
+    asset_key: str = Depends(APIKeyHeader(name="asset_key")),
+    asset: Asset = Depends(asset_by_id)
 ):
     """Public download link for asset data."""
     publication = asset.publication
