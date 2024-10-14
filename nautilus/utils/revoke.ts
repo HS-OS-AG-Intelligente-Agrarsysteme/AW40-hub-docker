@@ -1,6 +1,13 @@
 import { Nautilus, LifecycleStates } from '@deltadao/nautilus'
+import { initNautilus } from './init'
+import { Network } from 'config'
 
-export async function revoke(nautilus: Nautilus, assetdid: string) {
+export async function revoke(
+  network: Network,
+  assetdid: string,
+  privateKey: string
+) {
+  const { nautilus } = await initNautilus(network, privateKey)
   const aquariusAsset = await nautilus.getAquariusAsset(assetdid)
   const tx = await nautilus.setAssetLifecycleState(
     aquariusAsset,

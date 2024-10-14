@@ -7,20 +7,21 @@ import {
   AssetBuilder
 } from '@deltadao/nautilus'
 
-import { NetworkConfig } from 'config'
+import { Network } from 'config'
 import { Wallet } from 'ethers'
 
+import { initNautilus } from './init'
+
 export async function publishAccessDataset(
-  nautilus: Nautilus,
-  networkConfig: NetworkConfig,
-  pricingConfig: any,
-  wallet: Wallet,
+  network: Network,
   service_descr: any,
-  asset_descr: any
+  asset_descr: any,
+  privateKey: string
 ) {
   const { url, api_key, data_key, timeout } = service_descr
   const { name, type, description, author, license, price } = asset_descr
-
+  const { nautilus, wallet, networkConfig, pricingConfigs } =
+    await initNautilus(network, privateKey)
   const owner = await wallet.getAddress()
   const serviceBuilder = new ServiceBuilder({
     serviceType: ServiceTypes.ACCESS,
@@ -36,15 +37,15 @@ export async function publishAccessDataset(
       DATA_KEY: data_key
     }
   }
-  var pricing = pricingConfig
-  if (!(pricing.type === 'free')) {
-    pricing.freCreationParams.fixedRate = price
+  const pricingConfig = pricingConfigs[price.currency]
+  if (!(pricingConfig.type === 'free')) {
+    pricingConfig.freCreationParams.fixedRate = price.value
   }
   const service = serviceBuilder
     .setServiceEndpoint(networkConfig.providerUri)
     .setTimeout(timeout)
     .addFile(urlFile)
-    .setPricing(pricing)
+    .setPricing(pricingConfig)
     .setDatatokenNameAndSymbol('Data Access Token', 'DAT') // important for following access token transactions in the explorer
     .build()
 
@@ -57,7 +58,6 @@ export async function publishAccessDataset(
     .setLicense(license)
     .addService(service)
     .setOwner(owner)
-    //.addCredentialAddresses(CredentialListTypes.ALLOW, [owner]) // OPTIONAL Configure access control to only allow the owner-address (0xabc...) to access the asset
     .build()
 
   const result = await nautilus.publish(asset)

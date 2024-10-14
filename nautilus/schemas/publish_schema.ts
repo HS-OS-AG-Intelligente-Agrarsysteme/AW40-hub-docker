@@ -16,10 +16,6 @@ export const publishSchema = {
       options: { min: 0 }
     }
   },
-  'service_descr.network': {
-    isString: true,
-    toUpperCase: true
-  },
   asset_descr: {
     isObject: true
   },
