@@ -39,7 +39,7 @@ export async function publishAccessDataset(
   }
   const pricingConfig = pricingConfigs[price.currency]
   if (!(pricingConfig.type === 'free')) {
-    pricingConfig.freCreationParams.fixedRate = price.value
+    pricingConfig.freCreationParams.fixedRate = price.value.toString()
   }
   const service = serviceBuilder
     .setServiceEndpoint(networkConfig.providerUri)
