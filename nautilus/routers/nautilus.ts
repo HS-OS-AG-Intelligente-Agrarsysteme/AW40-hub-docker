@@ -11,7 +11,7 @@ import { Network, PRICING_CONFIGS } from '../config'
 import { publishSchema } from '../schemas'
 import { access, revoke, publishAccessDataset, initNautilus } from '../utils'
 
-const privKeyValidator = header('priv_key').matches('^[0-9a-z]{64}$')
+const privKeyValidator = header('priv_key').matches('^[0-9a-z]{64}$').hide()
 const assetDidValidator = param('assetdid').matches('^did:op:[0-9a-z]{64}$')
 
 const networkValidator = param('network')
