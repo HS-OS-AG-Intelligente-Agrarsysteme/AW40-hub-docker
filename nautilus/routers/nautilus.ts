@@ -33,7 +33,7 @@ nautilusrouter.post(
   async (req: Request, res: Response) => {
     const err = validationResult(req)
     if (!err.isEmpty()) {
-      res.send({ error: err.mapped() })
+      res.status(400).send({ error: err.mapped() })
       return
     }
 
@@ -43,7 +43,7 @@ nautilusrouter.post(
     const currency = asset_descr.price.currency
 
     if (!(currency in PRICING_CONFIGS[network])) {
-      res.send({ error: `Unknown Currency: '${currency}'` })
+      res.status(400).send({ error: `Unknown Currency: '${currency}'` })
       return
     }
 
@@ -54,7 +54,7 @@ nautilusrouter.post(
       privateKey
     )
 
-    res.send({ result: result })
+    res.status(201).send({ result: result })
   }
 )
 nautilusrouter.post(
@@ -65,7 +65,7 @@ nautilusrouter.post(
   async (req: Request, res: Response) => {
     const err = validationResult(req)
     if (!err.isEmpty()) {
-      res.send({ error: err.mapped() })
+      res.status(400).send({ error: err.mapped() })
       return
     }
 
@@ -74,7 +74,7 @@ nautilusrouter.post(
     const network = Network[req.params.network]
     const result = await revoke(network, assetdid, privateKey)
 
-    res.send({ result: result })
+    res.status(200).send({ result: result })
   }
 )
 
@@ -86,7 +86,7 @@ nautilusrouter.get(
   async (req: Request, res: Response) => {
     const err = validationResult(req)
     if (!err.isEmpty()) {
-      res.send({ error: err.mapped() })
+      res.status(400).send({ error: err.mapped() })
       return
     }
 
@@ -94,6 +94,6 @@ nautilusrouter.get(
     const network = Network[req.params.network]
     const assetdid = req.params.assetdid
     const url = await access(network, assetdid, privateKey)
-    res.send({ url: url })
+    res.status(200).send({ url: url })
   }
 )
