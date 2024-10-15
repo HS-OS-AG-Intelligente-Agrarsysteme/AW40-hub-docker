@@ -46,15 +46,19 @@ nautilusrouter.post(
       res.status(400).send({ error: `Unknown Currency: '${currency}'` })
       return
     }
+    try {
+      const result = await publishAccessDataset(
+        network,
+        service_descr,
+        asset_descr,
+        privateKey
+      )
 
-    const result = await publishAccessDataset(
-      network,
-      service_descr,
-      asset_descr,
-      privateKey
-    )
-
-    res.status(201).send({ result: result })
+      res.status(201).send({ result: result })
+    } catch (e) {
+      console.log(e)
+      res.status(500).send()
+    }
   }
 )
 nautilusrouter.post(
@@ -72,9 +76,13 @@ nautilusrouter.post(
     const privateKey = req.get('priv_key')
     const assetdid = req.params.assetdid
     const network = Network[req.params.network]
-    const result = await revoke(network, assetdid, privateKey)
-
-    res.status(200).send({ result: result })
+    try {
+      const result = await revoke(network, assetdid, privateKey)
+      res.status(200).send({ result: result })
+    } catch (e) {
+      console.log(e)
+      res.status(500).send()
+    }
   }
 )
 
@@ -93,7 +101,12 @@ nautilusrouter.get(
     const privateKey = req.get('priv_key')
     const network = Network[req.params.network]
     const assetdid = req.params.assetdid
-    const url = await access(network, assetdid, privateKey)
-    res.status(200).send({ url: url })
+    try {
+      const url = await access(network, assetdid, privateKey)
+      res.status(200).send({ url: url })
+    } catch (e) {
+      console.log(e)
+      res.status(500).send()
+    }
   }
 )
