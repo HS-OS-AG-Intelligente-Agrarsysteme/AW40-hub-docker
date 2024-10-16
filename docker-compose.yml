@@ -258,6 +258,8 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_healthy
+      nautilus:
+        condition: service_healthy
       keycloak-config:
         condition: service_completed_successfully
     env_file:
@@ -386,7 +388,7 @@ services:
     env_file: ./nautilus/nautilus.env
     hostname: "nautilus"
     ports:
-      - 127.0.0.1:3000:3000
+      - 127.0.0.1:3000:3000 # Only for testing
     networks:
       hubintranet:
       hubnet:
