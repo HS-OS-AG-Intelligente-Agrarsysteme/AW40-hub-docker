@@ -5,11 +5,12 @@ import {
   header,
   param,
   query,
+  body,
   validationResult
 } from 'express-validator'
 import { Network, PRICING_CONFIGS } from '../config'
 import { publishSchema } from '../schemas'
-import { access, revoke, publishAccessDataset, initNautilus } from '../utils'
+import { access, revoke, publishAccessDataset, changePrice } from '../utils'
 
 const privKeyValidator = header('priv_key').matches('^[0-9a-z]{64}$').hide()
 const assetDidValidator = param('assetdid').matches('^did:op:[0-9a-z]{64}$')
@@ -104,6 +105,33 @@ nautilusrouter.get(
     try {
       const url = await access(network, assetdid, privateKey)
       res.status(200).send({ url: url })
+    } catch (e) {
+      console.log(e)
+      res.status(500).send()
+    }
+  }
+)
+
+nautilusrouter.post(
+  '/update_price/:network/:assetdid',
+  assetDidValidator,
+  privKeyValidator,
+  networkValidator,
+  body('price').isFloat({ min: 0.01 }),
+  async (req: Request, res: Response) => {
+    const err = validationResult(req)
+    if (!err.isEmpty()) {
+      res.status(400).send({ error: err.mapped() })
+      return
+    }
+
+    const privateKey = req.get('priv_key')
+    const { assetdid } = req.params
+    const { price } = req.body
+    const network = Network[req.params.network]
+    try {
+      const result = await changePrice(network, assetdid, price, privateKey)
+      res.status(200).send({ result: result })
     } catch (e) {
       console.log(e)
       res.status(500).send()

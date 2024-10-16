@@ -1,4 +1,4 @@
 export { publishAccessDataset } from './publish'
-export { revoke } from './revoke'
+export { revoke, changePrice } from './edit'
 export { access } from './access'
 export { initNautilus } from './init'
