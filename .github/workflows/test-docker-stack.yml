@@ -122,6 +122,13 @@ jobs:
           http://localhost:27017 \
           || exit 1
 
+      # Test Nautilus
+      - name: Check if Nautilus is reachable
+        run: |
+          curl -fs -o /dev/null -w 'http_code:%{http_code}' \
+          http://localhost:3000/health \
+          || exit 1
+
       # Test Keycloak
       - name: Check if Keycloak is healthy
         run: |
