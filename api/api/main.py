@@ -11,11 +11,9 @@ from .data_management import (
 from .data_management.timeseries_data import GridFSSignalStore
 from .diagnostics_management import DiagnosticTaskManager, KnowledgeGraph
 from .settings import settings
-from .storage.storage_factory import StorageFactory
 from .security.keycloak import Keycloak
 from .v1 import api_v1
 from .routers import diagnostics
-from .routers import minio
 
 app = FastAPI()
 app.add_middleware(
@@ -70,17 +68,6 @@ async def init_diagnostics_management():
 
 
 @app.on_event("startup")
-def init_storages():
-    StorageFactory.initialise_storages(
-        minio_host=settings.minio_api_address,
-        minio_password=settings.minio_password,
-        minio_username=settings.minio_username,
-        minio_use_tls=settings.minio_use_tls,
-        minio_check_cert=settings.minio_check_cert
-    )
-
-
-@app.on_event("startup")
 def init_knowledge_graph():
     KnowledgeGraph.set_kg_url(settings.knowledge_graph_url)
 
@@ -96,4 +83,3 @@ def init_keycloak():
 @app.on_event("startup")
 def set_api_keys():
     diagnostics.api_key_auth.valid_key = settings.api_key_diagnostics
-    minio.api_key_auth.valid_key = settings.api_key_minio

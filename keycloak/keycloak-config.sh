@@ -120,31 +120,7 @@ FRONTEND_ID=$(
         -s 'attributes."post.logout.redirect.uris"="+"'
 )
 
-MINIO_ID=$(
-    $kcadm create clients \
-        -i \
-        -r werkstatt-hub \
-        -s clientId=minio \
-        -s enabled=true \
-        -s description="Client for MinIO" \
-        -s directAccessGrantsEnabled=true \
-        -s clientAuthenticatorType=client-secret \
-        -s webOrigins='["*"]' \
-        -s redirectUris='["*"]' \
-        -s directAccessGrantsEnabled=true \
-        -s secret=${MINIO_CLIENT_SECRET}
-)
-
 # Add client scopes
-MINIO_SCOPE_ID=$(
-    $kcadm create client-scopes \
-        -i \
-        -r werkstatt-hub \
-        -s name=minio-policy-scope \
-        -s protocol=openid-connect \
-        -s 'attributes."include.in.token.scope"=true'
-)
-
 FRONTEND_SCOPE_ID=$(
     $kcadm create client-scopes \
         -i \
@@ -155,19 +131,6 @@ FRONTEND_SCOPE_ID=$(
 )
 
 # Add mappings
-$kcadm create client-scopes/${MINIO_SCOPE_ID}/protocol-mappers/models \
-    -r werkstatt-hub \
-    -s name=minio-policy-mapper \
-    -s protocol=openid-connect \
-    -s protocolMapper=oidc-usermodel-attribute-mapper \
-    -s 'config."aggregate.attrs"=true' \
-    -s 'config."multivalued"=true' \
-    -s 'config."userinfo.token.claim"=true' \
-    -s 'config."user.attribute"="miniopolicy"' \
-    -s 'config."id.token.claim"=true' \
-    -s 'config."access.token.claim"=true' \
-    -s 'config."claim.name"="miniopolicy"'
-
 $kcadm create client-scopes/${FRONTEND_SCOPE_ID}/protocol-mappers/models \
     -r werkstatt-hub \
     -s name=frontend-group-mapper \
@@ -180,9 +143,6 @@ $kcadm create client-scopes/${FRONTEND_SCOPE_ID}/protocol-mappers/models \
     -s 'config."claim.name"="groups"'
 
 # Add scopes to clients
-$kcadm update clients/${MINIO_ID}/default-client-scopes/${MINIO_SCOPE_ID} \
-    -r werkstatt-hub
-
 $kcadm update clients/${FRONTEND_ID}/default-client-scopes/${FRONTEND_SCOPE_ID} \
     -r werkstatt-hub
 

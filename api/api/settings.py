@@ -9,11 +9,6 @@ class Settings(BaseSettings):
     mongo_username: str
     mongo_password: str
     mongo_db: str
-    minio_api_address: str
-    minio_username: str
-    minio_password: str
-    minio_scheme: str
-    minio_check_cert: bool = False
 
     redis_password: str
     redis_host: str = "redis"
@@ -27,7 +22,6 @@ class Settings(BaseSettings):
     api_key_diagnostics: str
     api_key_minio: str
 
-    exclude_minio_router: bool = False
     exclude_diagnostics_router: bool = False
 
     @property
@@ -52,9 +46,6 @@ class Settings(BaseSettings):
             f":{self.redis_port}"
         )
 
-    @property
-    def minio_use_tls(self):
-        return self.minio_scheme == "https"
 
 
 settings = Settings()  # type: ignore
