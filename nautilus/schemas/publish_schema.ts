@@ -12,6 +12,9 @@ export const publishSchema = {
     isString: true
   },
   'service_descr.timeout': {
+    default: {
+      options: 0
+    },
     isInt: {
       options: { min: 0 }
     }
