@@ -62,7 +62,6 @@ $kcadm add-roles \
 
 $kcadm create groups \
     -r werkstatt-hub \
-    -s 'attributes."miniopolicy"=["readwrite"]' \
     -s name="Analysts"
 
 $kcadm add-roles \
@@ -73,7 +72,6 @@ $kcadm add-roles \
 
 $kcadm create groups \
     -r werkstatt-hub \
-    -s 'attributes."miniopolicy"=["consoleAdmin"]' \
     -s name="Admins"
 
 $kcadm add-roles \
@@ -85,10 +83,10 @@ $kcadm add-roles \
 # Add users
 $kcadm create users \
     -r werkstatt-hub \
-    -s username=${MINIO_ADMIN_WERKSTATTHUB} \
+    -s username=${WERKSTATT_ADMIN} \
     -s enabled=true \
     -s groups='["Admins"]' \
-    -s credentials='[{"type":"password","value":"'${MINIO_ADMIN_WERKSTATTHUB_PASSWORD}'"}]'
+    -s credentials='[{"type":"password","value":"'${WERKSTATT_ADMIN_PASSWORD}'"}]'
 
 $kcadm create users \
     -r werkstatt-hub \

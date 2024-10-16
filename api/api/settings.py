@@ -20,7 +20,6 @@ class Settings(BaseSettings):
     keycloak_workshop_realm: str = "werkstatt-hub"
 
     api_key_diagnostics: str
-    api_key_minio: str
 
     exclude_diagnostics_router: bool = False
 
