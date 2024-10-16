@@ -26,7 +26,11 @@ export const publishSchema = {
     isString: true
   },
   'asset_descr.type': {
-    isString: true
+    isString: true,
+    toLowerCase: true,
+    matches: {
+      options: '^dataset$'
+    }
   },
   'asset_descr.description': {
     isString: true
