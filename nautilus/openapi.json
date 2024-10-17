@@ -1,0 +1,464 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Nautilus API",
+    "version": "1"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                },
+                "example": {
+                  "status": "healthy"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nautilus/download_url/{network}/{assetdid}": {
+      "get": {
+        "tags": ["Nautilus"],
+        "summary": "Get Download URL",
+        "description": "Get download url for `assetid` in `network`.",
+        "operationId": "get_download_id",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Network"
+            },
+            "name": "network",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "AssetDID",
+              "type": "string"
+            },
+            "name": "assetdid",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "url",
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "title": "url",
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "url": "http://url.org/asset.json"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "priv_key": []
+          }
+        ]
+      }
+    },
+    "/nautilus/revoke/{network}/{assetdid}": {
+      "post": {
+        "tags": ["Nautilus"],
+        "summary": "Revoke Asset",
+        "description": "Removed Asset with id `assetdid` from `network`.",
+        "operationId": "revoke_asset",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Network"
+            },
+            "name": "network",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "AssetDID",
+              "type": "string"
+            },
+            "name": "assetdid",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Result"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "priv_key": []
+          }
+        ]
+      }
+    },
+    "/nautilus/update_price/{network}/{assetdid}": {
+      "post": {
+        "tags": ["Nautilus"],
+        "summary": "Updated Price",
+        "description": "Update the price of `assetdid` from `network`. The Currency can not be changed.",
+        "operationId": "change_price",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Network"
+            },
+            "name": "network",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "AssetDID",
+              "type": "string"
+            },
+            "name": "assetdid",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Price"
+              },
+              "example": {
+                "price": 2.0
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Result"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "priv_key": []
+          }
+        ]
+      }
+    },
+    "/nautilus/publish/{network}": {
+      "post": {
+        "tags": ["Nautilus"],
+        "summary": "Publish Asset",
+        "description": "Publish an asset on `network`.",
+        "operationId": "publish",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Network"
+            },
+            "name": "network",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "description": "Optional description in *Markdown*",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Publish"
+              },
+              "example": {
+                "service_descr": {
+                  "url": "https://www.autowerkstatt40.org/wp-content/uploads/2022/03/Autowerkstatt_Logo_White-768x179.png",
+                  "api_key": "empty",
+                  "data_key": "empty"
+                },
+                "asset_descr": {
+                  "name": "Test Asset: AW4.0 Logo",
+                  "type": "dataset",
+                  "description": "Logo der AW4.0.\n Dies ist nur ein Test.\n Es werden keine Nutzungsrechte eingeräumt.",
+                  "author": "UNKNOWN",
+                  "license": "CUSTOM",
+                  "price": {
+                    "value": 1.0,
+                    "currency": "FIXED_EUROE"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Result"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "priv_key": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Network": {
+        "title": "Network",
+        "type": "string",
+        "enum": ["PONTUSXDEV", "PONTUSXTEST"]
+      },
+      "ResultType": {
+        "title": "Network",
+        "type": "string",
+        "enum": ["success", "failed", "unkown"]
+      },
+      "Result": {
+        "title": "Result",
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/ResultType"
+          }
+        }
+      },
+      "ValidationError": {
+        "title": "Validation Error",
+        "type": "object",
+        "properties": {
+          "error": {
+            "title": "Error",
+            "type": "object"
+          }
+        }
+      },
+      "Price": {
+        "title": "Price",
+        "type": "object",
+        "properties": {
+          "price": {
+            "title": "Price",
+            "type": "number",
+            "minimum": 0.01,
+            "exclusiveMinimum": false
+          }
+        }
+      },
+      "Publish": {
+        "title": "Publish",
+        "type": "object",
+        "properties": {
+          "service_description": {
+            "$ref": "#/components/schemas/ServiceDescription"
+          },
+          "asset_description": {
+            "$ref": "#/components/schemas/AssetDescription"
+          }
+        }
+      },
+      "AssetDescription": {
+        "title": "Asset description",
+        "type": "object",
+        "properties": {
+          "url": {
+            "title": "URL",
+            "type": "string"
+          },
+          "api_key": {
+            "title": "API Key",
+            "type": "string"
+          },
+          "data_key": {
+            "title": "Data Key",
+            "type": "string"
+          },
+          "timeout": {
+            "title": "Timeout",
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": false
+          }
+        }
+      },
+      "ServiceDescription": {
+        "title": "Service description",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "description": {
+            "title": "description",
+            "type": "string"
+          },
+          "author": {
+            "title": "Author",
+            "type": "string"
+          },
+          "license": {
+            "title": "License",
+            "type": "string"
+          },
+          "price": {
+            "$ref": "#/components/schemas/ServicePrice"
+          }
+        }
+      },
+      "Currency": {
+        "title": "Currency",
+        "type": "string",
+        "enum": ["FIXED_EUROE", "FIXED_OCEAN", "FREE"]
+      },
+      "ServicePrice": {
+        "title": "Service Price",
+        "type": "object",
+        "properties": {
+          "value": {
+            "title": "Value",
+            "type": "number",
+            "minimum": 0.01,
+            "exclusiveMinimum": false
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          }
+        }
+      },
+      "Health": {
+        "title": "health",
+        "type": "object",
+        "properties": {
+          "status": {
+            "title": "status",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "priv_key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "priv_key"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Health",
+      "description": "Endpoints for health checks"
+    },
+    {
+      "name": "Nautilus",
+      "description": "Endpoints for nautilus"
+    }
+  ]
+}
