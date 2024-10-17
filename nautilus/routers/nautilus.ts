@@ -34,7 +34,7 @@ nautilusrouter.post(
   async (req: Request, res: Response) => {
     const err = validationResult(req)
     if (!err.isEmpty()) {
-      res.status(400).send({ error: err.mapped() })
+      res.status(422).send({ error: err.mapped() })
       return
     }
 
@@ -44,7 +44,7 @@ nautilusrouter.post(
     const currency = asset_descr.price.currency
 
     if (!(currency in PRICING_CONFIGS[network])) {
-      res.status(400).send({ error: `Unknown Currency: '${currency}'` })
+      res.status(422).send({ error: `Unknown Currency: '${currency}'` })
       return
     }
     try {
@@ -70,7 +70,7 @@ nautilusrouter.post(
   async (req: Request, res: Response) => {
     const err = validationResult(req)
     if (!err.isEmpty()) {
-      res.status(400).send({ error: err.mapped() })
+      res.status(422).send({ error: err.mapped() })
       return
     }
 
@@ -95,7 +95,7 @@ nautilusrouter.get(
   async (req: Request, res: Response) => {
     const err = validationResult(req)
     if (!err.isEmpty()) {
-      res.status(400).send({ error: err.mapped() })
+      res.status(422).send({ error: err.mapped() })
       return
     }
 
@@ -121,7 +121,7 @@ nautilusrouter.post(
   async (req: Request, res: Response) => {
     const err = validationResult(req)
     if (!err.isEmpty()) {
-      res.status(400).send({ error: err.mapped() })
+      res.status(422).send({ error: err.mapped() })
       return
     }
 
