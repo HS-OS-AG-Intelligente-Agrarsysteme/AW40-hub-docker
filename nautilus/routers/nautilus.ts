@@ -55,7 +55,7 @@ nautilusrouter.post(
         privateKey
       )
 
-      res.status(201).send({ result: result })
+      res.status(201).send({ assetdid: result.ddo.id })
     } catch (e) {
       console.log(e)
       res.status(500).send()
@@ -79,7 +79,7 @@ nautilusrouter.post(
     const network = Network[req.params.network]
     try {
       const result = await revoke(network, assetdid, privateKey)
-      res.status(200).send({ result: result })
+      res.status(200).send({ result: 'success' })
     } catch (e) {
       console.log(e)
       res.status(500).send()
@@ -131,7 +131,7 @@ nautilusrouter.post(
     const network = Network[req.params.network]
     try {
       const result = await changePrice(network, assetdid, price, privateKey)
-      res.status(200).send({ result: result })
+      res.status(200).send({ result: 'success' })
     } catch (e) {
       console.log(e)
       res.status(500).send()
