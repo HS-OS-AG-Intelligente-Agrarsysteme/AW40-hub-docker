@@ -109,6 +109,38 @@ void main() {
       await HttpService(client).getCases("some-token", workshopId);
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
+    test("verify getCasesByVehicleVin", () async {
+      const workshopId = "some-workshop-id";
+      const vehicleVin = "some-vehicle-vin";
+      bool sentRequest = false;
+      final client = MockClient((request) async {
+        sentRequest = true;
+        expect(
+          request.method,
+          equals("GET"),
+          reason: "Request method is not GET",
+        );
+        expect(
+          request.headers["content-type"],
+          isNull,
+          reason: "Request should not have content-type header",
+        );
+        expect(
+          request.url.toString(),
+          endsWith("/$workshopId/cases?vin=some-vehicle-vin"),
+          reason:
+              "Request URL does not end with /{workshopId}/cases?vin=vehicleVin",
+        );
+        return http.Response('{"status": "success"}', 200);
+      });
+      await HttpService(client).getCasesByVehicleVin(
+        "some-token",
+        workshopId,
+        vehicleVin,
+      );
+      expect(sentRequest, isTrue, reason: "Request was not sent");
+    });
+
     test("verify addCase", () async {
       const workshopId = "some-workshop-id";
       const requestBody = {"key": "value"};

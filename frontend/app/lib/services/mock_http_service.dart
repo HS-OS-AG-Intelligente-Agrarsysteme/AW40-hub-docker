@@ -1274,6 +1274,7 @@ class MockHttpService implements HttpService {
     String workshopId,
     String caseId,
     List<int> vcdsData,
+    String filename,
   ) {
     _logger.warning(
       "actual method not implemented, not checking for potential"

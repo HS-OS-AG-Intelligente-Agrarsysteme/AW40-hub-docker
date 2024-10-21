@@ -18,12 +18,16 @@ class UploadVcdsForm extends StatefulWidget {
 
 class _UploadVcdsFormState extends State<UploadVcdsForm> {
   Uint8List? _file;
+  String? _filename;
 
   @override
   Widget build(BuildContext context) {
     return BaseUploadForm(
       content: FileUploadFormComponent(
-        onFileDrop: (Uint8List file, String name) => _file = file,
+        onFileDrop: (Uint8List file, String name) {
+          _file = file;
+          _filename = name;
+        },
       ),
       onSubmit: _onSubmit,
     );
@@ -41,10 +45,16 @@ class _UploadVcdsFormState extends State<UploadVcdsForm> {
       );
       return;
     }
+
+    final String? filename = _filename;
+    if (filename == null) return;
+
     final bool result = await provider.uploadVcdsData(
       widget.caseId,
       file,
+      filename,
     );
+
     final String snackBarText = result
         ? tr("diagnoses.details.uploadDataSuccessMessage")
         : tr("diagnoses.details.uploadDataErrorMessage");
