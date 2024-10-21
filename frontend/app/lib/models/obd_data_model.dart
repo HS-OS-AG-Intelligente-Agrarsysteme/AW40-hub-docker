@@ -7,7 +7,7 @@ class ObdDataModel {
   });
 
   DateTime? timestamp;
-  List<dynamic>? obdSpecs;
+  dynamic obdSpecs;
   List<String> dtcs;
   int? dataId;
 }

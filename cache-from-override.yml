@@ -9,6 +9,11 @@ services:
         cache_from:
           - ghcr.io/hs-os-ag-intelligente-agrarsysteme/aw40-edc:buildcache
 
+  nautilus:
+      build:
+        cache_from:
+          - ghcr.io/hs-os-ag-intelligente-agrarsysteme/aw40-nautilus:buildcache
+
   api:
     build:
       cache_from:

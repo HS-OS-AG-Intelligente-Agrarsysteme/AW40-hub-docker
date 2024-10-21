@@ -175,13 +175,18 @@ class CaseProvider with ChangeNotifier {
     return true;
   }
 
-  Future<bool> uploadVcdsData(String caseId, List<int> vcdsData) async {
+  Future<bool> uploadVcdsData(
+    String caseId,
+    List<int> vcdsData,
+    String filename,
+  ) async {
     final String authToken = _getAuthToken();
     final Response response = await _httpService.uploadVcdsData(
       authToken,
       workshopId,
       caseId,
       vcdsData,
+      filename,
     );
     return HelperService.verifyStatusCode(
       response.statusCode,

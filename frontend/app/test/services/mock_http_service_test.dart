@@ -662,6 +662,7 @@ void main() {
           workshopId,
           caseId,
           [0],
+          "some_file.txt",
         );
 
         expect(response.statusCode, 201, reason: "status code should be 201");

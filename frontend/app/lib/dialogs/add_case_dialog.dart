@@ -296,6 +296,7 @@ class _AddCaseDialogFormState extends State<AddCaseDialogForm> {
                 SizedBox(
                   width: 227,
                   child: TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     inputFormatters: [UpperCaseTextInputFormatter()],
                     decoration: InputDecoration(
                       labelText: tr("general.vehicleVin"),

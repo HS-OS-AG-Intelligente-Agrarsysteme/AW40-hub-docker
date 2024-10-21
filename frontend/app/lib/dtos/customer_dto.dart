@@ -1,4 +1,5 @@
 import "package:aw40_hub_frontend/models/customer_model.dart";
+import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:json_annotation/json_annotation.dart";
 
 part "customer_dto.g.dart";
@@ -25,14 +26,19 @@ class CustomerDto {
   CustomerModel toModel() {
     return CustomerModel(
       id: id,
-      firstname: firstname,
-      lastname: lastname,
-      email: email,
-      phone: phone,
-      street: street,
-      housenumber: housenumber,
-      postcode: postcode,
-      city: city,
+      firstname: HelperService.convertIso88591ToUtf8(firstname),
+      lastname: HelperService.convertIso88591ToUtf8(lastname),
+      email: email != null ? HelperService.convertIso88591ToUtf8(email!) : null,
+      phone: phone != null ? HelperService.convertIso88591ToUtf8(phone!) : null,
+      street:
+          street != null ? HelperService.convertIso88591ToUtf8(street!) : null,
+      housenumber: housenumber != null
+          ? HelperService.convertIso88591ToUtf8(housenumber!)
+          : null,
+      postcode: postcode != null
+          ? HelperService.convertIso88591ToUtf8(postcode!)
+          : null,
+      city: city != null ? HelperService.convertIso88591ToUtf8(city!) : null,
     );
   }
 
