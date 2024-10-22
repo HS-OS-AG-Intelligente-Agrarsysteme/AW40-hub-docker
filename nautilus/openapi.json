@@ -277,7 +277,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Result"
+                  "$ref": "#/components/schemas/AssetDID"
+                },
+                "example": {
+                  "assetdid": "did:op:a65cbddf809c83a6051e94d40a4bd6d674e769a3c6a33adc6cf51ff24571f62a"
                 }
               }
             }
@@ -429,6 +432,16 @@
           },
           "currency": {
             "$ref": "#/components/schemas/Currency"
+          }
+        }
+      },
+      "AssetDID": {
+        "title": "AssetDID",
+        "type": "object",
+        "properties": {
+          "assetdid": {
+            "title": "assetdid",
+            "type": "string"
           }
         }
       },
