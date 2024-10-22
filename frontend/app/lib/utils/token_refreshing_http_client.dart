@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:aw40_hub_frontend/services/storage_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:http/http.dart" as http;
@@ -10,19 +12,22 @@ class TokenRefreshingHttpClient extends http.BaseClient {
   final http.Client _innerClient;
   final StorageService _storageService;
 
-// TODO check whether certain requests are excluded (e.g. health, authenticate etc.)
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    // check whether token is still valid otherwise renew token
-    String? token = await _getAccessToken();
-    if (token == null) {
-      await _refreshToken();
-      token = await _getAccessToken();
-    }
+    final Uri url = request.url;
 
-    // set valid access token in header
-    if (token != null) {
-      request.headers["Authorization"] = "Bearer $token";
+    if (!url.path.contains("/health/ping")) {
+      // check whether token is still valid otherwise renew token
+      String? token = await _getAccessToken();
+      if (token == null) {
+        await _refreshToken();
+        token = await _getAccessToken();
+      }
+
+      // set valid access token in header
+      if (token != null) {
+        request.headers["Authorization"] = "Bearer $token";
+      }
     }
 
     return _innerClient.send(request);
@@ -49,13 +54,17 @@ class TokenRefreshingHttpClient extends http.BaseClient {
   }
 
   Future<void> _refreshToken() async {
-    // TODO implement later
-    /* final refreshToken = await storage.read(key: "refreshToken");
+    // TODO implement
+    /*
+    final refreshToken = await _storageService.loadStringFromLocalStorage(
+      key: LocalStorageKey.refreshToken,
+    );
     if (refreshToken == null) {
       throw Exception("Refresh token not found");
     }
 
-    // TODO adjust
+    // TODO adjust (see other refreshToken method as reference)
+    // TODO get keycloak url and client id from config maybe
     final response = await http.post(
       Uri.parse(
           "https://<your-keycloak-server>/realms/<realm>/protocol/openid-connect/token"),
@@ -73,15 +82,31 @@ class TokenRefreshingHttpClient extends http.BaseClient {
       final newRefreshToken = newTokenData["refresh_token"];
       final expiresIn = newTokenData["expires_in"];
 
-      // Speichere die neuen Tokens
+      final jwt = JwtModel.fromJwtString(newAccessToken);
+
       final expiryDate = DateTime.now().add(Duration(seconds: expiresIn));
-      await storage.write(key: "accessToken", value: newAccessToken);
-      await storage.write(key: "refreshToken", value: newRefreshToken);
-      // TODO adjust to 'accessTokenExpiryDate'
-      await secStorage.write(
-          key: "expiryDate", value: expiryDate.toIso8601String());
+
+      unawaited(
+        _storageService.storeStringToLocalStorage(
+          key: LocalStorageKey.accessToken,
+          value: newAccessToken,
+        ),
+      );
+      unawaited(
+        _storageService.storeStringToLocalStorage(
+          key: LocalStorageKey.accessTokenExpirationDateTime,
+          value: jwt.exp.toIso8601String(),
+        ),
+      );
+      unawaited(
+        _storageService.storeStringToLocalStorage(
+          key: LocalStorageKey.refreshToken,
+          value: newRefreshToken,
+        ),
+      );
     } else {
+      // TODO prompt login to user
       throw Exception("Token refresh failed");
-    } */
+    }  */
   }
 }
