@@ -26,8 +26,6 @@ services:
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.websecure.http.tls=true"
 
-      - "--entrypoints.minio.address=:9000"
-
       # Let's Encrypt
       - "--certificatesResolvers.letsencrypt.acme.email=${ROOT_EMAIL:?error}"
       - "--certificatesResolvers.letsencrypt.acme.httpChallenge.entryPoint=web"
