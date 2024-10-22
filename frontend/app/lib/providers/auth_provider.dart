@@ -322,6 +322,18 @@ class AuthProvider with ChangeNotifier {
 
         unawaited(
           _storageService.storeStringToLocalStorage(
+            key: LocalStorageKey.accessToken,
+            value: newJwt,
+          ),
+        );
+        unawaited(
+          _storageService.storeStringToLocalStorage(
+            key: LocalStorageKey.accessTokenExpirationDateTime,
+            value: _jwt?.exp.toIso8601String() ?? "",
+          ),
+        );
+        unawaited(
+          _storageService.storeStringToLocalStorage(
             key: LocalStorageKey.refreshToken,
             value: newRefreshToken,
           ),
