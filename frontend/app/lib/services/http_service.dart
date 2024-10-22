@@ -46,6 +46,23 @@ class HttpService {
     );
   }
 
+  Future<http.Response> getCasesByVehicleVin(
+    String token,
+    String workshopId,
+    String vehicleVin,
+  ) {
+    final uri = Uri.parse("$backendUrl/$workshopId/cases").replace(
+      queryParameters: {
+        "vin": vehicleVin,
+      },
+    );
+
+    return _client.get(
+      uri,
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
   Future<http.Response> addCase(
     String token,
     String workshopId,
@@ -149,11 +166,25 @@ class HttpService {
     String workshopId,
     String caseId,
     List<int> vcdsData,
-  ) {
-    // TODO: implement uploadVcdsData
-    // I added it with what I hope will be the actual signature so I can mock it
-    // in the MockHttpService.
-    throw UnimplementedError();
+    String filename,
+  ) async {
+    final request = http.MultipartRequest(
+      "POST",
+      Uri.parse(
+        "$backendUrl/$workshopId/cases/$caseId/obd_data/upload/vcds",
+      ),
+    );
+    request.files.add(
+      http.MultipartFile.fromBytes("upload", vcdsData, filename: filename),
+    );
+    request.fields["file_format"] = "VCDS TXT";
+
+    final Map<String, String> authHeader = getAuthHeaderWith(token);
+    assert(authHeader.length == 1);
+    request.headers[authHeader.keys.first] = authHeader.values.first;
+
+    final response = await _client.send(request);
+    return http.Response.fromStream(response);
   }
 
   Future<http.Response> addTimeseriesData(
@@ -298,7 +329,7 @@ class HttpService {
     );
   }
 
-  Future<http.Response> getCustomers(
+  Future<http.Response> getCustomer(
     String token,
     String workshopId,
     String caseId,
@@ -306,6 +337,54 @@ class HttpService {
     return _client.get(
       Uri.parse("$backendUrl/$workshopId/cases/$caseId/customer"),
       headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> getCustomers(
+    String token,
+    int? page,
+    int? pageSize,
+  ) {
+    final int pageNumber = page ?? 0;
+    final int pageSizeNumber = pageSize ?? 30;
+
+    final uri = Uri.parse("$backendUrl/customers").replace(
+      queryParameters: {
+        "page": pageNumber.toString(),
+        "pageSize": pageSizeNumber.toString(),
+      },
+    );
+
+    return _client.get(
+      uri,
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> addCustomer(
+    String token,
+    Map<String, dynamic> requestBody,
+  ) {
+    return _client.post(
+      Uri.parse("$backendUrl/customers"),
+      headers: getAuthHeaderWith(token, {
+        "Content-Type": "application/json; charset=UTF-8",
+      }),
+      body: jsonEncode(requestBody),
+    );
+  }
+
+  Future<http.Response> updateCustomer(
+    String token,
+    String customerId,
+    Map<String, dynamic> requestBody,
+  ) {
+    return _client.patch(
+      Uri.parse("$backendUrl/customers/$customerId"),
+      headers: getAuthHeaderWith(token, {
+        "Content-Type": "application/json; charset=UTF-8",
+      }),
+      body: jsonEncode(requestBody),
     );
   }
 
@@ -327,14 +406,14 @@ class HttpService {
     );
   }
 
-  Future<http.Response> updateVehicles(
+  Future<http.Response> updateVehicle(
     String token,
     String workshopId,
     String caseId,
     Map<String, dynamic> requestBody,
   ) {
     return _client.put(
-      Uri.parse("$backendUrl/$workshopId/cases/$caseId/vehicles"),
+      Uri.parse("$backendUrl/$workshopId/cases/$caseId/vehicle"),
       headers: getAuthHeaderWith(token, {
         "Content-Type": "application/json; charset=UTF-8",
       }),

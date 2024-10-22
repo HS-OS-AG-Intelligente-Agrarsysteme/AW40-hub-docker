@@ -1,8 +1,10 @@
 from collections import namedtuple
-from datetime import datetime, timedelta
+from contextlib import asynccontextmanager
+from datetime import datetime, timedelta, UTC
 from tempfile import TemporaryFile
 from unittest import mock
 
+import bson
 import pytest
 from api.data_management import (
     TimeseriesData,
@@ -14,7 +16,8 @@ from api.data_management import (
     Vehicle,
     Customer,
     Workshop,
-    Diagnosis
+    Diagnosis,
+    DiagnosisStatus
 )
 from api.routers.workshop import (
     router, case_from_workshop, DiagnosticTaskManager
@@ -24,7 +27,10 @@ from beanie import init_beanie
 from bson import ObjectId
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
-from httpx import AsyncClient
+from httpx import (
+    AsyncClient,
+    ASGITransport
+)
 from jose import jws
 
 
@@ -62,25 +68,31 @@ def symptom():
 
 
 @pytest.fixture
-def test_app(motor_db):
+def app(motor_db):
     """
-    Request this fixture to test routes via TestClient(test_app) as described
+    Request this fixture to test routes via TestClient(app) as described
     in https://fastapi.tiangolo.com/tutorial/testing/.
     If a test requires beanie initialization, (e.g. because a non-mock
     instance of a beanie doc is created at some point) this fixture needs to
-    be used in a with statement (e.g. with TestClient(test_app) as client: ...)
+    be used in a with statement (e.g. with TestClient(app) as client: ...)
     Using a with statement ensures execution of the test applications startup
     and shutdown handlers used for beanie/mongo setup and teardown
     (see https://fastapi.tiangolo.com/advanced/testing-events/).
     """
-    test_app = FastAPI()
-    test_app.include_router(router)
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI):
+        await init_mongo()
+        yield
+        await teardown_mongo()
+
+    app = FastAPI(lifespan=lifespan)
+    app.include_router(router)
 
     models = [
         Case, Vehicle, Customer, Workshop, Diagnosis
     ]
 
-    @test_app.on_event("startup")
     async def init_mongo():
         await init_beanie(
             motor_db,
@@ -91,20 +103,19 @@ def test_app(motor_db):
             # test
             await model.delete_all()
 
-    @test_app.on_event("shutdown")
     async def teardown_mongo():
         for model in models:
             await model.get_motor_collection().drop()
             await model.get_motor_collection().drop_indexes()
 
-    yield test_app
+    yield app
 
 
 @pytest.fixture
 def jwt_payload(workshop_id):
     return {
-        "iat": datetime.utcnow().timestamp(),
-        "exp": (datetime.utcnow() + timedelta(60)).timestamp(),
+        "iat": datetime.now(UTC).timestamp(),
+        "exp": (datetime.now(UTC) + timedelta(60)).timestamp(),
         "preferred_username": workshop_id,
         "realm_access": {"roles": ["workshop"]}
     }
@@ -117,9 +128,9 @@ def signed_jwt(jwt_payload, rsa_private_key_pem: bytes):
 
 
 @pytest.fixture
-def unauthenticated_client(test_app):
+def unauthenticated_client(app):
     """Unauthenticated client, e.g. no bearer token in header."""
-    yield TestClient(test_app)
+    yield TestClient(app)
 
 
 @pytest.fixture
@@ -191,7 +202,6 @@ def test_list_cases_with_filters(
 def test_add_case(authenticated_client, workshop_id):
     new_case = {
         "vehicle_vin": "test-vin",
-        "customer_id": "unknown",
         "occasion": "unknown",
         "milage": 42
     }
@@ -200,6 +210,24 @@ def test_add_case(authenticated_client, workshop_id):
 
     assert response.status_code == 201
     assert response.json()["_id"] is not None
+
+
+@pytest.mark.parametrize(
+    "customer_id",
+    [
+        "not-an-object-id",  # invalid format
+        str(bson.ObjectId())  # invalid as no customer with this id exists
+    ]
+)
+def test_add_case_with_invalid_customer_id(
+        authenticated_client, workshop_id, customer_id
+):
+    with authenticated_client as client:
+        response = client.post(
+            f"/{workshop_id}/cases",
+            json={"vehicle_vin": "v", "customer_id": customer_id}
+        )
+    assert response.status_code == 422
 
 
 @mock.patch("api.routers.workshop.Case.get", autospec=True)
@@ -368,7 +396,7 @@ def mock_add_timeseries_data(signal_id):
 
     async def add_timeseries_data(self, new_data: NewTimeseriesData):
         # exchange signal and signal_id without accessing signal store
-        meta_data = new_data.dict(exclude={"signal"})
+        meta_data = new_data.model_dump(exclude={"signal"})
         meta_data["signal_id"] = signal_id
         timeseries_data = TimeseriesData(**meta_data)
 
@@ -926,7 +954,10 @@ def mock_add_obd_data():
     """
 
     async def add_obd_data(self, new_obd_data: NewOBDData):
-        obd_data = OBDData(data_id=self.obd_data_added, **new_obd_data.dict())
+        obd_data = OBDData(
+            data_id=self.obd_data_added,
+            **new_obd_data.model_dump()
+        )
         self.obd_data.append(obd_data)
         self.obd_data_added += 1
         return self
@@ -1363,7 +1394,7 @@ def test_get_diagnosis_no_diag(case_data, authenticated_client):
 
 @pytest.fixture
 def authenticated_async_client(
-        test_app, rsa_public_key_pem, signed_jwt
+        app, rsa_public_key_pem, signed_jwt
 ):
     """
     Authenticated async client for tests that require mongodb access via beanie
@@ -1371,13 +1402,13 @@ def authenticated_async_client(
 
     # Client with valid auth header
     client = AsyncClient(
-        app=test_app,
+        transport=ASGITransport(app=app),
         base_url="http://",
         headers={"Authorization": f"Bearer {signed_jwt}"}
     )
 
     # Make app use public key from fixture for token validation
-    test_app.dependency_overrides[
+    app.dependency_overrides[
         Keycloak.get_public_key_for_workshop_realm
     ] = lambda: rsa_public_key_pem.decode()
 
@@ -1495,6 +1526,8 @@ async def test_start_diagnosis(
         # confirm expected state in db
         case_db = await Case.get(case_id)
         diag = await Diagnosis.get(diag_response["_id"])
+        assert case_db
+        assert diag
         assert case_db.diagnosis_id == diag.id
 
 
@@ -1529,6 +1562,7 @@ async def test_delete_diagnosis(
         # confirm expected state in db
         case_db = await Case.get(case_id)
         diag = await Diagnosis.get(diag.id)
+        assert case_db
         assert case_db.diagnosis_id is None
         assert diag is None
 
@@ -1557,8 +1591,16 @@ async def test_list_diagnoses(
         assert response.json() == []
 
         # Add diagnosis for each case
-        diag_1 = await Diagnosis(case_id=case_1.id, status="scheduled").insert()  # noqa F841
-        diag_2 = await Diagnosis(case_id=case_2.id, status="finished").insert()
+        assert case_1.id
+        diag_1 = await Diagnosis(  # noqa F841
+            case_id=case_1.id,
+            status=DiagnosisStatus("scheduled")
+        ).insert()  # noqa F841
+        assert case_2.id
+        diag_2 = await Diagnosis(
+            case_id=case_2.id,
+            status=DiagnosisStatus("finished")
+        ).insert()
 
         # There are two diagnoses now
         response = await authenticated_async_client.get(
@@ -1625,8 +1667,8 @@ def test_invalid_jwt_signature(
 @pytest.fixture
 def expired_jwt_payload(workshop_id):
     return {
-        "iat": (datetime.utcnow() - timedelta(60)).timestamp(),
-        "exp": datetime.utcnow().timestamp(),
+        "iat": (datetime.now(UTC) - timedelta(60)).timestamp(),
+        "exp": datetime.now(UTC).timestamp(),
         "preferred_username": workshop_id
     }
 

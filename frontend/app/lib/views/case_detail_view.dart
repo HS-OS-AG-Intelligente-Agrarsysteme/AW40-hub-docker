@@ -1,4 +1,5 @@
 import "dart:async";
+
 import "package:aw40_hub_frontend/components/dataset_upload_case_view.dart";
 import "package:aw40_hub_frontend/dialogs/update_case_dialog.dart";
 import "package:aw40_hub_frontend/dtos/case_update_dto.dart";
@@ -67,7 +68,7 @@ class CaseDetailView extends StatelessWidget {
     );
   }
 
-  static Future<void> _onDeleteButtonPress(
+  Future<void> _onDeleteButtonPress(
     BuildContext context,
     LoggedInUserModel loggedInUserModel,
     String caseModelId,
@@ -87,6 +88,8 @@ class CaseDetailView extends StatelessWidget {
           : tr("cases.details.deleteCaseErrorMessage");
       _showMessage(message, scaffoldMessengerState);
     });
+
+    onClose();
   }
 
   static void _showMessage(String text, ScaffoldMessengerState state) {
@@ -176,7 +179,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                         foregroundColor: colorScheme.error,
                       ),
                       onPressed:
-                          caseProvider.workShopId == widget.caseModel.workshopId
+                          caseProvider.workshopId == widget.caseModel.workshopId
                               ? widget.onDelete
                               : null,
                     ),
@@ -203,7 +206,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                     FilledButton.icon(
                       icon: const Icon(Icons.upload_rounded),
                       label: Text(tr("uploadData.label")),
-                      onPressed: caseProvider.workShopId ==
+                      onPressed: caseProvider.workshopId ==
                               widget.caseModel.workshopId
                           ? () async => showDialog<String>(
                                 context: context,
@@ -221,7 +224,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                     FilledButton.icon(
                       icon: const Icon(Icons.edit),
                       label: Text(tr("general.edit")),
-                      onPressed: caseProvider.workShopId ==
+                      onPressed: caseProvider.workshopId ==
                               widget.caseModel.workshopId
                           ? () async {
                               final CaseUpdateDto? caseUpdateDto =
@@ -237,7 +240,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                     const SizedBox(width: 16),
                     FilledButton.icon(
                       icon: const Icon(Icons.tab),
-                      onPressed: caseProvider.workShopId ==
+                      onPressed: caseProvider.workshopId ==
                               widget.caseModel.workshopId
                           ? () async {
                               if (widget.caseModel.diagnosisId == null) {
@@ -289,7 +292,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                 ),
                 const SizedBox(height: 16),
                 if (hasNoData)
-                  Text(tr("general.no.data"))
+                  Text(tr("general.noData"))
                 else
                   Table(
                     columnWidths: const {0: IntrinsicColumnWidth()},

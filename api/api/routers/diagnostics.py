@@ -1,5 +1,6 @@
-from typing import List, Union
+from typing import List, Optional
 
+from beanie.odm.fields import PydanticObjectId
 from bson import ObjectId
 from fastapi import (
     APIRouter, HTTPException, Body, Form, Depends, UploadFile, File
@@ -32,7 +33,7 @@ api_key_auth = APIKeyAuth()
 router = APIRouter(tags=["Diagnostics"], dependencies=[Depends(api_key_auth)])
 
 
-async def _diag_by_id_or_404(diag_id: str):
+async def _diag_by_id_or_404(diag_id: str) -> Diagnosis:
     diag = await Diagnosis.get(diag_id)
     if diag is None:
         raise HTTPException(
@@ -41,7 +42,7 @@ async def _diag_by_id_or_404(diag_id: str):
     return diag
 
 
-async def _case_by_diag_id_or_404(diag_id: str):
+async def _case_by_diag_id_or_404(diag_id: str) -> Case:
     case = await Case.find_one({"diagnosis_id": ObjectId(diag_id)})
     if case is None:
         raise HTTPException(
@@ -55,7 +56,9 @@ async def _case_by_diag_id_or_404(diag_id: str):
     status_code=200,
     response_model=Diagnosis
 )
-async def get_diagnosis(diag: Diagnosis = Depends(_diag_by_id_or_404)):
+async def get_diagnosis(
+        diag: Diagnosis = Depends(_diag_by_id_or_404)
+) -> Diagnosis:
     """Get data of a diagnosis."""
     return diag
 
@@ -65,7 +68,9 @@ async def get_diagnosis(diag: Diagnosis = Depends(_diag_by_id_or_404)):
     status_code=200,
     response_model=List[OBDData]
 )
-async def get_obd_data(case: Case = Depends(_case_by_diag_id_or_404)):
+async def get_obd_data(
+        case: Case = Depends(_case_by_diag_id_or_404)
+) -> List[OBDData]:
     """Get OBD data for a diagnosis."""
     return case.obd_data
 
@@ -75,9 +80,17 @@ async def get_obd_data(case: Case = Depends(_case_by_diag_id_or_404)):
     status_code=200,
     response_model=Vehicle
 )
-async def get_vehicle(case: Case = Depends(_case_by_diag_id_or_404)):
+async def get_vehicle(
+        case: Case = Depends(_case_by_diag_id_or_404)
+) -> Vehicle:
     """Get vehicle data for a diagnosis."""
     vehicle = await Vehicle.find_one({"vin": case.vehicle_vin})
+    if vehicle is None:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Vehicle with VIN '{case.vehicle_vin}' "
+                   f"from case '{case.id}' not found in database."
+        )
     return vehicle
 
 
@@ -89,14 +102,14 @@ async def get_vehicle(case: Case = Depends(_case_by_diag_id_or_404)):
 async def get_oscillograms(
         component: str,
         case: Case = Depends(_case_by_diag_id_or_404)
-):
+) -> List[TimeseriesDataFull]:
     """Get all oscillograms for a specific component."""
-    output_data = []
+    output_data: List[TimeseriesDataFull] = []
     for tsd in case.timeseries_data:
         if tsd.component == component:
             signal = await tsd.get_signal()
             output_data.append(
-                TimeseriesDataFull(signal=signal, **tsd.dict())
+                TimeseriesDataFull(signal=signal, **tsd.model_dump())
             )
     return output_data
 
@@ -108,7 +121,7 @@ async def get_oscillograms(
 )
 async def get_symptoms(
         component: str, case: Case = Depends(_case_by_diag_id_or_404)
-):
+) -> List[Symptom]:
     """Get all symptoms for a specific component."""
     symptoms = [s for s in case.symptoms if s.component == component]
     return symptoms
@@ -123,13 +136,13 @@ async def set_todo(
         action_id: str,
         action: Action,
         diag: Diagnosis = Depends(_diag_by_id_or_404)
-):
+) -> Diagnosis:
     """Require a user action for a diagnosis."""
     action.id = action_id
     todo_exists = False
     # if action with same id exists in todos, replace it
     for i, todo in enumerate(diag.todos):
-        if todo.id == action_id:
+        if todo.id is not None and todo.id == action_id:
             diag.todos[i] = action
             todo_exists = True
             break
@@ -147,10 +160,10 @@ async def set_todo(
 )
 async def delete_todo(
         action_id: str, diag: Diagnosis = Depends(_diag_by_id_or_404)
-):
+) -> None:
     """Remove a required user action from a diagnosis."""
     for i, todo in enumerate(diag.todos):
-        if todo.id == action_id:
+        if todo.id is not None and todo.id == action_id:
             diag.todos.pop(i)
             break
     await diag.save()
@@ -164,19 +177,25 @@ async def delete_todo(
 )
 async def add_message_to_state_machine_log(
         message: str = Form(title="Message to be added to log."),
-        attachment: Union[UploadFile, None] = File(default=None),
+        attachment: Optional[UploadFile] = File(default=None),
         diag: Diagnosis = Depends(_diag_by_id_or_404),
         attachment_bucket: motor_asyncio.AsyncIOMotorGridFSBucket = Depends(
             AttachmentBucket.create
         )
-):
-    attachment_id = None
+) -> List[DiagnosisLogEntry]:
+    attachment_id: PydanticObjectId | None = None
     # if a file attachments was uploaded, store it and generate an id
     if attachment is not None:
         attachment_content = await attachment.read()
-        attachment_id = await attachment_bucket.upload_from_stream(
-            filename=attachment.filename,
-            source=attachment_content
+        if attachment.filename is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Attachment is missing filename"
+            )
+        attachment_id = PydanticObjectId(
+            await attachment_bucket.upload_from_stream(
+                filename=attachment.filename,
+                source=attachment_content)
         )
 
     new_log_entry = DiagnosisLogEntry(
@@ -196,7 +215,7 @@ async def add_message_to_state_machine_log(
 async def set_state_machine_status(
         status: DiagnosisStatus = Body(title="New status"),
         diag: Diagnosis = Depends(_diag_by_id_or_404)
-):
+) -> DiagnosisStatus:
     diag.status = status
     await diag.save()
     return diag.status

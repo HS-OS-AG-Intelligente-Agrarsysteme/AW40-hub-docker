@@ -1,6 +1,7 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from enum import Enum
 from typing import List, Optional
+from typing_extensions import Annotated
 
 from beanie import Document, Indexed, PydanticObjectId
 from motor import motor_asyncio
@@ -10,12 +11,12 @@ from pydantic import BaseModel, Field
 class Action(BaseModel):
     """Describes an action, that can be required of an user"""
 
-    id: str = None
+    id: Optional[str] = None
     instruction: str
 
-    action_type: str = None
-    data_type: str = None
-    component: str = None
+    action_type: Optional[str] = None
+    data_type: Optional[str] = None
+    component: Optional[str] = None
 
 
 class DiagnosisStatus(str, Enum):
@@ -32,7 +33,7 @@ class DiagnosisLogEntry(BaseModel):
 
 
 class AttachmentBucket:
-    bucket: motor_asyncio.AsyncIOMotorGridFSBucket = None
+    bucket: Optional[motor_asyncio.AsyncIOMotorGridFSBucket] = None
 
     @classmethod
     def create(cls):
@@ -51,16 +52,16 @@ class Diagnosis(Document):
     class Settings:
         name = "diagnosis"
 
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-    status: DiagnosisStatus = None
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    status: Optional[DiagnosisStatus] = None
     state_machine_log: List[DiagnosisLogEntry] = []
-    case_id: Indexed(PydanticObjectId, unique=True)
+    case_id: Annotated[PydanticObjectId, Indexed(unique=True)]
     todos: List[Action] = []
 
     @classmethod
     async def find_in_hub(
             cls,
-            workshop_id: str = None,
+            workshop_id: Optional[str] = None,
             status: Optional[DiagnosisStatus] = None
     ) -> List["Diagnosis"]:
         """

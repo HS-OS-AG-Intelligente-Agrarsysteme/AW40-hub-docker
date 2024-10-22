@@ -1,6 +1,10 @@
 import pytest
 
-from api.data_management import Case, Diagnosis
+from api.data_management import (
+    Case,
+    Diagnosis,
+    DiagnosisStatus
+)
 
 
 class TestDiagnosis:
@@ -21,11 +25,13 @@ class TestDiagnosis:
             case_21 = await Case(workshop_id="2", vehicle_vin="v21").insert()  # noqa F841
 
             # Both cases of workshop "1" have a diagnosis
+            assert case_11.id
             diag_11 = await Diagnosis(  # noqa F841
-                case_id=case_11.id, status="scheduled"
+                case_id=case_11.id, status=DiagnosisStatus("scheduled")
             ).insert()
+            assert case_12.id
             diag_12 = await Diagnosis(
-                case_id=case_12.id, status="finished"
+                case_id=case_12.id, status=DiagnosisStatus("finished")
             ).insert()
 
             workshop_1_result = await Diagnosis.find_in_hub(workshop_id="1")
@@ -33,7 +39,7 @@ class TestDiagnosis:
                 "Expected 2 diagnoses for workshop 1."
 
             workshop_1_finished_result = await Diagnosis.find_in_hub(
-                workshop_id="1", status="finished"
+                workshop_id="1", status=DiagnosisStatus("finished")
             )
             assert len(workshop_1_finished_result) == 1
             assert workshop_1_finished_result[0].id == diag_12.id, \

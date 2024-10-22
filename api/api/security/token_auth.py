@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, status, Path
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import jwt, JWTError
-from pydantic import BaseModel, Field, root_validator
+from pydantic import BaseModel, Field, model_validator
 
 
 from .keycloak import Keycloak
@@ -10,6 +10,8 @@ from .keycloak import Keycloak
 REQUIRED_WORKSHOP_ROLE = "workshop"
 # required role to access shared resources
 REQUIRED_SHARED_ROLE = "shared"
+# required role for customer data management
+REQUIRED_CUSTOMERS_ROLE = "customers"
 
 
 failed_auth_exception = HTTPException(
@@ -24,7 +26,7 @@ class TokenData(BaseModel):
     username: str = Field(alias="preferred_username")
     roles: list[str]
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
     @classmethod
     def parse_roles_from_keycloak_token(cls, values):
         values["roles"] = values.get("realm_access", {}).get("roles", [])
@@ -90,4 +92,15 @@ async def authorized_knowledge_access(
     required_roles = set({REQUIRED_SHARED_ROLE, REQUIRED_WORKSHOP_ROLE})
     assigned_roles = set(token_data.roles)
     if not required_roles.intersection(assigned_roles):
+        raise failed_auth_exception
+
+
+async def authorized_customers_access(
+        token_data: TokenData = Depends(verify_token)
+):
+    """
+    Authorize access to customer data management if the user is assigned the
+    respective role.
+    """
+    if REQUIRED_CUSTOMERS_ROLE not in token_data.roles:
         raise failed_auth_exception

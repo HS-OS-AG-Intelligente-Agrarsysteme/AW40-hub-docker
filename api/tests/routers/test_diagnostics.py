@@ -1,7 +1,8 @@
 import pytest
 from api.data_management import (
     Case, NewOBDData, NewSymptom, NewTimeseriesData,
-    TimeseriesMetaData, Action, AttachmentBucket, Diagnosis
+    TimeseriesMetaData, Action, AttachmentBucket, Diagnosis,
+    SymptomLabel
 )
 from api.data_management.timeseries_data import GridFSSignalStore
 from api.routers import diagnostics
@@ -22,7 +23,7 @@ def case_id():
     return str(ObjectId())
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def data_context(diag_id, case_id):
     # Prefill database with diagnosis and associated case.
     # Usage: `with initialized_beanie_context, data_context: ...`
@@ -44,10 +45,10 @@ def data_context(diag_id, case_id):
     return DataContext()
 
 
-test_app = FastAPI()
-test_app.include_router(diagnostics.router)
+app = FastAPI()
+app.include_router(diagnostics.router)
 
-client = AsyncClient(app=test_app, base_url="http://")
+client = AsyncClient(app=app, base_url="http://")
 
 # The test client needs to use a header for API key authentication
 test_api_key = "valid key"
@@ -78,14 +79,13 @@ async def test_get_obd_data(
 ):
     async with initialized_beanie_context, data_context:
         case = await Case.get(case_id)
-        obd_data = {"dtcs": ["P1234"]}
-        await case.add_obd_data(
-            NewOBDData(**obd_data)
-        )
+        assert case
+        obd_data = NewOBDData(dtcs=["P1234"])
+        await case.add_obd_data(obd_data)
 
         response = await client.get(f"/{diag_id}/obd_data")
         assert response.status_code == 200
-        assert response.json()[0]["dtcs"] == obd_data["dtcs"]
+        assert response.json()[0]["dtcs"] == obd_data.dtcs
 
 
 @pytest.mark.asyncio
@@ -116,6 +116,7 @@ async def test_get_vehicle(
 ):
     async with initialized_beanie_context, data_context:
         case = await Case.get(case_id)
+        assert case
         response = await client.get(
             f"/{diag_id}/vehicle"
         )
@@ -153,6 +154,7 @@ async def test_get_oscillograms(
             "sampling_rate": 1,
             "duration": 2
         }
+        assert case
         await case.add_timeseries_data(
             NewTimeseriesData(**oscillogram_data)
         )
@@ -195,14 +197,13 @@ async def test_get_symptoms(
     async with initialized_beanie_context, data_context:
         # seed database with data
         component = "battery"
-        symptom_data = {
-            "component": component,
-            "label": "defect"
-        }
-        case = await Case.get(case_id)
-        await case.add_symptom(
-            NewSymptom(**symptom_data)
+        symptom_data = NewSymptom(
+            component=component,
+            label=SymptomLabel("defect")
         )
+        case = await Case.get(case_id)
+        assert case
+        await case.add_symptom(symptom_data)
 
         # request data
         response = await client.get(
@@ -210,7 +211,7 @@ async def test_get_symptoms(
         )
         # confirm expected response
         assert response.status_code == 200
-        assert response.json()[0]["label"] == symptom_data["label"]
+        assert response.json()[0]["label"] == symptom_data.label
 
 
 @pytest.mark.asyncio
@@ -260,6 +261,7 @@ async def test_create_todo(diag_id, data_context, initialized_beanie_context):
 
         # confirm expected new state in db
         diag = await Diagnosis.get(response_data["_id"])
+        assert diag
         assert diag.todos[-1] == Action(**new_action_data)
 
 
@@ -275,6 +277,7 @@ async def test_delete_todo(diag_id, data_context, initialized_beanie_context):
     async with initialized_beanie_context, data_context:
         # seed db diagnosis with an action
         diag = await Diagnosis.get(diag_id)
+        assert diag
         action_id = "test-action"
         diag.todos.append(Action(id=action_id, instruction="Do something"))
         await diag.save()
@@ -288,6 +291,7 @@ async def test_delete_todo(diag_id, data_context, initialized_beanie_context):
 
         # confirm expected new state in db
         diag = await Diagnosis.get(diag_id)
+        assert diag
         assert diag.todos == []
 
 
@@ -325,6 +329,7 @@ async def test_add_message_to_state_machine_log_no_attachment(
 
         # confirm expected change of db state
         diag = await Diagnosis.get(diag_id)
+        assert diag
         assert diag.state_machine_log[-1].message == msg
 
 
@@ -353,6 +358,7 @@ async def test_add_message_to_state_machine_log_with_attachment(
 
         # confirm expected change of db state
         diag = await Diagnosis.get(diag_id)
+        assert diag
         assert diag.state_machine_log[-1].message == msg
 
         attachment_id = response_data[-1]["attachment"]
@@ -382,6 +388,7 @@ async def test_set_state_machine_status(
     async with initialized_beanie_context, data_context:
         # double check that diag in data_context does not have the new status
         diag = await Diagnosis.get(diag_id)
+        assert diag
         assert diag.status != new_status
 
         # test request and confirm expected response data
@@ -391,6 +398,7 @@ async def test_set_state_machine_status(
 
         # confirm expected state in db
         diag = await Diagnosis.get(diag_id)
+        assert diag
         assert diag.status == new_status
 
 
@@ -413,7 +421,7 @@ def test_missing_api_key(route):
     assert len(route.methods) == 1, "Test assumes one method per route."
     path = route.path.replace("{diag_id}", "any-id")
     method = next(iter(route.methods))
-    test_client = TestClient(test_app)
+    test_client = TestClient(app)
     response = test_client.request(method=method, url=path)
     assert response.status_code == 403
     assert list(response.json().keys()) == ["detail"], \
@@ -430,7 +438,7 @@ def test_invalid_api_key(route):
     assert len(route.methods) == 1, "Test assumes one method per route."
     path = route.path.replace("{diag_id}", "any-id")
     method = next(iter(route.methods))
-    test_client = TestClient(test_app)
+    test_client = TestClient(app)
     test_client.headers["x-api-key"] = test_api_key[1:]
     response = test_client.request(method=method, url=path)
     assert response.status_code == 401

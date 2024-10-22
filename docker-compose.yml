@@ -50,11 +50,8 @@ services:
         aliases:
           - ${FRONTEND_ADDRESS}
           - ${DOCS_ADDRESS}
-          - ${MINIO_ADDRESS}
-          - ${MINIO_API_ADDRESS}
           - ${KEYCLOAK_ADDRESS}
           - ${API_ADDRESS}
-          - ${EDC_ADDRESS}
     ports:
       - 80:80
       - 443:443
@@ -147,141 +144,12 @@ services:
     volumes:
       - keycloak-db-data:/var/lib/postgresql/data
 
-  minio:
-    build:
-      context: ./minio
-      args:
-        - MINIO_VER=RELEASE.2023-05-27T05-56-19Z
-    <<: *default_restart_policy
-    profiles:
-      - full
-    command: server /data --address ":9000" --console-address ":9090"
-    depends_on:
-      keycloak-config:
-        condition: service_completed_successfully
-    env_file:
-      - minio/minio.env
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=hubnet
-
-      - traefik.http.routers.minio.rule=Host(`${MINIO_ADDRESS:?error}`) && PathPrefix(`${MINIO_PATH:-/}`)
-      - traefik.http.routers.minio.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
-      - traefik.http.middlewares.minio-remove-prefix.stripprefix.prefixes=${MINIO_PATH:-/}
-      - traefik.http.routers.minio.middlewares=minio-remove-prefix@docker
-      - traefik.http.routers.minio.service=minio
-      - traefik.http.services.minio.loadbalancer.server.port=9090
-
-      - traefik.http.routers.minio_api.rule=Host(`${MINIO_API_ADDRESS:?error}`)
-      - traefik.http.routers.minio_api.entrypoints=${MINIO_ENTRY_POINT:?error}
-      - traefik.http.routers.minio_api.service=minio_api
-      - traefik.http.services.minio_api.loadbalancer.server.port=9000
-    hostname: "minio"
-    networks:
-      hubintranet:
-      hubnet:
-    volumes:
-      - minio-data:/data
-
-  minio-config:
-      image: minio/mc
-      depends_on:
-        minio:
-          condition: service_healthy
-      entrypoint: ["sh","-c","chmod +x /minio-config.sh && ./minio-config.sh"]
-      profiles:
-        - full
-      environment:
-          - S3_ROOT_USER=${S3_ROOT_USER:?error}
-          - S3_ROOT_PASSWORD=${S3_ROOT_PASSWORD:?error}
-      networks:
-        - hubintranet
-      volumes:
-        - ./minio/minio-config.sh:/minio-config.sh
-
-  edc:
-      build:
-        context: ./edc
-      <<: *default_restart_policy
-      depends_on:
-        minio:
-          condition: service_healthy
-        edc-db:
-          condition: service_healthy
-        minio-config:
-          condition: service_completed_successfully
-      profiles:
-        - full
-      env_file:
-        - edc/edc.env
-      hostname: "edc"
-      labels:
-        - traefik.enable=true
-        - traefik.docker.network=hubnet
-
-        - traefik.http.middlewares.edc-remove-prefix.stripprefix.prefixes=${EDC_PATH:-/}
-
-
-        - traefik.http.routers.edc_api.rule=Host(`${EDC_ADDRESS:?error}`) && PathPrefix(`${EDC_PATH:-}/api`)
-        - traefik.http.routers.edc_api.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
-        - traefik.http.routers.edc_api.middlewares=edc-remove-prefix@docker
-        - traefik.http.routers.edc_api.service=edc_api
-        - traefik.http.services.edc_api.loadbalancer.server.port=8181
-
-        - traefik.http.routers.edc_management.rule=Host(`${EDC_ADDRESS:?error}`) && PathPrefix(`${EDC_PATH:-}/management`)
-        - traefik.http.routers.edc_management.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
-        - traefik.http.routers.edc_management.middlewares=edc-remove-prefix@docker
-        - traefik.http.routers.edc_management.service=edc_management
-        - traefik.http.services.edc_management.loadbalancer.server.port=8182
-
-        - traefik.http.routers.edc_protocol.rule=Host(`${EDC_ADDRESS:?error}`) && PathPrefix(`${EDC_PATH:-}/protocol`)
-        - traefik.http.routers.edc_protocol.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
-        - traefik.http.routers.edc_protocol.middlewares=edc-remove-prefix@docker
-        - traefik.http.routers.edc_protocol.service=edc_protocol
-        - traefik.http.services.edc_protocol.loadbalancer.server.port=8282
-
-        - traefik.http.routers.edc_control.rule=Host(`${EDC_ADDRESS:?error}`) && PathPrefix(`${EDC_PATH:-}/control`)
-        - traefik.http.routers.edc_control.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
-        - traefik.http.routers.edc_control.middlewares=edc-remove-prefix@docker
-        - traefik.http.routers.edc_control.service=edc_control
-        - traefik.http.services.edc_control.loadbalancer.server.port=8183
-
-        - traefik.http.routers.edc_public.rule=Host(`${EDC_ADDRESS:?error}`) && PathPrefix(`${EDC_PATH:-}/public`)
-        - traefik.http.routers.edc_public.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
-        - traefik.http.routers.edc_public.middlewares=edc-remove-prefix@docker
-        - traefik.http.routers.edc_public.service=edc_public
-        - traefik.http.services.edc_public.loadbalancer.server.port=8185
-
-        - traefik.http.routers.edc_identity.rule=Host(`${EDC_ADDRESS:?error}`) && PathPrefix(`${EDC_PATH:-}/identity`)
-        - traefik.http.routers.edc_identity.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
-        - traefik.http.routers.edc_identity.middlewares=edc-remove-prefix@docker
-        - traefik.http.routers.edc_identity.service=edc_identity
-        - traefik.http.services.edc_identity.loadbalancer.server.port=8186
-      networks:
-        - hubnet
-      volumes:
-          - ./edc/resources:/resources
-
-  edc-db:
-      build:
-          context: ./edc-db
-      profiles:
-        - full
-      env_file:
-          - edc-db/edc-db.env
-      hostname: "edc-db"
-      networks:
-          - hubnet
-      volumes:
-          - edc-db-data:/var/lib/postgresql/data
-          - ./edc-db/sql_tables:/docker-entrypoint-initdb.d/
-
   api:
     build:
       context: ./api
     <<: *default_restart_policy
     # DEVELOPMENT: run with reload and mount api package code
-    command: uvicorn --host 0.0.0.0 --root-path ${API_PATH:-""} --reload api.main:app
+    command: uvicorn --reload api.main:app --root-path ${API_PATH:-""}
     profiles:
       - full
       - rollout1
@@ -289,6 +157,8 @@ services:
       mongo:
         condition: service_healthy
       keycloak:
+        condition: service_healthy
+      nautilus:
         condition: service_healthy
       keycloak-config:
         condition: service_completed_successfully
@@ -404,7 +274,7 @@ services:
 
   # utilized by the diagnostics service
   knowledge-graph:
-    build: 
+    build:
       context: ./knowledge-graph
     <<: *default_restart_policy
     profiles:
@@ -416,6 +286,19 @@ services:
     networks:
       - hubintranet
       - hubnet
+
+  nautilus:
+    build:
+      context: ./nautilus
+    profiles:
+      - full
+    env_file: ./nautilus/nautilus.env
+    hostname: "nautilus"
+    ports:
+      - 127.0.0.1:3000:3000 # Only for testing
+    networks:
+      hubintranet:
+      hubnet:
 
 networks:
   hubnet:
@@ -429,6 +312,4 @@ networks:
 volumes:
   mongo-data:
   keycloak-db-data:
-  minio-data:
-  edc-db-data:
   proxy-certs:

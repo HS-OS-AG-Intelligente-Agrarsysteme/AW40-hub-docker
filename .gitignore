@@ -19,8 +19,5 @@ build/
 
 .ipynb_checkpoints
 
-edc/build
-edc/.gradle
-
 # Ignore temporary MS Office files.
 ~$*

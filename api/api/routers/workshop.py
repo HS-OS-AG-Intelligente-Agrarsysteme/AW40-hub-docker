@@ -1,4 +1,9 @@
-from typing import List, Union, Literal, Optional
+from typing import (
+    List,
+    Union,
+    Literal,
+    Optional
+)
 
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -59,7 +64,9 @@ router = APIRouter(dependencies=[Depends(authorized_workshop_id)])
     tags=["Workshop - Case Management"]
 )
 async def list_cases(
-        workshop_id: str, customer_id: str = None, vin: str = None
+        workshop_id: str,
+        customer_id: Optional[str] = None,
+        vin: Optional[str] = None
 ) -> List[Case]:
     cases = await Case.find_in_hub(
         customer_id=customer_id, vin=vin, workshop_id=workshop_id
@@ -74,9 +81,18 @@ async def list_cases(
     tags=["Workshop - Case Management"]
 )
 async def add_case(workshop_id: str, case: NewCase) -> Case:
-    case = Case(workshop_id=workshop_id, **case.dict())
-    case = await case.insert()
-    return case
+    customer_id = case.customer_id
+    if customer_id is not None:
+        # If a customer_id is specified, confirm that it points to an existing
+        # customer
+        customer = await Customer.get(customer_id)
+        if customer is None:
+            raise HTTPException(
+                status_code=422, detail=f"Invalid customer_id '{customer_id}'"
+            )
+    _case = Case(workshop_id=workshop_id, **case.model_dump())
+    _case = await _case.insert()
+    return _case
 
 
 async def case_from_workshop(workshop_id: str, case_id: str) -> Case:
@@ -94,12 +110,12 @@ async def case_from_workshop(workshop_id: str, case_id: str) -> Case:
     )
 
     try:
-        case_id = ObjectId(case_id)
+        document_id: ObjectId = ObjectId(case_id)
     except InvalidId:
         # invalid id reports not found to user
         raise no_case_with_id_exception
 
-    case = await Case.get(case_id)
+    case = await Case.get(document_id)
 
     if case is None or case.workshop_id != workshop_id:
         # No case for THIS workshop
@@ -126,8 +142,8 @@ async def get_case(case: Case = Depends(case_from_workshop)) -> Case:
 async def update_case(
         update: CaseUpdate,
         case: Case = Depends(case_from_workshop)
-):
-    await case.set(update.dict(exclude_unset=True))
+) -> Case:
+    await case.set(update.model_dump(exclude_unset=True))
     return case
 
 
@@ -137,7 +153,9 @@ async def update_case(
     response_model=None,
     tags=["Workshop - Case Management"]
 )
-async def delete_case(case: Case = Depends(case_from_workshop)):
+async def delete_case(
+        case: Case = Depends(case_from_workshop)
+) -> None:
     await case.delete()
 
 
@@ -146,7 +164,9 @@ async def delete_case(case: Case = Depends(case_from_workshop)):
     status_code=200,
     response_model=Customer, tags=["Workshop - Case Management"]
 )
-async def get_customer(case: Case = Depends(case_from_workshop)):
+async def get_customer(
+        case: Case = Depends(case_from_workshop)
+) -> Customer | None:
     customer = await Customer.get(case.customer_id)
     return customer
 
@@ -156,7 +176,9 @@ async def get_customer(case: Case = Depends(case_from_workshop)):
     status_code=200,
     response_model=Vehicle, tags=["Workshop - Case Management"]
 )
-async def get_vehicle(case: Case = Depends(case_from_workshop)):
+async def get_vehicle(
+        case: Case = Depends(case_from_workshop)
+) -> Vehicle | None:
     vehicle = await Vehicle.find_one({"vin": case.vehicle_vin})
     return vehicle
 
@@ -168,10 +190,18 @@ async def get_vehicle(case: Case = Depends(case_from_workshop)):
 )
 async def update_vehicle(
         update: VehicleUpdate, case: Case = Depends(case_from_workshop)
-):
+) -> Vehicle:
+    no_vehicle_with_id_exception = HTTPException(
+        status_code=500,
+        detail=f"No vehicle with VIN '{case.vehicle_vin}' found "
+               f"for workshop '{case.workshop_id}'."
+    )
     vehicle = await Vehicle.find_one({"vin": case.vehicle_vin})
-    await vehicle.set(update.dict(exclude_unset=True))
-    return vehicle
+    if vehicle is not None:
+        await vehicle.set(update.model_dump(exclude_unset=True))
+        return vehicle
+    else:
+        raise no_vehicle_with_id_exception
 
 
 @router.get(
@@ -179,7 +209,9 @@ async def update_vehicle(
     status_code=200,
     response_model=List[TimeseriesData], tags=["Workshop - Data Management"]
 )
-def list_timeseries_data(case: Case = Depends(case_from_workshop)):
+def list_timeseries_data(
+        case: Case = Depends(case_from_workshop)
+) -> List[TimeseriesData]:
     """List all available timeseries datasets for a case."""
     return case.timeseries_data
 
@@ -315,7 +347,7 @@ def process_picoscope_upload(
 async def upload_picoscope_data(
         processed_upload: list = Depends(process_picoscope_upload),
         case: Case = Depends(case_from_workshop)
-):
+) -> Case:
     for data in processed_upload:
         case = await case.add_timeseries_data(
             NewTimeseriesData(**data)
@@ -346,7 +378,7 @@ async def upload_omniview_data(
             description="Label for the oscillogram"
         ),
         case: Case = Depends(case_from_workshop)
-):
+) -> Case:
     """Upload an Omniview csv export to a case."""
     data = read_file_or_400(upload, file_format)[0]
     data["component"] = component
@@ -385,7 +417,7 @@ async def get_timeseries_data(
 )
 async def get_timeseries_data_signal(
         data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
-) -> TimeseriesData:
+) -> List[float]:
     """Get the signal of a specific timeseries dataset from a case."""
     timeseries_data = case.get_timeseries_data(data_id)
     if timeseries_data is not None:
@@ -406,7 +438,7 @@ async def update_timeseries_data(
         data_id: NonNegativeInt,
         update: TimeseriesDataUpdate,
         case: Case = Depends(case_from_workshop)
-):
+) -> TimeseriesData:
     """Update a specific timeseries dataset of a case."""
     timeseries_data = await case.update_timeseries_data(
         data_id=data_id, update=update
@@ -427,7 +459,7 @@ async def update_timeseries_data(
 )
 async def delete_timeseries_data(
         data_id: NonNegativeInt, case: Case = Depends(case_from_workshop)
-):
+) -> Case:
     """Delete a specific timeseries dataset from a case."""
     await case.delete_timeseries_data(data_id)
     return case
@@ -471,7 +503,7 @@ async def upload_vcds_data(
         ),
         file_format: Literal["VCDS TXT"] = Form(default="VCDS TXT"),
         case: Case = Depends(case_from_workshop)
-):
+) -> Case:
     data = read_file_or_400(upload, file_format)[0]
     data = data["obd_data"]
     case = await case.add_obd_data(
@@ -508,7 +540,7 @@ async def update_obd_data(
         data_id: NonNegativeInt,
         update: OBDDataUpdate,
         case: Case = Depends(case_from_workshop)
-):
+) -> OBDData:
     """Update a specific obd dataset from a case."""
     obd_data = await case.update_obd_data(data_id=data_id, update=update)
     if obd_data is not None:
@@ -586,7 +618,7 @@ async def update_symptom(
         data_id: NonNegativeInt,
         update: SymptomUpdate,
         case: Case = Depends(case_from_workshop)
-):
+) -> Symptom:
     """Update a specific symptom of a case."""
     symptom = await case.update_symptom(data_id=data_id, update=update)
     if symptom is not None:
@@ -617,7 +649,9 @@ async def delete_symptom(
     response_model=Union[Diagnosis, None],
     tags=["Workshop - Diagnostics"]
 )
-async def get_diagnosis(case: Case = Depends(case_from_workshop)):
+async def get_diagnosis(
+        case: Case = Depends(case_from_workshop)
+) -> Diagnosis | None:
     """Get diagnosis data for this case."""
     if case.diagnosis_id is None:
         return None
@@ -636,23 +670,27 @@ async def start_diagnosis(
         manage_diagnostic_task: DiagnosticTaskManager = Depends(
             DiagnosticTaskManager
         )
-):
+) -> Diagnosis | None:
     """Initialize the diagnosis process for this case."""
     if case.diagnosis_id is not None:
         # Diagnosis for this case was already initialized and is returned as is
         diag = await Diagnosis.get(case.diagnosis_id)
     else:
         # New diagnosis is initialized
-        diag = Diagnosis(
-            case_id=case.id,
-            status="scheduled"
-        )
-        await diag.create()
-        case.diagnosis_id = diag.id
-        await case.save()
+        if case.id is None:
+            exception_detail = "Case is missing an ID"
+            raise HTTPException(status_code=500, detail=exception_detail)
+        else:
+            diag = Diagnosis(
+                case_id=case.id,
+                status=DiagnosisStatus("scheduled")
+            )
+            await diag.create()
+            case.diagnosis_id = diag.id
+            await case.save()
 
-        # New diagnosis is handed over to diagnostic backend
-        await manage_diagnostic_task(case.diagnosis_id)
+            # New diagnosis is handed over to diagnostic backend
+            await manage_diagnostic_task(case.diagnosis_id)
 
     return diag
 
@@ -663,12 +701,15 @@ async def start_diagnosis(
     response_model=None,
     tags=["Workshop - Diagnostics"]
 )
-async def delete_diagnosis(case: Case = Depends(case_from_workshop)):
+async def delete_diagnosis(
+        case: Case = Depends(case_from_workshop)
+) -> None:
     """Stop the diagnosis process for this case."""
     diag = await Diagnosis.get(case.diagnosis_id)
-    await diag.delete()
-    case.diagnosis_id = None
-    await case.save()
+    if diag is not None:
+        await diag.delete()
+        case.diagnosis_id = None
+        await case.save()
     return None
 
 
@@ -684,7 +725,7 @@ async def get_diagnosis_attachment(
         attachment_bucket: motor_asyncio.AsyncIOMotorGridFSBucket = Depends(
             AttachmentBucket.create
         )
-):
+) -> Response:
     """Retrieve a specific diagnosis attachment."""
     attachment = await attachment_bucket.open_download_stream(
         ObjectId(attachment_id)
@@ -701,7 +742,7 @@ async def get_diagnosis_attachment(
 )
 async def list_diagnoses(
         workshop_id: str, status: Optional[DiagnosisStatus] = None
-):
+) -> List[Diagnosis]:
     """List all diagnoses of a workshop, optionally filtered by status."""
     diagnoses = await Diagnosis.find_in_hub(
         workshop_id=workshop_id, status=status

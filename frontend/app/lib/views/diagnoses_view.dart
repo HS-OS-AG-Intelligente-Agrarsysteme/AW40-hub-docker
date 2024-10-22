@@ -126,7 +126,7 @@ class _DesktopDiagnosesViewState extends State<DesktopDiagnosesView> {
     if (widget.diagnosisModels.isEmpty) {
       return Center(
         child: Text(
-          tr("general.no.diagnoses"),
+          tr("general.noDiagnoses"),
           style: Theme.of(context).textTheme.displaySmall,
         ),
       );

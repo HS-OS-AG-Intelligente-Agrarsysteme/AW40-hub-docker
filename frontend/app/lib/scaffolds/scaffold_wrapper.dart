@@ -45,8 +45,8 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
   }
 
   Future<void> _showFilterDiagnosesDialog() async {
-    // TODO implement in a later story
-    _logger.warning("Unimplemented: _showFilterDiagnosesDialog()");
+    // TODO implement _showFilterDiagnosesDialog
+    throw UnimplementedError();
   }
 
   Future<void> _showFilterCasesDialog() async {

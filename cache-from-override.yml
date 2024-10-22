@@ -4,10 +4,10 @@ services:
       cache_from:
           - ghcr.io/hs-os-ag-intelligente-agrarsysteme/aw40-keycloak:buildcache
 
-  edc:
+  nautilus:
       build:
         cache_from:
-          - ghcr.io/hs-os-ag-intelligente-agrarsysteme/aw40-edc:buildcache
+          - ghcr.io/hs-os-ag-intelligente-agrarsysteme/aw40-nautilus:buildcache
 
   api:
     build:

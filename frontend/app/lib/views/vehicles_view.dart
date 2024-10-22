@@ -3,6 +3,7 @@ import "package:aw40_hub_frontend/exceptions/app_exception.dart";
 import "package:aw40_hub_frontend/models/vehicle_model.dart";
 import "package:aw40_hub_frontend/providers/vehicle_provider.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/views/vehicle_detail_view.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:logging/logging.dart";
@@ -50,7 +51,6 @@ class _VehiclesViewState extends State<VehiclesView> {
         }
         return DesktopVehiclesView(
           vehicleModel: vehicleModels,
-          currentIndexNotifier: currentVehicleIndexNotifier,
         );
       },
     );
@@ -60,26 +60,30 @@ class _VehiclesViewState extends State<VehiclesView> {
 class DesktopVehiclesView extends StatefulWidget {
   const DesktopVehiclesView({
     required this.vehicleModel,
-    required this.currentIndexNotifier,
     super.key,
   });
 
   final List<VehicleModel> vehicleModel;
-  final ValueNotifier<int?> currentIndexNotifier;
 
   @override
   State<DesktopVehiclesView> createState() => DesktopVehiclesViewState();
 }
 
 class DesktopVehiclesViewState extends State<DesktopVehiclesView> {
-  int? currentVehiclesIndex;
+  ValueNotifier<int?> currentVehiclesIndexNotifier = ValueNotifier<int?>(null);
+
+  @override
+  void dispose() {
+    currentVehiclesIndexNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     if (widget.vehicleModel.isEmpty) {
       return Center(
         child: Text(
-          tr("general.no.diagnoses"),
+          tr("general.noVehicles"),
           style: Theme.of(context).textTheme.displaySmall,
         ),
       );
@@ -93,23 +97,38 @@ class DesktopVehiclesViewState extends State<DesktopVehiclesView> {
             child: PaginatedDataTable(
               source: VehiclesDataTableSource(
                 themeData: Theme.of(context),
-                currentIndexNotifier: widget.currentIndexNotifier,
+                currentIndexNotifier: currentVehiclesIndexNotifier,
                 vehicleModels: widget.vehicleModel,
                 onPressedRow: (int i) =>
-                    setState(() => currentVehiclesIndex = i),
+                    setState(() => currentVehiclesIndexNotifier.value = i),
               ),
               showCheckboxColumn: false,
               rowsPerPage: 50,
               columns: [
                 DataColumn(
-                  label: Text(tr("vehicles.headlines.vin")),
+                  label: Text(tr("general.vin")),
                 ),
-                DataColumn(label: Text(tr("vehicles.headlines.tsn"))),
-                DataColumn(label: Text(tr("vehicles.headlines.yearBuild"))),
+                DataColumn(label: Text(tr("general.tsn"))),
+                DataColumn(label: Text(tr("general.yearBuild"))),
               ],
             ),
           ),
         ),
+
+        // Show detail view if a vehicle is selected.
+        ValueListenableBuilder(
+          valueListenable: currentVehiclesIndexNotifier,
+          builder: (context, value, child) {
+            if (value == null) return const SizedBox.shrink();
+            return Expanded(
+              flex: 2,
+              child: VehicleDetailView(
+                vehicleModel: widget.vehicleModel[value],
+                onClose: () => currentVehiclesIndexNotifier.value = null,
+              ),
+            );
+          },
+        )
       ],
     );
   }
