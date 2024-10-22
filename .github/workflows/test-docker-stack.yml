@@ -19,11 +19,8 @@ jobs:
       # Overwrite Addresses in dev.env
       FRONTEND_ADDRESS: werkstatthub.docker.localhost
       DOCS_ADDRESS: docs.werkstatthub.docker.localhost
-      MINIO_ADDRESS: minio.werkstatthub.docker.localhost
-      MINIO_API_ADDRESS: minioapi.werkstatthub.docker.localhost
       KEYCLOAK_ADDRESS: keycloak.werkstatthub.docker.localhost
       API_ADDRESS: api.werkstatthub.docker.localhost
-      EDC_ADDRESS: edc.werkstatthub.docker.localhost
       DOCS_BUILD_WITH_PDF: 0
       COMPOSE_PROFILES: full
 
@@ -134,20 +131,6 @@ jobs:
         run: |
           curl -fs -o /dev/null -w 'http_code:%{http_code}' \
           $PROXY_DEFAULT_SCHEME://$KEYCLOAK_ADDRESS/health/live \
-          || exit 1
-
-      # Test MinIO
-      - name: Check if MinIO is healthy
-        run: |
-          curl -fs -o /dev/null -w 'http_code:%{http_code}' \
-          $PROXY_DEFAULT_SCHEME://$MINIO_ADDRESS/minio/health/live \
-          || exit 1
-
-      # Test EDC
-      - name: Check if EDC is healthy
-        run: |
-          curl -fs -o /dev/null -w 'http_code:%{http_code}' \
-          $PROXY_DEFAULT_SCHEME://$EDC_ADDRESS/api/health \
           || exit 1
 
       # Test Frontend

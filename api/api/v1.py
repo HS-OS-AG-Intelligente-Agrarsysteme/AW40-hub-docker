@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI
 
 from .routers import (
-    health, shared, workshop, minio, diagnostics, knowledge,
+    health, shared, workshop, diagnostics, knowledge,
     customers, assets
 )
 from .settings import settings
@@ -42,10 +42,6 @@ api_v1.include_router(customers.router, prefix="/customers")
 # Prefixes for the assets routers are handled in the module
 api_v1.include_router(assets.management_router)
 api_v1.include_router(assets.public_router)
-if not settings.exclude_minio_router:
-    api_v1.include_router(minio.router, prefix="/minio")
-else:
-    print("Router /minio is excluded.")
 if not settings.exclude_diagnostics_router:
     api_v1.include_router(diagnostics.router, prefix="/diagnostics")
 else:
