@@ -60,9 +60,7 @@ class TokenRefreshingHttpClient extends http.BaseClient {
     if (expiryDateString != null) {
       final expiryDate = DateTime.parse(expiryDateString);
 
-      // TODO check whether this works with timezones etc
-      // TODO remove '&& false'. It is there for debugging/testing purposes only.
-      if (DateTime.now().isAfter(expiryDate) && false) {
+      if (DateTime.now().isAfter(expiryDate)) {
         // token is expired
         return null;
       }
@@ -120,7 +118,8 @@ class TokenRefreshingHttpClient extends http.BaseClient {
         final String? newIdToken = tokenMap[TokenType.id];
         if (newJwt == null || newRefreshToken == null) return;
         refreshToken = newRefreshToken;
-        idToken = newIdToken;
+        idToken =
+            newIdToken; // TODO either persist this in LocalStorage also or send it to AuthProvider...
         accessToken = JwtModel.fromJwtString(newJwt);
 
         unawaited(
