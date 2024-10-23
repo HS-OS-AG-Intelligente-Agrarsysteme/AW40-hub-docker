@@ -6,21 +6,12 @@ import "package:aw40_hub_frontend/services/config_service.dart";
 import "package:aw40_hub_frontend/services/storage_service.dart";
 import "package:aw40_hub_frontend/services/token_service.dart";
 import "package:http/http.dart" as http;
-import "package:logging/logging.dart";
 
 class TokenRefreshingHttpClient extends http.BaseClient {
   TokenRefreshingHttpClient(
     this._innerClient,
-    this._storageService,
-    this._configService,
-    this._tokenService,
   );
-  // TODO remove unused services
   final http.Client _innerClient;
-  final StorageService _storageService;
-  final Logger _logger = Logger("token_refreshing_http_client");
-  final ConfigService _configService;
-  final TokenService _tokenService;
   final AuthProvider _authProvider = AuthProvider(
     http.Client(),
     StorageService(),
