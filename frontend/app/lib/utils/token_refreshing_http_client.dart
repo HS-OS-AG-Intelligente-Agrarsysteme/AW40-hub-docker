@@ -1,16 +1,28 @@
 import "dart:async";
+import "dart:convert";
 
+import "package:aw40_hub_frontend/models/jwt_model.dart";
+import "package:aw40_hub_frontend/services/auth_service.dart";
+import "package:aw40_hub_frontend/services/config_service.dart";
 import "package:aw40_hub_frontend/services/storage_service.dart";
+import "package:aw40_hub_frontend/services/token_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:http/http.dart" as http;
+import "package:logging/logging.dart";
 
 class TokenRefreshingHttpClient extends http.BaseClient {
   TokenRefreshingHttpClient(
     this._innerClient,
     this._storageService,
+    this._configService,
+    this._tokenService,
   );
   final http.Client _innerClient;
   final StorageService _storageService;
+  final Logger _logger = Logger("token_refreshing_http_client");
+  final ConfigService _configService;
+  final TokenService
+      _tokenService; // TODO maybe remove as param (see AuthService)
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
@@ -20,7 +32,7 @@ class TokenRefreshingHttpClient extends http.BaseClient {
       // check whether token is still valid otherwise renew token
       String? token = await _getAccessToken();
       if (token == null) {
-        await _refreshToken();
+        await _refreshAccessToken();
         token = await _getAccessToken();
       }
 
@@ -31,6 +43,14 @@ class TokenRefreshingHttpClient extends http.BaseClient {
     }
 
     return _innerClient.send(request);
+  }
+
+  // TODO adjust
+  Future<void> resetAuthTokensAndStorage() async {
+    await _storageService.resetLocalStorage();
+    //_jwt = null;
+    //_refreshToken = null;
+    //notifyListeners();
   }
 
   Future<String?> _getAccessToken() async {
@@ -53,60 +73,89 @@ class TokenRefreshingHttpClient extends http.BaseClient {
     );
   }
 
-  Future<void> _refreshToken() async {
-    // TODO implement
-    /*
-    final refreshToken = await _storageService.loadStringFromLocalStorage(
+  Future<void> _refreshAccessToken() async {
+    _logger.config("refreshJWT");
+
+    var accessToken;
+    var idToken;
+    var refreshToken = await _storageService.loadStringFromLocalStorage(
       key: LocalStorageKey.refreshToken,
     );
     if (refreshToken == null) {
+      // TODO prompt user login!?
       throw Exception("Refresh token not found");
     }
 
-    // TODO adjust (see other refreshToken method as reference)
-    // TODO get keycloak url and client id from config maybe
-    final response = await http.post(
-      Uri.parse(
-          "https://<your-keycloak-server>/realms/<realm>/protocol/openid-connect/token"),
-      headers: {"Content-Type": "application/x-www-form-urlencoded"},
-      body: {
-        "grant_type": "refresh_token",
-        "client_id": "<your-client-id>",
-        "refresh_token": refreshToken,
-      },
-    );
+    final Map<String, dynamic> jsonMap = <String, dynamic>{
+      "refresh_token": refreshToken,
+      "grant_type": "refresh_token",
+      "client_id": _configService.getConfigValue(ConfigKey.keyCloakClient),
+    };
 
-    if (response.statusCode == 200) {
-      final newTokenData = json.decode(response.body);
-      final newAccessToken = newTokenData["access_token"];
-      final newRefreshToken = newTokenData["refresh_token"];
-      final expiresIn = newTokenData["expires_in"];
-
-      final jwt = JwtModel.fromJwtString(newAccessToken);
-
-      final expiryDate = DateTime.now().add(Duration(seconds: expiresIn));
-
-      unawaited(
-        _storageService.storeStringToLocalStorage(
-          key: LocalStorageKey.accessToken,
-          value: newAccessToken,
-        ),
+    try {
+      final Uri uri = Uri.parse(
+        "${AuthService().getKeyCloakUrlWithRealm()}token",
       );
-      unawaited(
-        _storageService.storeStringToLocalStorage(
-          key: LocalStorageKey.accessTokenExpirationDateTime,
-          value: jwt.exp.toIso8601String(),
-        ),
+      final http.Response res = await _innerClient
+          .post(
+            uri,
+            headers: {"Content-Type": "application/x-www-form-urlencoded"},
+            body: jsonMap,
+          )
+          .timeout(
+            const Duration(
+              seconds: 10,
+            ),
+          );
+
+      if (res.statusCode == 200) {
+        final Map<String, dynamic> keyCloakMap =
+            json.decode(res.body) as Map<String, dynamic>;
+
+        final Map<TokenType, String> tokenMap =
+            _tokenService.readRefreshAndJWTFromKeyCloakMap(keyCloakMap);
+
+        final String? newJwt = tokenMap[TokenType.jwt];
+        final String? newRefreshToken = tokenMap[TokenType.refresh];
+        final String? newIdToken = tokenMap[TokenType.id];
+        if (newJwt == null || newRefreshToken == null) return;
+        refreshToken = newRefreshToken;
+        idToken = newIdToken;
+        accessToken = JwtModel.fromJwtString(newJwt);
+
+        unawaited(
+          _storageService.storeStringToLocalStorage(
+            key: LocalStorageKey.accessToken,
+            value: newJwt,
+          ),
+        );
+        unawaited(
+          _storageService.storeStringToLocalStorage(
+            key: LocalStorageKey.accessTokenExpirationDateTime,
+            value: accessToken?.exp.toIso8601String() ?? "",
+          ),
+        );
+        unawaited(
+          _storageService.storeStringToLocalStorage(
+            key: LocalStorageKey.refreshToken,
+            value: newRefreshToken,
+          ),
+        );
+      } else {
+        _logger.config(
+          res.statusCode == 503
+              ? "Server not available, clearing tokens and Storage."
+              : "Refresh token not accepted, clearing tokens and Storage.",
+        );
+        _logger.config(res.reasonPhrase);
+        _logger.config(res.body);
+        await resetAuthTokensAndStorage();
+      }
+    } on Exception catch (e) {
+      _logger.warning(
+        "$e: token could not be refreshed, clearing tokens and storage",
       );
-      unawaited(
-        _storageService.storeStringToLocalStorage(
-          key: LocalStorageKey.refreshToken,
-          value: newRefreshToken,
-        ),
-      );
-    } else {
-      // TODO prompt login to user
-      throw Exception("Token refresh failed");
-    }  */
+      await resetAuthTokensAndStorage();
+    }
   }
 }
