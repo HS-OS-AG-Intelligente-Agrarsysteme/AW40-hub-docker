@@ -29,7 +29,7 @@ class AuthProvider with ChangeNotifier {
     this._configService, [
     this._refreshToken,
   ]);
-  JwtModel? _jwt;
+  JwtModel? _jwt; // TODO rename into "_accessToken"
   String? _refreshToken;
   String? _idToken;
   Completer<void>? _pendingAuthCheck;
@@ -42,6 +42,7 @@ class AuthProvider with ChangeNotifier {
   final ConfigService _configService;
   final Logger _logger = Logger("auth_provider");
 
+  // TODO is this necessary or is getAccessTokenSufficient?
   Future<String?> getAuthToken() async {
     await _checkAuth();
     return _jwt?.jwt;
@@ -175,7 +176,7 @@ class AuthProvider with ChangeNotifier {
       final bool hasRefreshTokenButNoValidJwt = refreshTokenSnapshot != null &&
           (jwtSnapshot == null || isExpired(jwtSnapshot));
       if (hasRefreshTokenButNoValidJwt) {
-        await _refreshJWT();
+        await refreshAccessToken();
       }
     } finally {
       _pendingAuthCheck?.complete();
@@ -280,8 +281,35 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _refreshJWT() async {
-    _logger.config("refreshJWT");
+  Future<String?> getAccessToken() async {
+    final expiryDateString = await _storageService.loadStringFromLocalStorage(
+      key: LocalStorageKey.accessTokenExpirationDateTime,
+    );
+    if (expiryDateString != null) {
+      final expiryDate = DateTime.parse(expiryDateString);
+
+      if (DateTime.now().isAfter(expiryDate)) {
+        // token is expired
+        return null;
+      }
+    }
+
+    return _storageService.loadStringFromLocalStorage(
+      key: LocalStorageKey.accessToken,
+    );
+  }
+
+  Future<void> refreshAccessToken() async {
+    _logger.config("refreshAccessToken");
+
+    // TODO evaluate if I need to get refreshToken from Storage or whether is it sufficient to get the value from this providers field variable (_refreshToken)
+    _refreshToken = await _storageService.loadStringFromLocalStorage(
+      key: LocalStorageKey.refreshToken,
+    );
+    if (_refreshToken == null) {
+      // TODO prompt user login!?
+      throw Exception("Refresh token not found");
+    }
 
     final Map<String, dynamic> jsonMap = <String, dynamic>{
       "refresh_token": _refreshToken,
@@ -317,6 +345,7 @@ class AuthProvider with ChangeNotifier {
         final String? newIdToken = tokenMap[TokenType.id];
         if (newJwt == null || newRefreshToken == null) return;
         _refreshToken = newRefreshToken;
+        // TODO either persist id token in LocalStorage also or leave it as field variable in AuthProvider...
         _idToken = newIdToken;
         _jwt = JwtModel.fromJwtString(newJwt);
 
@@ -329,7 +358,7 @@ class AuthProvider with ChangeNotifier {
         unawaited(
           _storageService.storeStringToLocalStorage(
             key: LocalStorageKey.accessTokenExpirationDateTime,
-            value: _jwt?.exp.toIso8601String() ?? "",
+            value: _jwt?.exp.toIso8601String() ?? "", // TODO remove '?? ""' ?
           ),
         );
         unawaited(
@@ -341,6 +370,7 @@ class AuthProvider with ChangeNotifier {
 
         notifyListeners();
       } else {
+        // TODO prompt user login!?
         _logger.config(
           res.statusCode == 503
               ? "Server not available, clearing tokens and Storage."
@@ -351,6 +381,7 @@ class AuthProvider with ChangeNotifier {
         await resetAuthTokensAndStorage();
       }
     } on Exception catch (e) {
+      // TODO prompt user login!?
       _logger.warning(
         "$e: token could not be refreshed, clearing tokens and storage",
       );
