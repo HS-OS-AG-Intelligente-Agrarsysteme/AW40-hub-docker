@@ -3,7 +3,7 @@ import "dart:convert";
 import "package:aw40_hub_frontend/dtos/new_symptom_dto.dart";
 import "package:aw40_hub_frontend/services/config_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
-import 'package:aw40_hub_frontend/utils/token_refreshing_http_client_interceptor.dart';
+import "package:aw40_hub_frontend/utils/token_refreshing_http_client_interceptor.dart";
 import "package:collection/collection.dart";
 import "package:enum_to_string/enum_to_string.dart";
 import "package:http/http.dart" as http;
