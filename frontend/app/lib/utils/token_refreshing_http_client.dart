@@ -53,6 +53,7 @@ class TokenRefreshingHttpClient extends http.BaseClient {
     //notifyListeners();
   }
 
+  // TODO move this into Auth provider?
   Future<String?> _getAccessToken() async {
     final expiryDateString = await _storageService.loadStringFromLocalStorage(
       key: LocalStorageKey.accessTokenExpirationDateTime,
@@ -71,12 +72,13 @@ class TokenRefreshingHttpClient extends http.BaseClient {
     );
   }
 
+  // TODO move this into Auth provider?
   Future<void> _refreshAccessToken() async {
     _logger.config("refreshJWT");
 
-    var accessToken;
-    var idToken;
-    var refreshToken = await _storageService.loadStringFromLocalStorage(
+    JwtModel accessToken;
+    String? idToken;
+    String? refreshToken = await _storageService.loadStringFromLocalStorage(
       key: LocalStorageKey.refreshToken,
     );
     if (refreshToken == null) {
@@ -141,6 +143,7 @@ class TokenRefreshingHttpClient extends http.BaseClient {
           ),
         );
       } else {
+        // TODO prompt user login!?
         _logger.config(
           res.statusCode == 503
               ? "Server not available, clearing tokens and Storage."
@@ -151,6 +154,7 @@ class TokenRefreshingHttpClient extends http.BaseClient {
         await resetAuthTokensAndStorage();
       }
     } on Exception catch (e) {
+      // TODO prompt user login!?
       _logger.warning(
         "$e: token could not be refreshed, clearing tokens and storage",
       );
