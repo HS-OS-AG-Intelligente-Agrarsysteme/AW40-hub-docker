@@ -29,7 +29,7 @@ class AuthProvider with ChangeNotifier {
     this._configService, [
     this._refreshToken,
   ]);
-  JwtModel? _accessTokenJwt; // TODO rename into "_accessToken"
+  JwtModel? _accessTokenJwt;
   String? _refreshToken;
   String? _idToken;
   Completer<void>? _pendingAuthCheck;
@@ -357,8 +357,9 @@ class AuthProvider with ChangeNotifier {
         );
         unawaited(
           _storageService.storeStringToLocalStorage(
-              key: LocalStorageKey.accessTokenExpirationDateTime,
-              value: _accessTokenJwt!.exp.toIso8601String()),
+            key: LocalStorageKey.accessTokenExpirationDateTime,
+            value: _accessTokenJwt!.exp.toIso8601String(),
+          ),
         );
         unawaited(
           _storageService.storeStringToLocalStorage(
