@@ -7,8 +7,8 @@ import "package:aw40_hub_frontend/services/storage_service.dart";
 import "package:aw40_hub_frontend/services/token_service.dart";
 import "package:http/http.dart" as http;
 
-class TokenRefreshingHttpClient extends http.BaseClient {
-  TokenRefreshingHttpClient(
+class TokenRefreshingHttpClientInterceptor extends http.BaseClient {
+  TokenRefreshingHttpClientInterceptor(
     this._innerClient,
   );
   final http.Client _innerClient;
