@@ -307,8 +307,7 @@ class AuthProvider with ChangeNotifier {
       key: LocalStorageKey.refreshToken,
     );
     if (_refreshToken == null) {
-      // TODO prompt user login!?
-      throw Exception("Refresh token not found");
+      _informUserAboutInvalidToken();
     }
 
     final Map<String, dynamic> jsonMap = <String, dynamic>{
@@ -370,7 +369,6 @@ class AuthProvider with ChangeNotifier {
 
         notifyListeners();
       } else {
-        // TODO prompt user login!?
         _logger.config(
           res.statusCode == 503
               ? "Server not available, clearing tokens and Storage."
@@ -379,14 +377,19 @@ class AuthProvider with ChangeNotifier {
         _logger.config(res.reasonPhrase);
         _logger.config(res.body);
         await resetAuthTokensAndStorage();
+        _informUserAboutInvalidToken();
       }
     } on Exception catch (e) {
-      // TODO prompt user login!?
       _logger.warning(
         "$e: token could not be refreshed, clearing tokens and storage",
       );
       await resetAuthTokensAndStorage();
+      _informUserAboutInvalidToken();
     }
+  }
+
+  void _informUserAboutInvalidToken() {
+    // TODO add snackbar which informs the user at least
   }
 
   Future<void> logout() async {
