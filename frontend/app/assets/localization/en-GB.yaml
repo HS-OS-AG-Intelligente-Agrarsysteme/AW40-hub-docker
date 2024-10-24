@@ -16,6 +16,7 @@ general:
   housenumber: "House No."
   id: "ID"
   invalidEmail: "Email is invalid."
+  invalidSession: "Your session is invalid it seems. Please try login again."
   yearBuild: "Year built"
   language: "Language"
   lastname: "Last Name"
@@ -136,11 +137,11 @@ cases:
       obdData: "OBD Data"
       symptoms: "Symptoms"
       timeseriesData: "Timeseries Data"
-uploadData: 
+uploadData:
   label: "Upload data"
 customers:
   title: "Customers"
-  headlines: 
+  headlines:
     id: "ID"
   actions:
     updateCustomer: "Update customer"
@@ -207,4 +208,3 @@ forms:
     component:
       label: "Component"
       hint: "Enter a Component"
-

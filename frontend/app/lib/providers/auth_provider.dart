@@ -302,7 +302,6 @@ class AuthProvider with ChangeNotifier {
   Future<void> refreshAccessToken() async {
     _logger.config("refreshAccessToken");
 
-    // TODO evaluate if I need to get refreshToken from Storage or whether is it sufficient to get the value from this providers field variable (_refreshToken)
     _refreshToken = await _storageService.loadStringFromLocalStorage(
       key: LocalStorageKey.refreshToken,
     );
@@ -344,7 +343,6 @@ class AuthProvider with ChangeNotifier {
         final String? newIdToken = tokenMap[TokenType.id];
         if (newAccessToken == null || newRefreshToken == null) return;
         _refreshToken = newRefreshToken;
-        // TODO either persist id token in LocalStorage also or leave it as field variable in AuthProvider...
         _idToken = newIdToken;
         _accessTokenJwt = JwtModel.fromJwtString(newAccessToken);
 
@@ -389,7 +387,12 @@ class AuthProvider with ChangeNotifier {
   }
 
   void _informUserAboutInvalidToken() {
-    // TODO add snackbar which informs the user at least
+    final messengerState = ScaffoldMessenger.of(HelperService.globalContext);
+    messengerState.showSnackBar(
+      SnackBar(
+        content: Text(tr("common.invalidSession")),
+      ),
+    );
   }
 
   Future<void> logout() async {
