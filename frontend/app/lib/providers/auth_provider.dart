@@ -390,7 +390,7 @@ class AuthProvider with ChangeNotifier {
     final messengerState = ScaffoldMessenger.of(HelperService.globalContext);
     messengerState.showSnackBar(
       SnackBar(
-        content: Text(tr("common.invalidSession")),
+        content: Text(tr("general.invalidSession")),
       ),
     );
   }
