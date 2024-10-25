@@ -312,7 +312,8 @@ async def test_publish_asset_not_ready(
         # Attempt to publish asset before the asset definition was
         # processed
         response = await authenticated_async_client.post(
-            f"/dataspace/manage/assets/{asset_id}/publication"
+            f"/dataspace/manage/assets/{asset_id}/publication",
+            json={"nautilus_private_key": "42"}
         )
     assert response.status_code == 400
 
@@ -333,14 +334,14 @@ async def test_publish_asset_already_published(
         await asset.process_definition()
         asset.publication = Publication(
             did="some-did",
-            market="some-market",
             asset_key="some-key",
             asset_url="http://some-url"
         )
         await asset.save()
         # Attempt to publish the asset that already has a publication
         response = await authenticated_async_client.post(
-            f"/dataspace/manage/assets/{asset_id}/publication"
+            f"/dataspace/manage/assets/{asset_id}/publication",
+            json = {"nautilus_private_key": "42"}
         )
     # Response should indicate success but without creation of a new resource
     # via 200 status code.
@@ -363,9 +364,10 @@ def patch_nautilus_to_avoid_external_request(
     monkeypatch.setattr(
         nautilus.httpx,
         "post",
-        lambda url, json: httpx.Response(
+        lambda url, json, headers: httpx.Response(
             status_code=201,
-            request=httpx.Request("post", url)
+            request=httpx.Request("post", url),
+            json={"assetdid": "newdid"}
         )
     )
     yield
@@ -388,7 +390,8 @@ async def test_publish_asset(
         await asset.process_definition()
         # Attempt to publish to dataspace
         response = await authenticated_async_client.post(
-            f"/dataspace/manage/assets/{asset_id}/publication"
+            f"/dataspace/manage/assets/{asset_id}/publication",
+            json={"nautilus_private_key": "42"}
         )
         # Status code should indicate creation of new resource
         assert response.status_code == 201
@@ -567,7 +570,8 @@ async def test_get_published_dataset(
         asset = await Asset.get(asset_id)
         await asset.process_definition()
         await authenticated_async_client.post(
-            f"/dataspace/manage/assets/{asset_id}/publication"
+            f"/dataspace/manage/assets/{asset_id}/publication",
+            json={"nautilus_private_key": "42"}
         )
         # As part of the publishing process, an asset_url and asset_key were
         # created. Fetch those from the db, as the public client will need
@@ -614,7 +618,8 @@ async def test_get_published_dataset_invalid_asset_key(
         asset = await Asset.get(asset_id)
         await asset.process_definition()
         await authenticated_async_client.post(
-            f"/dataspace/manage/assets/{asset_id}/publication"
+            f"/dataspace/manage/assets/{asset_id}/publication",
+            json={"nautilus_private_key": "42"}
         )
         # As part of the publishing process, an asset_url and asset_key were
         # created. Only fetch the url here.
