@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime, UTC
 from enum import Enum
-from typing import Optional, Annotated, ClassVar
+from typing import Optional, Annotated, ClassVar, Literal
 from zipfile import ZipFile
 
 from beanie import Document, before_event, Delete
@@ -43,16 +43,40 @@ class AssetDefinition(BaseModel):
     )
 
 
-class Publication(BaseModel):
-    """Publication information for an asset."""
-    market: str = Field(
-        description="Market that an asset is available in via this publication"
+class PublicationNetwork(str, Enum):
+    pontusxdev = "PONTUSXDEV"
+    pontusxtest = "PONTUSXTEST"
+
+
+class PublicationPrice(BaseModel):
+    value: float
+    currency: str
+
+
+class PublicationBase(BaseModel):
+    network: PublicationNetwork = Field(
+        description="Network that an asset is available in via this "
+                    "publication",
+        default=PublicationNetwork.pontusxdev
     )
+    license: Literal["CUSTOM"] = "CUSTOM"
+    price: PublicationPrice = PublicationPrice(value=1, currency="FIXED_EUROE")
+
+
+class NewPublication(PublicationBase):
+    """Schema for new asset publications."""
+    nautilus_private_key: str = Field(
+        description="Key for dataspace authentication."
+    )
+
+
+class Publication(PublicationBase):
+    """Publication information for an asset."""
     did: str = Field(
-        description="Id of this publication provided by the market."
+        description="Id of this publication within its network."
     )
     asset_url: str = Field(
-        description="URL to access asset data within the market."
+        description="URL to access asset data from the network."
     )
     asset_key: str = Field(
         description="Publication specific key to access data via `asset_url`.",
@@ -65,6 +89,8 @@ class AssetMetaData(BaseModel):
     definition: AssetDefinition
     description: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    type: Literal["dataset"] = "dataset"
+    author: Literal["UNKNOWN"] = "UNKNOWN"
 
 
 class Asset(AssetMetaData, Document):

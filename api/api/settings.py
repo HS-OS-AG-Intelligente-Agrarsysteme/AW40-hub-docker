@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     keycloak_url: str = "http://keycloak:8080"
     keycloak_workshop_realm: str = "werkstatt-hub"
 
-    nautilus_publication_url: str = "https://webhook.site/418cbe1c-0753-49d1-a649-0749fd7ef328"  # TODO: Configure properly  # noqa: E501
+    nautilus_publication_url: str = "http://nautilus:3000/nautilus/publish"
 
     api_key_diagnostics: str
 

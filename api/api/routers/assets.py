@@ -7,7 +7,9 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.security import APIKeyHeader
 
-from ..data_management import NewAsset, Asset, Publication, AssetDataStatus
+from ..data_management import (
+    NewAsset, Asset, Publication, AssetDataStatus, NewPublication
+)
 from ..dataspace_management import Nautilus
 from ..security.token_auth import authorized_assets_access
 
@@ -123,6 +125,7 @@ async def get_asset_dataset(
     response_model=Publication
 )
 async def publish_asset(
+        new_publication: NewPublication,
         request: Request,
         asset: Asset = Depends(asset_by_id),
         nautilus: Nautilus = Depends(Nautilus)
@@ -158,7 +161,9 @@ async def publish_asset(
     # Use nautilus to trigger the publication and store publication info
     # within the asset.
     publication = nautilus.publish_access_dataset(
-        asset_url=asset_url, asset=asset
+        asset_url=asset_url,
+        asset=asset,
+        new_publication=new_publication
     )
     asset.publication = publication
     await asset.save()
