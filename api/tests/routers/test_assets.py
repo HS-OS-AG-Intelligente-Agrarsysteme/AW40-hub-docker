@@ -341,7 +341,7 @@ async def test_publish_asset_already_published(
         # Attempt to publish the asset that already has a publication
         response = await authenticated_async_client.post(
             f"/dataspace/manage/assets/{asset_id}/publication",
-            json = {"nautilus_private_key": "42"}
+            json={"nautilus_private_key": "42"}
         )
     # Response should indicate success but without creation of a new resource
     # via 200 status code.
