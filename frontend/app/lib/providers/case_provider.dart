@@ -321,7 +321,6 @@ class CaseProvider with ChangeNotifier {
     return true;
   }
 
-  // TODO is this (and _getAuthToken) necessary? Or is it oboslete because the existence of TokenRefreshingHttpClient
   Future<void> fetchAndSetAuthToken(AuthProvider authProvider) async {
     _authToken = await authProvider.getAuthToken();
     notifyListeners();
