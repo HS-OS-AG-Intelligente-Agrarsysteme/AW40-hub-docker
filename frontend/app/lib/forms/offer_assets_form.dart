@@ -86,7 +86,7 @@ class OfferAssetsForm extends StatelessWidget {
               child: DropdownButtonFormField<AssetsDatatype>(
                 value: assetsDatatypeController.value,
                 decoration: InputDecoration(
-                  labelText: tr("assets.dataType"),
+                  labelText: tr("assets.datatype"),
                   border: const OutlineInputBorder(),
                   errorStyle: const TextStyle(height: 0.1),
                 ),

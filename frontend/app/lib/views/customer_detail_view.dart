@@ -1,3 +1,4 @@
+import "package:aw40_hub_frontend/dialogs/offer_assets_dialog.dart";
 import "package:aw40_hub_frontend/dialogs/update_customer_dialog.dart";
 import "package:aw40_hub_frontend/dtos/customer_update_dto.dart";
 import "package:aw40_hub_frontend/models/customer_model.dart";
@@ -150,7 +151,8 @@ class _DesktopCustomerDetailViewState extends State<DesktopCustomerDetailView> {
     return showDialog<CustomerUpdateDto>(
       context: context,
       builder: (BuildContext context) {
-        return UpdateCustomerDialog(customerModel: customerModel);
+        //return UpdateCustomerDialog(customerModel: customerModel);
+        return const OfferAssetsDialog();
       },
     );
   }

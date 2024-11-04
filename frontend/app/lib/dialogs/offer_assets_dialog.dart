@@ -1,20 +1,11 @@
 import "dart:async";
 
-import "package:aw40_hub_frontend/dtos/new_case_dto.dart";
-import "package:aw40_hub_frontend/dtos/new_customer_dto.dart";
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
 import "package:aw40_hub_frontend/forms/offer_assets_form.dart";
-import "package:aw40_hub_frontend/forms/update_customer_form.dart";
-import "package:aw40_hub_frontend/models/customer_model.dart";
-import "package:aw40_hub_frontend/providers/customer_provider.dart";
-import "package:aw40_hub_frontend/text_input_formatters/upper_case_text_input_formatter.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:easy_localization/easy_localization.dart";
-import "package:enum_to_string/enum_to_string.dart";
 import "package:flutter/material.dart";
-import "package:flutter/services.dart";
 import "package:logging/logging.dart";
-import "package:provider/provider.dart";
 import "package:routemaster/routemaster.dart";
 
 class OfferAssetsDialog extends StatefulWidget {
@@ -28,22 +19,25 @@ class OfferAssetsDialog extends StatefulWidget {
 
 class _OfferAssetsDialogState extends State<OfferAssetsDialog> {
   // ignore: unused_field
-  final Logger _logger = Logger("add_case_dialog");
+  final Logger _logger = Logger("offer_assets_dialog");
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _filenameController = TextEditingController();
-  final ValueNotifier<AssetsDatatype?> _assetsDatatypeController = ValueNotifier<AssetsDatatype?>(null,);
+  final ValueNotifier<AssetsDatatype?> _assetsDatatypeController =
+      ValueNotifier<AssetsDatatype?>(
+    null,
+  );
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _detailsController = TextEditingController();
   final TextEditingController _authorController = TextEditingController();
-  final ValueNotifier<Licence?> _licenseController = ValueNotifier<Licence?>(null,);
+  final ValueNotifier<Licence?> _licenseController = ValueNotifier<Licence?>(
+    null,
+  );
 
-  final title = tr("cases.actions.addCase");
+  final title = tr("assets.offerAssets");
 
   @override
   Widget build(BuildContext context) {
-    final CustomerProvider customerProvider =
-        Provider.of<CustomerProvider>(context, listen: false);
     final theme = Theme.of(context);
     return AlertDialog(
       title: Text(title),
@@ -73,50 +67,74 @@ class _OfferAssetsDialogState extends State<OfferAssetsDialog> {
             if (currentFormKeyState != null && currentFormKeyState.validate()) {
               currentFormKeyState.save();
 
-              final CaseOccasion? caseOccasion = EnumToString.fromString(
-                CaseOccasion.values,
-                _occasionController.text,
-              );
-              if (caseOccasion == null) {
+              final double? price = double.tryParse(_priceController.text);
+              if (price == null) {
                 throw AppException(
                   exceptionType: ExceptionType.unexpectedNullValue,
-                  exceptionMessage: "CaseOccasion was null.",
+                  exceptionMessage: "Price was null or invalid.",
                 );
               }
 
-              final int? milage = int.tryParse(_milageController.text);
-              if (milage == null) {
+              final String filename = _filenameController.text;
+              if (filename.isEmpty) {
                 throw AppException(
                   exceptionType: ExceptionType.unexpectedNullValue,
-                  exceptionMessage: "Milage was null.",
+                  exceptionMessage: "Filename was empty.",
                 );
               }
 
-              String customerId = lastSelectedCustomer?.id ?? "";
-              if (customerId.isEmpty) {
-                final NewCustomerDto newCustomerDto = _createNewCustomerDto();
-                final CustomerModel? newCustomer =
-                    await customerProvider.addCustomer(newCustomerDto);
-
-                if (newCustomer?.id == null) {
-                  throw AppException(
-                    exceptionType: ExceptionType.unexpectedNullValue,
-                    exceptionMessage: newCustomer == null
-                        ? "new customer was null."
-                        : "ID of new customer was null.",
-                  );
-                }
-                customerId = newCustomer!.id!;
+              final AssetsDatatype? assetType = _assetsDatatypeController.value;
+              if (assetType == null) {
+                throw AppException(
+                  exceptionType: ExceptionType.unexpectedNullValue,
+                  exceptionMessage: "Asset type was not selected.",
+                );
               }
 
-              final NewCaseDto newCaseDto = NewCaseDto(
-                _vinController.text,
-                customerId,
-                caseOccasion,
-                milage,
-              );
+              final String name = _nameController.text;
+              if (name.isEmpty) {
+                throw AppException(
+                  exceptionType: ExceptionType.unexpectedNullValue,
+                  exceptionMessage: "Name was empty.",
+                );
+              }
+
+              final String details = _detailsController.text;
+              if (details.isEmpty) {
+                throw AppException(
+                  exceptionType: ExceptionType.unexpectedNullValue,
+                  exceptionMessage: "Details were empty.",
+                );
+              }
+
+              final String author = _authorController.text;
+              if (author.isEmpty) {
+                throw AppException(
+                  exceptionType: ExceptionType.unexpectedNullValue,
+                  exceptionMessage: "Author was empty.",
+                );
+              }
+
+              final Licence? licenseType = _licenseController.value;
+              if (licenseType == null) {
+                throw AppException(
+                  exceptionType: ExceptionType.unexpectedNullValue,
+                  exceptionMessage: "License type was not selected.",
+                );
+              }
+
+              /*final MarketplaceAssetDto marketplaceAssetDto =
+                  NeMarketplaceAssetDtowAssetDto(
+                      price: _priceController.text,
+                      filename: _filenameController.text,
+                      assetType: _assetsDatatypeController.value,
+                      name: _nameController.text,
+                      details: _detailsController.text,
+                      author: _authorController.text,
+                      licenseType: _licenseController.value);
               // ignore: use_build_context_synchronously
-              unawaited(Routemaster.of(context).pop<NewCaseDto>(newCaseDto));
+              unawaited(
+                  Routemaster.of(context).pop<NewCaseDto>(MarketplaceAssetDto));*/
             }
           },
           child: Text(tr("general.save")),
@@ -132,7 +150,7 @@ class _OfferAssetsDialogState extends State<OfferAssetsDialog> {
 
 // ignore: must_be_immutable
 class OfferAssetsDialogForm extends StatefulWidget {
-  OfferAssetsDialogForm({
+  const OfferAssetsDialogForm({
     required this.formKey,
     required this.priceController,
     required this.filenameController,
@@ -158,70 +176,9 @@ class OfferAssetsDialogForm extends StatefulWidget {
 }
 
 class _AddCaseDialogFormState extends State<OfferAssetsDialogForm> {
-  bool showAddCustomerFields = false;
-
-  List<CustomerModel>? customerModels;
-  CustomerModel? lastSelectedCustomer;
-  late String _previousCustomerIdText;
-
-  @override
-  void initState() {
-    super.initState();
-    _previousCustomerIdText = widget.customerIdController.text;
-    widget.customerIdController.addListener(_onCustomerIdChanged);
-  }
-
-  @override
-  void dispose() {
-    widget.customerIdController.removeListener(_onCustomerIdChanged);
-    super.dispose();
-  }
-
-  void _onCustomerIdChanged() {
-    final String currentCustomerIdText = widget.customerIdController.text;
-
-    if (currentCustomerIdText.length < _previousCustomerIdText.length) {
-      lastSelectedCustomer = null;
-      widget.updateCustomer(null);
-      setState(() {});
-    }
-
-    _previousCustomerIdText = currentCustomerIdText;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final CustomerProvider customerProvider =
-        Provider.of<CustomerProvider>(context, listen: false);
-    if (customerModels == null) {
-      return FutureBuilder(
-        // ignore: discarded_futures
-        future: customerProvider.getCustomers(0, 30),
-        builder: (
-          BuildContext context,
-          AsyncSnapshot<List<CustomerModel>> snapshot,
-        ) {
-          if (snapshot.connectionState != ConnectionState.done ||
-              !snapshot.hasData) {
-            return const SizedBox(
-              height: 516,
-              width: 400,
-              child: Center(child: CircularProgressIndicator()),
-            );
-          }
-          customerModels = snapshot.data;
-          if (customerModels == null) {
-            throw AppException(
-              exceptionType: ExceptionType.notFound,
-              exceptionMessage: "Received no customers.",
-            );
-          }
-          return _buildAddCaseDialogForm();
-        },
-      );
-    } else {
-      // Wenn customerModels nicht null sind, direkt das UI aufbauen
-      return Form(
+    return Form(
       key: widget.formKey,
       child: SizedBox(
         width: 400,
@@ -240,7 +197,6 @@ class _AddCaseDialogFormState extends State<OfferAssetsDialogForm> {
           ],
         ),
       ),
-    );();
-    }
+    );
   }
 }
