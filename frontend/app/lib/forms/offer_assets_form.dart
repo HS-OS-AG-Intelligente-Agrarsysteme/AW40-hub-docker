@@ -6,22 +6,22 @@ import "package:flutter/material.dart";
 class OfferAssetsForm extends StatelessWidget {
   const OfferAssetsForm({
     required this.priceController,
-    required this.dataNameController,
+    required this.filenameController,
     required this.nameController,
-    required this.descriptionController,
+    required this.detailsController,
     required this.authorController,
-    required this.assetsDataType,
-    required this.license,
+    required this.assetsDatatypeController,
+    required this.licenseController,
     super.key,
   });
 
   final TextEditingController priceController;
-  final TextEditingController dataNameController;
+  final TextEditingController filenameController;
+  final ValueNotifier<AssetsDatatype?> assetsDatatypeController;
   final TextEditingController nameController;
-  final TextEditingController descriptionController;
+  final TextEditingController detailsController;
   final TextEditingController authorController;
-  final ValueNotifier<AssetsDatatype?> assetsDataType;
-  final ValueNotifier<Licence?> license;
+  final ValueNotifier<Licence?> licenseController;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +61,7 @@ class OfferAssetsForm extends StatelessWidget {
               width: 192,
               height: 66,
               child: TextFormField(
-                controller: dataNameController,
+                controller: filenameController,
                 decoration: InputDecoration(
                   labelText: tr("assets.dataName"),
                   border: const OutlineInputBorder(),
@@ -84,7 +84,7 @@ class OfferAssetsForm extends StatelessWidget {
               width: 192,
               height: 66,
               child: DropdownButtonFormField<AssetsDatatype>(
-                value: assetsDataType.value,
+                value: assetsDatatypeController.value,
                 decoration: InputDecoration(
                   labelText: tr("assets.dataType"),
                   border: const OutlineInputBorder(),
@@ -100,7 +100,7 @@ class OfferAssetsForm extends StatelessWidget {
                     ),
                   );
                 }).toList(),
-                onChanged: (value) => assetsDataType.value = value,
+                onChanged: (value) => assetsDatatypeController.value = value,
                 validator: (value) {
                   if (value == null) {
                     return tr("general.obligatoryField");
@@ -134,7 +134,7 @@ class OfferAssetsForm extends StatelessWidget {
           width: double.infinity,
           height: 66,
           child: TextFormField(
-            controller: descriptionController,
+            controller: detailsController,
             decoration: InputDecoration(
               labelText: tr("assets.description"),
               border: const OutlineInputBorder(),
@@ -166,7 +166,7 @@ class OfferAssetsForm extends StatelessWidget {
               width: 192,
               height: 66,
               child: DropdownButtonFormField<Licence>(
-                value: license.value,
+                value: licenseController.value,
                 decoration: InputDecoration(
                   labelText: tr("assets.license"),
                   border: const OutlineInputBorder(),
@@ -180,7 +180,7 @@ class OfferAssetsForm extends StatelessWidget {
                     ),
                   );
                 }).toList(),
-                onChanged: (value) => license.value = value,
+                onChanged: (value) => licenseController.value = value,
                 validator: (value) {
                   if (value == null) {
                     return tr("general.obligatoryField");
