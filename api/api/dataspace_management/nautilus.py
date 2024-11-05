@@ -46,7 +46,8 @@ class Nautilus:
         response = httpx.post(
             "/".join([self._publication_url, new_publication.network]),
             json=payload,
-            headers={"priv_key": new_publication.nautilus_private_key}
+            headers={"priv_key": new_publication.nautilus_private_key},
+            timeout=None
         )
         # response.raise_for_status()  # TODO: Handle failures
         did = response.json().get("assetdid", "")
