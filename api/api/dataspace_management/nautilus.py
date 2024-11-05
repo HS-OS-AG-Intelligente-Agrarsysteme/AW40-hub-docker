@@ -7,23 +7,31 @@ from ..data_management import Asset, Publication, NewPublication
 
 
 class Nautilus:
-    _publication_url: Optional[str] = None
+    _url: Optional[str] = None
 
     def __init__(self):
-        if not self._publication_url:
+        if not self._url:
             raise AttributeError("No Nautilus connection configured.")
 
     @classmethod
-    def configure(cls, publication_url: str):
+    def configure(cls, url: str):
         """Configure nautilus connection details."""
-        cls._publication_url = publication_url
+        cls._url = url
+
+    @property
+    def _publication_url(self):
+        return "/".join([self._url, "publish"])
+
+    @property
+    def _revocation_url(self):
+        return "/".join([self._url, "revoke"])
 
     def publish_access_dataset(
             self,
             asset_url: str,
             asset: Asset,
             new_publication: NewPublication
-    ) -> Publication:
+    ) -> (Publication | None, str):
         # Generate a new asset key
         asset_key = secrets.token_urlsafe(32)
         # Set up request payload
@@ -37,9 +45,11 @@ class Nautilus:
                 **asset.model_dump(
                     include={"name", "type", "description", "author"}
                 ),
-                **new_publication.model_dump(
-                    include={"license", "price"}
-                )
+                "license": new_publication.license,
+                "price": {
+                             "value": new_publication.price,
+                             "currency": "FIXED_EUROE"
+                         }
             }
         }
         try:
@@ -52,11 +62,11 @@ class Nautilus:
             )
         except httpx.TimeoutException:
             # None return value indicates failed communication
-            return None
+            return None, "Connection timeout."
 
         if response.status_code // 100 != 2:
             # None return value indicates failed communication
-            return None
+            return None, response.text
 
         did = response.json()["assetdid"]
         return Publication(
@@ -64,4 +74,28 @@ class Nautilus:
             asset_key=asset_key,
             asset_url=asset_url,
             **new_publication.model_dump()
-        )
+        ), "success"
+
+    def revoke_publication(
+            self, publication: Publication, nautilus_private_key: str
+    ) -> (bool, str):
+        try:
+            # Revoke the publication
+            response = httpx.post(
+                "/".join(
+                    [
+                        self._revocation_url,
+                        publication.network,
+                        publication.did
+                    ]
+                ),
+                headers={"priv_key": nautilus_private_key},
+                timeout=120  # Takes a while due to roundtrip to pontus-x
+            )
+        except httpx.TimeoutException:
+            # False indicates failed communication
+            return False, "Connection timeout."
+        if response.status_code // 100 != 2:
+            # False indicates failed communication
+            return False, response.text
+        return True, "success"

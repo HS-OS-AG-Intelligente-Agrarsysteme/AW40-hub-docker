@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     keycloak_url: str = "http://keycloak:8080"
     keycloak_workshop_realm: str = "werkstatt-hub"
 
-    nautilus_publication_url: str = "http://nautilus:3000/nautilus/publish"
+    nautilus_url: str = "http://nautilus:3000/nautilus"
 
     api_key_diagnostics: str
 

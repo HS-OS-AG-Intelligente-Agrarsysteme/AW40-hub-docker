@@ -88,6 +88,4 @@ def set_api_keys():
 
 @app.on_event("startup")
 def init_nautilus():
-    Nautilus.configure(
-        publication_url=settings.nautilus_publication_url
-    )
+    Nautilus.configure(url=settings.nautilus_url)
