@@ -364,7 +364,7 @@ def patch_nautilus_to_avoid_external_request(
     monkeypatch.setattr(
         nautilus.httpx,
         "post",
-        lambda url, json, headers: httpx.Response(
+        lambda url, json, headers, timeout: httpx.Response(
             status_code=201,
             request=httpx.Request("post", url),
             json={"assetdid": "newdid"}
