@@ -208,7 +208,8 @@ class TestAsset:
             asset = await Asset(
                 name="Test Asset",
                 description="This is an test asset.",
-                definition=definition
+                definition=definition,
+                author="test author"
             ).create()
 
             # Process the definition
@@ -233,7 +234,8 @@ class TestAsset:
             asset = await Asset(
                 name="Test Asset",
                 description="This is an test asset.",
-                definition=AssetDefinition()
+                definition=AssetDefinition(),
+                author="Test author"
             ).create()
             # Test existence of archive file after processing the definition
             await asset.process_definition()
@@ -253,7 +255,8 @@ class TestAsset:
             asset = await Asset(
                 name="Test Asset",
                 description="This is an test asset.",
-                definition=AssetDefinition()
+                definition=AssetDefinition(),
+                author="Test author"
             ).create()
             # Delete before an archive file was created
             await asset.delete()

@@ -48,19 +48,14 @@ class PublicationNetwork(str, Enum):
     pontusxtest = "PONTUSXTEST"
 
 
-class PublicationPrice(BaseModel):
-    value: float
-    currency: str
-
-
 class PublicationBase(BaseModel):
     network: PublicationNetwork = Field(
         description="Network that an asset is available in via this "
                     "publication",
         default=PublicationNetwork.pontusxdev
     )
-    license: Literal["CUSTOM"] = "CUSTOM"
-    price: PublicationPrice = PublicationPrice(value=1, currency="FIXED_EUROE")
+    license: str = "CUSTOM"
+    price: float = 0
 
 
 class NewPublication(PublicationBase):
@@ -90,7 +85,7 @@ class AssetMetaData(BaseModel):
     description: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     type: Literal["dataset"] = "dataset"
-    author: Literal["UNKNOWN"] = "UNKNOWN"
+    author: str
 
 
 class Asset(AssetMetaData, Document):
@@ -183,3 +178,4 @@ class NewAsset(BaseModel):
     name: str
     definition: Optional[AssetDefinition] = AssetDefinition()
     description: str
+    author: str

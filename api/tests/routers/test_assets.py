@@ -126,7 +126,8 @@ def data_context(
                     id=a_id,
                     name=f"A{i}",
                     description=f"This is asset {i}.",
-                    definition=AssetDefinition()
+                    definition=AssetDefinition(),
+                    author="Test author"
                 ).create()
 
         async def __aexit__(self, exc_type, exc, tb):
@@ -177,7 +178,8 @@ async def test_add_asset(
             json={
                 "name": name,
                 "description": description,
-                "definition": {}
+                "definition": {},
+                "author": "Test author"
             }
         )
         assert response.status_code == 201
