@@ -165,6 +165,11 @@ async def publish_asset(
         asset=asset,
         new_publication=new_publication
     )
+    if publication is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed communication with nautilus."
+        )
     asset.publication = publication
     await asset.save()
     return publication

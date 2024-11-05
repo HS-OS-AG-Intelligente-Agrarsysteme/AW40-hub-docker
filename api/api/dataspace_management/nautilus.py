@@ -42,16 +42,23 @@ class Nautilus:
                 )
             }
         }
-        # Trigger the publication
-        response = httpx.post(
-            "/".join([self._publication_url, new_publication.network]),
-            json=payload,
-            headers={"priv_key": new_publication.nautilus_private_key},
-            timeout=None
-        )
-        # response.raise_for_status()  # TODO: Handle failures
-        did = response.json().get("assetdid", "")
+        try:
+            # Trigger the publication
+            response = httpx.post(
+                "/".join([self._publication_url, new_publication.network]),
+                json=payload,
+                headers={"priv_key": new_publication.nautilus_private_key},
+                timeout=120  # Takes a while due to roundtrip to pontus-x
+            )
+        except httpx.TimeoutException:
+            # None return value indicates failed communication
+            return None
 
+        if response.status_code // 100 != 2:
+            # None return value indicates failed communication
+            return None
+
+        did = response.json()["assetdid"]
         return Publication(
             did=did,
             asset_key=asset_key,
