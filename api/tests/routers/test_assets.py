@@ -407,6 +407,103 @@ async def test_publish_asset(
         )
 
 
+@pytest.fixture
+def patch_nautilus_to_timeout_communication(
+        authenticated_async_client, monkeypatch
+):
+    """
+    Patch Nautilus such that external publication request times out.
+    """
+    # Configure publication url to avoid failure of Nautilus constructor
+    Nautilus.configure(publication_url="http://nothing-here")
+
+    # Patch httpx.post in the nautilus module to timeout
+    def _timeout(*args, **kwargs):
+        raise httpx.TimeoutException(
+            "Simulated timeout during dataset publication"
+        )
+
+    monkeypatch.setattr(
+        nautilus.httpx, "post", _timeout
+    )
+    yield
+    # Clean up
+    Nautilus.configure(publication_url=None)
+
+
+@pytest.mark.asyncio
+async def test_publish_asset_with_communication_timeout(
+        authenticated_async_client,
+        initialized_beanie_context,
+        data_context,
+        asset_ids_in_data_context,
+        patch_nautilus_to_timeout_communication
+):
+    asset_id = asset_ids_in_data_context[0]
+    async with initialized_beanie_context, data_context:
+        # Process asset definition to allow publication
+        asset = await Asset.get(asset_id)
+        await asset.process_definition()
+        # Attempt to publish to dataspace
+        response = await authenticated_async_client.post(
+            f"/dataspace/manage/assets/{asset_id}/publication",
+            json={"nautilus_private_key": "42"}
+        )
+        # Http exception should indicate failed communication
+        assert response.status_code == 500
+        assert response.json()["detail"] == ("Failed communication with "
+                                             "nautilus.")
+
+
+@pytest.fixture(params=[400, 401, 500, 501])
+def patch_nautilus_to_fail_http_communication(
+        authenticated_async_client, monkeypatch, request
+):
+    """
+    Patch Nautilus such that external publication request fails with non-success
+    http status code.
+    """
+    # Configure publication url to avoid failure of Nautilus constructor
+    Nautilus.configure(publication_url="http://nothing-here")
+    # Patch httpx.post in the nautilus module to avoid external request and
+    # to respond with non-success http code
+    monkeypatch.setattr(
+        nautilus.httpx,
+        "post",
+        lambda url, json, headers, timeout: httpx.Response(
+            status_code=request.param,
+            request=httpx.Request("post", url)
+        )
+    )
+    yield
+    # Clean up
+    Nautilus.configure(publication_url=None)
+
+
+@pytest.mark.asyncio
+async def test_publish_asset_with_failed_http_communication(
+        authenticated_async_client,
+        initialized_beanie_context,
+        data_context,
+        asset_ids_in_data_context,
+        patch_nautilus_to_fail_http_communication
+):
+    asset_id = asset_ids_in_data_context[0]
+    async with initialized_beanie_context, data_context:
+        # Process asset definition to allow publication
+        asset = await Asset.get(asset_id)
+        await asset.process_definition()
+        # Attempt to publish to dataspace
+        response = await authenticated_async_client.post(
+            f"/dataspace/manage/assets/{asset_id}/publication",
+            json={"nautilus_private_key": "42"}
+        )
+        # Http exception should indicate failed communication
+        assert response.status_code == 500
+        assert response.json()["detail"] == ("Failed communication with "
+                                             "nautilus.")
+
+
 @pytest.mark.parametrize(
     "method,endpoint",
     [
@@ -669,7 +766,6 @@ async def test_get_published_dataset_asset_invalid_asset_id(
         public_async_client,
         initialized_beanie_context
 ):
-
     async with (initialized_beanie_context):
         # Public client attempts to fetch an asset that does not exist at all
         # (Note: No data context here and new asset id)
