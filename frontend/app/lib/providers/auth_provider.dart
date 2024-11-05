@@ -18,7 +18,7 @@ import "package:flutter/material.dart";
 import "package:http/http.dart" as http;
 import "package:logging/logging.dart";
 import "package:routemaster/routemaster.dart";
-import "package:universal_html/html.dart" hide Navigator;
+import "package:universal_html/html.dart" hide Navigator, Text;
 
 class AuthProvider with ChangeNotifier {
   AuthProvider(
