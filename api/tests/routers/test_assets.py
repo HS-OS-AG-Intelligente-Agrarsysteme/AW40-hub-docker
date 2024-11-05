@@ -460,8 +460,8 @@ def patch_nautilus_to_fail_http_communication(
         authenticated_async_client, monkeypatch, request
 ):
     """
-    Patch Nautilus such that external publication request fails with non-success
-    http status code.
+    Patch Nautilus such that external publication request fails with
+    non-success http status code.
     """
     # Configure publication url to avoid failure of Nautilus constructor
     Nautilus.configure(publication_url="http://nothing-here")
