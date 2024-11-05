@@ -214,17 +214,96 @@ async def test_get_asset(
     assert response.json()["_id"] == asset_id
 
 
+@pytest.fixture
+def patch_nautilus_to_fail_revocation(
+        authenticated_async_client, monkeypatch
+):
+    """
+    Patch Nautilus to enforce failure of any attempt to revoke a publication
+    in the dataspace.
+    """
+    # Configure url to avoid failure of Nautilus constructor
+    Nautilus.configure(url="http://nothing-here")
+
+    def _raise(*args, **kwargs):
+        raise Exception("Simulated failure during asset revocation")
+
+    monkeypatch.setattr(Nautilus, "revoke_publication", _raise)
+    yield
+    # Clean up
+    Nautilus.configure(url=None)
+
+
 @pytest.mark.asyncio
 async def test_delete_asset(
         authenticated_async_client,
         initialized_beanie_context,
         data_context,
-        asset_ids_in_data_context
+        asset_ids_in_data_context,
+        patch_nautilus_to_fail_revocation  # ... as there is no publication
 ):
     asset_id = asset_ids_in_data_context[0]
     async with initialized_beanie_context, data_context:
-        response = await authenticated_async_client.delete(
-            f"/dataspace/manage/assets/{asset_id}"
+        response = await authenticated_async_client.request(
+            "DELETE",
+            f"/dataspace/manage/assets/{asset_id}",
+            json={"nautilus_private_key": "42"}
+        )
+        assert response.status_code == 200
+        assert response.json() is None
+        # Confirm deletion in db
+        asset_db = await Asset.get(asset_id)
+        assert asset_db is None
+
+
+@pytest.fixture
+def patch_nautilus_to_avoid_external_revocation_request(
+        authenticated_async_client, monkeypatch
+):
+    """
+    Patch Nautilus to avoid external request for asset revocation
+    """
+    # Configure url to avoid failure of Nautilus constructor
+    Nautilus.configure(url="http://nothing-here")
+    # Patch httpx.post in the nautilus module to avoid external request
+    monkeypatch.setattr(
+        nautilus.httpx,
+        "post",
+        lambda url, headers, timeout: httpx.Response(
+            status_code=200,
+            request=httpx.Request("post", url),
+        )
+    )
+    yield
+    # Clean up
+    Nautilus.configure(url=None)
+
+
+@pytest.mark.asyncio
+async def test_delete_asset_with_publication(
+        authenticated_async_client,
+        initialized_beanie_context,
+        data_context,
+        asset_ids_in_data_context,
+        patch_nautilus_to_avoid_external_revocation_request
+):
+    asset_id = asset_ids_in_data_context[0]
+    async with initialized_beanie_context, data_context:
+        # Get one of the assets in the data_context, process it's definition
+        # and add a publication
+        asset = await Asset.get(asset_id)
+        await asset.process_definition()
+        asset.publication = Publication(
+            did="some-did",
+            asset_key="some-key",
+            asset_url="http://some-url"
+        )
+        await asset.save()
+        # Delete it
+        response = await authenticated_async_client.request(
+            "DELETE",
+            f"/dataspace/manage/assets/{asset_id}",
+            json={"nautilus_private_key": "42"}
         )
         assert response.status_code == 200
         assert response.json() is None
