@@ -289,8 +289,8 @@ def patch_nautilus_to_fail_publication(
     Patch Nautilus to enforce failure of any attempt to publish to the
     dataspace.
     """
-    # Configure publication url to avoid failure of Nautilus constructor
-    Nautilus.configure(publication_url="http://nothing-here")
+    # Configure url to avoid failure of Nautilus constructor
+    Nautilus.configure(url="http://nothing-here")
 
     def _raise():
         raise Exception("Simulated failure during dataset publication")
@@ -298,7 +298,7 @@ def patch_nautilus_to_fail_publication(
     monkeypatch.setattr(Nautilus, "publish_access_dataset", _raise)
     yield
     # Clean up
-    Nautilus.configure(publication_url=None)
+    Nautilus.configure(url=None)
 
 
 @pytest.mark.asyncio
@@ -360,8 +360,8 @@ def patch_nautilus_to_avoid_external_request(
     Patch Nautilus to just return a publication without first attempting any
     external http requests.
     """
-    # Configure publication url to avoid failure of Nautilus constructor
-    Nautilus.configure(publication_url="http://nothing-here")
+    # Configure url to avoid failure of Nautilus constructor
+    Nautilus.configure(url="http://nothing-here")
     # Patch httpx.post in the nautilus module to avoid external request
     monkeypatch.setattr(
         nautilus.httpx,
@@ -374,7 +374,7 @@ def patch_nautilus_to_avoid_external_request(
     )
     yield
     # Clean up
-    Nautilus.configure(publication_url=None)
+    Nautilus.configure(url=None)
 
 
 @pytest.mark.asyncio
@@ -414,8 +414,8 @@ def patch_nautilus_to_timeout_communication(
     """
     Patch Nautilus such that external publication request times out.
     """
-    # Configure publication url to avoid failure of Nautilus constructor
-    Nautilus.configure(publication_url="http://nothing-here")
+    # Configure url to avoid failure of Nautilus constructor
+    Nautilus.configure(url="http://nothing-here")
 
     # Patch httpx.post in the nautilus module to timeout
     def _timeout(*args, **kwargs):
@@ -428,7 +428,7 @@ def patch_nautilus_to_timeout_communication(
     )
     yield
     # Clean up
-    Nautilus.configure(publication_url=None)
+    Nautilus.configure(url=None)
 
 
 @pytest.mark.asyncio
@@ -452,7 +452,7 @@ async def test_publish_asset_with_communication_timeout(
         # Http exception should indicate failed communication
         assert response.status_code == 500
         assert response.json()["detail"] == ("Failed communication with "
-                                             "nautilus.")
+                                             "nautilus: Connection timeout.")
 
 
 @pytest.fixture(params=[400, 401, 500, 501])
@@ -463,8 +463,8 @@ def patch_nautilus_to_fail_http_communication(
     Patch Nautilus such that external publication request fails with
     non-success http status code.
     """
-    # Configure publication url to avoid failure of Nautilus constructor
-    Nautilus.configure(publication_url="http://nothing-here")
+    # Configure url to avoid failure of Nautilus constructor
+    Nautilus.configure(url="http://nothing-here")
     # Patch httpx.post in the nautilus module to avoid external request and
     # to respond with non-success http code
     monkeypatch.setattr(
@@ -472,12 +472,13 @@ def patch_nautilus_to_fail_http_communication(
         "post",
         lambda url, json, headers, timeout: httpx.Response(
             status_code=request.param,
+            text="Failed.",
             request=httpx.Request("post", url)
         )
     )
     yield
     # Clean up
-    Nautilus.configure(publication_url=None)
+    Nautilus.configure(url=None)
 
 
 @pytest.mark.asyncio
@@ -501,7 +502,7 @@ async def test_publish_asset_with_failed_http_communication(
         # Http exception should indicate failed communication
         assert response.status_code == 500
         assert response.json()["detail"] == ("Failed communication with "
-                                             "nautilus.")
+                                             "nautilus: Failed.")
 
 
 @pytest.mark.parametrize(
