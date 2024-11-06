@@ -9,10 +9,11 @@ import "package:enum_to_string/enum_to_string.dart";
 import "package:http/http.dart" as http;
 
 class HttpService {
-  HttpService(this._client) {
-    _client = TokenRefreshingHttpClientInterceptor(
-      _client,
-    );
+  HttpService(this._client, {http.Client? interceptor}) {
+    _client = interceptor ??
+        TokenRefreshingHttpClientInterceptor(
+          _client,
+        );
   }
 
   http.Client _client;
