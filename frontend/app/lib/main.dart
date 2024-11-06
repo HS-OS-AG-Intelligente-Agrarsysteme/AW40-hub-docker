@@ -7,8 +7,6 @@ import "package:easy_localization/easy_localization.dart";
 import "package:easy_logger/easy_logger.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
-// ignore: depend_on_referenced_packages
-import "package:flutter_test/flutter_test.dart";
 import "package:flutter_web_plugins/url_strategy.dart";
 import "package:http/http.dart" as http;
 import "package:logging/logging.dart";
@@ -18,7 +16,6 @@ final GlobalKey<NavigatorState> globalNavKey =
 final Logger _logger = Logger("main");
 
 Future<void> main() async {
-  TestWidgetsFlutterBinding.ensureInitialized();
   await _initialize();
   final String d = EnvironmentService().isDebugMode ? "in debug mode" : "";
   _logger.info(

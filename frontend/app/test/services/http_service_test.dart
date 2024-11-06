@@ -7,6 +7,7 @@ import "package:http/http.dart" as http;
 import "package:http/testing.dart";
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group("HttpService", () {
     setUp(() async {
       await ConfigService().initialize();
