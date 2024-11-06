@@ -64,7 +64,8 @@ $kcadm add-roles \
     -r werkstatt-hub \
     --gname Mechanics \
     --rolename workshop \
-    --rolename shared
+    --rolename shared \
+    --rolename customers
 
 $kcadm create groups \
     -r werkstatt-hub \
@@ -74,7 +75,9 @@ $kcadm add-roles \
     -r werkstatt-hub \
     --gname Analysts \
     --rolename workshop \
-    --rolename shared
+    --rolename shared \
+    --rolename customers \
+    --rolename assets
 
 $kcadm create groups \
     -r werkstatt-hub \
