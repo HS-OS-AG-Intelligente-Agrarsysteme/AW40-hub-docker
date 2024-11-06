@@ -213,5 +213,5 @@ async def get_published_dataset(
             headers={"WWW-Authenticate": "asset_key"},
         )
     return FileResponse(
-        path=asset.data_file_path, filename=asset.data_file_name
+        path=asset.data_file_path, filename=f"{asset.name}.zip"
     )
