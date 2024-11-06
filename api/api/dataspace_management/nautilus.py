@@ -1,6 +1,5 @@
 import secrets
 from typing import Optional, Tuple
-from urllib.parse import urljoin
 
 import httpx
 
@@ -22,11 +21,11 @@ class Nautilus:
 
     @property
     def _publication_url(self):
-        return urljoin(self._url, "publish")
+        return "/".join([self._url, "publish"])
 
     @property
     def _revocation_url(self):
-        return urljoin(self._url, "revoke")
+        return "/".join([self._url, "revoke"])
 
     def _post_request(
             self,
@@ -79,7 +78,7 @@ class Nautilus:
         }
         # Attempt publication
         response, info = self._post_request(
-            url=urljoin(self._publication_url, new_publication.network),
+            url="/".join([self._publication_url, new_publication.network]),
             headers={"priv_key": new_publication.nautilus_private_key},
             json_payload=payload
         )
@@ -99,9 +98,8 @@ class Nautilus:
             self, publication: Publication, nautilus_private_key: str
     ) -> Tuple[bool, str]:
         """Revoke a published asset in Nautilus."""
-        url = urljoin(
-            self._revocation_url,
-            f"{publication.network}/{publication.did}"
+        url = "/".join(
+            [self._revocation_url, publication.network, publication.did]
         )
         response, info = self._post_request(
             url=url, headers={"priv_key": nautilus_private_key}
