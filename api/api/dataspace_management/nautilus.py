@@ -8,16 +8,17 @@ from ..data_management import Asset, Publication, NewPublication
 
 class Nautilus:
     _url: Optional[str] = None
-    TIMEOUT: int = 120  # Timeout for external requests to nautilus
+    _timeout: Optional[int] = None  # Timeout for external requests to nautilus
 
     def __init__(self):
         if not self._url:
             raise AttributeError("No Nautilus connection configured.")
 
     @classmethod
-    def configure(cls, url: str):
+    def configure(cls, url: str, timeout: int):
         """Configure the nautilus connection details."""
         cls._url = url
+        cls._timeout = timeout
 
     @property
     def _publication_url(self):
@@ -38,7 +39,7 @@ class Nautilus:
         """
         try:
             response = httpx.post(
-                url, json=json_payload, headers=headers, timeout=self.TIMEOUT
+                url, json=json_payload, headers=headers, timeout=self._timeout
             )
             response.raise_for_status()
             return response, "success"

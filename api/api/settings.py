@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     keycloak_workshop_realm: str = "werkstatt-hub"
 
     nautilus_url: str = "http://nautilus:3000/nautilus"
+    nautilus_timeout: int = 120
 
     api_key_diagnostics: str
 

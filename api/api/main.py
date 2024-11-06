@@ -88,4 +88,6 @@ def set_api_keys():
 
 @app.on_event("startup")
 def init_nautilus():
-    Nautilus.configure(url=settings.nautilus_url)
+    Nautilus.configure(
+        url=settings.nautilus_url, timeout=settings.nautilus_timeout
+    )
