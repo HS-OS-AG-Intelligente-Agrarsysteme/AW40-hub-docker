@@ -269,7 +269,7 @@ def patch_nautilus_to_avoid_external_revocation_request(
     monkeypatch.setattr(
         nautilus.httpx,
         "post",
-        lambda url, headers, timeout: httpx.Response(
+        lambda url, headers, timeout, json: httpx.Response(
             status_code=200,
             request=httpx.Request("post", url),
         )
