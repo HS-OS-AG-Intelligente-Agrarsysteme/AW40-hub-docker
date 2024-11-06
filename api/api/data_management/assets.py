@@ -109,7 +109,8 @@ class Asset(AssetMetaData, Document):
         exclude = {
             field: True for field in [
                 "customer_id", "workshop_id", "diagnosis_id",
-                "timeseries_data_added", "obd_data_added", "symptoms_added"
+                "timeseries_data_added", "obd_data_added", "symptoms_added",
+                "status"
             ]
         }
         # Exclude fields only relevant for internal data management from
