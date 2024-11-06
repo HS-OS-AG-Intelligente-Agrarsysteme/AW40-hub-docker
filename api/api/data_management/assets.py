@@ -55,7 +55,7 @@ class PublicationBase(BaseModel):
         default=PublicationNetwork.pontusxdev
     )
     license: str = "CUSTOM"
-    price: float = 0
+    price: float = 1.0
 
 
 class NewPublication(PublicationBase):
