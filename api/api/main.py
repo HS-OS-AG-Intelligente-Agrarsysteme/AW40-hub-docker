@@ -14,7 +14,7 @@ from .diagnostics_management import DiagnosticTaskManager, KnowledgeGraph
 from .settings import settings
 from .security.keycloak import Keycloak
 from .v1 import api_v1
-from .routers import diagnostics
+from .routers import diagnostics, assets
 
 app = FastAPI()
 app.add_middleware(
@@ -84,10 +84,13 @@ def init_keycloak():
 @app.on_event("startup")
 def set_api_keys():
     diagnostics.api_key_auth.valid_key = settings.api_key_diagnostics
+    assets.api_key_auth.valid_key = settings.api_key_assets
 
 
 @app.on_event("startup")
 def init_nautilus():
     Nautilus.configure(
-        url=settings.nautilus_url, timeout=settings.nautilus_timeout
+        url=settings.nautilus_url,
+        timeout=settings.nautilus_timeout,
+        api_key_assets=settings.api_key_assets
     )

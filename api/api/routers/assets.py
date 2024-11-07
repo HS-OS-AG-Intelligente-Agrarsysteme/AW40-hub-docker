@@ -14,6 +14,9 @@ from ..data_management import (
 )
 from ..dataspace_management import Nautilus
 from ..security.token_auth import authorized_assets_access
+from ..security.api_key_auth import APIKeyAuth
+
+api_key_auth = APIKeyAuth()
 
 tags_metadata = [
     {
@@ -34,7 +37,8 @@ management_router = APIRouter(
 
 public_router = APIRouter(
     tags=["Public Dataspace Resources"],
-    prefix="/dataspace/public"
+    prefix="/dataspace/public",
+    dependencies=[Depends(api_key_auth)]
 )
 
 
