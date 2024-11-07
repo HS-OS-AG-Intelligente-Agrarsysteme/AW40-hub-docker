@@ -24,6 +24,8 @@ class Settings(BaseSettings):
 
     api_key_diagnostics: str
 
+    api_key_assets: str
+
     exclude_diagnostics_router: bool = False
 
     @property

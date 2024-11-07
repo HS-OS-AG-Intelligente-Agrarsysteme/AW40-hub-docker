@@ -33,8 +33,8 @@ export async function publishAccessDataset(
     url: url,
     method: 'GET',
     headers: {
-      API_KEY: api_key,
-      DATA_KEY: data_key
+      'x-api-key': api_key,
+      data_key: data_key
     }
   }
   const pricingConfig = pricingConfigs[price.currency]
