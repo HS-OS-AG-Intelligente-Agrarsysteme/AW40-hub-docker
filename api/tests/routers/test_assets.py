@@ -39,6 +39,7 @@ def app(motor_db):
     app = FastAPI()
     app.include_router(assets.management_router)
     app.include_router(assets.public_router)
+    assets.api_key_auth.valid_key = "assets-key-dev"
     yield app
 
 
@@ -223,7 +224,11 @@ def patch_nautilus_to_fail_revocation(
     in the dataspace.
     """
     # Configure url to avoid failure of Nautilus constructor
-    Nautilus.configure(url="http://nothing-here", timeout=None)
+    Nautilus.configure(
+        url="http://nothing-here",
+        timeout=None,
+        api_key_assets=None
+    )
 
     def _raise(*args, **kwargs):
         raise Exception("Simulated failure during asset revocation")
@@ -231,7 +236,7 @@ def patch_nautilus_to_fail_revocation(
     monkeypatch.setattr(Nautilus, "revoke_publication", _raise)
     yield
     # Clean up
-    Nautilus.configure(url=None, timeout=None)
+    Nautilus.configure(url=None, timeout=None, api_key_assets=None)
 
 
 @pytest.mark.asyncio
@@ -264,7 +269,11 @@ def patch_nautilus_to_avoid_external_revocation_request(
     Patch Nautilus to avoid external request for asset revocation
     """
     # Configure url to avoid failure of Nautilus constructor
-    Nautilus.configure(url="http://nothing-here", timeout=None)
+    Nautilus.configure(
+        url="http://nothing-here",
+        timeout=None,
+        api_key_assets=None
+    )
     # Patch httpx.post in the nautilus module to avoid external request
     monkeypatch.setattr(
         nautilus.httpx,
@@ -276,7 +285,7 @@ def patch_nautilus_to_avoid_external_revocation_request(
     )
     yield
     # Clean up
-    Nautilus.configure(url=None, timeout=None)
+    Nautilus.configure(url=None, timeout=None, api_key_assets=None)
 
 
 @pytest.mark.asyncio
@@ -369,7 +378,11 @@ def patch_nautilus_to_fail_publication(
     dataspace.
     """
     # Configure url to avoid failure of Nautilus constructor
-    Nautilus.configure(url="http://nothing-here", timeout=None)
+    Nautilus.configure(
+        url="http://nothing-here",
+        timeout=None,
+        api_key_assets=None
+    )
 
     def _raise():
         raise Exception("Simulated failure during dataset publication")
@@ -377,7 +390,7 @@ def patch_nautilus_to_fail_publication(
     monkeypatch.setattr(Nautilus, "publish_access_dataset", _raise)
     yield
     # Clean up
-    Nautilus.configure(url=None, timeout=None)
+    Nautilus.configure(url=None, timeout=None, api_key_assets=None)
 
 
 @pytest.mark.asyncio
@@ -440,7 +453,11 @@ def patch_nautilus_to_avoid_external_request(
     external http requests.
     """
     # Configure url to avoid failure of Nautilus constructor
-    Nautilus.configure(url="http://nothing-here", timeout=None)
+    Nautilus.configure(
+        url="http://nothing-here",
+        timeout=None,
+        api_key_assets=None
+    )
     # Patch httpx.post in the nautilus module to avoid external request
     monkeypatch.setattr(
         nautilus.httpx,
@@ -453,7 +470,7 @@ def patch_nautilus_to_avoid_external_request(
     )
     yield
     # Clean up
-    Nautilus.configure(url=None, timeout=None)
+    Nautilus.configure(url=None, timeout=None, api_key_assets=None)
 
 
 @pytest.mark.asyncio
@@ -494,7 +511,11 @@ def patch_nautilus_to_timeout_communication(
     Patch Nautilus such that external publication request times out.
     """
     # Configure url to avoid failure of Nautilus constructor
-    Nautilus.configure(url="http://nothing-here", timeout=None)
+    Nautilus.configure(
+        url="http://nothing-here",
+        timeout=None,
+        api_key_assets=None
+    )
 
     # Patch httpx.post in the nautilus module to timeout
     def _timeout(*args, **kwargs):
@@ -507,7 +528,7 @@ def patch_nautilus_to_timeout_communication(
     )
     yield
     # Clean up
-    Nautilus.configure(url=None, timeout=None)
+    Nautilus.configure(url=None, timeout=None, api_key_assets=None)
 
 
 @pytest.mark.asyncio
@@ -543,7 +564,11 @@ def patch_nautilus_to_fail_http_communication(
     non-success http status code.
     """
     # Configure url to avoid failure of Nautilus constructor
-    Nautilus.configure(url="http://nothing-here", timeout=None)
+    Nautilus.configure(
+        url="http://nothing-here",
+        timeout=None,
+        api_key_assets=None
+    )
     # Patch httpx.post in the nautilus module to avoid external request and
     # to respond with non-success http code
     monkeypatch.setattr(
@@ -557,7 +582,7 @@ def patch_nautilus_to_fail_http_communication(
     )
     yield
     # Clean up
-    Nautilus.configure(url=None, timeout=None)
+    Nautilus.configure(url=None, timeout=None, api_key_assets=None)
 
 
 @pytest.mark.asyncio
@@ -765,7 +790,8 @@ async def test_get_published_dataset(
         # Now do the actual testing: Can the public client access the asset
         # data archive using the automatically created url and key?
         response = await public_async_client.get(
-            asset_url, headers={"asset_key": asset_key}
+            asset_url,
+            headers={"asset_key": asset_key, "x-api-key": "assets-key-dev"}
         )
         assert response.status_code == 200
         # Download the archive and validate structure
@@ -811,7 +837,10 @@ async def test_get_published_dataset_invalid_asset_key(
         # Now do the actual testing: The asset url is valid, but the public
         # client can not access the dataset with an invalid asset_key
         response = await public_async_client.get(
-            asset_url, headers={"asset_key": "this-sure-is-not-the-right-key"}
+            asset_url,
+            headers={
+                "asset_key": "this-sure-is-not-the-right-key",
+                "x-api-key": "assets-key-dev"}
         )
         assert response.status_code == 401
         assert response.json() == {"detail": "Could not validate asset key."}
@@ -833,7 +862,8 @@ async def test_get_published_dataset_asset_not_published(
         # Public client tries to fetch the data (maybe the asset was published
         # in the past)
         response = await public_async_client.get(
-            asset_url, headers={"asset_key": "some-key"}
+            asset_url,
+            headers={"asset_key": "some-key", "x-api-key": "assets-key-dev"}
         )
         assert response.status_code == 404
         assert response.json() == {
@@ -852,7 +882,8 @@ async def test_get_published_dataset_asset_invalid_asset_id(
         asset_id = str(ObjectId())
         asset_url = f"/dataspace/public/assets/{asset_id}/data"
         response = await public_async_client.get(
-            asset_url, headers={"asset_key": "some-key"}
+            asset_url,
+            headers={"asset_key": "some-key", "x-api-key": "assets-key-dev"}
         )
         assert response.status_code == 404
         assert response.json() == {
@@ -863,7 +894,9 @@ async def test_get_published_dataset_asset_invalid_asset_id(
 def test_get_published_dataset_no_asset_key(unauthenticated_client):
     any_asset_id = str(ObjectId())
     response = unauthenticated_client.get(
-        f"/dataspace/public/assets/{any_asset_id}/data"
+        f"/dataspace/public/assets/{any_asset_id}/data",
+        headers={"x-api-key": "assets-key-dev"}
     )
     assert response.status_code == 403
     assert response.json() == {"detail": "Not authenticated"}
+
