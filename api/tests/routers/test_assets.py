@@ -900,3 +900,12 @@ def test_get_published_dataset_no_asset_key(unauthenticated_client):
     assert response.status_code == 403
     assert response.json() == {"detail": "Not authenticated"}
 
+
+def test_get_published_dataset_no_asset_api_key(unauthenticated_client):
+    any_asset_id = str(ObjectId())
+    response = unauthenticated_client.get(
+        f"/dataspace/public/assets/{any_asset_id}/data",
+        headers={"x-api-key": "assets-key-dev"}
+    )
+    assert response.status_code == 403
+    assert response.json() == {"detail": "Not authenticated"}
