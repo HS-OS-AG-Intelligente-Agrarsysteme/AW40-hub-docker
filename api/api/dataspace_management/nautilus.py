@@ -9,16 +9,18 @@ from ..data_management import Asset, Publication, NewPublication
 class Nautilus:
     _url: Optional[str] = None
     _timeout: Optional[int] = None  # Timeout for external requests to nautilus
+    _api_key_assets: Optional[str] = None
 
     def __init__(self):
         if not self._url:
             raise AttributeError("No Nautilus connection configured.")
 
     @classmethod
-    def configure(cls, url: str, timeout: int):
+    def configure(cls, url: str, timeout: int, api_key_assets: str):
         """Configure the nautilus connection details."""
         cls._url = url
         cls._timeout = timeout
+        cls._api_key_assets = api_key_assets
 
     @property
     def _publication_url(self):
@@ -63,7 +65,7 @@ class Nautilus:
         payload = {
             "service_descr": {
                 "url": asset_url,
-                "api_key": "UNDETERMINED",
+                "api_key": self._api_key_assets,
                 "data_key": asset_key
             },
             "asset_descr": {
