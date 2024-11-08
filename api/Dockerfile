@@ -13,6 +13,9 @@ RUN groupadd -r api && \
 # use api users home directory as workdir
 WORKDIR /home/api
 
+# create directory to store asset data and chown to api user
+RUN mkdir /home/api/asset-data && chown api:api /home/api/asset-data
+
 # install minimal requirements
 COPY ./requirements.txt /home/api/requirements.txt
 RUN pip install --upgrade pip && \

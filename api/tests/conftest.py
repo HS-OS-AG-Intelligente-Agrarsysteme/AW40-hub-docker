@@ -9,7 +9,8 @@ from api.data_management import (
     Vehicle,
     Customer,
     Workshop,
-    Diagnosis
+    Diagnosis,
+    Asset
 )
 from beanie import init_beanie
 from bson import ObjectId
@@ -47,7 +48,7 @@ async def initialized_beanie_context(motor_db):
     context manager to handle test setup and teardown.
     """
     models = [
-        Case, Vehicle, Customer, Workshop, Diagnosis
+        Case, Vehicle, Customer, Workshop, Diagnosis, Asset
     ]
 
     class InitializedBeanieContext:
@@ -317,3 +318,8 @@ def another_rsa_public_key_pem() -> bytes:
     """Get a public key that does not match keys from any other fixture."""
     _, public_key_pem = _create_rsa_key_pair()
     return public_key_pem
+
+
+@pytest.fixture(autouse=True)
+def set_asset_data_dir_path_to_temporary_test_dir(tmp_path):
+    Asset.asset_data_dir_path = tmp_path

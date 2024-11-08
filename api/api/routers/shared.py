@@ -22,7 +22,6 @@ tags_metadata = [
     }
 ]
 
-
 router = APIRouter(
     tags=["Shared"],
     dependencies=[Depends(authorized_shared_access)]
@@ -33,14 +32,24 @@ router = APIRouter(
 async def list_cases(
         customer_id: Optional[str] = None,
         vin: Optional[str] = None,
-        workshop_id: Optional[str] = None
+        workshop_id: Optional[str] = None,
+        obd_data_dtc: Optional[str] = None,
+        timeseries_data_component: Optional[str] = None
 ) -> List[Case]:
     """
     List all cases in Hub. Query params can be used to filter by `customer_id`,
-    `vin` and `workshop_id`.
+    (partial) `vin`, `workshop_id`, `obd_data_dtc` or
+    `timeseries_data_component`.
+
+    The specified `vin` is matched against the beginning of the stored vehicle
+    vins.
     """
     cases = await Case.find_in_hub(
-        customer_id=customer_id, vin=vin, workshop_id=workshop_id
+        customer_id=customer_id,
+        vin=vin,
+        workshop_id=workshop_id,
+        obd_data_dtc=obd_data_dtc,
+        timeseries_data_component=timeseries_data_component
     )
     return cases
 
@@ -88,6 +97,7 @@ class DatasetById:
     Parameterized dependency to fetch a dataset by id or raise 404 if the
     data_id is not existent.
     """
+
     def __init__(
             self, data_type: Literal["timeseries_data", "obd_data", "symptom"]
     ):
