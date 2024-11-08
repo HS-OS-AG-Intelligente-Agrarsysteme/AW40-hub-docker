@@ -1,8 +1,6 @@
-import "package:aw40_hub_frontend/providers/case_provider.dart";
 import "package:aw40_hub_frontend/text_input_formatters/upper_case_text_input_formatter.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
-import "package:provider/provider.dart";
 import "package:routemaster/routemaster.dart";
 
 class FilterCasesDialog extends StatelessWidget {
@@ -45,10 +43,8 @@ class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
 
   final List<String> mockDataEntries = ["Test1", "Test2", "Test3"];
 
-  bool _switchState = true;
   @override
   Widget build(BuildContext context) {
-    _switchState = Provider.of<CaseProvider>(context).showSharedCases;
     return SizedBox(
       height: 250,
       width: 350,
@@ -117,23 +113,6 @@ class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
                 },
               ).toList(),
             ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Text(tr("cases.filterDialog.toggleShared")),
-              const SizedBox(width: 16),
-              Switch(
-                value: _switchState,
-                onChanged: (v) async {
-                  setState(() {
-                    _switchState = v;
-                  });
-                  await Provider.of<CaseProvider>(context, listen: false)
-                      .toggleShowSharedCases();
-                },
-              ),
-            ],
           ),
         ],
       ),
