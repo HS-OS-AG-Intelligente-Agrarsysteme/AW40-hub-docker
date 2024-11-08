@@ -3,6 +3,7 @@ general:
   case: "Fall"
   city: "Stadt"
   close: "Schließen"
+  component: "Komponente"
   customer: "Kunde"
   customerId: "Kunden ID"
   dataType: "Datentyp"
