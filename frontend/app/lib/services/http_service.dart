@@ -456,4 +456,13 @@ class HttpService {
       body: jsonEncode(requestBody),
     );
   }
+
+  Future<http.Response> getVehicleComponents(
+    String token,
+  ) {
+    return _client.get(
+      Uri.parse("$backendUrl/knowledge/components"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
 }

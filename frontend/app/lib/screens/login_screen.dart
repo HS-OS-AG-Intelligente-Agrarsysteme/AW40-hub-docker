@@ -6,6 +6,7 @@ import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/providers/case_provider.dart";
 import "package:aw40_hub_frontend/providers/customer_provider.dart";
 import "package:aw40_hub_frontend/providers/diagnosis_provider.dart";
+import "package:aw40_hub_frontend/providers/knowledge_provider.dart";
 import "package:aw40_hub_frontend/providers/vehicle_provider.dart";
 import "package:aw40_hub_frontend/services/auth_service.dart";
 import "package:aw40_hub_frontend/services/config_service.dart";
@@ -117,6 +118,8 @@ class _LoginScreenState extends State<LoginScreen> {
         Provider.of<VehicleProvider>(context, listen: false);
     final CustomerProvider customerProvider =
         Provider.of<CustomerProvider>(context, listen: false);
+    final KnowledgeProvider knowledgeProvider =
+        Provider.of<KnowledgeProvider>(context, listen: false);
 
     await authProvider.tryLoginWithStoredRefreshToken();
 

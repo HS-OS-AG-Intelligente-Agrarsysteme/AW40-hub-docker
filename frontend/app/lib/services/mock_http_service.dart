@@ -1464,4 +1464,10 @@ class MockHttpService implements HttpService {
     // TODO: implement deleteSymptomData
     throw UnimplementedError();
   }
+
+  @override
+  Future<Response> getVehicleComponents(String token) {
+    // TODO: implement getVehicleComponents
+    throw UnimplementedError();
+  }
 }
