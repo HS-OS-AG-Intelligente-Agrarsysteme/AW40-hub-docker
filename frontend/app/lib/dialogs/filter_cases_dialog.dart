@@ -36,11 +36,13 @@ class FilterCasesDialogContent extends StatefulWidget {
 }
 
 class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
+  // TODO rename?
   final TextEditingController _errorCodeController = TextEditingController();
   final TextEditingController _vinController = TextEditingController();
-  // TODO Dropdown
+  // TODO rename?
   final TextEditingController _oscillogramController = TextEditingController();
 
+  // TODO replace with actual data
   final List<String> mockDataEntries = ["Test1", "Test2", "Test3"];
 
   @override
@@ -56,10 +58,10 @@ class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
             child: TextFormField(
               autovalidateMode: AutovalidateMode.onUserInteraction,
               inputFormatters: [UpperCaseTextInputFormatter()],
-              decoration: const InputDecoration(
-                labelText: "Error code",
-                border: OutlineInputBorder(),
-                errorStyle: TextStyle(height: 0.1),
+              decoration: InputDecoration(
+                labelText: tr("cases.filterDialog.error"),
+                border: const OutlineInputBorder(),
+                errorStyle: const TextStyle(height: 0.1),
               ),
               controller: _errorCodeController,
             ),
@@ -72,7 +74,7 @@ class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
               autovalidateMode: AutovalidateMode.onUserInteraction,
               inputFormatters: [UpperCaseTextInputFormatter()],
               decoration: InputDecoration(
-                labelText: "first 6 numbers of vehicle vin",
+                labelText: tr("cases.filterDialog.error"),
                 border: const OutlineInputBorder(),
                 errorStyle: const TextStyle(height: 0.1),
               ),
@@ -93,8 +95,7 @@ class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
           ),
           const SizedBox(width: 16),
           Tooltip(
-            // TODO adjust (and translate) or remove
-            message: "Please select",
+            message: tr("cases.filterDialog.tooltip"),
             child: DropdownMenu<String>(
               controller: _oscillogramController,
               label: Text(tr("general.component")),

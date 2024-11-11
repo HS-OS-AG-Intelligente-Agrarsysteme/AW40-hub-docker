@@ -108,7 +108,10 @@ cases:
     open: "Open"
     closed: "Closed"
   filterDialog:
+    error: "Error code"
     title: "Filter cases"
+    tooltip: "Please select"
+    vin: "First six numbers of vehicle vin"
     toggleShared: "Show cases from all workshops"
   addCaseDialog:
     customerTooltip: "Assign case to a customer"
