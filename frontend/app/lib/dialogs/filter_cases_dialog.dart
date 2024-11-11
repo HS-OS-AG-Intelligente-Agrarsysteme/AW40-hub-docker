@@ -72,7 +72,7 @@ class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
           child: Column(
             children: [
               SizedBox(
-                width: 300,
+                width: 320,
                 height: 66,
                 child: TextFormField(
                   autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -87,13 +87,13 @@ class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
               ),
               const SizedBox(width: 16),
               SizedBox(
-                width: 300,
+                width: 320,
                 height: 66,
                 child: TextFormField(
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   inputFormatters: [UpperCaseTextInputFormatter()],
                   decoration: InputDecoration(
-                    labelText: tr("cases.filterDialog.error"),
+                    labelText: tr("cases.filterDialog.vin"),
                     border: const OutlineInputBorder(),
                     errorStyle: const TextStyle(height: 0.1),
                   ),
@@ -120,7 +120,7 @@ class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
                   label: Text(tr("general.component")),
                   hintText: tr("forms.optional"),
                   enableFilter: true,
-                  width: 300,
+                  width: 320,
                   //onSelected: (value) async => _onCustomerSelection(context, value),
                   menuStyle: const MenuStyle(alignment: Alignment.bottomLeft),
                   dropdownMenuEntries:

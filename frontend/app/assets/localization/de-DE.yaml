@@ -110,7 +110,7 @@ cases:
     error: "Fehler-Code"
     title: "Fälle filtern"
     tooltip: "Bitte auswählen"
-    vin: "Die ersten sechs Stellen Stellen der VIN"
+    vin: "Die ersten sechs Stellen der VIN"
     toggleShared: "Fälle aus allen Werkstätten anzeigen"
   addCaseDialog:
     customerTooltip: "Fall einem Kunden zuordnen"
