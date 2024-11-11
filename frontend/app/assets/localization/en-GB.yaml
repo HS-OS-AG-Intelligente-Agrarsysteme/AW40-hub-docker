@@ -1,4 +1,5 @@
 general:
+  apply: "Apply"
   cancel: "Cancel"
   case: "Case"
   city: "City"
@@ -110,9 +111,10 @@ cases:
   filterDialog:
     error: "Error code"
     title: "Filter cases"
+    toggleShared: "Show cases from all workshops"
     tooltip: "Please select"
     vin: "First six numbers of vehicle vin"
-    toggleShared: "Show cases from all workshops"
+    vinLengthInvalid: "Must be a maximum of six characters long"
   addCaseDialog:
     customerTooltip: "Assign case to a customer"
     createNewCustomerTooltip: "Create new customer"

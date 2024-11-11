@@ -118,6 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Provider.of<VehicleProvider>(context, listen: false);
     final CustomerProvider customerProvider =
         Provider.of<CustomerProvider>(context, listen: false);
+    // apparently this has an effect despite the variable not being used here
     final KnowledgeProvider knowledgeProvider =
         Provider.of<KnowledgeProvider>(context, listen: false);
 

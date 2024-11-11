@@ -30,7 +30,19 @@ class CaseProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<CaseModel>> getCurrentCases() async {
+  Future<List<CaseModel>> getCurrentCases({
+    String? vin,
+    String? obdDataDtc,
+    String? timeseriesDataComponent,
+  }) async {
+    Map<String, String> queryParams = {};
+
+    if (vin != null) queryParams["vin"] = vin;
+    if (obdDataDtc != null) queryParams["obd_data_dtc"] = obdDataDtc;
+    if (timeseriesDataComponent != null) {
+      queryParams["timeseries_data_component"] = timeseriesDataComponent;
+    }
+
     final String authToken = _getAuthToken();
     // * Return value currently not used.
     final Response response;

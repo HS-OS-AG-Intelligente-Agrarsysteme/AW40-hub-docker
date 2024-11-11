@@ -1,4 +1,5 @@
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
+import "package:aw40_hub_frontend/providers/case_provider.dart";
 import "package:aw40_hub_frontend/providers/knowledge_provider.dart";
 import "package:aw40_hub_frontend/text_input_formatters/upper_case_text_input_formatter.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
@@ -8,17 +9,40 @@ import "package:provider/provider.dart";
 import "package:routemaster/routemaster.dart";
 
 class FilterCasesDialog extends StatelessWidget {
-  const FilterCasesDialog({super.key});
+  FilterCasesDialog({super.key});
+
+  final TextEditingController _obdDataDtcController = TextEditingController();
+  final TextEditingController _vinController = TextEditingController();
+  final TextEditingController _timeseriesDataComponentController =
+      TextEditingController();
+
+  late CaseProvider _caseProvider;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    _caseProvider = Provider.of<CaseProvider>(context, listen: false);
+
     return AlertDialog(
       title: Text(tr("cases.filterDialog.title")),
-      content: const FilterCasesDialogContent(),
+      content: FilterCasesDialogContent(
+        obdDataDtcController: _obdDataDtcController,
+        vinController: _vinController,
+        timeseriesDataComponentController: _timeseriesDataComponentController,
+      ),
       actions: [
         TextButton(
-          child: Text(tr("general.close")),
           onPressed: () async => _onCancel(context),
+          child: Text(
+            tr("general.cancel"),
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: theme.colorScheme.error,
+            ),
+          ),
+        ),
+        TextButton(
+          onPressed: _applyFilterForCases,
+          child: Text(tr("general.apply")),
         ),
       ],
     );
@@ -27,12 +51,27 @@ class FilterCasesDialog extends StatelessWidget {
   Future<void> _onCancel(BuildContext context) async {
     await Routemaster.of(context).pop();
   }
+
+  Future<void> _applyFilterForCases() async {
+    await _caseProvider.getCurrentCases(
+      obdDataDtc: _obdDataDtcController.text,
+      vin: _vinController.text,
+      timeseriesDataComponent: _timeseriesDataComponentController.text,
+    );
+  }
 }
 
 class FilterCasesDialogContent extends StatefulWidget {
   const FilterCasesDialogContent({
+    required this.obdDataDtcController,
+    required this.vinController,
+    required this.timeseriesDataComponentController,
     super.key,
   });
+
+  final TextEditingController obdDataDtcController;
+  final TextEditingController vinController;
+  final TextEditingController timeseriesDataComponentController;
 
   @override
   State<FilterCasesDialogContent> createState() =>
@@ -40,12 +79,6 @@ class FilterCasesDialogContent extends StatefulWidget {
 }
 
 class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
-  // TODO rename?
-  final TextEditingController _errorCodeController = TextEditingController();
-  final TextEditingController _vinController = TextEditingController();
-  // TODO rename?
-  final TextEditingController _oscillogramController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     final knowledgeProvider =
@@ -82,7 +115,7 @@ class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
                     border: const OutlineInputBorder(),
                     errorStyle: const TextStyle(height: 0.1),
                   ),
-                  controller: _errorCodeController,
+                  controller: widget.obdDataDtcController,
                 ),
               ),
               const SizedBox(width: 16),
@@ -97,10 +130,10 @@ class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
                     border: const OutlineInputBorder(),
                     errorStyle: const TextStyle(height: 0.1),
                   ),
-                  controller: _vinController,
+                  controller: widget.vinController,
                   validator: (String? value) {
                     if ((value?.length ?? 0) > 6) {
-                      return tr("cases.addCaseDialog.vinLengthInvalid");
+                      return tr("cases.filterDialog.vinLengthInvalid");
                     }
                     if (value != null && value.contains(RegExp("[IOQ]"))) {
                       return tr(
@@ -116,7 +149,7 @@ class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
               Tooltip(
                 message: tr("cases.filterDialog.tooltip"),
                 child: DropdownMenu<String>(
-                  controller: _oscillogramController,
+                  controller: widget.timeseriesDataComponentController,
                   label: Text(tr("general.component")),
                   hintText: tr("forms.optional"),
                   enableFilter: true,

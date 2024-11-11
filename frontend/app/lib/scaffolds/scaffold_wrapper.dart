@@ -73,7 +73,7 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
   Future<void> _showFilterCasesDialog() async {
     await showDialog(
       context: context,
-      builder: (BuildContext context) => const FilterCasesDialog(),
+      builder: (BuildContext context) => FilterCasesDialog(),
     );
   }
 
