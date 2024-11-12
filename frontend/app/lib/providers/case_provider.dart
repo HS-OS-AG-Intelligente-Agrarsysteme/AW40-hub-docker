@@ -10,6 +10,7 @@ import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:aw40_hub_frontend/services/http_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/utils/filter_criteria.dart";
 import "package:flutter/material.dart";
 import "package:http/http.dart";
 import "package:logging/logging.dart";
@@ -24,35 +25,40 @@ class CaseProvider with ChangeNotifier {
   bool get showSharedCases => _showSharedCases;
   String? _authToken;
 
-  // TODO should this reset the filter as it probably does right now?
+  FilterCriteria? _filterCriteria;
+
+  FilterCriteria? get filterCriteria => _filterCriteria;
+
+  void setFilterCriteria(FilterCriteria criteria) {
+    _filterCriteria = criteria;
+    notifyListeners();
+  }
+
+  void resetFilterCriteria() {
+    _filterCriteria = null;
+    notifyListeners();
+  }
+
   Future<void> toggleShowSharedCases() async {
     _showSharedCases = !_showSharedCases;
     await getCurrentCases();
     notifyListeners();
   }
 
-  Future<List<CaseModel>> getCurrentCases({
-    String? vin,
-    String? obdDataDtc,
-    String? timeseriesDataComponent,
-  }) async {
+  Future<List<CaseModel>> getCurrentCases() async {
     final String authToken = _getAuthToken();
     // * Return value currently not used.
     final Response response;
     if (_showSharedCases) {
       response = await _httpService.getSharedCases(
         authToken,
-        vin: vin,
-        obdDataDtc: obdDataDtc,
-        timeseriesDataComponent: timeseriesDataComponent,
+        filterCriteria: filterCriteria,
       );
     } else {
       response = await _httpService.getCases(
         authToken,
         workshopId,
-        vin: vin,
-        obdDataDtc: obdDataDtc,
-        timeseriesDataComponent: timeseriesDataComponent,
+        filterCriteria: filterCriteria,
       );
     }
     final bool verifyStatusCode = HelperService.verifyStatusCode(
@@ -164,12 +170,13 @@ class CaseProvider with ChangeNotifier {
     _logger.warning("Unimplemented: sortCases()");
   }
 
-  Future<void> filterCases() async {
+// TODO remove
+  /*Future<void> filterCases() async {
     // Klasse FilterCriteria mit Feld für jedes Filterkriterium.
     // Aktuelle Filter werden durch Zustand einer FilterCriteria Instanz
     // definiert.
     _logger.warning("Unimplemented: filterCases()");
-  }
+  }*/
 
   Future<bool> uploadObdData(String caseId, NewOBDDataDto obdDataDto) async {
     final String authToken = _getAuthToken();

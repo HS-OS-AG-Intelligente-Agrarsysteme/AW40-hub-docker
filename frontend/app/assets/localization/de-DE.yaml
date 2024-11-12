@@ -109,6 +109,7 @@ cases:
     closed: "Geschlossen"
   filterDialog:
     error: "Fehler-Code"
+    resetFilterCriteria: "Filter zurücksetzen"
     title: "Fälle filtern"
     toggleShared: "Fälle aus allen Werkstätten anzeigen"
     tooltip: "Bitte auswählen"

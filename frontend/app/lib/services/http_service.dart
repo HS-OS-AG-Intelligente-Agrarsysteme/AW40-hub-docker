@@ -3,6 +3,7 @@ import "dart:convert";
 import "package:aw40_hub_frontend/dtos/new_symptom_dto.dart";
 import "package:aw40_hub_frontend/services/config_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/utils/filter_criteria.dart";
 import "package:collection/collection.dart";
 import "package:enum_to_string/enum_to_string.dart";
 import "package:http/http.dart" as http;
@@ -34,16 +35,15 @@ class HttpService {
 
   Future<http.Response> getSharedCases(
     String token, {
-    String? vin,
-    String? obdDataDtc,
-    String? timeseriesDataComponent,
+    FilterCriteria? filterCriteria,
   }) {
     final uri = Uri.parse("$backendUrl/shared/cases").replace(
       queryParameters: {
-        if (vin != null) "vin": vin,
-        if (obdDataDtc != null) "obd_data_dtc": obdDataDtc,
-        if (timeseriesDataComponent != null)
-          "timeseries_data_component": timeseriesDataComponent,
+        if (filterCriteria?.vin != null) "vin": filterCriteria?.vin,
+        if (filterCriteria?.obdDataDtc != null)
+          "obd_data_dtc": filterCriteria?.obdDataDtc,
+        if (filterCriteria?.timeseriesDataComponent != null)
+          "timeseries_data_component": filterCriteria?.timeseriesDataComponent,
       },
     );
 
@@ -56,16 +56,15 @@ class HttpService {
   Future<http.Response> getCases(
     String token,
     String workshopId, {
-    String? vin,
-    String? obdDataDtc,
-    String? timeseriesDataComponent,
+    FilterCriteria? filterCriteria,
   }) {
     final uri = Uri.parse("$backendUrl/$workshopId/cases").replace(
       queryParameters: {
-        if (vin != null) "vin": vin,
-        if (obdDataDtc != null) "obd_data_dtc": obdDataDtc,
-        if (timeseriesDataComponent != null)
-          "timeseries_data_component": timeseriesDataComponent,
+        if (filterCriteria?.vin != null) "vin": filterCriteria?.vin,
+        if (filterCriteria?.obdDataDtc != null)
+          "obd_data_dtc": filterCriteria?.obdDataDtc,
+        if (filterCriteria?.timeseriesDataComponent != null)
+          "timeseries_data_component": filterCriteria?.timeseriesDataComponent,
       },
     );
 

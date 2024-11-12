@@ -110,6 +110,7 @@ cases:
     closed: "Closed"
   filterDialog:
     error: "Error code"
+    resetFilterCriteria: "Reset filter"
     title: "Filter cases"
     toggleShared: "Show cases from all workshops"
     tooltip: "Please select"

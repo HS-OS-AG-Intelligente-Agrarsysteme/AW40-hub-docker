@@ -17,6 +17,7 @@ import "package:aw40_hub_frontend/dtos/vehicle_dto.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:aw40_hub_frontend/services/http_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/utils/filter_criteria.dart";
 import "package:http/http.dart" show Response;
 import "package:logging/logging.dart";
 
@@ -876,9 +877,7 @@ class MockHttpService implements HttpService {
   Future<Response> getCases(
     String token,
     String workshopId, {
-    String? vin,
-    String? obdDataDtc,
-    String? timeseriesDataComponent,
+    FilterCriteria? filterCriteria,
   }) {
     _demoCaseDto.workshopId = workshopId;
     for (final c in _caseDtos) {
@@ -952,9 +951,7 @@ class MockHttpService implements HttpService {
   @override
   Future<Response> getSharedCases(
     String token, {
-    String? vin,
-    String? obdDataDtc,
-    String? timeseriesDataComponent,
+    FilterCriteria? filterCriteria,
   }) {
     final List<CaseDto> caseDtos = _caseDtos + _sharedCaseDtos;
     return Future.delayed(

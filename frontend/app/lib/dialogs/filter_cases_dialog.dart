@@ -5,6 +5,7 @@ import "package:aw40_hub_frontend/providers/case_provider.dart";
 import "package:aw40_hub_frontend/providers/knowledge_provider.dart";
 import "package:aw40_hub_frontend/text_input_formatters/upper_case_text_input_formatter.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/utils/filter_criteria.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
@@ -25,6 +26,8 @@ class FilterCasesDialog extends StatelessWidget {
     final theme = Theme.of(context);
     _caseProvider = Provider.of<CaseProvider>(context, listen: false);
 
+    // TODO init with
+
     return AlertDialog(
       title: Text(tr("cases.filterDialog.title")),
       content: FilterCasesDialogContent(
@@ -43,11 +46,25 @@ class FilterCasesDialog extends StatelessWidget {
           ),
         ),
         TextButton(
+          onPressed: () async => _resetFilterCriteria(context),
+          child: Text(
+            tr("cases.filterDialog.resetFilterCriteria"),
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: theme.colorScheme.error,
+            ),
+          ),
+        ),
+        TextButton(
           onPressed: () async => _applyFilterForCases(context),
           child: Text(tr("general.apply")),
         ),
       ],
     );
+  }
+
+  Future<void> _resetFilterCriteria(BuildContext context) async {
+    _caseProvider.resetFilterCriteria();
+    await Routemaster.of(context).pop();
   }
 
   Future<void> _onCancel(BuildContext context) async {
@@ -58,12 +75,15 @@ class FilterCasesDialog extends StatelessWidget {
     final obdDataDtc = _obdDataDtcController.text;
     final vin = _vinController.text;
     final timeseriesDataComponent = _timeseriesDataComponentController.text;
-    await _caseProvider.getCurrentCases(
+    final filterCriteria = FilterCriteria(
       obdDataDtc: obdDataDtc.isEmpty ? null : obdDataDtc,
       vin: vin.isEmpty ? null : vin,
       timeseriesDataComponent:
           timeseriesDataComponent.isEmpty ? null : timeseriesDataComponent,
     );
+
+    _caseProvider.setFilterCriteria(filterCriteria);
+
     // ignore: use_build_context_synchronously
     await Routemaster.of(context).pop();
   }
