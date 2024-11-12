@@ -170,14 +170,6 @@ class CaseProvider with ChangeNotifier {
     _logger.warning("Unimplemented: sortCases()");
   }
 
-// TODO remove
-  /*Future<void> filterCases() async {
-    // Klasse FilterCriteria mit Feld für jedes Filterkriterium.
-    // Aktuelle Filter werden durch Zustand einer FilterCriteria Instanz
-    // definiert.
-    _logger.warning("Unimplemented: filterCases()");
-  }*/
-
   Future<bool> uploadObdData(String caseId, NewOBDDataDto obdDataDto) async {
     final String authToken = _getAuthToken();
     final Map<String, dynamic> obdDataJson = obdDataDto.toJson();

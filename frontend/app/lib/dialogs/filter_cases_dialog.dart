@@ -186,7 +186,6 @@ class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
                   hintText: tr("forms.optional"),
                   enableFilter: true,
                   width: 320,
-                  //onSelected: (value) async => _onCustomerSelection(context, value),
                   menuStyle: const MenuStyle(alignment: Alignment.bottomLeft),
                   dropdownMenuEntries:
                       vehicleComponents.map<DropdownMenuEntry<String>>(
