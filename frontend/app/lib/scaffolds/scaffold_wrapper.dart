@@ -34,10 +34,13 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
   final Logger _logger = Logger("scaffold_wrapper");
   int currentIndex = 0;
   bool _switchState = true;
+  bool _isFilterActive = false;
 
   @override
   Widget build(BuildContext context) {
-    _switchState = Provider.of<CaseProvider>(context).showSharedCases;
+    final caseProvider = Provider.of<CaseProvider>(context);
+    _switchState = caseProvider.showSharedCases;
+    _isFilterActive = caseProvider.isFilterActive();
 
     final LoggedInUserModel loggedInUserModel =
         Provider.of<AuthProvider>(context).loggedInUser;
@@ -146,11 +149,20 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
             icon: const Icon(Icons.sort),
             tooltip: tr("cases.actions.sortCases"),
           ),
-          IconButton(
-            onPressed: () async => _showFilterCasesDialog(),
-            icon: const Icon(Icons.filter_list),
-            tooltip: tr("cases.actions.filterCases"),
-          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: _isFilterActive
+                  ? Colors.blue.withOpacity(0.2)
+                  : Colors.transparent,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              onPressed: () async => _showFilterCasesDialog(),
+              icon: const Icon(Icons.filter_list),
+              color: _isFilterActive ? Colors.blue : null,
+              tooltip: tr("cases.actions.filterCases"),
+            ),
+          )
         ],
       ),
       NavigationMenuItemModel(

@@ -39,6 +39,10 @@ class CaseProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  bool isFilterActive() {
+    return filterCriteria != null;
+  }
+
   Future<void> toggleShowSharedCases() async {
     _showSharedCases = !_showSharedCases;
     await getCurrentCases();
