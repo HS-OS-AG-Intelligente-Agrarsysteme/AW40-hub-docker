@@ -26,7 +26,11 @@ class FilterCasesDialog extends StatelessWidget {
     final theme = Theme.of(context);
     _caseProvider = Provider.of<CaseProvider>(context, listen: false);
 
-    // TODO init with
+    final FilterCriteria? currentFilterCriteria = _caseProvider.filterCriteria;
+    _obdDataDtcController.text = currentFilterCriteria?.obdDataDtc ?? "";
+    _vinController.text = currentFilterCriteria?.vin ?? "";
+    _timeseriesDataComponentController.text =
+        currentFilterCriteria?.timeseriesDataComponent ?? "";
 
     return AlertDialog(
       title: Text(tr("cases.filterDialog.title")),
