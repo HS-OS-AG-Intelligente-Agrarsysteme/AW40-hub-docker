@@ -150,34 +150,35 @@ class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
                   controller: widget.obdDataDtcController,
                 ),
               ),
-              const SizedBox(width: 16),
-              SizedBox(
-                width: 320,
-                height: 66,
-                child: TextFormField(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  inputFormatters: [UpperCaseTextInputFormatter()],
-                  decoration: InputDecoration(
-                    labelText: tr("cases.filterDialog.vin"),
-                    border: const OutlineInputBorder(),
-                    errorStyle: const TextStyle(height: 0.1),
-                  ),
-                  controller: widget.vinController,
-                  validator: (String? value) {
-                    if ((value?.length ?? 0) > 6) {
-                      return tr("cases.filterDialog.vinLengthInvalid");
-                    }
-                    if (value != null && value.contains(RegExp("[IOQ]"))) {
-                      return tr(
-                        "cases.addCaseDialog.vinCharactersInvalid",
-                      );
-                    }
+              Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 16),
+                child: SizedBox(
+                  width: 320,
+                  height: 66,
+                  child: TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    inputFormatters: [UpperCaseTextInputFormatter()],
+                    decoration: InputDecoration(
+                      labelText: tr("cases.filterDialog.vin"),
+                      border: const OutlineInputBorder(),
+                      errorStyle: const TextStyle(height: 0.1),
+                    ),
+                    controller: widget.vinController,
+                    validator: (String? value) {
+                      if ((value?.length ?? 0) > 6) {
+                        return tr("cases.filterDialog.vinLengthInvalid");
+                      }
+                      if (value != null && value.contains(RegExp("[IOQ]"))) {
+                        return tr(
+                          "cases.addCaseDialog.vinCharactersInvalid",
+                        );
+                      }
 
-                    return null;
-                  },
+                      return null;
+                    },
+                  ),
                 ),
               ),
-              const SizedBox(width: 16),
               Tooltip(
                 message: tr("cases.filterDialog.tooltip"),
                 child: DropdownMenu<String>(
