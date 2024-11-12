@@ -873,7 +873,13 @@ class MockHttpService implements HttpService {
   }
 
   @override
-  Future<Response> getCases(String token, String workshopId) {
+  Future<Response> getCases(
+    String token,
+    String workshopId, {
+    String? vin,
+    String? obdDataDtc,
+    String? timeseriesDataComponent,
+  }) {
     _demoCaseDto.workshopId = workshopId;
     for (final c in _caseDtos) {
       c.workshopId = workshopId;
@@ -944,7 +950,12 @@ class MockHttpService implements HttpService {
   }
 
   @override
-  Future<Response> getSharedCases(String token) {
+  Future<Response> getSharedCases(
+    String token, {
+    String? vin,
+    String? obdDataDtc,
+    String? timeseriesDataComponent,
+  }) {
     final List<CaseDto> caseDtos = _caseDtos + _sharedCaseDtos;
     return Future.delayed(
       Duration(milliseconds: delay),

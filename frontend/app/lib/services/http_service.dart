@@ -32,16 +32,45 @@ class HttpService {
     return _client.get(Uri.parse("$backendUrl/health/ping"));
   }
 
-  Future<http.Response> getSharedCases(String token) {
+  Future<http.Response> getSharedCases(
+    String token, {
+    String? vin,
+    String? obdDataDtc,
+    String? timeseriesDataComponent,
+  }) {
+    final uri = Uri.parse("$backendUrl/shared/cases").replace(
+      queryParameters: {
+        if (vin != null) "vin": vin,
+        if (obdDataDtc != null) "obd_data_dtc": obdDataDtc,
+        if (timeseriesDataComponent != null)
+          "timeseries_data_component": timeseriesDataComponent,
+      },
+    );
+
     return _client.get(
-      Uri.parse("$backendUrl/shared/cases"),
+      uri,
       headers: getAuthHeaderWith(token),
     );
   }
 
-  Future<http.Response> getCases(String token, String workshopId) {
+  Future<http.Response> getCases(
+    String token,
+    String workshopId, {
+    String? vin,
+    String? obdDataDtc,
+    String? timeseriesDataComponent,
+  }) {
+    final uri = Uri.parse("$backendUrl/$workshopId/cases").replace(
+      queryParameters: {
+        if (vin != null) "vin": vin,
+        if (obdDataDtc != null) "obd_data_dtc": obdDataDtc,
+        if (timeseriesDataComponent != null)
+          "timeseries_data_component": timeseriesDataComponent,
+      },
+    );
+
     return _client.get(
-      Uri.parse("$backendUrl/$workshopId/cases"),
+      uri,
       headers: getAuthHeaderWith(token),
     );
   }

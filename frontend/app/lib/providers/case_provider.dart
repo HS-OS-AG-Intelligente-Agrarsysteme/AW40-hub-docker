@@ -24,6 +24,7 @@ class CaseProvider with ChangeNotifier {
   bool get showSharedCases => _showSharedCases;
   String? _authToken;
 
+  // TODO should this reset the filter as it probably does right now?
   Future<void> toggleShowSharedCases() async {
     _showSharedCases = !_showSharedCases;
     await getCurrentCases();
@@ -35,21 +36,24 @@ class CaseProvider with ChangeNotifier {
     String? obdDataDtc,
     String? timeseriesDataComponent,
   }) async {
-    Map<String, String> queryParams = {};
-
-    if (vin != null) queryParams["vin"] = vin;
-    if (obdDataDtc != null) queryParams["obd_data_dtc"] = obdDataDtc;
-    if (timeseriesDataComponent != null) {
-      queryParams["timeseries_data_component"] = timeseriesDataComponent;
-    }
-
     final String authToken = _getAuthToken();
     // * Return value currently not used.
     final Response response;
     if (_showSharedCases) {
-      response = await _httpService.getSharedCases(authToken);
+      response = await _httpService.getSharedCases(
+        authToken,
+        vin: vin,
+        obdDataDtc: obdDataDtc,
+        timeseriesDataComponent: timeseriesDataComponent,
+      );
     } else {
-      response = await _httpService.getCases(authToken, workshopId);
+      response = await _httpService.getCases(
+        authToken,
+        workshopId,
+        vin: vin,
+        obdDataDtc: obdDataDtc,
+        timeseriesDataComponent: timeseriesDataComponent,
+      );
     }
     final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,

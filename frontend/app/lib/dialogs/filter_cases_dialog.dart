@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
 import "package:aw40_hub_frontend/providers/case_provider.dart";
 import "package:aw40_hub_frontend/providers/knowledge_provider.dart";
@@ -41,7 +43,7 @@ class FilterCasesDialog extends StatelessWidget {
           ),
         ),
         TextButton(
-          onPressed: _applyFilterForCases,
+          onPressed: () async => _applyFilterForCases(context),
           child: Text(tr("general.apply")),
         ),
       ],
@@ -52,12 +54,18 @@ class FilterCasesDialog extends StatelessWidget {
     await Routemaster.of(context).pop();
   }
 
-  Future<void> _applyFilterForCases() async {
+  Future<void> _applyFilterForCases(BuildContext context) async {
+    final obdDataDtc = _obdDataDtcController.text;
+    final vin = _vinController.text;
+    final timeseriesDataComponent = _timeseriesDataComponentController.text;
     await _caseProvider.getCurrentCases(
-      obdDataDtc: _obdDataDtcController.text,
-      vin: _vinController.text,
-      timeseriesDataComponent: _timeseriesDataComponentController.text,
+      obdDataDtc: obdDataDtc.isEmpty ? null : obdDataDtc,
+      vin: vin.isEmpty ? null : vin,
+      timeseriesDataComponent:
+          timeseriesDataComponent.isEmpty ? null : timeseriesDataComponent,
     );
+    // ignore: use_build_context_synchronously
+    await Routemaster.of(context).pop();
   }
 }
 
