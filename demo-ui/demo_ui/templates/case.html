@@ -39,7 +39,7 @@
         <div style="margin: 0px 20px 0px 20px;">
             {% if not case["diagnosis_id"] %}
             <form action="{{ request.path_params['case_id'] }}/diag" method="post">
-                <button type="submit" disabled>Diagnose starten</button>
+                <button type="submit">Diagnose starten</button>
             </form>
             {% else %}
             <p>
