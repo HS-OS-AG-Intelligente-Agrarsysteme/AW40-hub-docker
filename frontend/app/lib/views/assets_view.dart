@@ -1,13 +1,8 @@
 import "package:aw40_hub_frontend/data_sources/assets_data_table_source.dart";
-import "package:aw40_hub_frontend/exceptions/app_exception.dart";
 import "package:aw40_hub_frontend/models/assets_model.dart";
-import "package:aw40_hub_frontend/providers/assets_provider.dart";
-import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:aw40_hub_frontend/views/assets_detail_view.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
-import "package:logging/logging.dart";
-import "package:provider/provider.dart";
 
 class AssetsView extends StatefulWidget {
   const AssetsView({
@@ -20,7 +15,6 @@ class AssetsView extends StatefulWidget {
 
 class _AssetsView extends State<AssetsView> {
   ValueNotifier<int?> currentCaseIndexNotifier = ValueNotifier<int?>(null);
-  final Logger _logger = Logger("AssetsViewLogger");
 
   @override
   void dispose() {
@@ -121,7 +115,8 @@ class AssetsTableState extends State<AssetsTable> {
               rowsPerPage: 50,
               columns: [
                 DataColumn(
-                    label: Text(tr("assets.headlines.timeOfGeneration"))),
+                  label: Text(tr("assets.headlines.timeOfGeneration")),
+                ),
                 DataColumn(label: Text(tr("assets.headlines.filter"))),
               ],
             ),
