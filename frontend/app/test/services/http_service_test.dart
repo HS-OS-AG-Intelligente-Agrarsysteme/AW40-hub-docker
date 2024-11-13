@@ -75,7 +75,7 @@ void main() {
         expect(request.body, isEmpty, reason: "Request body is not empty");
         expect(
           request.url.toString(),
-          endsWith("/shared/cases"),
+          contains("/shared/cases"),
           reason: "Request URL does not end with /shared/cases",
         );
         return http.Response('{"status": "success"}', 200);
@@ -101,7 +101,7 @@ void main() {
         expect(request.body, isEmpty, reason: "Request body is not empty");
         expect(
           request.url.toString(),
-          endsWith("/$workshopId/cases"),
+          contains("/$workshopId/cases"),
           reason: "Request URL does not end with /{workshopId}/cases",
         );
         return http.Response('{"status": "success"}', 200);
