@@ -23,7 +23,6 @@ class EndpointLogFilter(logging.Filter):
 
 
 app = FastAPI(root_path=settings.root_path)
-app = FastAPI()
 app.add_middleware(
     SessionMiddleware, secret_key=settings.session_secret, max_age=None
 )
