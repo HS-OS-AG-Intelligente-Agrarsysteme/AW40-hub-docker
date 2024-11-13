@@ -1464,4 +1464,27 @@ class MockHttpService implements HttpService {
     // TODO: implement deleteSymptomData
     throw UnimplementedError();
   }
+
+  @override
+  Future<Response> getAssets(String token, String workshopId, String caseId) {
+    // TODO: implement getAssets
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> getSharedAssets(String token) {
+    // TODO: implement getSharedAssets
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> updateAssets(
+    String token,
+    String workshopId,
+    String caseId,
+    Map<String, dynamic> requestBody,
+  ) {
+    // TODO: implement updateAssets
+    throw UnimplementedError();
+  }
 }

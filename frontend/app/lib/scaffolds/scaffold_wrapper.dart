@@ -138,6 +138,11 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
         destination: kRouteVecicles,
       ),
       NavigationMenuItemModel(
+        title: tr("assets.title"),
+        icon: const Icon(Icons.storage),
+        destination: kRouteAssets,
+      ),
+      NavigationMenuItemModel(
         title: tr("training.title"),
         icon: const Icon(Icons.school),
         // * Note: On Android, this will cause the emulator to crash. Other URLs

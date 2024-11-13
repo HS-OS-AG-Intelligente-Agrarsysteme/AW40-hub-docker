@@ -154,6 +154,13 @@ vehicles:
     updateVehicle: "Fahrzeug bearbeiten"
   details:
     headline: "Detailansicht"
+assets:
+  title: "Assets"
+  headlines:
+    timeOfGeneration: "Zeitpunkt der  Generation"
+    filter: "Filter"
+  upload: "Asset-Upload"
+  noAssets: "Keine Assets"
 training:
   title: "Schulung"
 pageNotFound:

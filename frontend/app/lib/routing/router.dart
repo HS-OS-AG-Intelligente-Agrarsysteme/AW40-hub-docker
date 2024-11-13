@@ -1,5 +1,6 @@
 import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/scaffolds/scaffold_wrapper.dart";
+import "package:aw40_hub_frontend/screens/assets_screen.dart";
 import "package:aw40_hub_frontend/screens/cases_screen.dart";
 import "package:aw40_hub_frontend/screens/customers_screen.dart";
 import "package:aw40_hub_frontend/screens/diagnoses_screen.dart";
@@ -106,6 +107,14 @@ Map<String, PageBuilder> _basicRoutes = {
       child: ScaffoldWrapper(
         currentIndex: 3,
         child: VehiclesScreen(),
+      ),
+    );
+  },
+  kRouteAssets: (RouteData info) {
+    return const MaterialPage<Widget>(
+      child: ScaffoldWrapper(
+        currentIndex: 4,
+        child: AssetsScreen(),
       ),
     );
   },
