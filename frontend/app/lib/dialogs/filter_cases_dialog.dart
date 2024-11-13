@@ -122,7 +122,11 @@ class _FilterCasesDialogContentState extends State<FilterCasesDialogContent> {
       builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
         if (snapshot.connectionState != ConnectionState.done ||
             !snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
+          return const SizedBox(
+            height: 250,
+            width: 350,
+            child: Center(child: CircularProgressIndicator()),
+          );
         }
         final List<String>? vehicleComponents = snapshot.data;
         if (vehicleComponents == null) {
