@@ -19,7 +19,7 @@ class FilterCasesDialog extends StatelessWidget {
   final TextEditingController _timeseriesDataComponentController =
       TextEditingController();
 
-  late CaseProvider _caseProvider;
+  late final CaseProvider _caseProvider;
 
   @override
   Widget build(BuildContext context) {
