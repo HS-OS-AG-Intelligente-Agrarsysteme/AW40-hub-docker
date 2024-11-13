@@ -119,6 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final CustomerProvider customerProvider =
         Provider.of<CustomerProvider>(context, listen: false);
     // apparently this has an effect despite the variable not being used here
+    // ignore: unused_local_variable
     final KnowledgeProvider knowledgeProvider =
         Provider.of<KnowledgeProvider>(context, listen: false);
 
