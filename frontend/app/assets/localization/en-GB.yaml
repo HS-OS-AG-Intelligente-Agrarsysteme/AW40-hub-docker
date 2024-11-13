@@ -158,7 +158,7 @@ vehicles:
 assets:
   title: "Assets"
   headlines:
-    timeOfGeneration: "Time of Generation"
+    timeOfGeneration: "Time of generation"
     filter: "Filter"
   upload: "Upload Asset"
   noAssets: "No Assets"
