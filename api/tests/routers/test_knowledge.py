@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 import pytest
 from api.diagnostics_management import KnowledgeGraph
@@ -20,8 +20,8 @@ def jwt_payload(request):
     over the possible combinations.
     """
     return {
-        "iat": datetime.utcnow().timestamp(),
-        "exp": (datetime.utcnow() + timedelta(60)).timestamp(),
+        "iat": datetime.now(UTC).timestamp(),
+        "exp": (datetime.now(UTC) + timedelta(60)).timestamp(),
         "preferred_username": "some-user-with-knowledge-access",
         "realm_access": {"roles": request.param}
     }
@@ -34,21 +34,21 @@ def signed_jwt(jwt_payload, rsa_private_key_pem: bytes):
 
 
 @pytest.fixture
-def test_app(kg_url, kg_obd_dataset_name, kg_prefilled):
-    test_app = FastAPI()
-    test_app.include_router(knowledge.router)
+def app(kg_url, kg_obd_dataset_name, kg_prefilled):
+    app = FastAPI()
+    app.include_router(knowledge.router)
 
     # All tests use the prefilled test knowledge graph
     KnowledgeGraph.set_kg_url(kg_url)
     KnowledgeGraph.obd_dataset_name = kg_obd_dataset_name
 
-    yield test_app
+    yield app
 
 
 @pytest.fixture
-def unauthenticated_client(test_app):
+def unauthenticated_client(app):
     """Unauthenticated client, e.g. no bearer token in header."""
-    yield TestClient(test_app)
+    yield TestClient(app)
 
 
 @pytest.fixture
@@ -165,8 +165,8 @@ def test_invalid_jwt_signature(
 @pytest.fixture
 def expired_jwt_payload():
     return {
-        "iat": (datetime.utcnow() - timedelta(60)).timestamp(),
-        "exp": (datetime.utcnow() - timedelta(1)).timestamp(),
+        "iat": (datetime.now(UTC) - timedelta(60)).timestamp(),
+        "exp": (datetime.now(UTC) - timedelta(1)).timestamp(),
         "preferred_username": "user",
         "realm_access": {"roles": ["shared"]}
     }

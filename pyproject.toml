@@ -1,0 +1,7 @@
+[tool.pytest.ini_options]
+asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    "ignore::DeprecationWarning:jose.*",        # This is simply outdated
+    "ignore::DeprecationWarning:httpx._client", # Deprecation warning because FastAPI Testclient makes wrong override
+]

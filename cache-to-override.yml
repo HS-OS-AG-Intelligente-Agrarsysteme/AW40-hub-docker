@@ -4,10 +4,10 @@ services:
       cache_to:
           - type=registry,ref=ghcr.io/hs-os-ag-intelligente-agrarsysteme/aw40-keycloak:buildcache,mode=max
 
-  edc:
-      build:
-        cache_to:
-          - type=registry,ref=ghcr.io/hs-os-ag-intelligente-agrarsysteme/aw40-edc:buildcache,mode=max
+  nautilus:
+    build:
+      cache_to:
+          - type=registry,ref=ghcr.io/hs-os-ag-intelligente-agrarsysteme/aw40-nautilus:buildcache,mode=max
 
   api:
     build:

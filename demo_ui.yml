@@ -8,12 +8,14 @@ services:
     build:
       context: ./demo-ui
       # DEVELOPMENT: run with reload and mount source code
-    command: uvicorn --host 0.0.0.0 --port 8002 --reload demo_ui.main:app
+    command: uvicorn --reload demo_ui.main:app
     <<: *default_restart_policy
     depends_on:
       api:
         condition: service_healthy
     hostname: "demo-ui"
+    env_file:
+        - demo-ui/demo_ui.env
     networks:
       - keycloaknet
       - frontend-backend

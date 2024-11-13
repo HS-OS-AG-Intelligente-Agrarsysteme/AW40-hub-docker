@@ -1,7 +1,8 @@
 from enum import Enum
+from typing_extensions import Annotated, Optional
 
-from beanie import Document, Indexed
-from pydantic import BaseModel
+from beanie import Document, Indexed, PydanticObjectId
+from pydantic import BaseModel, Field
 
 
 class Component(str, Enum):
@@ -19,18 +20,20 @@ class Component(str, Enum):
 
 class Vehicle(Document):
 
-    class Config:
-        # 'vin' is used instead of 'id'
-        fields = {"id": {"exclude": True}}
+    id: Optional[PydanticObjectId] = Field(
+        default=None,
+        description="MongoDB document ObjectID",
+        exclude=True
+    )
 
     class Settings:
         name = "vehicles"
 
-    vin: Indexed(str, unique=True)
-    tsn: str = None
-    year_build: int = None
+    vin: Annotated[str, Indexed(unique=True)]
+    tsn: Optional[str] = None
+    year_build: Optional[int] = None
 
 
 class VehicleUpdate(BaseModel):
-    tsn: str = None
-    year_build: int = None
+    tsn: Optional[str] = None
+    year_build: Optional[int] = None

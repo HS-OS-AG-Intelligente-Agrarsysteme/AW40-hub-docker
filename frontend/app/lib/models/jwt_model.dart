@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_dynamic_calls
-
-import "package:aw40_hub_frontend/services/services.dart";
+import "package:aw40_hub_frontend/services/token_service.dart";
 
 class JwtModel {
   JwtModel({

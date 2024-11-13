@@ -27,6 +27,7 @@ RUN flutter pub get
 
 ARG API_ADDRESS
 ARG FRONTEND_ADDRESS
+ARG FRONTEND_PATH
 ARG FRONTEND_BASIC_AUTH_KEY
 ARG KEYCLOAK_ADDRESS
 ARG KEYCLOAK_FRONTEND_CLIENT
@@ -36,11 +37,12 @@ ARG FRONTEND_REDIRECT_URI_MOBILE
 ARG PROXY_DEFAULT_SCHEME
 
 RUN flutter pub run build_runner build --delete-conflicting-outputs --release
-RUN flutter build web
+RUN flutter build web --base-href $FRONTEND_PATH/
 
 FROM nginx:alpine AS serve
 
 COPY --from=build /home/flutter/app/build/web /usr/share/nginx/html
+COPY ./nginx_templates/* /etc/nginx/templates/
 
 HEALTHCHECK --start-period=30s --start-interval=1s --interval=30s --timeout=5s --retries=5 \
   CMD curl -fs http://localhost:80 || exit 1

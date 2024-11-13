@@ -9,17 +9,19 @@ from api.data_management import (
     Vehicle,
     Customer,
     Workshop,
-    Diagnosis
+    Diagnosis,
+    Asset
 )
 from beanie import init_beanie
 from bson import ObjectId
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from motor import motor_asyncio
+import pytest_asyncio
 
 
-@pytest.fixture
-def motor_client():
+@pytest_asyncio.fixture
+async def motor_client():
     """
     Assume a local mongodb instance is available with credentials as in dev.env
     """
@@ -28,8 +30,8 @@ def motor_client():
     return motor_asyncio.AsyncIOMotorClient(mongo_uri)
 
 
-@pytest.fixture
-def motor_db(motor_client):
+@pytest_asyncio.fixture
+async def motor_db(motor_client):
     """
     Use database 'aw40-hub-test'. Database 'aw40-hub' ist defined in dev.env
     and hence mongo/init-users.sh should have created readWrite role for
@@ -38,15 +40,15 @@ def motor_db(motor_client):
     yield motor_client["aw40-hub-test"]
 
 
-@pytest.fixture
-def initialized_beanie_context(motor_db):
+@pytest_asyncio.fixture
+async def initialized_beanie_context(motor_db):
     """
     Could not get standard pytest fixture setup and teardown to work for
     beanie initialization. As a workaround this fixture creates an async
     context manager to handle test setup and teardown.
     """
     models = [
-        Case, Vehicle, Customer, Workshop, Diagnosis
+        Case, Vehicle, Customer, Workshop, Diagnosis, Asset
     ]
 
     class InitializedBeanieContext:
@@ -69,8 +71,8 @@ def initialized_beanie_context(motor_db):
     return InitializedBeanieContext()
 
 
-@pytest.fixture
-def signal_bucket(motor_db):
+@pytest_asyncio.fixture
+async def signal_bucket(motor_db):
     test_bucket_name = "signals-pytest"  # dedicated test bucket
     test_bucket = motor_asyncio.AsyncIOMotorGridFSBucket(
         motor_db, bucket_name=test_bucket_name
@@ -316,3 +318,8 @@ def another_rsa_public_key_pem() -> bytes:
     """Get a public key that does not match keys from any other fixture."""
     _, public_key_pem = _create_rsa_key_pair()
     return public_key_pem
+
+
+@pytest.fixture(autouse=True)
+def set_asset_data_dir_path_to_temporary_test_dir(tmp_path):
+    Asset.asset_data_dir_path = tmp_path

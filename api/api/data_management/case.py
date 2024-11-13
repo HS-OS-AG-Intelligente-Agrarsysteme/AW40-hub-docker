@@ -1,13 +1,29 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from enum import Enum
-from typing import List, Union, Optional
+from typing import (
+    Annotated,
+    List,
+    Optional,
+    Tuple,
+    Any,
+    Self
+)
 
 from beanie import (
-    Document, Indexed, before_event, Insert, Delete, PydanticObjectId
+    Document,
+    Indexed,
+    before_event,
+    Insert,
+    Delete,
+    PydanticObjectId
 )
-from pydantic import BaseModel, Field, NonNegativeInt
+from pydantic import (
+    BaseModel,
+    Field,
+    NonNegativeInt,
+    ConfigDict
+)
 
-from .customer import Customer, AnonymousCustomerId
 from .diagnosis import Diagnosis
 from .obd_data import NewOBDData, OBDData, OBDDataUpdate
 from .symptom import NewSymptom, Symptom, SymptomUpdate
@@ -31,51 +47,53 @@ class Status(str, Enum):
 class NewCase(BaseModel):
     """Schema for new cases added via the api."""
 
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "vehicle_vin": "VIN42",
-                "customer_id": "unknown",
                 "occasion": Occasion.service_routine,
                 "milage": 42
             }
         }
+    )
 
     vehicle_vin: str
-    customer_id: AnonymousCustomerId = Customer.unknown_id
+    customer_id: Optional[PydanticObjectId] = None
     occasion: Occasion = Occasion.unknown
-    milage: int = None
+    milage: Optional[int] = None
 
 
 class CaseUpdate(BaseModel):
     """Metadata of a case that can be updated after creation."""
-    timestamp: datetime = None
-    occasion: Occasion = None
-    milage: int = None
-    status: Status = None
+    timestamp: Optional[datetime] = None
+    occasion: Optional[Occasion] = None
+    milage: Optional[int] = None
+    status: Optional[Status] = None
 
 
 class Case(Document):
     """Complete case schema and major db interfacing class."""
 
-    class Config:
-        validate_assignment = True
-        fields = {"schema_version": {"exclude": True}}
+    model_config = ConfigDict(
+        validate_assignment=True
+    )
 
     class Settings:
         name = "cases"
 
     # case descriptions
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     occasion: Occasion = Occasion.unknown
-    milage: int = None
+    milage: Optional[int] = None
     status: Status = Status.open
 
     # foreign keys
-    customer_id: Indexed(str, unique=False) = Customer.unknown_id
-    vehicle_vin: Indexed(str, unique=False)
-    workshop_id: Indexed(str, unique=False)
-    diagnosis_id: Optional[Indexed(PydanticObjectId)]
+    customer_id: Optional[
+        Annotated[PydanticObjectId, Indexed(unique=False)]
+    ] = None
+    vehicle_vin: Annotated[str, Indexed(unique=False)]
+    workshop_id: Annotated[str, Indexed(unique=False)]
+    diagnosis_id: Optional[Annotated[PydanticObjectId, Indexed()]] = None
 
     # diagnostic data
     timeseries_data: List[TimeseriesData] = []
@@ -87,7 +105,10 @@ class Case(Document):
     obd_data_added: NonNegativeInt = 0
     symptoms_added: NonNegativeInt = 0
 
-    schema_version: int = 0
+    schema_version: int = Field(
+        default=0,
+        exclude=True
+    )
 
     @before_event(Insert)
     async def insert_vehicle(self):
@@ -100,40 +121,65 @@ class Case(Document):
             vehicle = Vehicle(vin=self.vehicle_vin)
             await vehicle.insert()
 
-    @before_event(Insert)
-    async def insert_customer(self):
-        """
-        Create the customer if non-existent, e.g. if it is the first case for
-        this customer.
-        """
-        customer = await Customer.get(self.customer_id)
-        if customer is None:
-            customer = Customer(id=self.customer_id)
-            await customer.insert()
-
     @classmethod
     async def find_in_hub(
             cls,
-            customer_id: str = None,
-            vin: str = None,
-            workshop_id: str = None
-    ):
+            customer_id: Optional[str] = None,
+            vin: Optional[str] = None,
+            workshop_id: Optional[str] = None,
+            obd_data_dtc: Optional[str] = None,
+            timeseries_data_component: Optional[str] = None
+    ) -> List[Self]:
         """
-        Get list of all cases filtered by customer_id, vehicle_vin and
-        workshop_id.
+        Get list of all cases with optional filtering by customer_id,
+        vehicle_vin, workshop_id or obd_data dtc.
+
+        Parameters
+        ----------
+        customer_id
+            Customer Id to search for. Only cases associated with the specified
+            customer are returned
+        vin
+            (Partial) VIN to search for. The specified parameter value is
+            matched against the beginning of the stored vins.
+            This allows partial vin specification e.g. to search for cases with
+            vehicles by a specific manufacturer.
+        workshop_id
+            Workshop Id to search for. Only cases from the specified workshop
+            are returned.
+        obd_data_dtc
+            DTC to search for. Only cases with at least one occurrence of the
+            specified dtc in any of the OBD datasets are returned.
+        timeseries_data_component
+            Timeseries data component to search for. Only cases that contain at
+            least one timeseries dataset for the specified component are
+            returned.
+
+        Returns
+        -------
+        List of cases matching the specified search criteria.
         """
         filter = {}
         if customer_id is not None:
-            filter["customer_id"] = customer_id
+            filter["customer_id"] = PydanticObjectId(customer_id)
         if vin is not None:
-            filter["vehicle_vin"] = vin
+            # VIN is matched against beginning of stored vins
+            filter["vehicle_vin"] = {"$regex": f"^{vin}"}
         if workshop_id is not None:
             filter["workshop_id"] = workshop_id
+        if obd_data_dtc is not None:
+            # Only return cases that contain the specified dtc in any
+            # of the obd datasets
+            filter["obd_data.dtcs"] = obd_data_dtc
+        if timeseries_data_component is not None:
+            # Only return cases that contain a timeseries dataset with the
+            # specified component
+            filter["timeseries_data.component"] = timeseries_data_component
 
         cases = await cls.find(filter).to_list()
         return cases
 
-    async def add_timeseries_data(self, new_data: NewTimeseriesData) -> "Case":
+    async def add_timeseries_data(self, new_data: NewTimeseriesData) -> Self:
         # signal data is stored and converted to ref
         timeseries_data = await new_data.to_timeseries_data()
         # append to data array
@@ -143,15 +189,17 @@ class Case(Document):
         await self.save()
         return self
 
-    async def add_obd_data(self, new_obd_data: NewOBDData) -> "Case":
-        obd_data = OBDData(data_id=self.obd_data_added, **new_obd_data.dict())
+    async def add_obd_data(self, new_obd_data: NewOBDData) -> Self:
+        obd_data = OBDData(data_id=self.obd_data_added,
+                           **new_obd_data.model_dump())
         self.obd_data.append(obd_data)
         self.obd_data_added += 1
         await self.save()
         return self
 
-    async def add_symptom(self, new_symptom: NewSymptom) -> "Case":
-        symptom = Symptom(data_id=self.symptoms_added, **new_symptom.dict())
+    async def add_symptom(self, new_symptom: NewSymptom) -> Self:
+        symptom = Symptom(data_id=self.symptoms_added,
+                          **new_symptom.model_dump())
         self.symptoms.append(symptom)
         self.symptoms_added += 1
         await self.save()
@@ -160,26 +208,28 @@ class Case(Document):
     @staticmethod
     def find_data_in_array(
             data_array: list, data_id: NonNegativeInt
-    ) -> (NonNegativeInt, Union[TimeseriesData, OBDData, Symptom]):
+    ) -> Tuple[NonNegativeInt, Any] | Tuple[None, None]:
         for i, d in enumerate(data_array):
             if d.data_id == data_id:
                 return i, d
 
         return None, None
 
-    def get_timeseries_data(self, data_id: NonNegativeInt) -> TimeseriesData:
+    def get_timeseries_data(
+            self, data_id: NonNegativeInt
+    ) -> TimeseriesData | None:
         _, timeseries_data = self.find_data_in_array(
             data_array=self.timeseries_data, data_id=data_id
         )
         return timeseries_data
 
-    def get_obd_data(self, data_id: NonNegativeInt) -> OBDData:
+    def get_obd_data(self, data_id: NonNegativeInt) -> OBDData | None:
         _, obd_data = self.find_data_in_array(
             data_array=self.obd_data, data_id=data_id
         )
         return obd_data
 
-    def get_symptom(self, data_id: NonNegativeInt) -> Symptom:
+    def get_symptom(self, data_id: NonNegativeInt) -> Symptom | None:
         _, symptom = self.find_data_in_array(
             data_array=self.symptoms, data_id=data_id
         )
@@ -189,7 +239,7 @@ class Case(Document):
         idx, timeseries_data = self.find_data_in_array(
             data_array=self.timeseries_data, data_id=data_id
         )
-        if timeseries_data is not None:
+        if timeseries_data is not None and idx is not None:
             await timeseries_data.delete_signal()
             self.timeseries_data.pop(idx)
             await self.save()
@@ -212,13 +262,13 @@ class Case(Document):
 
     async def update_timeseries_data(
             self, data_id: NonNegativeInt, update: TimeseriesDataUpdate
-    ) -> TimeseriesData:
+    ) -> TimeseriesData | None:
         idx, timeseries_data = self.find_data_in_array(
             data_array=self.timeseries_data, data_id=data_id
         )
-        if timeseries_data is not None:
-            timeseries_data = timeseries_data.dict()
-            timeseries_data.update(update.dict(exclude_unset=True))
+        if timeseries_data is not None and idx is not None:
+            timeseries_data = timeseries_data.model_dump()
+            timeseries_data.update(update.model_dump(exclude_unset=True))
             timeseries_data = TimeseriesData(**timeseries_data)
             self.timeseries_data[idx] = timeseries_data
             await self.save()
@@ -226,13 +276,13 @@ class Case(Document):
 
     async def update_obd_data(
             self, data_id: NonNegativeInt, update: OBDDataUpdate
-    ) -> OBDData:
+    ) -> OBDData | None:
         idx, obd_data = self.find_data_in_array(
             data_array=self.obd_data, data_id=data_id
         )
-        if obd_data is not None:
-            obd_data = obd_data.dict()
-            obd_data.update(update.dict(exclude_unset=True))
+        if obd_data is not None and idx is not None:
+            obd_data = obd_data.model_dump()
+            obd_data.update(update.model_dump(exclude_unset=True))
             obd_data = OBDData(**obd_data)
             self.obd_data[idx] = obd_data
             await self.save()
@@ -240,13 +290,13 @@ class Case(Document):
 
     async def update_symptom(
             self, data_id: NonNegativeInt, update: SymptomUpdate
-    ) -> Symptom:
+    ) -> Symptom | None:
         idx, symptom = self.find_data_in_array(
             data_array=self.symptoms, data_id=data_id
         )
-        if symptom is not None:
-            symptom = symptom.dict()
-            symptom.update(update.dict(exclude_unset=True))
+        if symptom is not None and idx is not None:
+            symptom = symptom.model_dump()
+            symptom.update(update.model_dump(exclude_unset=True))
             symptom = Symptom(**symptom)
             self.symptoms[idx] = symptom
             await self.save()
@@ -283,4 +333,5 @@ class Case(Document):
             # delete via instance to make sure Diagnosis event handlers
             # are also executed
             diag = await Diagnosis.get(self.diagnosis_id)
-            await diag.delete()
+            if diag is not None:
+                await diag.delete()

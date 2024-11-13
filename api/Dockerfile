@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7.0
-FROM python:3.9.5-slim-buster AS base
+FROM python:3.12-slim-bookworm AS base
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -12,6 +12,9 @@ RUN groupadd -r api && \
 
 # use api users home directory as workdir
 WORKDIR /home/api
+
+# create directory to store asset data and chown to api user
+RUN mkdir /home/api/asset-data && chown api:api /home/api/asset-data
 
 # install minimal requirements
 COPY ./requirements.txt /home/api/requirements.txt
@@ -27,4 +30,4 @@ FROM base as prod
 USER api
 
 HEALTHCHECK --start-period=30s --start-interval=1s --interval=30s --timeout=5s --retries=5 \
-  CMD curl -fs http://localhost:8000/v1/health/ping|| exit 1
+    CMD curl -fs http://localhost:8000/v1/health/ping || exit 1

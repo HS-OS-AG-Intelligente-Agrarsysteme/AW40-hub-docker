@@ -1,4 +1,9 @@
-from typing import List, Literal, Callable
+from typing import (
+    List,
+    Literal,
+    Callable,
+    Optional
+)
 
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -17,7 +22,6 @@ tags_metadata = [
     }
 ]
 
-
 router = APIRouter(
     tags=["Shared"],
     dependencies=[Depends(authorized_shared_access)]
@@ -26,16 +30,26 @@ router = APIRouter(
 
 @router.get("/cases", status_code=200, response_model=List[Case])
 async def list_cases(
-        customer_id: str = None,
-        vin: str = None,
-        workshop_id: str = None
+        customer_id: Optional[str] = None,
+        vin: Optional[str] = None,
+        workshop_id: Optional[str] = None,
+        obd_data_dtc: Optional[str] = None,
+        timeseries_data_component: Optional[str] = None
 ) -> List[Case]:
     """
     List all cases in Hub. Query params can be used to filter by `customer_id`,
-    `vin` and `workshop_id`.
+    (partial) `vin`, `workshop_id`, `obd_data_dtc` or
+    `timeseries_data_component`.
+
+    The specified `vin` is matched against the beginning of the stored vehicle
+    vins.
     """
     cases = await Case.find_in_hub(
-        customer_id=customer_id, vin=vin, workshop_id=workshop_id
+        customer_id=customer_id,
+        vin=vin,
+        workshop_id=workshop_id,
+        obd_data_dtc=obd_data_dtc,
+        timeseries_data_component=timeseries_data_component
     )
     return cases
 
@@ -48,12 +62,12 @@ async def case_by_id(case_id: str) -> Case:
         status_code=404, detail=f"No case with id `{case_id}`."
     )
     try:
-        case_id = ObjectId(case_id)
+        document_id = ObjectId(case_id)
     except InvalidId:
         # invalid id reports not found to user
         raise no_case_exception
 
-    case = await Case.get(case_id)
+    case = await Case.get(document_id)
     if case is not None:
         return case
     else:
@@ -71,7 +85,9 @@ async def get_case(case: Case = Depends(case_by_id)) -> Case:
     status_code=200,
     response_model=List[TimeseriesData]
 )
-def list_timeseries_data(case: Case = Depends(case_by_id)):
+def list_timeseries_data(
+        case: Case = Depends(case_by_id)
+) -> List[TimeseriesData]:
     """List all available timeseries datasets for a case."""
     return case.timeseries_data
 
@@ -81,6 +97,7 @@ class DatasetById:
     Parameterized dependency to fetch a dataset by id or raise 404 if the
     data_id is not existent.
     """
+
     def __init__(
             self, data_type: Literal["timeseries_data", "obd_data", "symptom"]
     ):

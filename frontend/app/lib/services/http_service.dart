@@ -1,7 +1,8 @@
 import "dart:convert";
 
-import "package:aw40_hub_frontend/services/services.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/dtos/new_symptom_dto.dart";
+import "package:aw40_hub_frontend/services/config_service.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:collection/collection.dart";
 import "package:enum_to_string/enum_to_string.dart";
 import "package:http/http.dart" as http;
@@ -45,6 +46,23 @@ class HttpService {
     );
   }
 
+  Future<http.Response> getCasesByVehicleVin(
+    String token,
+    String workshopId,
+    String vehicleVin,
+  ) {
+    final uri = Uri.parse("$backendUrl/$workshopId/cases").replace(
+      queryParameters: {
+        "vin": vehicleVin,
+      },
+    );
+
+    return _client.get(
+      uri,
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
   Future<http.Response> addCase(
     String token,
     String workshopId,
@@ -81,6 +99,52 @@ class HttpService {
   ) {
     return _client.delete(
       Uri.parse("$backendUrl/$workshopId/cases/$caseId"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> deleteObdData(
+    String token,
+    int? dataId,
+    String workshopId,
+    String caseId,
+  ) {
+    return _client.delete(
+      Uri.parse("$backendUrl/$workshopId/cases/$caseId/obd_data/$dataId"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> deleteTimeseriesData(
+    String token,
+    int? dataId,
+    String workshopId,
+    String caseId,
+  ) {
+    return _client.delete(
+      Uri.parse("$backendUrl/$workshopId/cases/$caseId/timeseries/$dataId"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> deleteSymptomData(
+    String token,
+    int? dataId,
+    String workshopId,
+    String caseId,
+  ) {
+    return _client.delete(
+      Uri.parse("$backendUrl/$workshopId/cases/$caseId/symptoms/$dataId"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> getDiagnoses(
+    String token,
+    String workshopId,
+  ) {
+    return _client.get(
+      Uri.parse("$backendUrl/$workshopId/diagnoses"),
       headers: getAuthHeaderWith(token),
     );
   }
@@ -131,6 +195,63 @@ class HttpService {
       }),
       body: jsonEncode(requestBody),
     );
+  }
+
+  Future<http.Response> uploadVcdsData(
+    String token,
+    String workshopId,
+    String caseId,
+    List<int> vcdsData,
+    String filename,
+  ) async {
+    final request = http.MultipartRequest(
+      "POST",
+      Uri.parse(
+        "$backendUrl/$workshopId/cases/$caseId/obd_data/upload/vcds",
+      ),
+    );
+    request.files.add(
+      http.MultipartFile.fromBytes("upload", vcdsData, filename: filename),
+    );
+    request.fields["file_format"] = "VCDS TXT";
+
+    final Map<String, String> authHeader = getAuthHeaderWith(token);
+    assert(authHeader.length == 1);
+    request.headers[authHeader.keys.first] = authHeader.values.first;
+
+    final response = await _client.send(request);
+    return http.Response.fromStream(response);
+  }
+
+  Future<http.Response> addTimeseriesData(
+    String token,
+    String workshopId,
+    String caseId,
+    String component,
+    TimeseriesDataLabel label,
+    int samplingRate,
+    int duration,
+    List<int> signal,
+  ) async {
+    final request = http.MultipartRequest(
+      "POST",
+      Uri.parse(
+        "$backendUrl/$workshopId/cases/$caseId/timeseries_data",
+      ),
+    );
+
+    request.fields["label"] = EnumToString.convertToString(label);
+    request.fields["component"] = component;
+    request.fields["sampling_rate"] = samplingRate.toString();
+    request.fields["duration"] = duration.toString();
+    request.fields["signal"] = signal.toString();
+
+    final Map<String, String> authHeader = getAuthHeaderWith(token);
+    assert(authHeader.length == 1);
+    request.headers[authHeader.keys.first] = authHeader.values.first;
+
+    final response = await _client.send(request);
+    return http.Response.fromStream(response);
   }
 
   Future<http.Response> uploadPicoscopeData(
@@ -189,12 +310,12 @@ class HttpService {
     String token,
     String workshopId,
     String caseId,
-    // TODO: Change param structure.
-    // Add 2 String params `component` and `label`
-    // Remove requestBody param
-    // Create JSON object from `component` and `label` params inside function
-    Map<String, dynamic> requestBody,
+    String component,
+    SymptomLabel label,
   ) {
+    final symptomDto = NewSymptomDto(component, label);
+    final Map<String, dynamic> requestBody = symptomDto.toJson();
+
     return _client.post(
       Uri.parse("$backendUrl/$workshopId/cases/$caseId/symptoms"),
       headers: getAuthHeaderWith(token, {
@@ -235,5 +356,104 @@ class HttpService {
 
     final response = await _client.send(request);
     return http.Response.fromStream(response);
+  }
+
+  Future<http.Response> getSharedCustomers(String token) {
+    return _client.get(
+      Uri.parse("$backendUrl/shared/customers"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> getCustomer(
+    String token,
+    String workshopId,
+    String caseId,
+  ) {
+    return _client.get(
+      Uri.parse("$backendUrl/$workshopId/cases/$caseId/customer"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> getCustomers(
+    String token,
+    int? page,
+    int? pageSize,
+  ) {
+    final int pageNumber = page ?? 0;
+    final int pageSizeNumber = pageSize ?? 30;
+
+    final uri = Uri.parse("$backendUrl/customers").replace(
+      queryParameters: {
+        "page": pageNumber.toString(),
+        "pageSize": pageSizeNumber.toString(),
+      },
+    );
+
+    return _client.get(
+      uri,
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> addCustomer(
+    String token,
+    Map<String, dynamic> requestBody,
+  ) {
+    return _client.post(
+      Uri.parse("$backendUrl/customers"),
+      headers: getAuthHeaderWith(token, {
+        "Content-Type": "application/json; charset=UTF-8",
+      }),
+      body: jsonEncode(requestBody),
+    );
+  }
+
+  Future<http.Response> updateCustomer(
+    String token,
+    String customerId,
+    Map<String, dynamic> requestBody,
+  ) {
+    return _client.patch(
+      Uri.parse("$backendUrl/customers/$customerId"),
+      headers: getAuthHeaderWith(token, {
+        "Content-Type": "application/json; charset=UTF-8",
+      }),
+      body: jsonEncode(requestBody),
+    );
+  }
+
+  Future<http.Response> getSharedVehicles(String token) {
+    return _client.get(
+      Uri.parse("$backendUrl/shared/vehicles"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> getVehicles(
+    String token,
+    String workshopId,
+    String caseId,
+  ) {
+    return _client.get(
+      Uri.parse("$backendUrl/$workshopId/cases/$caseId/vehicles"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> updateVehicle(
+    String token,
+    String workshopId,
+    String caseId,
+    Map<String, dynamic> requestBody,
+  ) {
+    return _client.put(
+      Uri.parse("$backendUrl/$workshopId/cases/$caseId/vehicle"),
+      headers: getAuthHeaderWith(token, {
+        "Content-Type": "application/json; charset=UTF-8",
+      }),
+      body: jsonEncode(requestBody),
+    );
   }
 }

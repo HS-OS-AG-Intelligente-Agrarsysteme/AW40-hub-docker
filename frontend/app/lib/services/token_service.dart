@@ -1,6 +1,6 @@
 import "dart:convert";
 
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 
 class TokenService {
   Map<String, dynamic> decodeBodyFromJWT(String jwt) {

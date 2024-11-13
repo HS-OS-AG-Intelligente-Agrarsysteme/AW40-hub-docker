@@ -1,9 +1,11 @@
 import "dart:async";
 
-import "package:aw40_hub_frontend/dtos/dtos.dart";
-import "package:aw40_hub_frontend/exceptions/exceptions.dart";
+import "package:aw40_hub_frontend/dtos/case_update_dto.dart";
+import "package:aw40_hub_frontend/exceptions/app_exception.dart";
 import "package:aw40_hub_frontend/models/case_model.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/utils/constants.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/utils/extensions.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:enum_to_string/enum_to_string.dart";
 import "package:flutter/material.dart";

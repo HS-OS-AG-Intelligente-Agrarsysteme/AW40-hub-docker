@@ -1,6 +1,8 @@
-import "package:aw40_hub_frontend/dtos/dtos.dart";
+import "package:aw40_hub_frontend/dtos/obd_data_dto.dart";
+import "package:aw40_hub_frontend/dtos/symptom_dto.dart";
+import "package:aw40_hub_frontend/dtos/timeseries_data_dto.dart";
 import "package:aw40_hub_frontend/models/case_model.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:json_annotation/json_annotation.dart";
 
 part "case_dto.g.dart";

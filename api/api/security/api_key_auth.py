@@ -3,6 +3,8 @@ import secrets
 from fastapi import Depends, status, HTTPException
 from fastapi.security import APIKeyHeader
 
+from typing import Optional
+
 
 class APIKeyAuth:
 
@@ -10,11 +12,11 @@ class APIKeyAuth:
 
     def __init__(self):
         """Initialize instance without valid key specification"""
-        self.valid_key = None
+        self.valid_key: Optional[str] = None
 
     def __call__(
             self, key: str = Depends(APIKeyHeader(name=_api_key_header_name))
-    ) -> None:
+    ) -> bool:
         """
         Verify that an api key passed in a header matches the registered
         valid_key.

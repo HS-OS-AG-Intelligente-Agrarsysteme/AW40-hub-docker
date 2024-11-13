@@ -13,11 +13,13 @@ def DiagnosticTaskManager():
 
 class TestDiagnosticTaskManager:
 
-    def test_set_celery(self, DiagnosticTaskManager):
+    @pytest.mark.asyncio
+    async def test_set_celery(self, DiagnosticTaskManager):
         DiagnosticTaskManager.set_celery(Celery())
         DiagnosticTaskManager()
 
-    def test_init_fails_without_celery(self, DiagnosticTaskManager):
+    @pytest.mark.asyncio
+    async def test_init_fails_without_celery(self, DiagnosticTaskManager):
         with pytest.raises(AttributeError):
             DiagnosticTaskManager()
 

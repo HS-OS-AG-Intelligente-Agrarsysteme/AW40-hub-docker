@@ -1,3 +1,5 @@
+import "package:aw40_hub_frontend/utils/enums.dart";
+
 class ActionModel {
   ActionModel({
     required this.id,
@@ -10,6 +12,6 @@ class ActionModel {
   String id;
   String instruction;
   String actionType;
-  String dataType;
+  DatasetType dataType;
   String? component;
 }

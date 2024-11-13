@@ -3,15 +3,15 @@ name: Test Docker Stack
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
-    - main
+      - main
 
 jobs:
   docker:
     timeout-minutes: 20
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       # Overwrite dev.env to use http
       PROXY_DEFAULT_ENTRYPOINTS: web
@@ -19,16 +19,13 @@ jobs:
       # Overwrite Addresses in dev.env
       FRONTEND_ADDRESS: werkstatthub.docker.localhost
       DOCS_ADDRESS: docs.werkstatthub.docker.localhost
-      MINIO_ADDRESS: minio.werkstatthub.docker.localhost
-      MINIO_API_ADDRESS: minioapi.werkstatthub.docker.localhost
       KEYCLOAK_ADDRESS: keycloak.werkstatthub.docker.localhost
       API_ADDRESS: api.werkstatthub.docker.localhost
-      EDC_ADDRESS: edc.werkstatthub.docker.localhost
       DOCS_BUILD_WITH_PDF: 0
       COMPOSE_PROFILES: full
 
     steps:
-    # Setup environment
+      # Setup environment
       - name: Checkout
         uses: actions/checkout@v1
 
@@ -47,10 +44,16 @@ jobs:
         if: ${{ env.ACT }}
         run: sudo apt-get update && sudo apt-get install python3-dev -y
 
-      - name: Install python dependencies
-        run: pip install -r requirements.txt
+      - name: Setup python venv
+        run: python3 -m venv .venv
 
-    # Tag Containers
+      - name: Install python dependecies
+        run: |
+          source .venv/bin/activate
+          pip3 install -r requirements.txt
+          deactivate
+
+      # Tag Containers
       - name: Build containers and save cache (only on main)
         if: ${{ github.ref_name == 'main' && github.ref_type == 'branch'}}
         run: |
@@ -70,7 +73,7 @@ jobs:
           -f cache-from-override.yml \
           build
 
-    # Start Containers
+      # Start Containers
       - name: Start containers and wait for healthy state
         run: |
           docker compose \
@@ -79,11 +82,11 @@ jobs:
           -f cache-from-override.yml \
           up -d --wait
 
-    # Wait for Traefik to generate routes
+      # Wait for Traefik to generate routes
       - name: Proxy setup delay
         run: sleep 10s
 
-    # Test API
+      # Test API
       - name: Check if API is healthy
         run: |
           curl -fs -o /dev/null -w 'http_code:%{http_code}' \
@@ -97,51 +100,47 @@ jobs:
             || exit 1
 
       - name: Run pytest
-        run: pytest ./api
+        run: |
+          source .venv/bin/activate
+          pytest ./api
+          deactivate
 
-    # Test documentation
+      # Test documentation
       - name: Check if documentation is reachable
         run: |
           curl -fs -o /dev/null -w 'http_code:%{http_code}' \
           $PROXY_DEFAULT_SCHEME://$DOCS_ADDRESS \
           || exit 1
 
-    # Test MongoDB
+      # Test MongoDB
       - name: Check if MongoDB is reachable
         run: |
           curl -fs -o /dev/null -w 'http_code:%{http_code}' \
           http://localhost:27017 \
           || exit 1
 
-    # Test Keycloak
+      # Test Nautilus
+      - name: Check if Nautilus is reachable
+        run: |
+          curl -fs -o /dev/null -w 'http_code:%{http_code}' \
+          http://localhost:3000/health \
+          || exit 1
+
+      # Test Keycloak
       - name: Check if Keycloak is healthy
         run: |
           curl -fs -o /dev/null -w 'http_code:%{http_code}' \
           $PROXY_DEFAULT_SCHEME://$KEYCLOAK_ADDRESS/health/live \
           || exit 1
 
-    # Test MinIO
-      - name: Check if MinIO is healthy
-        run: |
-          curl -fs -o /dev/null -w 'http_code:%{http_code}' \
-          $PROXY_DEFAULT_SCHEME://$MINIO_ADDRESS/minio/health/live \
-          || exit 1
-
-    # Test EDC
-      - name: Check if EDC is healthy
-        run: |
-            curl -fs -o /dev/null -w 'http_code:%{http_code}' \
-            $PROXY_DEFAULT_SCHEME://$EDC_ADDRESS/api/health \
-            || exit 1
-
-    # Test Frontend
+      # Test Frontend
       - name: Check if Frontend is reachable
         run: |
           curl -fs -o /dev/null -w 'http_code:%{http_code}' \
           $PROXY_DEFAULT_SCHEME://$FRONTEND_ADDRESS \
           || exit 1
 
-    # Clean up
+      # Clean up
       - name: Stop containers
         if: always()
         run: docker compose --env-file=dev.env down -v

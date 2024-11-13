@@ -6,22 +6,21 @@ from motor import motor_asyncio
 
 from .data_management import (
     Case, Vehicle, Customer, Workshop, TimeseriesMetaData, Diagnosis,
-    AttachmentBucket
+    AttachmentBucket, Asset
 )
 from .data_management.timeseries_data import GridFSSignalStore
+from .dataspace_management import Nautilus
 from .diagnostics_management import DiagnosticTaskManager, KnowledgeGraph
 from .settings import settings
-from .storage.storage_factory import StorageFactory
 from .security.keycloak import Keycloak
 from .v1 import api_v1
-from .routers import diagnostics
-from .routers import minio
+from .routers import diagnostics, assets
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
-    allow_methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allow_methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allow_headers=["*"],
 )
 
@@ -44,7 +43,7 @@ async def init_mongo():
     await init_beanie(
         client[settings.mongo_db],
         document_models=[
-            Case, Vehicle, Customer, Workshop, Diagnosis
+            Case, Vehicle, Customer, Workshop, Diagnosis, Asset
         ]
     )
 
@@ -70,17 +69,6 @@ async def init_diagnostics_management():
 
 
 @app.on_event("startup")
-def init_storages():
-    StorageFactory.initialise_storages(
-        minio_host=settings.minio_api_address,
-        minio_password=settings.minio_password,
-        minio_username=settings.minio_username,
-        minio_use_tls=settings.minio_use_tls,
-        minio_check_cert=settings.minio_check_cert
-    )
-
-
-@app.on_event("startup")
 def init_knowledge_graph():
     KnowledgeGraph.set_kg_url(settings.knowledge_graph_url)
 
@@ -96,4 +84,13 @@ def init_keycloak():
 @app.on_event("startup")
 def set_api_keys():
     diagnostics.api_key_auth.valid_key = settings.api_key_diagnostics
-    minio.api_key_auth.valid_key = settings.api_key_minio
+    assets.api_key_auth.valid_key = settings.api_key_assets
+
+
+@app.on_event("startup")
+def init_nautilus():
+    Nautilus.configure(
+        url=settings.nautilus_url,
+        timeout=settings.nautilus_timeout,
+        api_key_assets=settings.api_key_assets
+    )

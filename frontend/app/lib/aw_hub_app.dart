@@ -1,9 +1,20 @@
-import "package:aw40_hub_frontend/configs/configs.dart";
+import "package:aw40_hub_frontend/configs/localization_config.dart";
 import "package:aw40_hub_frontend/main.dart";
-import "package:aw40_hub_frontend/providers/providers.dart";
+import "package:aw40_hub_frontend/providers/auth_provider.dart";
+import "package:aw40_hub_frontend/providers/case_provider.dart";
+import "package:aw40_hub_frontend/providers/customer_provider.dart";
+import "package:aw40_hub_frontend/providers/diagnosis_provider.dart";
+import "package:aw40_hub_frontend/providers/theme_provider.dart";
+import "package:aw40_hub_frontend/providers/vehicle_provider.dart";
 import "package:aw40_hub_frontend/routing/router.dart";
-import "package:aw40_hub_frontend/services/services.dart";
+import "package:aw40_hub_frontend/services/auth_service.dart";
+import "package:aw40_hub_frontend/services/config_service.dart";
+import "package:aw40_hub_frontend/services/http_service.dart";
+import "package:aw40_hub_frontend/services/mock_http_service.dart";
+import "package:aw40_hub_frontend/services/storage_service.dart";
+import "package:aw40_hub_frontend/services/token_service.dart";
 import "package:aw40_hub_frontend/themes/color_schemes.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:easy_localization_loader/easy_localization_loader.dart";
 import "package:flutter/material.dart";
@@ -18,7 +29,10 @@ class AWHubApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final httpService = HttpService(http.Client());
+    final useMockData =
+        ConfigService().getConfigValue(ConfigKey.useMockData) == "true";
+    final httpService =
+        useMockData ? MockHttpService() : HttpService(http.Client());
     return EasyLocalization(
       path: kLocalesPath,
       supportedLocales: kSupportedLocales.values.toList(),
@@ -47,6 +61,18 @@ class AWHubApp extends StatelessWidget {
             update: (_, authProvider, caseProvider) =>
                 // ignore: discarded_futures
                 caseProvider!..fetchAndSetAuthToken(authProvider),
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, CustomerProvider>(
+            create: (_) => CustomerProvider(httpService),
+            update: (_, authProvider, caseProvider) =>
+                // ignore: discarded_futures
+                caseProvider!..fetchAndSetAuthToken(authProvider),
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, VehicleProvider>(
+            create: (_) => VehicleProvider(httpService),
+            update: (_, authProvider, vehicleProvider) =>
+                // ignore: discarded_futures
+                vehicleProvider!..fetchAndSetAuthToken(authProvider),
           ),
           ChangeNotifierProvider<ThemeProvider>(
             create: (_) => ThemeProvider(),

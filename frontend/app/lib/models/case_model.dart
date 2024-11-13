@@ -1,7 +1,7 @@
 import "package:aw40_hub_frontend/models/obd_data_model.dart";
 import "package:aw40_hub_frontend/models/symptom_model.dart";
 import "package:aw40_hub_frontend/models/timeseries_data_model.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 
 class CaseModel {
   CaseModel({

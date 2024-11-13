@@ -1,10 +1,18 @@
 import "dart:async";
 
-import "package:aw40_hub_frontend/configs/configs.dart";
-import "package:aw40_hub_frontend/exceptions/exceptions.dart";
-import "package:aw40_hub_frontend/providers/providers.dart";
-import "package:aw40_hub_frontend/services/services.dart";
-import "package:aw40_hub_frontend/utils/utils.dart";
+import "package:aw40_hub_frontend/configs/localization_config.dart";
+import "package:aw40_hub_frontend/exceptions/app_exception.dart";
+import "package:aw40_hub_frontend/providers/auth_provider.dart";
+import "package:aw40_hub_frontend/providers/case_provider.dart";
+import "package:aw40_hub_frontend/providers/customer_provider.dart";
+import "package:aw40_hub_frontend/providers/diagnosis_provider.dart";
+import "package:aw40_hub_frontend/providers/vehicle_provider.dart";
+import "package:aw40_hub_frontend/services/auth_service.dart";
+import "package:aw40_hub_frontend/services/config_service.dart";
+import "package:aw40_hub_frontend/services/localization_service.dart";
+import "package:aw40_hub_frontend/services/storage_service.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/utils/extensions.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
@@ -105,6 +113,10 @@ class _LoginScreenState extends State<LoginScreen> {
         Provider.of<CaseProvider>(context, listen: false);
     final DiagnosisProvider diagnosisProvider =
         Provider.of<DiagnosisProvider>(context, listen: false);
+    final VehicleProvider vehicleProvider =
+        Provider.of<VehicleProvider>(context, listen: false);
+    final CustomerProvider customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
 
     await authProvider.tryLoginWithStoredRefreshToken();
 
@@ -122,8 +134,10 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
     final String workShopId = authProvider.loggedInUser.workShopId;
-    caseProvider.workShopId = workShopId;
-    diagnosisProvider.workShopId = workShopId;
+    caseProvider.workshopId = workShopId;
+    diagnosisProvider.workshopId = workShopId;
+    vehicleProvider.workshopId = workShopId;
+    customerProvider.workshopId = workShopId;
   }
 
   Future<void> _webGoToKeyCloakLogin() async {
