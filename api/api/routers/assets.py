@@ -206,7 +206,7 @@ async def publish_asset(
     response_class=FileResponse
 )
 async def get_published_dataset(
-    asset_key: str = Depends(APIKeyHeader(name="asset_key")),
+    asset_key: str = Depends(APIKeyHeader(name="data_key")),
     asset: Asset = Depends(asset_by_id)
 ):
     """Public download link for asset data."""
