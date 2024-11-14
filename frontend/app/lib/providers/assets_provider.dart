@@ -3,7 +3,7 @@ import "dart:convert";
 import "package:aw40_hub_frontend/dtos/asset_dto.dart";
 import "package:aw40_hub_frontend/dtos/assets_update_dto.dart";
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
-import "package:aw40_hub_frontend/models/assets_model.dart";
+import "package:aw40_hub_frontend/models/asset_model.dart";
 import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:aw40_hub_frontend/services/http_service.dart";

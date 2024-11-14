@@ -1,4 +1,4 @@
-import "package:aw40_hub_frontend/models/assets_model.dart";
+import "package:aw40_hub_frontend/models/asset_model.dart";
 import "package:flutter/material.dart";
 
 class AssetsDataTableSource extends DataTableSource {

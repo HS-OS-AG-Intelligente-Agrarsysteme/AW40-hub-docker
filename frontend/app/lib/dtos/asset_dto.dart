@@ -1,6 +1,6 @@
 import "package:aw40_hub_frontend/dtos/asset_definition_dto.dart";
 import "package:aw40_hub_frontend/dtos/publication_dto.dart";
-import "package:aw40_hub_frontend/models/assets_model.dart";
+import "package:aw40_hub_frontend/models/asset_model.dart";
 import "package:json_annotation/json_annotation.dart";
 
 part "asset_dto.g.dart";
