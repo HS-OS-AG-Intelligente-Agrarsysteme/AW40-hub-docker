@@ -5,17 +5,17 @@ class AssetsDataTableSource extends DataTableSource {
   AssetsDataTableSource({
     required this.themeData,
     required this.currentIndexNotifier,
-    required this.assetsModels,
+    required this.assetModels,
     required this.onPressedRow,
   });
-  List<AssetModel> assetsModels;
+  List<AssetModel> assetModels;
   final void Function(int) onPressedRow;
   final ThemeData themeData;
   final ValueNotifier<int?> currentIndexNotifier;
 
   @override
   DataRow? getRow(int index) {
-    final assetsModel = assetsModels[index];
+    final assetModel = assetModels[index];
     return DataRow(
       onSelectChanged: (_) => onPressedRow(index),
       selected: currentIndexNotifier.value == index,
@@ -27,8 +27,8 @@ class AssetsDataTableSource extends DataTableSource {
         return null; // Use the default value.
       }),
       cells: [
-        DataCell(Text(assetsModel.timeOfGeneration)),
-        DataCell(Text(assetsModel.filter.toString())),
+        DataCell(Text(assetModel.name)),
+        DataCell(Text(assetModel.definition.toString())),
       ],
     );
   }
@@ -37,7 +37,7 @@ class AssetsDataTableSource extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => assetsModels.length;
+  int get rowCount => assetModels.length;
 
   @override
   int get selectedRowCount => 0;

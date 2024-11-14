@@ -102,7 +102,7 @@ class AssetsTableState extends State<AssetsTable> {
               source: AssetsDataTableSource(
                 themeData: Theme.of(context),
                 currentIndexNotifier: currentAssetsIndexNotifier,
-                assetsModels: widget.assetsModels,
+                assetModels: widget.assetsModels,
                 onPressedRow: (int i) =>
                     setState(() => currentAssetsIndexNotifier.value = i),
               ),

@@ -1,6 +1,6 @@
 import "dart:convert";
 
-import "package:aw40_hub_frontend/dtos/assets_dto.dart";
+import "package:aw40_hub_frontend/dtos/asset_dto.dart";
 import "package:aw40_hub_frontend/dtos/assets_update_dto.dart";
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
 import "package:aw40_hub_frontend/models/assets_model.dart";
@@ -41,7 +41,7 @@ class AssetProvider with ChangeNotifier {
       _logger.warning("Could not decode json response to List.");
       return [];
     }
-    return json.map((e) => AssetsDto.fromJson(e).toModel()).toList();
+    return json.map((e) => AssetDto.fromJson(e).toModel()).toList();
   }
 
   Future<AssetModel?> updateAssets(
@@ -70,7 +70,7 @@ class AssetProvider with ChangeNotifier {
 
   AssetModel _decodeAssetsModelFromResponseBody(Response response) {
     final Map<String, dynamic> body = jsonDecode(response.body);
-    final AssetsDto receivedAssets = AssetsDto.fromJson(body);
+    final AssetDto receivedAssets = AssetDto.fromJson(body);
     return receivedAssets.toModel();
   }
 
