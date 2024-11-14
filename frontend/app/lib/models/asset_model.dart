@@ -23,5 +23,5 @@ class AssetModel {
   String? type;
   String author;
   String? dataStatus;
-  PublicationModel publication;
+  PublicationModel? publication;
 }

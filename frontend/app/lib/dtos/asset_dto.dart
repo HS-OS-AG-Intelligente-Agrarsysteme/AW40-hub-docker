@@ -34,7 +34,7 @@ class AssetDto {
       type: type,
       author: author,
       dataStatus: dataStatus,
-      publication: publication.toModel(),
+      publication: publication?.toModel(),
     );
   }
 
@@ -48,5 +48,5 @@ class AssetDto {
   String? type;
   String author;
   String? dataStatus;
-  PublicationDto publication;
+  PublicationDto? publication;
 }
