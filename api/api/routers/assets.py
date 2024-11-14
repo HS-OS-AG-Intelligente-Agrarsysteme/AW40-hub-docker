@@ -176,6 +176,13 @@ async def publish_asset(
             )
         ]
     )
+
+    # Might need to fix asset_url scheme if running behind reverse proxy
+    x_forwarded_proto = request.headers.get("x-forwarded-proto", None)
+    if x_forwarded_proto is not None:
+        if x_forwarded_proto != asset_url[:len(x_forwarded_proto)]:
+            asset_url = f"{x_forwarded_proto}://{asset_url.split('://')[1]}"
+
     # Use nautilus to trigger the publication and store publication info
     # within the asset.
     publication, info = nautilus.publish_access_dataset(
