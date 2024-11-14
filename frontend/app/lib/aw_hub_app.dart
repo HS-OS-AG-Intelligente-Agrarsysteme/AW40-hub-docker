@@ -1,5 +1,6 @@
 import "package:aw40_hub_frontend/configs/localization_config.dart";
 import "package:aw40_hub_frontend/main.dart";
+import "package:aw40_hub_frontend/providers/assets_provider.dart";
 import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/providers/case_provider.dart";
 import "package:aw40_hub_frontend/providers/customer_provider.dart";
@@ -73,6 +74,12 @@ class AWHubApp extends StatelessWidget {
             update: (_, authProvider, vehicleProvider) =>
                 // ignore: discarded_futures
                 vehicleProvider!..fetchAndSetAuthToken(authProvider),
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, AssetProvider>(
+            create: (_) => AssetProvider(httpService),
+            update: (_, authProvider, assetProvider) =>
+                // ignore: discarded_futures
+                assetProvider!..fetchAndSetAuthToken(authProvider),
           ),
           ChangeNotifierProvider<ThemeProvider>(
             create: (_) => ThemeProvider(),

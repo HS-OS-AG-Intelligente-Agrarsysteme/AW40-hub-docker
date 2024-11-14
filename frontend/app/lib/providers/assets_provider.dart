@@ -12,8 +12,8 @@ import "package:flutter/foundation.dart";
 import "package:http/http.dart";
 import "package:logging/logging.dart";
 
-class AssetsProvider with ChangeNotifier {
-  AssetsProvider(this._httpService);
+class AssetProvider with ChangeNotifier {
+  AssetProvider(this._httpService);
 
   final HttpService _httpService;
 
@@ -24,32 +24,10 @@ class AssetsProvider with ChangeNotifier {
 
   String? _authToken;
 
-  Future<List<AssetsModel>> getSharedAssets() async {
-    final String authToken = _getAuthToken();
-    final Response response = await _httpService.getSharedAssets(
-      authToken,
-    );
-    if (response.statusCode != 200) {
-      _logger.warning(
-        "Could not get assets. "
-        "${response.statusCode}: ${response.reasonPhrase}",
-      );
-      return [];
-    }
-    final json = jsonDecode(response.body);
-    if (json is! List) {
-      _logger.warning("Could not decode json response to List.");
-      return [];
-    }
-    return json.map((e) => AssetsDto.fromJson(e).toModel()).toList();
-  }
-
   Future<List<AssetsModel>> getAssets() async {
     final String authToken = _getAuthToken();
     final Response response = await _httpService.getAssets(
       authToken,
-      workshopId,
-      caseId,
     );
     if (response.statusCode != 200) {
       _logger.warning(

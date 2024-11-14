@@ -457,20 +457,11 @@ class HttpService {
     );
   }
 
-  Future<http.Response> getSharedAssets(String token) {
-    return _client.get(
-      Uri.parse("$backendUrl/shared/assets"),
-      headers: getAuthHeaderWith(token),
-    );
-  }
-
   Future<http.Response> getAssets(
     String token,
-    String workshopId,
-    String caseId,
   ) {
     return _client.get(
-      Uri.parse("$backendUrl/$workshopId/assets"),
+      Uri.parse("$backendUrl/dataspace/manage/assets"),
       headers: getAuthHeaderWith(token),
     );
   }

@@ -1,8 +1,13 @@
 import "package:aw40_hub_frontend/data_sources/assets_data_table_source.dart";
+import "package:aw40_hub_frontend/exceptions/app_exception.dart";
 import "package:aw40_hub_frontend/models/assets_model.dart";
+import "package:aw40_hub_frontend/providers/assets_provider.dart";
+import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:aw40_hub_frontend/views/assets_detail_view.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
+import "package:logging/logging.dart";
+import "package:provider/provider.dart";
 
 class AssetsView extends StatefulWidget {
   const AssetsView({
@@ -14,6 +19,7 @@ class AssetsView extends StatefulWidget {
 }
 
 class _AssetsView extends State<AssetsView> {
+  final Logger _logger = Logger("AssetsViewLogger");
   ValueNotifier<int?> currentCaseIndexNotifier = ValueNotifier<int?>(null);
 
   @override
@@ -24,22 +30,11 @@ class _AssetsView extends State<AssetsView> {
 
   @override
   Widget build(BuildContext context) {
-    //final assetsProvider = Provider.of<AssetsProvider>(context);
-    return AssetsTable(
-      assetsModel: [
-        AssetsModel(
-          timeOfGeneration: "15:42",
-          filter: [
-            "filter1",
-            "filter2",
-          ],
-        )
-      ],
-      caseIndexNotifier: currentCaseIndexNotifier,
-    );
-    /*FutureBuilder(
+    final assetsProvider = Provider.of<AssetProvider>(context);
+
+    return FutureBuilder(
       // ignore: discarded_futures
-      future: assetsProvider.getSharedAssets(),
+      future: assetsProvider.getAssets(),
       builder:
           (BuildContext context, AsyncSnapshot<List<AssetsModel>> snapshot) {
         if (snapshot.connectionState != ConnectionState.done ||
@@ -60,7 +55,7 @@ class _AssetsView extends State<AssetsView> {
           caseIndexNotifier: currentCaseIndexNotifier,
         );
       },
-    );*/
+    );
   }
 }
 

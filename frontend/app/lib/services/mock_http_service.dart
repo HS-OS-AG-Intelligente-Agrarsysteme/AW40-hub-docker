@@ -1466,14 +1466,10 @@ class MockHttpService implements HttpService {
   }
 
   @override
-  Future<Response> getAssets(String token, String workshopId, String caseId) {
+  Future<Response> getAssets(
+    String token,
+  ) {
     // TODO: implement getAssets
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Response> getSharedAssets(String token) {
-    // TODO: implement getSharedAssets
     throw UnimplementedError();
   }
 
