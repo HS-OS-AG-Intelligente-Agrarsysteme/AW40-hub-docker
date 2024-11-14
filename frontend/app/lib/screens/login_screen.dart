@@ -2,6 +2,7 @@ import "dart:async";
 
 import "package:aw40_hub_frontend/configs/localization_config.dart";
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
+import "package:aw40_hub_frontend/providers/assets_provider.dart";
 import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/providers/case_provider.dart";
 import "package:aw40_hub_frontend/providers/customer_provider.dart";
@@ -117,6 +118,8 @@ class _LoginScreenState extends State<LoginScreen> {
         Provider.of<VehicleProvider>(context, listen: false);
     final CustomerProvider customerProvider =
         Provider.of<CustomerProvider>(context, listen: false);
+    final AssetProvider assetProvider =
+        Provider.of<AssetProvider>(context, listen: false);
 
     await authProvider.tryLoginWithStoredRefreshToken();
 

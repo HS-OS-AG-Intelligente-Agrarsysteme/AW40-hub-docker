@@ -30,11 +30,11 @@ class _AssetsView extends State<AssetsView> {
 
   @override
   Widget build(BuildContext context) {
-    final assetsProvider = Provider.of<AssetProvider>(context);
+    final assetProvider = Provider.of<AssetProvider>(context);
 
     return FutureBuilder(
       // ignore: discarded_futures
-      future: assetsProvider.getAssets(),
+      future: assetProvider.getAssets(),
       builder:
           (BuildContext context, AsyncSnapshot<List<AssetModel>> snapshot) {
         if (snapshot.connectionState != ConnectionState.done ||
