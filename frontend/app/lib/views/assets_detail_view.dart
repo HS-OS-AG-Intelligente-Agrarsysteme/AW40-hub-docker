@@ -51,8 +51,8 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
       tr("assets.headlines.filter")
     ];
     final List<String> valuesCase = [
-      widget.assetsModel.timeOfGeneration,
-      widget.assetsModel.filter.toString(),
+      widget.assetsModel.timestamp.toString(),
+      widget.assetsModel.definition.toString(),
     ];
 
     return SizedBox.expand(
