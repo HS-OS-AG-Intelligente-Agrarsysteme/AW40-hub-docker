@@ -791,7 +791,7 @@ async def test_get_published_dataset(
         # data archive using the automatically created url and key?
         response = await public_async_client.get(
             asset_url,
-            headers={"asset_key": asset_key, "x-api-key": "assets-key-dev"}
+            headers={"data_key": asset_key, "x-api-key": "assets-key-dev"}
         )
         assert response.status_code == 200
         # Download the archive and validate structure
@@ -839,7 +839,7 @@ async def test_get_published_dataset_invalid_asset_key(
         response = await public_async_client.get(
             asset_url,
             headers={
-                "asset_key": "this-sure-is-not-the-right-key",
+                "data_key": "this-sure-is-not-the-right-key",
                 "x-api-key": "assets-key-dev"}
         )
         assert response.status_code == 401
@@ -863,7 +863,7 @@ async def test_get_published_dataset_asset_not_published(
         # in the past)
         response = await public_async_client.get(
             asset_url,
-            headers={"asset_key": "some-key", "x-api-key": "assets-key-dev"}
+            headers={"data_key": "some-key", "x-api-key": "assets-key-dev"}
         )
         assert response.status_code == 404
         assert response.json() == {
@@ -883,7 +883,7 @@ async def test_get_published_dataset_asset_invalid_asset_id(
         asset_url = f"/dataspace/public/assets/{asset_id}/data"
         response = await public_async_client.get(
             asset_url,
-            headers={"asset_key": "some-key", "x-api-key": "assets-key-dev"}
+            headers={"data_key": "some-key", "x-api-key": "assets-key-dev"}
         )
         assert response.status_code == 404
         assert response.json() == {
