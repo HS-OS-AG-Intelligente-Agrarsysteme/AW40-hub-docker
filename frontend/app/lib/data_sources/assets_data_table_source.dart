@@ -8,7 +8,7 @@ class AssetsDataTableSource extends DataTableSource {
     required this.assetsModels,
     required this.onPressedRow,
   });
-  List<AssetsModel> assetsModels;
+  List<AssetModel> assetsModels;
   final void Function(int) onPressedRow;
   final ThemeData themeData;
   final ValueNotifier<int?> currentIndexNotifier;

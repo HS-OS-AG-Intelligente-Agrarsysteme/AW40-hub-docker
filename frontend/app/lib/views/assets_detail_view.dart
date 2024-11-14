@@ -9,7 +9,7 @@ class AssetsDetailView extends StatelessWidget {
     super.key,
   });
 
-  final AssetsModel assetsModel;
+  final AssetModel assetsModel;
   final void Function() onClose;
 
   @override
@@ -30,7 +30,7 @@ class DesktopAssetsDetailView extends StatefulWidget {
     super.key,
   });
 
-  final AssetsModel assetsModel;
+  final AssetModel assetsModel;
   final void Function() onClose;
   final void Function() onDelete;
 

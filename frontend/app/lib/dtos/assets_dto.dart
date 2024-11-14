@@ -12,8 +12,8 @@ class AssetsDto {
   }
   Map<String, dynamic> toJson() => _$AssetsDtoToJson(this);
 
-  AssetsModel toModel() {
-    return AssetsModel(
+  AssetModel toModel() {
+    return AssetModel(
       timeOfGeneration: timeOfGeneration,
       filter: filter,
     );

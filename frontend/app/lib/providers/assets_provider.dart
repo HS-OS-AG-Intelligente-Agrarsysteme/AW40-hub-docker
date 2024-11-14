@@ -24,7 +24,7 @@ class AssetProvider with ChangeNotifier {
 
   String? _authToken;
 
-  Future<List<AssetsModel>> getAssets() async {
+  Future<List<AssetModel>> getAssets() async {
     final String authToken = _getAuthToken();
     final Response response = await _httpService.getAssets(
       authToken,
@@ -44,7 +44,7 @@ class AssetProvider with ChangeNotifier {
     return json.map((e) => AssetsDto.fromJson(e).toModel()).toList();
   }
 
-  Future<AssetsModel?> updateAssets(
+  Future<AssetModel?> updateAssets(
     String caseId_,
     AssetsUpdateDto updateAssetsDto,
   ) async {
@@ -68,7 +68,7 @@ class AssetProvider with ChangeNotifier {
     return _decodeAssetsModelFromResponseBody(response);
   }
 
-  AssetsModel _decodeAssetsModelFromResponseBody(Response response) {
+  AssetModel _decodeAssetsModelFromResponseBody(Response response) {
     final Map<String, dynamic> body = jsonDecode(response.body);
     final AssetsDto receivedAssets = AssetsDto.fromJson(body);
     return receivedAssets.toModel();

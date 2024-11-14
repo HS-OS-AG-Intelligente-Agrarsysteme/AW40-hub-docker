@@ -1,5 +1,5 @@
-class AssetsModel {
-  AssetsModel({
+class AssetModel {
+  AssetModel({
     required this.timeOfGeneration,
     required this.filter,
   });
