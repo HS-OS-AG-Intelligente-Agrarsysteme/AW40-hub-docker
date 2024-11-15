@@ -1,14 +1,10 @@
 import os
 from datetime import datetime, timedelta, UTC
+from unittest.mock import AsyncMock
 from zipfile import ZipFile
 
 import httpx
 import pytest
-from bson import ObjectId
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
-from jose import jws
-
 from api.data_management import (
     Asset, AssetDefinition, Publication
 )
@@ -16,6 +12,10 @@ from api.dataspace_management import nautilus
 from api.routers import assets
 from api.routers.assets import Nautilus
 from api.security.keycloak import Keycloak
+from bson import ObjectId
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+from jose import jws
 
 
 @pytest.fixture
@@ -274,16 +274,24 @@ def patch_nautilus_to_avoid_external_revocation_request(
         timeout=None,
         api_key_assets=None
     )
-    # Patch httpx.post in the nautilus module to avoid external request
-    monkeypatch.setattr(
-        nautilus.httpx,
-        "post",
-        lambda url, headers, timeout, json: httpx.Response(
-            status_code=200,
-            request=httpx.Request("post", url),
-        )
+
+    # Create mock for the httpx.AsyncClient.post method
+    mock_post = AsyncMock(spec=httpx.AsyncClient.post)
+    mock_post.return_value = httpx.Response(
+        status_code=200,
+        request=httpx.Request("POST", "http://nothing-here")
     )
+
+    # Patch httpx.AsyncClient.post in the nautilus module to avoid external
+    # request
+    monkeypatch.setattr(
+        nautilus.httpx.AsyncClient,
+        "post",
+        mock_post
+    )
+
     yield
+
     # Clean up
     Nautilus.configure(url=None, timeout=None, api_key_assets=None)
 
@@ -458,15 +466,20 @@ def patch_nautilus_to_avoid_external_request(
         timeout=None,
         api_key_assets=None
     )
-    # Patch httpx.post in the nautilus module to avoid external request
+
+    # Create mock of httpx.AsyncClient
+    class MockAsyncClient:
+        async def post(self, url, headers, timeout, json):
+            return httpx.Response(
+                status_code=201,
+                request=httpx.Request("post", url),
+                json={"assetdid": "newdid"}
+            )
+
+    # Patch httpx.AsyncClient.post in the nautilus module to avoid external
+    # request
     monkeypatch.setattr(
-        nautilus.httpx,
-        "post",
-        lambda url, json, headers, timeout: httpx.Response(
-            status_code=201,
-            request=httpx.Request("post", url),
-            json={"assetdid": "newdid"}
-        )
+        nautilus.httpx, "AsyncClient",  MockAsyncClient
     )
     yield
     # Clean up
@@ -517,14 +530,15 @@ def patch_nautilus_to_timeout_communication(
         api_key_assets=None
     )
 
-    # Patch httpx.post in the nautilus module to timeout
-    def _timeout(*args, **kwargs):
-        raise httpx.TimeoutException(
-            "Simulated timeout during dataset publication"
-        )
+    # Patch httpx.AsyncClient.post in the nautilus module to timeout
+    class MockAsyncClient:
+        async def post(self, url, headers, timeout, json):
+            raise httpx.TimeoutException(
+                "Simulated timeout during dataset publication"
+            )
 
     monkeypatch.setattr(
-        nautilus.httpx, "post", _timeout
+        nautilus.httpx, "AsyncClient", MockAsyncClient
     )
     yield
     # Clean up
@@ -569,16 +583,19 @@ def patch_nautilus_to_fail_http_communication(
         timeout=None,
         api_key_assets=None
     )
-    # Patch httpx.post in the nautilus module to avoid external request and
-    # to respond with non-success http code
+
+    # Patch httpx.AsyncClient.post in the nautilus module to avoid external
+    # request and to respond with non-success http code
+    class MockAsyncClient:
+        async def post(self, url, headers, timeout, json):
+            return httpx.Response(
+                status_code=request.param,
+                text="Failed.",
+                request=httpx.Request("post", url)
+            )
+
     monkeypatch.setattr(
-        nautilus.httpx,
-        "post",
-        lambda url, json, headers, timeout: httpx.Response(
-            status_code=request.param,
-            text="Failed.",
-            request=httpx.Request("post", url)
-        )
+        nautilus.httpx, "AsyncClient", MockAsyncClient
     )
     yield
     # Clean up
