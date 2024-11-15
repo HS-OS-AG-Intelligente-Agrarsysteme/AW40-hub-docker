@@ -76,12 +76,12 @@ class AWHubApp extends StatelessWidget {
                 // ignore: discarded_futures
                 vehicleProvider!..fetchAndSetAuthToken(authProvider),
           ),
-
           ChangeNotifierProxyProvider<AuthProvider, AssetProvider>(
             create: (_) => AssetProvider(httpService),
             update: (_, authProvider, assetProvider) =>
                 // ignore: discarded_futures
                 assetProvider!..fetchAndSetAuthToken(authProvider),
+          ),
           ChangeNotifierProxyProvider<AuthProvider, KnowledgeProvider>(
             create: (_) => KnowledgeProvider(httpService),
             update: (_, authProvider, knowledgeProvider) =>

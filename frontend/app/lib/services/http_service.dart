@@ -508,6 +508,7 @@ class HttpService {
       body: jsonEncode(requestBody),
     );
   }
+
   Future<http.Response> getVehicleComponents(
     String token,
   ) {

@@ -127,7 +127,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final KnowledgeProvider knowledgeProvider =
         Provider.of<KnowledgeProvider>(context, listen: false);
 
-
     await authProvider.tryLoginWithStoredRefreshToken();
 
     if (!authProvider.isLoggedIn()) {
