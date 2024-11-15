@@ -37,8 +37,7 @@ management_router = APIRouter(
 
 public_router = APIRouter(
     tags=["Public Dataspace Resources"],
-    prefix="/dataspace/public",
-    dependencies=[Depends(api_key_auth)]
+    prefix="/dataspace/public"
 )
 
 
@@ -193,10 +192,24 @@ async def publish_asset(
     return publication
 
 
-@public_router.get(
+@public_router.head(
     "/assets/{asset_id}/data",
     status_code=200,
     response_class=FileResponse
+)
+async def get_published_dataset_head(
+    asset: Asset = Depends(asset_by_id)
+):
+    return FileResponse(
+        path=asset.data_file_path, filename=f"{asset.name}.zip"
+    )
+
+
+@public_router.get(
+    "/assets/{asset_id}/data",
+    status_code=200,
+    response_class=FileResponse,
+    dependencies=[Depends(api_key_auth)]
 )
 async def get_published_dataset(
     asset_key: str = Depends(APIKeyHeader(name="asset_key")),
