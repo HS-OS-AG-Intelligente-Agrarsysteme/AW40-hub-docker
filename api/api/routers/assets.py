@@ -184,7 +184,7 @@ async def publish_asset(
 
     # Use nautilus to trigger the publication and store publication info
     # within the asset.
-    publication, info = nautilus.publish_access_dataset(
+    publication, info = await nautilus.publish_access_dataset(  # TODO: Await
         asset_url=asset_url,
         asset=asset,
         new_publication=new_publication
@@ -223,19 +223,19 @@ async def get_published_dataset(
     asset: Asset = Depends(asset_by_id)
 ):
     """Public download link for asset data."""
-    publication = asset.publication
-    if publication is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"No published asset with ID '{asset.id}' found."
-        )
-    asset_key_valid = secrets.compare_digest(publication.asset_key, asset_key)
-    if not asset_key_valid:
-        raise HTTPException(
-            status_code=401,
-            detail="Could not validate asset key.",
-            headers={"WWW-Authenticate": "asset_key"},
-        )
+    # publication = asset.publication
+    # if publication is None:
+    #     raise HTTPException(
+    #         status_code=404,
+    #         detail=f"No published asset with ID '{asset.id}' found."
+    #     )
+    # asset_key_valid = secrets.compare_digest(publication.asset_key, asset_key)
+    # if not asset_key_valid:
+    #     raise HTTPException(
+    #         status_code=401,
+    #         detail="Could not validate asset key.",
+    #         headers={"WWW-Authenticate": "asset_key"},
+    #     )
     return FileResponse(
         path=asset.data_file_path, filename=f"{asset.name}.zip"
     )

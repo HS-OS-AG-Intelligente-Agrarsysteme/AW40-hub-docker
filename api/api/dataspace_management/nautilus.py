@@ -30,7 +30,7 @@ class Nautilus:
     def _revocation_url(self):
         return "/".join([self._url, "revoke"])
 
-    def _post_request(
+    async def _post_request(
             self,
             url: str,
             headers: dict,
@@ -40,7 +40,7 @@ class Nautilus:
         Helper method to perform a POST request with standard error handling.
         """
         try:
-            response = httpx.post(
+            response = await httpx.AsyncClient().post(
                 url, json=json_payload, headers=headers, timeout=self._timeout
             )
             response.raise_for_status()
@@ -50,7 +50,7 @@ class Nautilus:
         except httpx.HTTPStatusError as e:
             return None, e.response.text
 
-    def publish_access_dataset(
+    async def publish_access_dataset(
             self,
             asset_url: str,
             asset: "Asset",
@@ -80,7 +80,7 @@ class Nautilus:
             }
         }
         # Attempt publication
-        response, info = self._post_request(
+        response, info = await self._post_request(
             url="/".join([self._publication_url, new_publication.network]),
             headers={"priv_key": new_publication.nautilus_private_key},
             json_payload=payload
@@ -97,14 +97,14 @@ class Nautilus:
             **new_publication.model_dump()
         ), info
 
-    def revoke_publication(
+    async def revoke_publication(
             self, publication: Publication, nautilus_private_key: str
     ) -> Tuple[bool, str]:
         """Revoke a published asset in Nautilus."""
         url = "/".join(
             [self._revocation_url, publication.network, publication.did]
         )
-        response, info = self._post_request(
+        response, info = await self._post_request(
             url=url, headers={"priv_key": nautilus_private_key}
         )
         if response is None:
