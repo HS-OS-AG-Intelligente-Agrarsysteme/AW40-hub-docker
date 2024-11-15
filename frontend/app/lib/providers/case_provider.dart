@@ -10,6 +10,7 @@ import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:aw40_hub_frontend/services/http_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/utils/filter_criteria.dart";
 import "package:flutter/material.dart";
 import "package:http/http.dart";
 import "package:logging/logging.dart";
@@ -24,6 +25,24 @@ class CaseProvider with ChangeNotifier {
   bool get showSharedCases => _showSharedCases;
   String? _authToken;
 
+  FilterCriteria? _filterCriteria;
+
+  FilterCriteria? get filterCriteria => _filterCriteria;
+
+  void setFilterCriteria(FilterCriteria criteria) {
+    _filterCriteria = criteria;
+    notifyListeners();
+  }
+
+  void resetFilterCriteria() {
+    _filterCriteria = null;
+    notifyListeners();
+  }
+
+  bool isFilterActive() {
+    return filterCriteria != null;
+  }
+
   Future<void> toggleShowSharedCases() async {
     _showSharedCases = !_showSharedCases;
     await getCurrentCases();
@@ -35,9 +54,16 @@ class CaseProvider with ChangeNotifier {
     // * Return value currently not used.
     final Response response;
     if (_showSharedCases) {
-      response = await _httpService.getSharedCases(authToken);
+      response = await _httpService.getSharedCases(
+        authToken,
+        filterCriteria: filterCriteria,
+      );
     } else {
-      response = await _httpService.getCases(authToken, workshopId);
+      response = await _httpService.getCases(
+        authToken,
+        workshopId,
+        filterCriteria: filterCriteria,
+      );
     }
     final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
@@ -146,13 +172,6 @@ class CaseProvider with ChangeNotifier {
 
   Future<void> sortCases() async {
     _logger.warning("Unimplemented: sortCases()");
-  }
-
-  Future<void> filterCases() async {
-    // Klasse FilterCriteria mit Feld für jedes Filterkriterium.
-    // Aktuelle Filter werden durch Zustand einer FilterCriteria Instanz
-    // definiert.
-    _logger.warning("Unimplemented: filterCases()");
   }
 
   Future<bool> uploadObdData(String caseId, NewOBDDataDto obdDataDto) async {

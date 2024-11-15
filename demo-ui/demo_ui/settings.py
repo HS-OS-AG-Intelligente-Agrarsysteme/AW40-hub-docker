@@ -16,5 +16,7 @@ class Settings(BaseSettings):
 
     timezone: str = "Europe/Berlin"
 
+    root_path: str = ""
+
 
 settings = Settings()

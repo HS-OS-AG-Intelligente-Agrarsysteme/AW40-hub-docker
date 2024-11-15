@@ -17,6 +17,7 @@ import "package:aw40_hub_frontend/dtos/vehicle_dto.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:aw40_hub_frontend/services/http_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/utils/filter_criteria.dart";
 import "package:http/http.dart" show Response;
 import "package:logging/logging.dart";
 
@@ -873,7 +874,11 @@ class MockHttpService implements HttpService {
   }
 
   @override
-  Future<Response> getCases(String token, String workshopId) {
+  Future<Response> getCases(
+    String token,
+    String workshopId, {
+    FilterCriteria? filterCriteria,
+  }) {
     _demoCaseDto.workshopId = workshopId;
     for (final c in _caseDtos) {
       c.workshopId = workshopId;
@@ -944,7 +949,10 @@ class MockHttpService implements HttpService {
   }
 
   @override
-  Future<Response> getSharedCases(String token) {
+  Future<Response> getSharedCases(
+    String token, {
+    FilterCriteria? filterCriteria,
+  }) {
     final List<CaseDto> caseDtos = _caseDtos + _sharedCaseDtos;
     return Future.delayed(
       Duration(milliseconds: delay),
@@ -1481,6 +1489,10 @@ class MockHttpService implements HttpService {
     Map<String, dynamic> requestBody,
   ) {
     // TODO: implement updateAssets
+  
+  @override
+  Future<Response> getVehicleComponents(String token) {
+    // TODO: implement getVehicleComponents
     throw UnimplementedError();
   }
 }

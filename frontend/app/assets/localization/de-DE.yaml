@@ -1,8 +1,10 @@
 general:
+  apply: "Anwenden"
   cancel: "Abbrechen"
   case: "Fall"
   city: "Stadt"
   close: "Schließen"
+  component: "Komponente"
   customer: "Kunde"
   customerId: "Kunden ID"
   dataType: "Datentyp"
@@ -106,8 +108,13 @@ cases:
     open: "Offen"
     closed: "Geschlossen"
   filterDialog:
+    error: "Fehler-Code"
+    resetFilterCriteria: "Filter zurücksetzen"
     title: "Fälle filtern"
     toggleShared: "Fälle aus allen Werkstätten anzeigen"
+    tooltip: "Bitte auswählen"
+    vin: "Die ersten sechs Stellen der VIN"
+    vinLengthInvalid: "Muss maximal sechs Zeichen lang sein"
   addCaseDialog:
     customerTooltip: "Fall einem Kunden zuordnen"
     createNewCustomerTooltip: "Neuen Kunden erstellen"

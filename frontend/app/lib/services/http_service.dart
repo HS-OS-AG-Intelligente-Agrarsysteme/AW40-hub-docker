@@ -3,6 +3,7 @@ import "dart:convert";
 import "package:aw40_hub_frontend/dtos/new_symptom_dto.dart";
 import "package:aw40_hub_frontend/services/config_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/utils/filter_criteria.dart";
 import "package:collection/collection.dart";
 import "package:enum_to_string/enum_to_string.dart";
 import "package:http/http.dart" as http;
@@ -32,16 +33,43 @@ class HttpService {
     return _client.get(Uri.parse("$backendUrl/health/ping"));
   }
 
-  Future<http.Response> getSharedCases(String token) {
+  Future<http.Response> getSharedCases(
+    String token, {
+    FilterCriteria? filterCriteria,
+  }) {
+    final uri = Uri.parse("$backendUrl/shared/cases").replace(
+      queryParameters: {
+        if (filterCriteria?.vin != null) "vin": filterCriteria?.vin,
+        if (filterCriteria?.obdDataDtc != null)
+          "obd_data_dtc": filterCriteria?.obdDataDtc,
+        if (filterCriteria?.timeseriesDataComponent != null)
+          "timeseries_data_component": filterCriteria?.timeseriesDataComponent,
+      },
+    );
+
     return _client.get(
-      Uri.parse("$backendUrl/shared/cases"),
+      uri,
       headers: getAuthHeaderWith(token),
     );
   }
 
-  Future<http.Response> getCases(String token, String workshopId) {
+  Future<http.Response> getCases(
+    String token,
+    String workshopId, {
+    FilterCriteria? filterCriteria,
+  }) {
+    final uri = Uri.parse("$backendUrl/$workshopId/cases").replace(
+      queryParameters: {
+        if (filterCriteria?.vin != null) "vin": filterCriteria?.vin,
+        if (filterCriteria?.obdDataDtc != null)
+          "obd_data_dtc": filterCriteria?.obdDataDtc,
+        if (filterCriteria?.timeseriesDataComponent != null)
+          "timeseries_data_component": filterCriteria?.timeseriesDataComponent,
+      },
+    );
+
     return _client.get(
-      Uri.parse("$backendUrl/$workshopId/cases"),
+      uri,
       headers: getAuthHeaderWith(token),
     );
   }
@@ -478,6 +506,14 @@ class HttpService {
         "Content-Type": "application/json; charset=UTF-8",
       }),
       body: jsonEncode(requestBody),
+    );
+  }
+  Future<http.Response> getVehicleComponents(
+    String token,
+  ) {
+    return _client.get(
+      Uri.parse("$backendUrl/knowledge/components"),
+      headers: getAuthHeaderWith(token),
     );
   }
 }

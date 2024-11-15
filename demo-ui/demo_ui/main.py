@@ -22,7 +22,7 @@ class EndpointLogFilter(logging.Filter):
         return record.getMessage().find(self.prefix) == -1
 
 
-app = FastAPI()
+app = FastAPI(root_path=settings.root_path)
 app.add_middleware(
     SessionMiddleware, secret_key=settings.session_secret, max_age=None
 )
@@ -232,7 +232,9 @@ def login_post(
         )
     request.session["access_token"] = access_token
     request.session["refresh_token"] = refresh_token
-    redirect_url = app.url_path_for("cases", workshop_id=workshop_id)
+    redirect_url = app.root_path + app.url_path_for(
+        "cases", workshop_id=workshop_id
+    )
     return redirect_url
 
 
@@ -287,7 +289,7 @@ async def new_case_post(
     # remove empty fields
     form = {k: v for k, v in form.items() if v}
     case = await post_to_api(ressource_url, access_token, json=dict(form))
-    redirect_url = app.url_path_for(
+    redirect_url = app.root_path + app.url_path_for(
         "case", workshop_id=case["workshop_id"], case_id=case["_id"]
     )
     return redirect_url
@@ -330,7 +332,7 @@ def case_delete_get(
         ressource_url: str = Depends(get_case_url)
 ):
     delete_via_api(ressource_url, access_token)
-    redirect_url = app.url_path_for(
+    redirect_url = app.root_path + app.url_path_for(
         "cases", workshop_id=request.path_params["workshop_id"]
     )
     return redirect_url
@@ -373,7 +375,7 @@ async def new_obd_data_post(
         )
 
     new_data_id = case["obd_data"][-1]["data_id"]
-    redirect_url = app.url_path_for(
+    redirect_url = app.root_path + app.url_path_for(
         "obd_data",
         workshop_id=case["workshop_id"],
         case_id=case["_id"],
@@ -413,7 +415,7 @@ def obd_data_delete_get(
         ressource_url: str = Depends(get_obd_data_url)
 ):
     delete_via_api(ressource_url, access_token)
-    redirect_url = app.url_path_for(
+    redirect_url = app.root_path + app.url_path_for(
         "case",
         workshop_id=request.path_params["workshop_id"],
         case_id=request.path_params["case_id"]
@@ -465,7 +467,7 @@ async def new_timeseries_data_upload_omniview(
     )
 
     new_data_id = case["timeseries_data"][-1]["data_id"]
-    redirect_url = app.url_path_for(
+    redirect_url = app.root_path + app.url_path_for(
         "timeseries_data",
         workshop_id=case["workshop_id"],
         case_id=case["_id"],
@@ -497,7 +499,7 @@ async def new_timeseries_data_upload_picoscope(
     )
 
     new_data_id = case["timeseries_data"][-1]["data_id"]
-    redirect_url = app.url_path_for(
+    redirect_url = app.root_path + app.url_path_for(
         "timeseries_data",
         workshop_id=case["workshop_id"],
         case_id=case["_id"],
@@ -543,7 +545,7 @@ def timeseries_data_delete_get(
         ressource_url: str = Depends(get_timeseries_data_url)
 ):
     delete_via_api(ressource_url, access_token)
-    redirect_url = app.url_path_for(
+    redirect_url = app.root_path + app.url_path_for(
         "case",
         workshop_id=request.path_params["workshop_id"],
         case_id=request.path_params["case_id"]
@@ -582,7 +584,7 @@ async def new_symptom_post(
 ):
     form = await request.form()
     case = await post_to_api(ressource_url, access_token, json=dict(form))
-    redirect_url = app.url_path_for(
+    redirect_url = app.root_path + app.url_path_for(
         "case", workshop_id=case["workshop_id"], case_id=case["_id"]
     )
     return redirect_url
@@ -599,7 +601,7 @@ def symptom_delete_get(
         ressource_url: str = Depends(get_symptoms_url)
 ):
     delete_via_api(ressource_url, access_token)
-    redirect_url = app.url_path_for(
+    redirect_url = app.root_path + app.url_path_for(
         "case",
         workshop_id=request.path_params["workshop_id"],
         case_id=request.path_params["case_id"]
@@ -618,7 +620,7 @@ async def start_diagnosis(
         ressource_url: str = Depends(get_diagnosis_url)
 ):
     await post_to_api(ressource_url, access_token=access_token)
-    redirect_url = app.url_path_for(
+    redirect_url = app.root_path + app.url_path_for(
         "case",
         workshop_id=request.path_params["workshop_id"],
         case_id=request.path_params["case_id"]
@@ -678,7 +680,7 @@ def diagnosis_delete_get(
         ressource_url: str = Depends(get_diagnosis_url)
 ):
     delete_via_api(ressource_url, access_token)
-    redirect_url = app.url_path_for(
+    redirect_url = app.root_path + app.url_path_for(
         "case",
         workshop_id=request.path_params["workshop_id"],
         case_id=request.path_params["case_id"]
@@ -686,9 +688,10 @@ def diagnosis_delete_get(
     return redirect_url
 
 
-@app.get("/ui/logout", response_class=RedirectResponse)
+@app.get("/ui/logout", response_class=RedirectResponse, status_code=303)
 def logout(request: Request):
     request.session.pop("access_token", None)
     request.session.pop("refresh_token", None)
     flash_message(request, "Sie wurden erfolgreich ausgeloggt.")
-    return RedirectResponse("/ui", status_code=303)
+    redirect_url = app.root_path + app.url_path_for("login_get")
+    return redirect_url

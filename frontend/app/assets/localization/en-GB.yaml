@@ -1,8 +1,10 @@
 general:
+  apply: "Apply"
   cancel: "Cancel"
   case: "Case"
   city: "City"
   close: "Close"
+  component: "Component"
   customer: "Customer"
   customerId: "Customer id"
   dataType: "Data Type"
@@ -107,8 +109,13 @@ cases:
     open: "Open"
     closed: "Closed"
   filterDialog:
+    error: "Error code"
+    resetFilterCriteria: "Reset filter"
     title: "Filter cases"
     toggleShared: "Show cases from all workshops"
+    tooltip: "Please select"
+    vin: "First six numbers of vehicle vin"
+    vinLengthInvalid: "Must be a maximum of six characters long"
   addCaseDialog:
     customerTooltip: "Assign case to a customer"
     createNewCustomerTooltip: "Create new customer"

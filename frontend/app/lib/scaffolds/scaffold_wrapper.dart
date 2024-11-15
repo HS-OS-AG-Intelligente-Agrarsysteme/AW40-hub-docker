@@ -33,6 +33,30 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
   // ignore: unused_field
   final Logger _logger = Logger("scaffold_wrapper");
   int currentIndex = 0;
+  bool _switchState = true;
+  bool _isFilterActive = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final caseProvider = Provider.of<CaseProvider>(context);
+    _switchState = caseProvider.showSharedCases;
+    _isFilterActive = caseProvider.isFilterActive();
+
+    final LoggedInUserModel loggedInUserModel =
+        Provider.of<AuthProvider>(context).loggedInUser;
+    if (widget.currentIndex != null) currentIndex = widget.currentIndex!;
+
+    final List<NavigationMenuItemModel> navigationItemModels =
+        _getMenuItemModels();
+
+    return DesktopScaffold(
+      navItems: navigationItemModels,
+      currentIndex: currentIndex,
+      onNavItemTap: onItemTap,
+      loggedInUserModel: loggedInUserModel,
+      child: widget.child,
+    );
+  }
 
   Future<NewCaseDto?> _showAddCaseDialog() async {
     final NewCaseDto? newCase = await showDialog<NewCaseDto>(
@@ -52,7 +76,7 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
   Future<void> _showFilterCasesDialog() async {
     await showDialog(
       context: context,
-      builder: (BuildContext context) => const FilterCasesDialog(),
+      builder: (BuildContext context) => FilterCasesDialog(),
     );
   }
 
@@ -89,6 +113,31 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
         icon: const Icon(Icons.cases_sharp),
         destination: kRouteCases,
         actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 64),
+            child: Row(
+              children: [
+                Transform.scale(
+                  scale: 0.75,
+                  child: Tooltip(
+                    message: tr("cases.filterDialog.toggleShared"),
+                    child: Switch(
+                      value: _switchState,
+                      onChanged: (v) async {
+                        setState(() {
+                          _switchState = v;
+                        });
+                        await Provider.of<CaseProvider>(
+                          context,
+                          listen: false,
+                        ).toggleShowSharedCases();
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           IconButton(
             onPressed: () async {
               final NewCaseDto? newCase = await _showAddCaseDialog();
@@ -103,11 +152,20 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
             icon: const Icon(Icons.sort),
             tooltip: tr("cases.actions.sortCases"),
           ),
-          IconButton(
-            onPressed: () async => _showFilterCasesDialog(),
-            icon: const Icon(Icons.filter_list),
-            tooltip: tr("cases.actions.filterCases"),
-          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: _isFilterActive
+                  ? Colors.blue.withOpacity(0.2)
+                  : Colors.transparent,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              onPressed: () async => _showFilterCasesDialog(),
+              icon: const Icon(Icons.filter_list),
+              color: _isFilterActive ? Colors.blue : null,
+              tooltip: tr("cases.actions.filterCases"),
+            ),
+          )
         ],
       ),
       NavigationMenuItemModel(
@@ -153,23 +211,5 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
       ),
     ];
     return navigationItemModels;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final LoggedInUserModel loggedInUserModel =
-        Provider.of<AuthProvider>(context).loggedInUser;
-    if (widget.currentIndex != null) currentIndex = widget.currentIndex!;
-
-    final List<NavigationMenuItemModel> navigationItemModels =
-        _getMenuItemModels();
-
-    return DesktopScaffold(
-      navItems: navigationItemModels,
-      currentIndex: currentIndex,
-      onNavItemTap: onItemTap,
-      loggedInUserModel: loggedInUserModel,
-      child: widget.child,
-    );
   }
 }
