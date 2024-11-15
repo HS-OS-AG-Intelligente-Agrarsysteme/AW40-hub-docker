@@ -118,7 +118,7 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
             child: Row(
               children: [
                 //Text(tr("cases.filterDialog.toggleShared")),
-                const SizedBox(width: 8),
+                //const SizedBox(width: 8),
                 Transform.scale(
                     scale: 0.75,
                     child: Tooltip(
