@@ -117,21 +117,24 @@ class _ScaffoldWrapperState extends State<ScaffoldWrapper> {
             padding: const EdgeInsets.only(right: 64),
             child: Row(
               children: [
-                Text(tr("cases.filterDialog.toggleShared")),
+                //Text(tr("cases.filterDialog.toggleShared")),
                 const SizedBox(width: 8),
                 Transform.scale(
-                  scale: 0.75,
-                  child: Switch(
-                    value: _switchState,
-                    onChanged: (v) async {
-                      setState(() {
-                        _switchState = v;
-                      });
-                      await Provider.of<CaseProvider>(context, listen: false)
-                          .toggleShowSharedCases();
-                    },
-                  ),
-                ),
+                    scale: 0.75,
+                    child: Tooltip(
+                      message: tr("cases.filterDialog.toggleShared"),
+                      child: Switch(
+                        value: _switchState,
+                        onChanged: (v) async {
+                          setState(() {
+                            _switchState = v;
+                          });
+                          await Provider.of<CaseProvider>(context,
+                                  listen: false)
+                              .toggleShowSharedCases();
+                        },
+                      ),
+                    )),
               ],
             ),
           ),
