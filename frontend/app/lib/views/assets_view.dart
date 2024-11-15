@@ -84,14 +84,14 @@ class AssetsTableState extends State<AssetsTable> {
 
   @override
   Widget build(BuildContext context) {
-    /*if (widget.assetsModels.isEmpty) {
+    if (widget.assetsModels.isEmpty) {
       return Center(
         child: Text(
           tr("assets.noAssets"),
           style: Theme.of(context).textTheme.displaySmall,
         ),
       );
-    }*/
+    }
 
     return Row(
       children: [
