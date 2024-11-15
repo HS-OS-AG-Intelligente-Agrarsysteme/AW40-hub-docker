@@ -106,7 +106,7 @@ async def delete_asset(
 ):
     """Delete an Asset and revoke any publications."""
     if asset.publication is not None:
-        revocation_successful, info = nautilus.revoke_publication(
+        revocation_successful, info = await nautilus.revoke_publication(
             publication=asset.publication,
             nautilus_private_key=nautilus_private_key
         )
