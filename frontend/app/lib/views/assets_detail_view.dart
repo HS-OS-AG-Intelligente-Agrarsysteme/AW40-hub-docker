@@ -48,10 +48,12 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
 
     final List<String> attributesCase = [
       tr("assets.headlines.timeOfGeneration"),
+      tr("assets.headlines.name"),
       tr("assets.headlines.filter")
     ];
     final List<String> valuesCase = [
       widget.assetsModel.timestamp.toString(),
+      widget.assetsModel.name,
       widget.assetsModel.definition.toString(),
     ];
 

@@ -84,14 +84,14 @@ class AssetsTableState extends State<AssetsTable> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.assetsModels.isEmpty) {
+    /*if (widget.assetsModels.isEmpty) {
       return Center(
         child: Text(
           tr("assets.noAssets"),
           style: Theme.of(context).textTheme.displaySmall,
         ),
       );
-    }
+    }*/
 
     return Row(
       children: [
@@ -112,6 +112,7 @@ class AssetsTableState extends State<AssetsTable> {
                 DataColumn(
                   label: Text(tr("assets.headlines.timeOfGeneration")),
                 ),
+                DataColumn(label: Text(tr("assets.headlines.name"))),
                 DataColumn(label: Text(tr("assets.headlines.filter"))),
               ],
             ),
