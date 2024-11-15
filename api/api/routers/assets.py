@@ -182,19 +182,34 @@ async def publish_asset(
         if x_forwarded_proto != asset_url[:len(x_forwarded_proto)]:
             asset_url = f"{x_forwarded_proto}://{asset_url.split('://')[1]}"
 
-    # Use nautilus to trigger the publication and store publication info
-    # within the asset.
-    publication, info = await nautilus.publish_access_dataset(  # TODO: Await
+    # Generate a new asset key
+    asset_key = secrets.token_urlsafe(32)
+
+    # Setup Publication with undetermined did
+    publication = Publication(
+        did="undetermined",
+        asset_key=asset_key,
         asset_url=asset_url,
-        asset=asset,
-        new_publication=new_publication
+        **new_publication.model_dump()
     )
-    if publication is None:
+    asset.publication = publication
+    await asset.save()
+
+    # Use nautilus to trigger the publication
+    did, info = await nautilus.publish_access_dataset(
+        asset=asset,
+        nautilus_private_key=new_publication.nautilus_private_key
+    )
+    if did is None:
+        asset.publication = None
+        await asset.save()
         raise HTTPException(
             status_code=500,
             detail=f"Failed communication with nautilus: {info}"
         )
-    asset.publication = publication
+
+    # Store the publication did
+    asset.publication.did = did
     await asset.save()
     return publication
 
@@ -223,19 +238,19 @@ async def get_published_dataset(
     asset: Asset = Depends(asset_by_id)
 ):
     """Public download link for asset data."""
-    # publication = asset.publication
-    # if publication is None:
-    #     raise HTTPException(
-    #         status_code=404,
-    #         detail=f"No published asset with ID '{asset.id}' found."
-    #     )
-    # asset_key_valid = secrets.compare_digest(publication.asset_key, asset_key)
-    # if not asset_key_valid:
-    #     raise HTTPException(
-    #         status_code=401,
-    #         detail="Could not validate asset key.",
-    #         headers={"WWW-Authenticate": "asset_key"},
-    #     )
+    publication = asset.publication
+    if publication is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No published asset with ID '{asset.id}' found."
+        )
+    asset_key_valid = secrets.compare_digest(publication.asset_key, asset_key)
+    if not asset_key_valid:
+        raise HTTPException(
+            status_code=401,
+            detail="Could not validate asset key.",
+            headers={"WWW-Authenticate": "asset_key"},
+        )
     return FileResponse(
         path=asset.data_file_path, filename=f"{asset.name}.zip"
     )
