@@ -71,7 +71,7 @@ async def list_customers(
     return customers
 
 
-@router.post("/", status_code=201, response_model=Customer)
+@router.post("", status_code=201, response_model=Customer)
 async def add_customer(customer: CustomerBase):
     """Add a new customer."""
     customer = await Customer(**customer.model_dump()).create()
