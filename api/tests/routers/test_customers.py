@@ -32,7 +32,7 @@ def signed_jwt(jwt_payload, rsa_private_key_pem: bytes):
 @pytest.fixture
 def app(motor_db):
     app = FastAPI()
-    app.include_router(customers.router)
+    app.include_router(customers.router, prefix="/customers")
     yield app
 
 
@@ -151,7 +151,7 @@ async def test_list_customers_in_empty_db(
         authenticated_async_client, initialized_beanie_context
 ):
     async with initialized_beanie_context:
-        response = await authenticated_async_client.get("/")
+        response = await authenticated_async_client.get("/customers")
     assert response.status_code == 200
     assert response.json() == []
     assert response.headers["link"] == "", \
@@ -167,7 +167,7 @@ async def test_list_customers(
 ):
     async with initialized_beanie_context, data_context:
         # Request without any additional params
-        response = await authenticated_async_client.get("/")
+        response = await authenticated_async_client.get("/customers")
     # Validate response status code and data
     assert response.status_code == 200
     assert len(response.json()) == n_customers_in_data_context
@@ -210,7 +210,7 @@ async def test_list_customers_pagination(
         await Customer(first_name="B", last_name="A").create()
         await Customer(first_name="A", last_name="A").create()
         response = await authenticated_async_client.get(
-            f"/?page_size={page_size}&page={page}"
+            f"/customers?page_size={page_size}&page={page}"
         )
         assert response.status_code == 200
         response_data = response.json()
@@ -230,7 +230,7 @@ async def test_list_customers_pagination_valid_page_size_limits(
 ):
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get(
-            f"/?page_size={page_size}&page=0"
+            f"/customers?page_size={page_size}&page=0"
         )
     assert response.status_code == 200
     assert len(response.json()) == min(page_size, n_customers_in_data_context)
@@ -245,7 +245,7 @@ async def test_list_customers_pagination_invalid_page_size_limits(
 ):
     async with initialized_beanie_context:
         response = await authenticated_async_client.get(
-            f"/?page_size={page_size}&page=0"
+            f"/customers?page_size={page_size}&page=0"
         )
     assert response.status_code == 422, \
         "Expected response to indicate unprocessable content."
@@ -263,7 +263,7 @@ async def test_list_customers_out_of_range_page(
     out_of_range_page = max_page_index + 1
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get(
-            f"/?page_size={page_size}&page={out_of_range_page}"
+            f"/customers?page_size={page_size}&page={out_of_range_page}"
         )
     assert response.status_code == 400
     assert response.json()["detail"] == \
@@ -286,7 +286,7 @@ async def test_list_customers_pagination_links(
         c_1 = await Customer(first_name="A", last_name="A").create()
         # Test retrieval of all docs using the link header for navigation
         retrieved_docs = []
-        next_page = f"/?page_size={page_size}&page=0"
+        next_page = f"/customers?page_size={page_size}&page=0"
         while next_page:
             response = await authenticated_async_client.get(next_page)
             assert response.status_code == 200
@@ -310,7 +310,7 @@ async def test_add_customer(
     last_name = "some-last-name"
     async with initialized_beanie_context:
         response = await authenticated_async_client.post(
-            "/",
+            "/customers",
             json={"first_name": first_name, "last_name": last_name}
         )
         assert response.status_code == 201
@@ -334,7 +334,9 @@ async def test_get_customer(
 ):
     customer_id = customer_ids_in_data_context[0]
     async with initialized_beanie_context, data_context:
-        response = await authenticated_async_client.get(f"/{customer_id}")
+        response = await authenticated_async_client.get(
+            f"/customers/{customer_id}"
+        )
     assert response.status_code == 200
     assert response.json()["_id"] == customer_id
 
@@ -350,7 +352,7 @@ async def test_update_customer(
     update = {"first_name": "NewFirstName", "city": "NewCity"}
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.patch(
-            f"/{customer_id}", json=update
+            f"/customers/{customer_id}", json=update
         )
         assert response.status_code == 200
         # Confirm customer data in response
@@ -373,7 +375,9 @@ async def test_delete_customer(
 ):
     customer_id = customer_ids_in_data_context[0]
     async with initialized_beanie_context, data_context:
-        response = await authenticated_async_client.delete(f"/{customer_id}")
+        response = await authenticated_async_client.delete(
+            f"/customers/{customer_id}"
+        )
         assert response.status_code == 200
         assert response.json() is None
         # Confirm deletion in db
@@ -392,7 +396,7 @@ async def test_customer_not_found(
     customer_id = str(ObjectId())
     async with initialized_beanie_context:
         response = await authenticated_async_client.request(
-            method=method, url=f"/{customer_id}"
+            method=method, url=f"/customers/{customer_id}"
         )
     assert response.status_code == 404
     assert response.json()["detail"] == \
@@ -406,7 +410,9 @@ def test_missing_bearer_token(route, unauthenticated_client):
     """Endpoints should not be accessible without a bearer token."""
     assert len(route.methods) == 1, "Test assumes one method per route."
     method = next(iter(route.methods))
-    response = unauthenticated_client.request(method=method, url=route.path)
+    response = unauthenticated_client.request(
+        method=method, url=f"/customers{route.path}"
+    )
     assert response.status_code == 403
     assert response.json() == {"detail": "Not authenticated"}
 
@@ -442,7 +448,9 @@ def test_unauthorized_user(
     authenticated_client.headers.update(
         {"Authorization": f"Bearer {signed_jwt_with_unauthorized_role}"}
     )
-    response = authenticated_client.request(method=method, url=route.path)
+    response = authenticated_client.request(
+        method=method, url=f"/customers{route.path}"
+    )
     assert response.status_code == 401
     assert response.json() == {"detail": "Could not validate token."}
 
@@ -464,7 +472,9 @@ def test_invalid_jwt_signature(
     authenticated_client.app.dependency_overrides[
         Keycloak.get_public_key_for_workshop_realm
     ] = lambda: another_rsa_public_key_pem.decode()
-    response = authenticated_client.request(method=method, url=route.path)
+    response = authenticated_client.request(
+        method=method, url=f"/customers{route.path}"
+    )
     assert response.status_code == 401
     assert response.json() == {"detail": "Could not validate token."}
 
@@ -499,7 +509,7 @@ def test_expired_jwt(route, authenticated_client, expired_jwt):
     # The token offered by the authenticated client is expired
     response = authenticated_client.request(
         method=method,
-        url=route.path,
+        url=f"/customers{route.path}",
         headers={"Authorization": f"Bearer {expired_jwt}"}
     )
     assert response.status_code == 401
