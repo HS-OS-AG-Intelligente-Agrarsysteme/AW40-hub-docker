@@ -23,7 +23,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", status_code=200, response_model=List[Customer])
+@router.get("", status_code=200, response_model=List[Customer])
 async def list_customers(
         response: Response,
         request: Request,
