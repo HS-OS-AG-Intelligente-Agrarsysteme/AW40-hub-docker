@@ -1,5 +1,15 @@
-# AW40-hub-docker
+# AW40-HUB
 
+<p align="left">
+  <a href="https://editor.swagger.io/?url=https://raw.githubusercontent.com/FieldRobotEvent/REST-API-24/main/docs/static/openapi.json"><img src="https://img.shields.io/badge/open--API-V3.1-brightgreen.svg?style=flat&label=OpenAPI" alt="OpenAPI"/></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.12-3776AB.svg?style=flat&logo=python&logoColor=white" alt="Python 3.11"/></a>
+  <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-0.112.2-009688.svg?style=flat&logo=FastAPI&logoColor=white" alt="FastAPI"/></a>
+  <a href="https://www.gnu.org/licenses/gpl-3.0"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: GPL v3"/></a>
+</p>
+
+## Description
+This is the prototype implementation of the AW4.0 HUB architecture and part of the [Car Repair 4.0](https://www.autowerkstatt40.org/en/) research project. The purpose of the HUB is enable car workshops to use AI driven diagnostics, persist aquired data from cars in an Database as well as to particiapte alongside other car workshops as well as AI model providers in an Gaia-X compatible Dataspace to sell data and aquire new AI models.
+The name AW40 is a shortend version of the german project title "Autowerkstatt 4.0".
 ## Requirements
 
 - Docker v25.0 or later (run `docker --version`)
@@ -10,7 +20,7 @@ If you just need to update buildx, see [this section](#updating-docker-buildx-bu
 
 ## Overview
 
-Prototype implementation of the AW40 HUB Architecture on Docker\
+This is the prototype implementation of the AW4.0 HUB Architecture.\
 Currently included services:
 
 | Service (see [docker-compose.yml](docker-compose.yml)) | Description                                                              |
