@@ -88,6 +88,11 @@ def set_api_keys():
 
 
 @app.on_event("startup")
+def inject_nautilus_private_key():
+    assets.injected_nautilus_priv_key = settings.nautilus_injected_private_key
+
+
+@app.on_event("startup")
 def init_nautilus():
     Nautilus.configure(
         url=settings.nautilus_url,

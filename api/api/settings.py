@@ -21,6 +21,7 @@ class Settings(BaseSettings):
 
     nautilus_url: str = "http://nautilus:3000/nautilus"
     nautilus_timeout: int = 120
+    nautilus_injected_private_key: str = ""
 
     api_key_diagnostics: str
 

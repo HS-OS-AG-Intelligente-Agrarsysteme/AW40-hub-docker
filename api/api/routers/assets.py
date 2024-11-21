@@ -17,6 +17,7 @@ from ..security.token_auth import authorized_assets_access
 from ..security.api_key_auth import APIKeyAuth
 
 api_key_auth = APIKeyAuth()
+injected_nautilus_priv_key: str = ""
 
 tags_metadata = [
     {
@@ -105,6 +106,9 @@ async def delete_asset(
         nautilus_private_key: str = Body(embed=True)
 ):
     """Delete an Asset and revoke any publications."""
+    if injected_nautilus_priv_key:
+        # Inject Private Key for testing purposes
+        nautilus_private_key = injected_nautilus_priv_key
     if asset.publication is not None:
         revocation_successful, info = await nautilus.revoke_publication(
             publication=asset.publication,
@@ -195,10 +199,15 @@ async def publish_asset(
     asset.publication = publication
     await asset.save()
 
+    if injected_nautilus_priv_key:
+        # Inject Private Key for testing purposes
+        nautilus_private_key = injected_nautilus_priv_key
+    else:
+        nautilus_private_key = new_publication.nautilus_private_key
     # Use nautilus to trigger the publication
     did, info = await nautilus.publish_access_dataset(
         asset=asset,
-        nautilus_private_key=new_publication.nautilus_private_key
+        nautilus_private_key=nautilus_private_key
     )
     if did is None:
         asset.publication = None
