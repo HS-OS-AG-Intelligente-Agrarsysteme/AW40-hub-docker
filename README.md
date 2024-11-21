@@ -8,8 +8,8 @@
 </p>
 
 ## Description
-This is the prototype implementation of the AW4.0 HUB architecture and part of the [Car Repair 4.0](https://www.autowerkstatt40.org/en/) research project. The purpose of the HUB is enable car workshops to use AI driven diagnostics, persist aquired data from cars in a database as well as to particiapte alongside other car workshops as well as AI model providers in an [Gaia-X](https://gaia-x.eu/) compatible Dataspace to sell data and aquire new AI models.
-The name AW40 is a shortend version of the german project title "Autowerkstatt 4.0".
+This is the prototype implementation of the AW4.0 HUB architecture and part of the [Car Repair 4.0](https://www.autowerkstatt40.org/en/) research project. The purpose of the HUB is to enable car workshops to use AI driven diagnostics, persist acquired data from cars in a database as well as to participate alongside other car workshops as well as AI model providers in an [Gaia-X](https://gaia-x.eu/) compatible Dataspace to sell data and aquire new AI models.
+The name AW40 is a shortened version of the german project title "Autowerkstatt 4.0".
 ## Requirements
 
 - Docker v25.0 or later (run `docker --version`)
@@ -40,8 +40,8 @@ Currently included services:
 
 ## Usage
 
-### Start the developement HUB
-**WARNING: DO NOT RUN THE DEVELOPEMENT HUB ON PUBLIC SERVER**\
+### Start the development HUB
+**WARNING: DO NOT RUN THE DEVELOPMENT HUB ON PUBLIC SERVER**\
 To start the HUB in developer mode use:\
 ```docker compose --env-file=dev.env --profile full up -d```
 
