@@ -1,5 +1,6 @@
 import "package:aw40_hub_frontend/dialogs/offer_assets_dialog.dart";
 import "package:aw40_hub_frontend/dtos/asset_dto.dart";
+import "package:aw40_hub_frontend/dtos/nautilus_private_key_dto.dart";
 import "package:aw40_hub_frontend/models/asset_model.dart";
 import "package:aw40_hub_frontend/providers/asset_provider.dart";
 import "package:easy_localization/easy_localization.dart";
@@ -143,8 +144,11 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
       final ScaffoldMessengerState scaffoldMessengerState =
           ScaffoldMessenger.of(context);
       if (privateKey == null) return;
-      final bool deletionResult =
-          await assetProvider.deleteAsset(diagnosisModelCaseId, privateKey);
+
+      final bool deletionResult = await assetProvider.deleteAsset(
+        diagnosisModelCaseId,
+        NautilusPrivateKeyDto(privateKey),
+      );
       final String message = deletionResult
           ? tr("assets.details.deleteAssetSuccessMessage")
           : tr("assets.details.deleteAssetErrorMessage");
