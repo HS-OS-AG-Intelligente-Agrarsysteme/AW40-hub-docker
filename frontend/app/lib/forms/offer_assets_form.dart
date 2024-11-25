@@ -38,7 +38,7 @@ class OfferAssetsForm extends StatelessWidget {
               const pricePattern = r"^\d+([.,]\d{1,2})?$";
               final regExp = RegExp(pricePattern);
               if (!regExp.hasMatch(value)) {
-                return tr("assets.invalidPriceFormat");
+                return tr("assets.upload.invalidPriceFormat");
               }
               return null;
             },
