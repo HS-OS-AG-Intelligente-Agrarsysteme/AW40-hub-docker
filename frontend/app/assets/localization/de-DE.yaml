@@ -182,7 +182,7 @@ assets:
     timeOfGeneration: "Zeitpunkt der Generation"
   confirmation:
     title: Asset Upload
-    descrption: "Möchten Sie das Asset wirklich anbieten?"
+    description: "Möchten Sie das Asset wirklich anbieten?"
   remove:
     title: "Asset entfernen"
     description: "Möchten Sie das Asset wirklich entfernen?"
