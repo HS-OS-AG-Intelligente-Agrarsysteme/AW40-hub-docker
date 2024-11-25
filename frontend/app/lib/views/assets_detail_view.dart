@@ -171,9 +171,8 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
 
   Future<String?> _showConfirmRemoveDialog(BuildContext context) async {
     final TextEditingController privateKeyController = TextEditingController();
-    String? privateKey;
 
-    final result = await showDialog<bool>(
+    return showDialog<String?>(
       context: context,
       builder: (BuildContext context) {
         final theme = Theme.of(context);
@@ -205,26 +204,15 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
               ),
             ),
             TextButton(
-              onPressed: () {
-                privateKey = privateKeyController.text;
-                Navigator.pop(
-                  context,
-                  privateKey != null && privateKey!.isNotEmpty
-                      ? privateKey
-                      : null,
-                );
-              },
+              onPressed: () => Navigator.pop(
+                context,
+                privateKeyController.text,
+              ),
               child: Text(tr("general.confirm")),
             ),
           ],
         );
       },
     );
-
-    if (result ?? false) {
-      return privateKey;
-    } else {
-      return null;
-    }
   }
 }
