@@ -59,7 +59,6 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
         widget.assetModel.timestamp?.toGermanDateString();
 
     final List<String> valuesCase = [
-      //widget.assetModel.timestamp.toString(),
       formattedDateTime ?? tr("general.unknownDateTime"),
       widget.assetModel.name,
       widget.assetModel.definition.toJsonWithoutNullValues().toString(),

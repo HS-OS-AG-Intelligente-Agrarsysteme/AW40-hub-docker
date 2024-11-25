@@ -19,12 +19,6 @@ class AssetsDataTableSource extends DataTableSource {
   DataRow? getRow(int index) {
     final assetModel = assetModels[index];
 
-    /*final String formattedDateTime = assetModel.timestamp != null
-        ? DateFormat("dMy").format(
-            assetModel.timestamp ?? DateTime.now(),
-          )
-        : "Unknown Date";*/
-
     final String? formattedDateTime =
         assetModel.timestamp?.toGermanDateString();
 
