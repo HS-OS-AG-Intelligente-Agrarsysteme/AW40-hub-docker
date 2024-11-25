@@ -1,6 +1,7 @@
 import "package:aw40_hub_frontend/dialogs/offer_assets_dialog.dart";
 import "package:aw40_hub_frontend/dtos/asset_dto.dart";
 import "package:aw40_hub_frontend/models/asset_model.dart";
+import "package:aw40_hub_frontend/utils/extensions.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 
@@ -54,15 +55,12 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
       tr("assets.headlines.filter")
     ];
 
-    final String formattedDateTime = widget.assetModel.timestamp != null
-        ? DateFormat("dMy").format(
-            widget.assetModel.timestamp ?? DateTime.now(),
-          )
-        : "Unknown Date";
+    final String? formattedDateTime =
+        widget.assetModel.timestamp?.toGermanDateString();
 
     final List<String> valuesCase = [
       //widget.assetModel.timestamp.toString(),
-      formattedDateTime,
+      formattedDateTime ?? tr("general.unknownDateTime"),
       widget.assetModel.name,
       widget.assetModel.definition.toJsonWithoutNullValues().toString(),
     ];
