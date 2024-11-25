@@ -13,6 +13,7 @@ general:
   date: "Date"
   datasets: "Datasets"
   delete: "Delete"
+  details: "Details"
   edit: "Edit"
   email: "Email"
   filter: "Filter"
@@ -186,6 +187,9 @@ assets:
   remove:
     title: "Remove Asset"
     description: "Do you really would like to remove the asset?"
+  details:
+    deleteAssetSuccessMessage: "The asset was successfully deleted."
+    deleteAssetErrorMessage: "The asset could not be deleted."
   upload:
     title: "Asset Upload"
     price: "Price"
