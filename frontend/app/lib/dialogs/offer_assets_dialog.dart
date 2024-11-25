@@ -33,7 +33,7 @@ class _OfferAssetsDialogState extends State<OfferAssetsDialog> {
   final TextEditingController _licenseController = TextEditingController();
   final TextEditingController _privateKeyController = TextEditingController();
 
-  late final AssetProvider _assetProvider;
+  late AssetProvider _assetProvider;
 
   final title = tr("assets.upload.title");
 
