@@ -66,7 +66,8 @@ class _OfferAssetsDialogState extends State<OfferAssetsDialog> {
             if (currentFormKeyState != null && currentFormKeyState.validate()) {
               currentFormKeyState.save();
 
-              final double? price = double.tryParse(_priceController.text);
+              final double? price =
+                  double.tryParse(_priceController.text.replaceAll(",", "."));
               if (price == null) {
                 throw AppException(
                   exceptionType: ExceptionType.unexpectedNullValue,

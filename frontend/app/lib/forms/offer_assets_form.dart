@@ -34,7 +34,7 @@ class OfferAssetsForm extends StatelessWidget {
                 return tr("general.obligatoryField");
               }
               // Validate decimal format (2 decimal places)
-              const pricePattern = r"^\d+(\.\d{1,2})?$";
+              const pricePattern = r"^\d+([.,]\d{1,2})?$";
               final regExp = RegExp(pricePattern);
               if (!regExp.hasMatch(value)) {
                 return tr("assets.invalidPriceFormat");
