@@ -189,6 +189,8 @@ assets:
   details:
     deleteAssetSuccessMessage: "Das Asset wurde erfolgreich gelöscht."
     deleteAssetErrorMessage: "Das Asset konnte nicht gelöscht werden."
+    publishAssetSuccessMessage: "Das Asset wurde erfolgreich angeboten."
+    publishAssetErrorMessage: "Das Asset konnte nicht angeboten werden."
   upload:
     title: "Asset-Upload"
     price: "Preis"
