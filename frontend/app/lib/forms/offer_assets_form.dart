@@ -22,6 +22,7 @@ class OfferAssetsForm extends StatelessWidget {
           width: 192,
           child: TextFormField(
             controller: priceController,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             decoration: InputDecoration(
               labelText: tr("assets.upload.price"),
               suffixText: "€",
