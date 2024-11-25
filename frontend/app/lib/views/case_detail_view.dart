@@ -222,7 +222,6 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                         foregroundColor: colorScheme.primary,
                       ),
                     ),
-                    // const SizedBox(width: 16),
                     Text(
                       tr("cases.details.headline"),
                       style: textTheme.displaySmall,
