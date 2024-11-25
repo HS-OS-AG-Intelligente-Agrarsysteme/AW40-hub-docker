@@ -95,6 +95,8 @@ class _OfferAssetsDialogState extends State<OfferAssetsDialog> {
                 await _publishAsset(price, licenseType, privateKeyType);
               }
             }
+            // ignore: use_build_context_synchronously
+            unawaited(Routemaster.of(context).pop());
           },
           child: Text(tr("assets.upload.offer")),
         ),
