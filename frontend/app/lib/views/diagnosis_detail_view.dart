@@ -7,6 +7,7 @@ import "package:aw40_hub_frontend/models/diagnosis_model.dart";
 import "package:aw40_hub_frontend/models/state_machine_log_entry_model.dart";
 import "package:aw40_hub_frontend/providers/diagnosis_provider.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
+import "package:aw40_hub_frontend/services/ui_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:aw40_hub_frontend/utils/extensions.dart";
 import "package:collection/collection.dart";
@@ -220,15 +221,8 @@ class _DiagnosisDetailView extends State<DiagnosisDetailView> {
       final String message = deletionResult
           ? tr("diagnoses.details.deleteDiagnosisSuccessMessage")
           : tr("diagnoses.details.deleteDiagnosisErrorMessage");
-      _showMessage(message, scaffoldMessengerState);
+      UIService.showMessage(message, scaffoldMessengerState);
     });
-  }
-
-  static void _showMessage(String text, ScaffoldMessengerState state) {
-    final SnackBar snackBar = SnackBar(
-      content: Center(child: Text(text)),
-    );
-    state.showSnackBar(snackBar);
   }
 
   String? _getFaultPathFromStateMachineLog(

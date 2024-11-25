@@ -5,6 +5,7 @@ import "package:aw40_hub_frontend/exceptions/app_exception.dart";
 import "package:aw40_hub_frontend/forms/offer_assets_form.dart";
 import "package:aw40_hub_frontend/models/new_publication_model.dart";
 import "package:aw40_hub_frontend/providers/asset_provider.dart";
+import "package:aw40_hub_frontend/services/ui_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
@@ -125,15 +126,7 @@ class _OfferAssetsDialogState extends State<OfferAssetsDialog> {
     final String message = result != null
         ? tr("assets.details.publishAssetSuccessMessage")
         : tr("assets.details.publishAssetErrorMessage");
-    _showMessage(message, scaffoldMessengerState);
-  }
-
-  // TODO move into service?
-  static void _showMessage(String text, ScaffoldMessengerState state) {
-    final SnackBar snackBar = SnackBar(
-      content: Center(child: Text(text)),
-    );
-    state.showSnackBar(snackBar);
+    UIService.showMessage(message, scaffoldMessengerState);
   }
 
   static Future<bool?> _showConfirmOfferDialog(BuildContext context) {
