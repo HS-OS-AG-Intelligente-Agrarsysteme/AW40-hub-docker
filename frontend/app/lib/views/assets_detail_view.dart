@@ -53,8 +53,16 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
       tr("assets.headlines.name"),
       tr("assets.headlines.filter")
     ];
+
+    final String formattedDateTime = widget.assetModel.timestamp != null
+        ? DateFormat("dMy").format(
+            widget.assetModel.timestamp ?? DateTime.now(),
+          )
+        : "Unknown Date";
+
     final List<String> valuesCase = [
-      widget.assetModel.timestamp.toString(),
+      //widget.assetModel.timestamp.toString(),
+      formattedDateTime,
       widget.assetModel.name,
       widget.assetModel.definition.toJsonWithoutNullValues().toString(),
     ];
