@@ -22,6 +22,7 @@ class OfferAssetsForm extends StatelessWidget {
           width: 192,
           child: TextFormField(
             controller: priceController,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             decoration: InputDecoration(
               labelText: tr("assets.upload.price"),
               suffixText: "€",
@@ -34,10 +35,10 @@ class OfferAssetsForm extends StatelessWidget {
                 return tr("general.obligatoryField");
               }
               // Validate decimal format (2 decimal places)
-              const pricePattern = r"^\d+(\.\d{1,2})?$";
+              const pricePattern = r"^\d+([.,]\d{1,2})?$";
               final regExp = RegExp(pricePattern);
               if (!regExp.hasMatch(value)) {
-                return tr("assets.invalidPriceFormat");
+                return tr("assets.upload.invalidPriceFormat");
               }
               return null;
             },

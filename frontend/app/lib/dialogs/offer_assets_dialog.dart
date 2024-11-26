@@ -3,7 +3,9 @@ import "dart:async";
 import "package:aw40_hub_frontend/dtos/new_publication_dto.dart";
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
 import "package:aw40_hub_frontend/forms/offer_assets_form.dart";
+import "package:aw40_hub_frontend/models/new_publication_model.dart";
 import "package:aw40_hub_frontend/providers/asset_provider.dart";
+import "package:aw40_hub_frontend/services/ui_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
@@ -31,7 +33,7 @@ class _OfferAssetsDialogState extends State<OfferAssetsDialog> {
   final TextEditingController _licenseController = TextEditingController();
   final TextEditingController _privateKeyController = TextEditingController();
 
-  late final AssetProvider _assetProvider;
+  late AssetProvider _assetProvider;
 
   final title = tr("assets.upload.title");
 
@@ -64,7 +66,8 @@ class _OfferAssetsDialogState extends State<OfferAssetsDialog> {
             if (currentFormKeyState != null && currentFormKeyState.validate()) {
               currentFormKeyState.save();
 
-              final double? price = double.tryParse(_priceController.text);
+              final double? price =
+                  double.tryParse(_priceController.text.replaceAll(",", "."));
               if (price == null) {
                 throw AppException(
                   exceptionType: ExceptionType.unexpectedNullValue,
@@ -93,6 +96,8 @@ class _OfferAssetsDialogState extends State<OfferAssetsDialog> {
 
               if (confirmation) {
                 await _publishAsset(price, licenseType, privateKeyType);
+                // ignore: use_build_context_synchronously
+                unawaited(Routemaster.of(context).pop());
               }
             }
           },
@@ -107,6 +112,8 @@ class _OfferAssetsDialogState extends State<OfferAssetsDialog> {
     String licenseType,
     String privateKeyType,
   ) async {
+    final ScaffoldMessengerState scaffoldMessengerState =
+        ScaffoldMessenger.of(context);
     final String assetId = widget.assetModelId;
     final NewPublicationDto newPublicationDto = NewPublicationDto(
       // TODO is this hard coded value ok?
@@ -115,7 +122,12 @@ class _OfferAssetsDialogState extends State<OfferAssetsDialog> {
       price,
       privateKeyType,
     );
-    await _assetProvider.publishAsset(assetId, newPublicationDto);
+    final NewPublicationModel? result =
+        await _assetProvider.publishAsset(assetId, newPublicationDto);
+    final String message = result != null
+        ? tr("assets.details.publishAssetSuccessMessage")
+        : tr("assets.details.publishAssetErrorMessage");
+    UIService.showMessage(message, scaffoldMessengerState);
   }
 
   static Future<bool?> _showConfirmOfferDialog(BuildContext context) {

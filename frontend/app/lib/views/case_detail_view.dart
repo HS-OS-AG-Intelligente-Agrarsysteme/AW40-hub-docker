@@ -13,6 +13,7 @@ import "package:aw40_hub_frontend/models/timeseries_data_model.dart";
 import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/providers/case_provider.dart";
 import "package:aw40_hub_frontend/providers/diagnosis_provider.dart";
+import "package:aw40_hub_frontend/services/ui_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:aw40_hub_frontend/utils/extensions.dart";
 import "package:easy_localization/easy_localization.dart";
@@ -90,7 +91,7 @@ class CaseDetailView extends StatelessWidget {
       final String message = result
           ? tr("cases.details.deleteCaseSuccessMessage")
           : tr("cases.details.deleteCaseErrorMessage");
-      _showMessage(message, scaffoldMessengerState);
+      UIService.showMessage(message, scaffoldMessengerState);
     });
 
     onClose();
@@ -132,7 +133,7 @@ class CaseDetailView extends StatelessWidget {
         );
         break;
       case DatasetType.unknown:
-        _showMessage(
+        UIService.showMessage(
           tr("cases.details.deleteDataUnknownDataTypeMessage"),
           scaffoldMessengerState,
         );
@@ -142,14 +143,7 @@ class CaseDetailView extends StatelessWidget {
     final String message = result
         ? tr("cases.details.deleteDataSuccessMessage")
         : tr("cases.details.deleteDataErrorMessage");
-    _showMessage(message, scaffoldMessengerState);
-  }
-
-  static void _showMessage(String text, ScaffoldMessengerState state) {
-    final SnackBar snackBar = SnackBar(
-      content: Center(child: Text(text)),
-    );
-    state.showSnackBar(snackBar);
+    UIService.showMessage(message, scaffoldMessengerState);
   }
 }
 
@@ -222,7 +216,6 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                         foregroundColor: colorScheme.primary,
                       ),
                     ),
-                    // const SizedBox(width: 16),
                     Text(
                       tr("cases.details.headline"),
                       style: textTheme.displaySmall,
@@ -323,7 +316,10 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
                                     "diagnoses.details.startDiagnosisFailureMessage",
                                   );
                                 }
-                                _showMessage(message, scaffoldMessengerState);
+                                UIService.showMessage(
+                                  message,
+                                  scaffoldMessengerState,
+                                );
                               } else {
                                 routemaster.push(
                                   "/diagnoses/${widget.caseModel.diagnosisId}",
@@ -459,12 +455,5 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
         return UpdateCaseDialog(caseModel: caseModel);
       },
     );
-  }
-
-  static void _showMessage(String text, ScaffoldMessengerState state) {
-    final SnackBar snackBar = SnackBar(
-      content: Center(child: Text(text)),
-    );
-    state.showSnackBar(snackBar);
   }
 }

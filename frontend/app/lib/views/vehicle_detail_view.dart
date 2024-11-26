@@ -50,21 +50,25 @@ class _VehicleDetailView extends State<VehicleDetailView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              IconButton(
-                icon: const Icon(Icons.keyboard_double_arrow_right),
-                iconSize: 28,
-                onPressed: widget.onClose,
-                style: IconButton.styleFrom(
-                  foregroundColor: colorScheme.primary,
-                ),
-              ),
-              // Title bar
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    tr("vehicles.details.headline"),
-                    style: textTheme.displaySmall,
+                  IconButton(
+                    icon: const Icon(Icons.keyboard_double_arrow_right),
+                    iconSize: 28,
+                    onPressed: widget.onClose,
+                    style: IconButton.styleFrom(
+                      foregroundColor: colorScheme.primary,
+                    ),
+                  ),
+                  // Title bar
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        tr("vehicles.details.headline"),
+                        style: textTheme.displaySmall,
+                      ),
+                    ],
                   ),
                 ],
               ),

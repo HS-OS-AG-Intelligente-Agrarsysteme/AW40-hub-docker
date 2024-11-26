@@ -1,8 +1,12 @@
 import "package:aw40_hub_frontend/dialogs/offer_assets_dialog.dart";
 import "package:aw40_hub_frontend/dtos/asset_dto.dart";
+import "package:aw40_hub_frontend/dtos/nautilus_private_key_dto.dart";
 import "package:aw40_hub_frontend/models/asset_model.dart";
+import "package:aw40_hub_frontend/providers/asset_provider.dart";
+import "package:aw40_hub_frontend/services/ui_service.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
+import "package:provider/provider.dart";
 
 class AssetsDetailView extends StatelessWidget {
   const AssetsDetailView({
@@ -47,6 +51,7 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
     final TextTheme textTheme = theme.textTheme;
+    final assetProvider = Provider.of<AssetProvider>(context, listen: false);
 
     final List<String> attributesCase = [
       tr("assets.headlines.timeOfGeneration"),
@@ -78,8 +83,21 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
                       ),
                     ),
                     Text(
-                      tr("cases.details.headline"),
+                      tr("general.details"),
                       style: textTheme.displaySmall,
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.delete_forever),
+                      iconSize: 28,
+                      style: IconButton.styleFrom(
+                        foregroundColor: colorScheme.error,
+                      ),
+                      onPressed: () async => _onDeleteButtonPress(
+                        context,
+                        widget.assetModel.id!,
+                        assetProvider,
+                      ),
                     ),
                   ],
                 ),
@@ -108,18 +126,6 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
                         await _showOfferAssetsDialog();
                       },
                     ),
-                    const SizedBox(width: 16),
-                    FilledButton.icon(
-                      icon: const Icon(Icons.unpublished_outlined),
-                      label: Text(tr("assets.upload.retract")),
-                      onPressed: () async {
-                        final bool confirmation =
-                            await _showConfirmRemoveDialog(context) ?? false;
-                        if (confirmation) {
-                          // await _removeAsset(context);
-                        }
-                      },
-                    ),
                   ],
                 ),
               ],
@@ -128,6 +134,27 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
         ),
       ),
     );
+  }
+
+  Future<void> _onDeleteButtonPress(
+    BuildContext context,
+    String diagnosisModelCaseId,
+    AssetProvider assetProvider,
+  ) async {
+    await _showConfirmRemoveDialog(context).then((String? privateKey) async {
+      final ScaffoldMessengerState scaffoldMessengerState =
+          ScaffoldMessenger.of(context);
+      if (privateKey == null) return;
+
+      final bool deletionResult = await assetProvider.deleteAsset(
+        diagnosisModelCaseId,
+        NautilusPrivateKeyDto(privateKey),
+      );
+      final String message = deletionResult
+          ? tr("assets.details.deleteAssetSuccessMessage")
+          : tr("assets.details.deleteAssetErrorMessage");
+      UIService.showMessage(message, scaffoldMessengerState);
+    });
   }
 
   Future<AssetDto?> _showOfferAssetsDialog() async {
@@ -139,10 +166,10 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
     );
   }
 
-  Future<bool?> _showConfirmRemoveDialog(BuildContext context) async {
+  Future<String?> _showConfirmRemoveDialog(BuildContext context) async {
     final TextEditingController privateKeyController = TextEditingController();
 
-    return showDialog<bool>(
+    return showDialog<String?>(
       context: context,
       builder: (BuildContext context) {
         final theme = Theme.of(context);
@@ -174,13 +201,10 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
               ),
             ),
             TextButton(
-              onPressed: () {
-                final privateKey = privateKeyController.text;
-                Navigator.pop(
-                  context,
-                  privateKey.isNotEmpty ? privateKey : null,
-                );
-              },
+              onPressed: () => Navigator.pop(
+                context,
+                privateKeyController.text,
+              ),
               child: Text(tr("general.confirm")),
             ),
           ],

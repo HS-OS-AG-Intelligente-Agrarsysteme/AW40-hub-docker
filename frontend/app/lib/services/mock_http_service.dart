@@ -1507,7 +1507,7 @@ class MockHttpService implements HttpService {
   Future<Response> deleteAsset(
     String token,
     String assetId,
-    String requestBody,
+    Map<String, dynamic>? requestBody,
   ) {
     // TODO: implement deleteAsset
     throw UnimplementedError();

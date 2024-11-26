@@ -13,6 +13,7 @@ general:
   date: "Datum"
   datasets: "Datensätze"
   delete: "Löschen"
+  details: "Details"
   edit: "Bearbeiten"
   email: "E-Mail"
   filter: "Filtern"
@@ -75,7 +76,7 @@ diagnoses:
   details:
     headline: "Detailansicht"
     deleteDiagnosisSuccessMessage: "Die Diagnose wurde erfolgreich gelöscht."
-    deleteDiagnosisErrorMessage: "Der Diagnose konnte nicht gelöscht werden."
+    deleteDiagnosisErrorMessage: "Die Diagnose konnte nicht gelöscht werden."
     startDiagnosisSuccessMessage: "Die Diagnose wurde erfolgreich gestartet."
     startDiagnosisFailureMessage: "Die Diagnose konnte nicht erfolgreich gestartet werden."
     dialog:
@@ -181,10 +182,15 @@ assets:
     timeOfGeneration: "Zeitpunkt der Generation"
   confirmation:
     title: Asset Upload
-    descrption: "Möchten Sie das Asset wirklich anbieten?"
+    description: "Möchten Sie das Asset wirklich anbieten?"
   remove:
     title: "Asset entfernen"
     description: "Möchten Sie das Asset wirklich entfernen?"
+  details:
+    deleteAssetSuccessMessage: "Das Asset wurde erfolgreich gelöscht."
+    deleteAssetErrorMessage: "Das Asset konnte nicht gelöscht werden."
+    publishAssetSuccessMessage: "Das Asset wurde erfolgreich angeboten."
+    publishAssetErrorMessage: "Das Asset konnte nicht angeboten werden."
   upload:
     title: "Asset-Upload"
     price: "Preis"

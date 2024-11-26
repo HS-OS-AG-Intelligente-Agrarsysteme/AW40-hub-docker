@@ -20,11 +20,14 @@ class CustomerUpdateDto {
       _$CustomerUpdateDtoFromJson(json);
   Map<String, dynamic> toJson() => _$CustomerUpdateDtoToJson(this);
 
+  @JsonKey(name: "first_name")
   String firstname;
+  @JsonKey(name: "last_name")
   String lastname;
   String? email;
   String? phone;
   String? street;
+  @JsonKey(name: "house_number")
   String? housenumber;
   String? postcode;
   String? city;

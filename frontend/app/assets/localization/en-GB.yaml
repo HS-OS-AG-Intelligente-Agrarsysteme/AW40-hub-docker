@@ -13,6 +13,7 @@ general:
   date: "Date"
   datasets: "Datasets"
   delete: "Delete"
+  details: "Details"
   edit: "Edit"
   email: "Email"
   filter: "Filter"
@@ -182,10 +183,15 @@ assets:
     timeOfGeneration: "Time of Generation"
   confirmation:
     title: Asset Upload
-    descrption: "Do you really would like to offer the asset?"
+    description: "Do you really would like to offer the asset?"
   remove:
     title: "Remove Asset"
     description: "Do you really would like to remove the asset?"
+  details:
+    deleteAssetSuccessMessage: "The asset was successfully deleted."
+    deleteAssetErrorMessage: "The asset could not be deleted."
+    publishAssetSuccessMessage: "The asset was successfully offered."
+    publishAssetErrorMessage: "The asset could not be offered."
   upload:
     title: "Asset Upload"
     price: "Price"
