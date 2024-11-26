@@ -14,7 +14,7 @@ class AssetModel {
     required this.publication,
   });
 
-  String? id;
+  String? id; // TODO make non-nullable?
   String name;
   AssetDefinitionModel definition;
 

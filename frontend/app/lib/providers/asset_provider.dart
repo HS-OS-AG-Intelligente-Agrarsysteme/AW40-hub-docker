@@ -1,6 +1,7 @@
 import "dart:convert";
 
 import "package:aw40_hub_frontend/dtos/asset_dto.dart";
+import "package:aw40_hub_frontend/dtos/nautilus_private_key_dto.dart";
 import "package:aw40_hub_frontend/dtos/new_asset_dto.dart";
 import "package:aw40_hub_frontend/dtos/new_publication_dto.dart";
 import "package:aw40_hub_frontend/exceptions/app_exception.dart";
@@ -80,12 +81,15 @@ class AssetProvider with ChangeNotifier {
     return _decodeNewPublicationModelFromResponseBody(response);
   }
 
-  Future<bool> deleteAsset(String assetId, String privateKey) async {
+  Future<bool> deleteAsset(
+    String assetId,
+    NautilusPrivateKeyDto nautilusPrivateKeyDto,
+  ) async {
     final String authToken = _getAuthToken();
     final Response response = await _httpService.deleteAsset(
       authToken,
       assetId,
-      privateKey,
+      nautilusPrivateKeyDto.toJson(),
     );
     final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,

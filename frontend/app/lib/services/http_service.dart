@@ -524,11 +524,13 @@ class HttpService {
   Future<http.Response> deleteAsset(
     String token,
     String assetId,
-    String requestBody,
+    Map<String, dynamic> requestBody,
   ) {
     return _client.delete(
       Uri.parse("$backendUrl/dataspace/manage/assets/$assetId"),
-      headers: getAuthHeaderWith(token),
+      headers: getAuthHeaderWith(token, {
+        "Content-Type": "application/json; charset=UTF-8",
+      }),
       body: jsonEncode(requestBody),
     );
   }
