@@ -1,4 +1,6 @@
 import "package:aw40_hub_frontend/models/asset_model.dart";
+import "package:aw40_hub_frontend/utils/extensions.dart";
+import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 
 class AssetsDataTableSource extends DataTableSource {
@@ -16,6 +18,10 @@ class AssetsDataTableSource extends DataTableSource {
   @override
   DataRow? getRow(int index) {
     final assetModel = assetModels[index];
+
+    final String? formattedDateTime =
+        assetModel.timestamp?.toGermanDateString();
+
     return DataRow(
       onSelectChanged: (_) => onPressedRow(index),
       selected: currentIndexNotifier.value == index,
@@ -31,7 +37,7 @@ class AssetsDataTableSource extends DataTableSource {
         DataCell(
           Text(assetModel.definition.toJsonWithoutNullValues().toString()),
         ),
-        DataCell(Text(assetModel.timestamp.toString())),
+        DataCell(Text(formattedDateTime ?? tr("general.unknownDateTime"))),
       ],
     );
   }

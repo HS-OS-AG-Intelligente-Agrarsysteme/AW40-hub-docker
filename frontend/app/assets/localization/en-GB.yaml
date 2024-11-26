@@ -63,6 +63,7 @@ general:
   workshop: "Workshop"
   workshopId: "Workshop ID"
   yes: "Yes"
+  unknownDateTime: "Unknown Time"
 diagnoses:
   title: "Diagnosis"
   actions:

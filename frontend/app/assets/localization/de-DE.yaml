@@ -62,6 +62,7 @@ general:
   workshop: "Werkstatt"
   workshopId: "Werkstatt ID"
   yes: "Ja"
+  unknownDateTime: "Unbekannte Zeit"
 diagnoses:
   title: "Diagnosen"
   actions:

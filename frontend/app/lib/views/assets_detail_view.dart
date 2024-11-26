@@ -4,6 +4,7 @@ import "package:aw40_hub_frontend/dtos/nautilus_private_key_dto.dart";
 import "package:aw40_hub_frontend/models/asset_model.dart";
 import "package:aw40_hub_frontend/providers/asset_provider.dart";
 import "package:aw40_hub_frontend/services/ui_service.dart";
+import "package:aw40_hub_frontend/utils/extensions.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
@@ -58,8 +59,12 @@ class _DesktopAssetsDetailViewState extends State<DesktopAssetsDetailView> {
       tr("assets.headlines.name"),
       tr("assets.headlines.filter")
     ];
+
+    final String? formattedDateTime =
+        widget.assetModel.timestamp?.toGermanDateString();
+
     final List<String> valuesCase = [
-      widget.assetModel.timestamp.toString(),
+      formattedDateTime ?? tr("general.unknownDateTime"),
       widget.assetModel.name,
       widget.assetModel.definition.toJsonWithoutNullValues().toString(),
     ];
