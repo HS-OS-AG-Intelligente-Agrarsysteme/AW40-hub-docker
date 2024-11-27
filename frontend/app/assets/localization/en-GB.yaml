@@ -221,7 +221,7 @@ forms:
   obd:
     label: "Diagnostic Trouble Codes"
     hint: "Enter codes, separated by commas"
-    suffix: "e.g., P0001, U0001, U0002"
+    helper: "e.g., P0001, U0001, U0002 (for each 5 characters)"
   omniview:
     component:
       label: "Component"
