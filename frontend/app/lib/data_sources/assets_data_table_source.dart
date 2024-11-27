@@ -6,14 +6,14 @@ import "package:flutter/material.dart";
 class AssetsDataTableSource extends DataTableSource {
   AssetsDataTableSource({
     required this.themeData,
-    required this.currentIndexNotifier,
+    required this.selectedAssetIndexNotifier,
     required this.assetModels,
     required this.onPressedRow,
   });
   List<AssetModel> assetModels;
   final void Function(int) onPressedRow;
   final ThemeData themeData;
-  final ValueNotifier<int?> currentIndexNotifier;
+  final ValueNotifier<int?> selectedAssetIndexNotifier;
 
   @override
   DataRow? getRow(int index) {
@@ -24,7 +24,7 @@ class AssetsDataTableSource extends DataTableSource {
 
     return DataRow(
       onSelectChanged: (_) => onPressedRow(index),
-      selected: currentIndexNotifier.value == index,
+      selected: selectedAssetIndexNotifier.value == index,
       color: MaterialStateProperty.resolveWith<Color?>(
           (Set<MaterialState> states) {
         if (states.contains(MaterialState.selected)) {

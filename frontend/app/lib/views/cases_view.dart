@@ -18,11 +18,11 @@ class CasesView extends StatefulWidget {
 }
 
 class _CasesViewState extends State<CasesView> {
-  ValueNotifier<int?> currentCaseIndexNotifier = ValueNotifier<int?>(null);
+  ValueNotifier<int?> selectedCaseIndexNotifier = ValueNotifier<int?>(null);
 
   @override
   void dispose() {
-    currentCaseIndexNotifier.dispose();
+    selectedCaseIndexNotifier.dispose();
     super.dispose();
   }
 
@@ -61,21 +61,21 @@ class _CasesViewState extends State<CasesView> {
         Expanded(
           flex: 3,
           child: CasesTable(
-            caseIndexNotifier: currentCaseIndexNotifier,
+            selectedCaseIndexNotifier: selectedCaseIndexNotifier,
             caseModel: caseModels,
           ),
         ),
 
         // Show detail view if a case is selected.
         ValueListenableBuilder(
-          valueListenable: currentCaseIndexNotifier,
+          valueListenable: selectedCaseIndexNotifier,
           builder: (context, value, child) {
             if (value == null) return const SizedBox.shrink();
             return Expanded(
               flex: 2,
               child: CaseDetailView(
                 caseModel: caseModels[value],
-                onClose: () => currentCaseIndexNotifier.value = null,
+                onClose: () => selectedCaseIndexNotifier.value = null,
               ),
             );
           },
@@ -88,12 +88,12 @@ class _CasesViewState extends State<CasesView> {
 class CasesTable extends StatelessWidget {
   const CasesTable({
     required this.caseModel,
-    required this.caseIndexNotifier,
+    required this.selectedCaseIndexNotifier,
     super.key,
   });
 
   final List<CaseModel> caseModel;
-  final ValueNotifier<int?> caseIndexNotifier;
+  final ValueNotifier<int?> selectedCaseIndexNotifier;
 
   @override
   Widget build(BuildContext context) {
@@ -101,10 +101,10 @@ class CasesTable extends StatelessWidget {
       child: PaginatedDataTable(
         source: CasesDataTableSource(
           themeData: Theme.of(context),
-          currentIndexNotifier: caseIndexNotifier,
+          selectedCaseIndexNotifier: selectedCaseIndexNotifier,
           caseModels: caseModel,
           onPressedRow: (int i) {
-            caseIndexNotifier.value = i;
+            selectedCaseIndexNotifier.value = i;
           },
         ),
         showCheckboxColumn: false,
