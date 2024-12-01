@@ -45,7 +45,6 @@ class CaseProvider with ChangeNotifier {
 
   void resetSelectedcaseIndexNotifier() {
     selectedCaseIndexNotifier.value = null;
-    //notifyListeners();
   }
 
   bool isFilterActive() {
