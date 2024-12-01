@@ -82,6 +82,8 @@ class FilterCasesDialog extends StatelessWidget {
   }
 
   Future<void> _applyFilterForCases(BuildContext context) async {
+    _caseProvider.resetSelectedcaseIndexNotifier();
+
     if (!_containsAnyFilterInput()) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(tr("cases.filterDialog.noFilterInput"))),

@@ -18,11 +18,8 @@ class CasesView extends StatefulWidget {
 }
 
 class _CasesViewState extends State<CasesView> {
-  ValueNotifier<int?> selectedCaseIndexNotifier = ValueNotifier<int?>(null);
-
   @override
   void dispose() {
-    selectedCaseIndexNotifier.dispose();
     super.dispose();
   }
 
@@ -32,7 +29,7 @@ class _CasesViewState extends State<CasesView> {
 
     if (caseProvider.notifiedListenersAfterGettingEmptyCurrentCases) {
       caseProvider.notifiedListenersAfterGettingEmptyCurrentCases = false;
-      return buildCasesTable([]);
+      return buildCasesTable([], caseProvider);
     }
 
     return FutureBuilder(
@@ -50,32 +47,33 @@ class _CasesViewState extends State<CasesView> {
             exceptionMessage: "Received no case data.",
           );
         }
-        return buildCasesTable(caseModels);
+        return buildCasesTable(caseModels, caseProvider);
       },
     );
   }
 
-  Row buildCasesTable(List<CaseModel> caseModels) {
+  Row buildCasesTable(List<CaseModel> caseModels, CaseProvider caseProvider) {
     return Row(
       children: [
         Expanded(
           flex: 3,
           child: CasesTable(
-            selectedCaseIndexNotifier: selectedCaseIndexNotifier,
+            selectedCaseIndexNotifier: caseProvider.selectedCaseIndexNotifier,
             caseModel: caseModels,
           ),
         ),
 
         // Show detail view if a case is selected.
         ValueListenableBuilder(
-          valueListenable: selectedCaseIndexNotifier,
+          valueListenable: caseProvider.selectedCaseIndexNotifier,
           builder: (context, value, child) {
             if (value == null) return const SizedBox.shrink();
             return Expanded(
               flex: 2,
               child: CaseDetailView(
                 caseModel: caseModels[value],
-                onClose: () => selectedCaseIndexNotifier.value = null,
+                onClose: () =>
+                    caseProvider.selectedCaseIndexNotifier.value = null,
               ),
             );
           },
