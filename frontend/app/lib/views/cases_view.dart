@@ -6,6 +6,7 @@ import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:aw40_hub_frontend/views/case_detail_view.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
+import "package:logging/logging.dart";
 import "package:provider/provider.dart";
 
 class CasesView extends StatefulWidget {
@@ -18,6 +19,8 @@ class CasesView extends StatefulWidget {
 }
 
 class _CasesViewState extends State<CasesView> {
+  final Logger _logger = Logger("CasesView");
+
   @override
   void dispose() {
     super.dispose();
@@ -25,9 +28,11 @@ class _CasesViewState extends State<CasesView> {
 
   @override
   Widget build(BuildContext context) {
+    _logger.info("build _CasesViewState");
     final caseProvider = Provider.of<CaseProvider>(context);
 
     if (caseProvider.notifiedListenersAfterGettingEmptyCurrentCases) {
+      _logger.info("notifiedListenersAfterGettingEmptyCurrentCases = true");
       caseProvider.notifiedListenersAfterGettingEmptyCurrentCases = false;
       return buildCasesTable([], caseProvider);
     }
@@ -36,8 +41,16 @@ class _CasesViewState extends State<CasesView> {
       // ignore: discarded_futures
       future: caseProvider.getCurrentCases(),
       builder: (BuildContext context, AsyncSnapshot<List<CaseModel>> snapshot) {
+        _logger.info(
+          // ignore: lines_longer_than_80_chars
+          "FutureBuilder called - ConnectionState: ${snapshot.connectionState}, "
+          "Has Data: ${snapshot.hasData}, "
+          "Error: ${snapshot.error}, "
+          "Data: ${snapshot.data}",
+        );
         if (snapshot.connectionState != ConnectionState.done ||
             !snapshot.hasData) {
+          _logger.info("Returning: Center with CircularProgressIndicator");
           return const Center(child: CircularProgressIndicator());
         }
         final List<CaseModel>? caseModels = snapshot.data;
@@ -53,6 +66,7 @@ class _CasesViewState extends State<CasesView> {
   }
 
   Row buildCasesTable(List<CaseModel> caseModels, CaseProvider caseProvider) {
+    _logger.info("called buildCasesTable with data $caseModels");
     return Row(
       children: [
         Expanded(
