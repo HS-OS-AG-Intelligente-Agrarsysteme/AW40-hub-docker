@@ -384,16 +384,20 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
 
   TableRow buildDataRow(DataModel model) {
     Text textWidget = const Text("");
+    DatasetType datasetType = DatasetType.unknown;
     switch (model.runtimeType) {
       case ObdDataModel:
         textWidget = Text(tr("general.obd"));
+        datasetType = DatasetType.obd;
         break;
       case TimeseriesDataModel:
         final timeseriesDataModel = model as TimeseriesDataModel;
         textWidget = Text(timeseriesDataModel.type?.name.capitalize() ?? "");
+        datasetType = DatasetType.timeseries;
         break;
       case SymptomModel:
         textWidget = Text(tr("general.symptom"));
+        datasetType = DatasetType.symptom;
         break;
     }
 
@@ -425,7 +429,7 @@ class _DesktopCaseDetailViewState extends State<DesktopCaseDetailView> {
         deleteButton(
           colorScheme,
           model.dataId,
-          DatasetType.obd,
+          datasetType,
         ),
       ],
     );
