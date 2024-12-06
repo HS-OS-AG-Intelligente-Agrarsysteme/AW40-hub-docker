@@ -6,6 +6,7 @@ const String kRouteCases = "/cases";
 const String kRouteVecicles = "/vehicles";
 const String kRouteCustomers = "/customers";
 const String kRouteDiagnosis = "/diagnoses/:diagnosisId";
+const String kRouteAssets = "/assets";
 
 // External links
 const String kExternalLinkMoodle = "https://moodle.aw4null.de";

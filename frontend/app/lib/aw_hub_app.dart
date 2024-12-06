@@ -1,9 +1,11 @@
 import "package:aw40_hub_frontend/configs/localization_config.dart";
 import "package:aw40_hub_frontend/main.dart";
+import "package:aw40_hub_frontend/providers/asset_provider.dart";
 import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/providers/case_provider.dart";
 import "package:aw40_hub_frontend/providers/customer_provider.dart";
 import "package:aw40_hub_frontend/providers/diagnosis_provider.dart";
+import "package:aw40_hub_frontend/providers/knowledge_provider.dart";
 import "package:aw40_hub_frontend/providers/theme_provider.dart";
 import "package:aw40_hub_frontend/providers/vehicle_provider.dart";
 import "package:aw40_hub_frontend/routing/router.dart";
@@ -58,21 +60,33 @@ class AWHubApp extends StatelessWidget {
           ),
           ChangeNotifierProxyProvider<AuthProvider, DiagnosisProvider>(
             create: (_) => DiagnosisProvider(httpService),
-            update: (_, authProvider, caseProvider) =>
+            update: (_, authProvider, diagnosisProvider) =>
                 // ignore: discarded_futures
-                caseProvider!..fetchAndSetAuthToken(authProvider),
+                diagnosisProvider!..fetchAndSetAuthToken(authProvider),
           ),
           ChangeNotifierProxyProvider<AuthProvider, CustomerProvider>(
             create: (_) => CustomerProvider(httpService),
-            update: (_, authProvider, caseProvider) =>
+            update: (_, authProvider, customerProvider) =>
                 // ignore: discarded_futures
-                caseProvider!..fetchAndSetAuthToken(authProvider),
+                customerProvider!..fetchAndSetAuthToken(authProvider),
           ),
           ChangeNotifierProxyProvider<AuthProvider, VehicleProvider>(
             create: (_) => VehicleProvider(httpService),
             update: (_, authProvider, vehicleProvider) =>
                 // ignore: discarded_futures
                 vehicleProvider!..fetchAndSetAuthToken(authProvider),
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, AssetProvider>(
+            create: (_) => AssetProvider(httpService),
+            update: (_, authProvider, assetProvider) =>
+                // ignore: discarded_futures
+                assetProvider!..fetchAndSetAuthToken(authProvider),
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, KnowledgeProvider>(
+            create: (_) => KnowledgeProvider(httpService),
+            update: (_, authProvider, knowledgeProvider) =>
+                // ignore: discarded_futures
+                knowledgeProvider!..fetchAndSetAuthToken(authProvider),
           ),
           ChangeNotifierProvider<ThemeProvider>(
             create: (_) => ThemeProvider(),

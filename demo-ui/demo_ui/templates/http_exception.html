@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block sidebar %}
-<a href="/ui">Anmeldung Werkstatt</a>
-<a href="/ui/{{ request.path_params['workshop_id'] }}/cases">Fälle</a>
+<a href="{{ request.base_url }}ui">Anmeldung Werkstatt</a>
+<a href="{{ request.base_url }}ui/{{ request.path_params['workshop_id'] }}/cases">Fälle</a>
 <a href="#" style="color:red"><b>Fehler</b></a>
 {% endblock %}
 

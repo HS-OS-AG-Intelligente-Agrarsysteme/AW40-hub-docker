@@ -3,6 +3,7 @@ import "dart:convert";
 import "package:aw40_hub_frontend/dtos/new_symptom_dto.dart";
 import "package:aw40_hub_frontend/services/config_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/utils/filter_criteria.dart";
 import "package:aw40_hub_frontend/utils/token_refreshing_http_client_interceptor.dart";
 import "package:collection/collection.dart";
 import "package:enum_to_string/enum_to_string.dart";
@@ -38,16 +39,43 @@ class HttpService {
     return _client.get(Uri.parse("$backendUrl/health/ping"));
   }
 
-  Future<http.Response> getSharedCases(String token) {
+  Future<http.Response> getSharedCases(
+    String token, {
+    FilterCriteria? filterCriteria,
+  }) {
+    final uri = Uri.parse("$backendUrl/shared/cases").replace(
+      queryParameters: {
+        if (filterCriteria?.vin != null) "vin": filterCriteria?.vin,
+        if (filterCriteria?.obdDataDtc != null)
+          "obd_data_dtc": filterCriteria?.obdDataDtc,
+        if (filterCriteria?.timeseriesDataComponent != null)
+          "timeseries_data_component": filterCriteria?.timeseriesDataComponent,
+      },
+    );
+
     return _client.get(
-      Uri.parse("$backendUrl/shared/cases"),
+      uri,
       headers: getAuthHeaderWith(token),
     );
   }
 
-  Future<http.Response> getCases(String token, String workshopId) {
+  Future<http.Response> getCases(
+    String token,
+    String workshopId, {
+    FilterCriteria? filterCriteria,
+  }) {
+    final uri = Uri.parse("$backendUrl/$workshopId/cases").replace(
+      queryParameters: {
+        if (filterCriteria?.vin != null) "vin": filterCriteria?.vin,
+        if (filterCriteria?.obdDataDtc != null)
+          "obd_data_dtc": filterCriteria?.obdDataDtc,
+        if (filterCriteria?.timeseriesDataComponent != null)
+          "timeseries_data_component": filterCriteria?.timeseriesDataComponent,
+      },
+    );
+
     return _client.get(
-      Uri.parse("$backendUrl/$workshopId/cases"),
+      uri,
       headers: getAuthHeaderWith(token),
     );
   }
@@ -105,6 +133,42 @@ class HttpService {
   ) {
     return _client.delete(
       Uri.parse("$backendUrl/$workshopId/cases/$caseId"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> deleteObdData(
+    String token,
+    int? dataId,
+    String workshopId,
+    String caseId,
+  ) {
+    return _client.delete(
+      Uri.parse("$backendUrl/$workshopId/cases/$caseId/obd_data/$dataId"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> deleteTimeseriesData(
+    String token,
+    int? dataId,
+    String workshopId,
+    String caseId,
+  ) {
+    return _client.delete(
+      Uri.parse("$backendUrl/$workshopId/cases/$caseId/timeseries/$dataId"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> deleteSymptomData(
+    String token,
+    int? dataId,
+    String workshopId,
+    String caseId,
+  ) {
+    return _client.delete(
+      Uri.parse("$backendUrl/$workshopId/cases/$caseId/symptoms/$dataId"),
       headers: getAuthHeaderWith(token),
     );
   }
@@ -424,6 +488,65 @@ class HttpService {
         "Content-Type": "application/json; charset=UTF-8",
       }),
       body: jsonEncode(requestBody),
+    );
+  }
+
+  Future<http.Response> getAssets(
+    String token,
+  ) {
+    return _client.get(
+      Uri.parse("$backendUrl/dataspace/manage/assets"),
+      headers: getAuthHeaderWith(token),
+    );
+  }
+
+  Future<http.Response> createAsset(
+    String token,
+    Map<String, dynamic> requestBody,
+  ) {
+    return _client.post(
+      Uri.parse("$backendUrl/dataspace/manage/assets"),
+      headers: getAuthHeaderWith(token, {
+        "Content-Type": "application/json; charset=UTF-8",
+      }),
+      body: jsonEncode(requestBody),
+    );
+  }
+
+  Future<http.Response> publishAsset(
+    String token,
+    String assetId,
+    Map<String, dynamic> requestBody,
+  ) {
+    return _client.post(
+      Uri.parse("$backendUrl/dataspace/manage/assets/$assetId/publication"),
+      headers: getAuthHeaderWith(token, {
+        "Content-Type": "application/json; charset=UTF-8",
+      }),
+      body: jsonEncode(requestBody),
+    );
+  }
+
+  Future<http.Response> deleteAsset(
+    String token,
+    String assetId,
+    Map<String, dynamic> requestBody,
+  ) {
+    return _client.delete(
+      Uri.parse("$backendUrl/dataspace/manage/assets/$assetId"),
+      headers: getAuthHeaderWith(token, {
+        "Content-Type": "application/json; charset=UTF-8",
+      }),
+      body: jsonEncode(requestBody),
+    );
+  }
+
+  Future<http.Response> getVehicleComponents(
+    String token,
+  ) {
+    return _client.get(
+      Uri.parse("$backendUrl/knowledge/components"),
+      headers: getAuthHeaderWith(token),
     );
   }
 }

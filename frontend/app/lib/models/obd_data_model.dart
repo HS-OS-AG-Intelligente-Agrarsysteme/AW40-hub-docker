@@ -1,13 +1,13 @@
-class ObdDataModel {
+import "package:aw40_hub_frontend/models/data_model.dart";
+
+class ObdDataModel extends DataModel {
   ObdDataModel({
-    required this.timestamp,
+    required super.timestamp,
     required this.obdSpecs,
     required this.dtcs,
-    required this.dataId,
+    required super.dataId,
   });
 
-  DateTime? timestamp;
-  dynamic obdSpecs;
-  List<String> dtcs;
-  int? dataId;
+  final dynamic obdSpecs;
+  final List<String> dtcs;
 }

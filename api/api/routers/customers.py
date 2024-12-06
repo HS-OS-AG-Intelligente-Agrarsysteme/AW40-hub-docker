@@ -23,7 +23,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", status_code=200, response_model=List[Customer])
+@router.get("", status_code=200, response_model=List[Customer])
 async def list_customers(
         response: Response,
         request: Request,
@@ -71,7 +71,7 @@ async def list_customers(
     return customers
 
 
-@router.post("/", status_code=201, response_model=Customer)
+@router.post("", status_code=201, response_model=Customer)
 async def add_customer(customer: CustomerBase):
     """Add a new customer."""
     customer = await Customer(**customer.model_dump()).create()

@@ -154,8 +154,13 @@ def authenticated_client(
 
 @mock.patch("api.routers.workshop.Case.find_in_hub", autospec=True)
 def test_list_cases(find_in_hub, authenticated_client, workshop_id):
-
-    async def mock_find_in_hub(customer_id, workshop_id, vin):
+    async def mock_find_in_hub(
+            customer_id,
+            workshop_id,
+            vin,
+            obd_data_dtc,
+            timeseries_data_component
+    ):
         return []
 
     # patch Case.find_in_hub to use mock_find_in_hub
@@ -168,7 +173,11 @@ def test_list_cases(find_in_hub, authenticated_client, workshop_id):
     assert response.status_code == 200
     assert response.json() == []
     find_in_hub.assert_called_once_with(
-        customer_id=None, vin=None, workshop_id=workshop_id
+        customer_id=None,
+        vin=None,
+        workshop_id=workshop_id,
+        obd_data_dtc=None,
+        timeseries_data_component=None
     )
 
 
@@ -176,8 +185,13 @@ def test_list_cases(find_in_hub, authenticated_client, workshop_id):
 def test_list_cases_with_filters(
         find_in_hub, authenticated_client, workshop_id
 ):
-
-    async def mock_find_in_hub(customer_id, workshop_id, vin):
+    async def mock_find_in_hub(
+            customer_id,
+            workshop_id,
+            vin,
+            obd_data_dtc,
+            timeseries_data_component
+    ):
         return []
 
     # patch Case.find_in_hub to use mock_find_in_hub
@@ -186,16 +200,27 @@ def test_list_cases_with_filters(
     # request with filter params
     customer_id = "test customer"
     vin = "test vin"
+    obd_data_dtc = "P0001"
+    timeseries_data_component = "Test-Comp"
     response = authenticated_client.get(
         f"/{workshop_id}/cases",
-        params={"customer_id": customer_id, "vin": vin}
+        params={
+            "customer_id": customer_id,
+            "vin": vin,
+            "obd_data_dtc": obd_data_dtc,
+            "timeseries_data_component": timeseries_data_component
+        }
     )
 
     # confirm expected response and usage of db interface
     assert response.status_code == 200
     assert response.json() == []
     find_in_hub.assert_called_once_with(
-        customer_id=customer_id, vin=vin, workshop_id=workshop_id
+        customer_id=customer_id,
+        vin=vin,
+        workshop_id=workshop_id,
+        obd_data_dtc=obd_data_dtc,
+        timeseries_data_component=timeseries_data_component
     )
 
 
@@ -233,7 +258,6 @@ def test_add_case_with_invalid_customer_id(
 @mock.patch("api.routers.workshop.Case.get", autospec=True)
 @pytest.mark.asyncio
 async def test_case_from_workshop(get, case_id, workshop_id):
-
     async def mock_get(*args):
         """
         Always returns a case with case_id and workshop_id predefined in test
@@ -270,7 +294,6 @@ async def test_case_from_workshop_is_none(get, case_id):
 @mock.patch("api.routers.workshop.Case.get", autospec=True)
 @pytest.mark.asyncio
 async def test_case_from_workshop_wrong_workshop(get, case_id, workshop_id):
-
     async def mock_get(*args):
         """
         Always returns a case with case_id as predifined in test scope above

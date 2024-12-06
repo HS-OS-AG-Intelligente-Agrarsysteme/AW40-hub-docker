@@ -30,7 +30,7 @@ class _UploadObdFormState extends State<UploadObdForm> {
         decoration: InputDecoration(
           labelText: tr("forms.obd.label"),
           hintText: tr("forms.obd.hint"),
-          suffixText: tr("forms.obd.suffix"),
+          helperText: tr("forms.obd.helper"),
           border: const OutlineInputBorder(),
         ),
       ),
@@ -54,7 +54,8 @@ class _UploadObdFormState extends State<UploadObdForm> {
   Future<void> _onSubmit() async {
     final provider = Provider.of<CaseProvider>(context, listen: false);
     final messengerState = ScaffoldMessenger.of(context);
-    final List<String> codes = _controller.text.split("\n");
+    final List<String> codes =
+        _controller.text.split(",").map((code) => code.trim()).toList();
     final dto = NewOBDDataDto(null, codes);
     final bool result = await provider.uploadObdData(widget.caseId, dto);
     final String snackBarText = result

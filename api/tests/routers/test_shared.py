@@ -124,9 +124,14 @@ def case_data(case_id, customer_id, vin, workshop_id):
 
 
 @pytest.fixture
-def timeseries_data():
+def timeseries_data_component():
+    return "battery"
+
+
+@pytest.fixture
+def timeseries_data(timeseries_data_component):
     return {
-        "component": "battery",
+        "component": timeseries_data_component,
         "label": "norm",
         "sampling_rate": 1,
         "duration": 3,
@@ -136,9 +141,14 @@ def timeseries_data():
 
 
 @pytest.fixture
-def obd_data():
+def obd_data_dtc():
+    return "X4242"
+
+
+@pytest.fixture
+def obd_data(obd_data_dtc):
     return {
-        "dtcs": ["P0001", "U0001"]
+        "dtcs": ["P0001", "U0001", obd_data_dtc]
     }
 
 
@@ -235,7 +245,13 @@ async def test_list_cases(
     assert response_data[0]["_id"] == case_id
 
 
-@pytest.mark.parametrize("query_param", ["customer_id", "vin", "workshop_id"])
+@pytest.mark.parametrize(
+    "query_param",
+    [
+        "customer_id", "vin", "workshop_id", "obd_data_dtc",
+        "timeseries_data_component"
+    ]
+)
 @pytest.mark.asyncio
 async def test_list_cases_with_single_filter(
         authenticated_async_client, initialized_beanie_context, data_context,
@@ -256,12 +272,15 @@ async def test_list_cases_with_single_filter(
 @pytest.mark.asyncio
 async def test_list_cases_with_multiple_filters(
         authenticated_async_client, initialized_beanie_context, data_context,
-        case_id, customer_id, vin, workshop_id
+        case_id, customer_id, vin, workshop_id, obd_data_dtc,
+        timeseries_data_component
 ):
     """Test filtering by multiple query params."""
     query_string = f"?customer_id={customer_id}&" \
                    f"vin={vin}&" \
-                   f"workshop_id={workshop_id}"
+                   f"workshop_id={workshop_id}&" \
+                   f"obd_data_dtc={obd_data_dtc}&" \
+                   f"timeseries_data_component={timeseries_data_component}"
     url = f"/cases{query_string}"
     async with initialized_beanie_context, data_context:
         response = await authenticated_async_client.get(url)
@@ -271,7 +290,11 @@ async def test_list_cases_with_multiple_filters(
         assert response_data[0]["_id"] == case_id
 
 
-@pytest.mark.parametrize("query_param", ["customer_id", "vin", "workshop_id"])
+@pytest.mark.parametrize(
+    "query_param",
+    ["customer_id", "vin", "workshop_id", "obd_data_dtc",
+     "timeseries_data_component"]
+)
 @pytest.mark.asyncio
 async def test_list_cases_with_unmatched_filters(
         authenticated_async_client, initialized_beanie_context, data_context,

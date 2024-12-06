@@ -1,10 +1,12 @@
+import logging
+
 from fastapi import FastAPI
+
 from .routers import (
     health, shared, workshop, diagnostics, knowledge,
-    customers
+    customers, assets
 )
 from .settings import settings
-import logging
 
 
 class EndpointLogFilter(logging.Filter):
@@ -37,6 +39,9 @@ api_v1.include_router(shared.router, prefix="/shared")
 api_v1.include_router(knowledge.router, prefix="/knowledge")
 api_v1.include_router(workshop.router)
 api_v1.include_router(customers.router, prefix="/customers")
+# Prefixes for the assets routers are handled in the module
+api_v1.include_router(assets.management_router)
+api_v1.include_router(assets.public_router)
 if not settings.exclude_diagnostics_router:
     api_v1.include_router(diagnostics.router, prefix="/diagnostics")
 else:

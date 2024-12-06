@@ -10,6 +10,7 @@ import "package:aw40_hub_frontend/providers/auth_provider.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:aw40_hub_frontend/services/http_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/utils/filter_criteria.dart";
 import "package:flutter/material.dart";
 import "package:http/http.dart";
 import "package:logging/logging.dart";
@@ -17,15 +18,42 @@ import "package:logging/logging.dart";
 class CaseProvider with ChangeNotifier {
   CaseProvider(this._httpService);
   final HttpService _httpService;
-
   final Logger _logger = Logger("case_provider");
+
+  String? _authToken;
   late String workshopId;
+  bool notifiedListenersAfterGettingEmptyCurrentCases = false;
+
   bool _showSharedCases = true;
   bool get showSharedCases => _showSharedCases;
-  String? _authToken;
+
+  ValueNotifier<int?> selectedCaseIndexNotifier = ValueNotifier<int?>(null);
+
+  FilterCriteria? _filterCriteria;
+  FilterCriteria? get filterCriteria => _filterCriteria;
+
+  void setFilterCriteria(FilterCriteria criteria) {
+    _filterCriteria = criteria;
+    notifyListeners();
+  }
+
+  void resetFilterCriteria() {
+    _filterCriteria = null;
+    notifiedListenersAfterGettingEmptyCurrentCases = false;
+    notifyListeners();
+  }
+
+  void resetSelectedcaseIndexNotifier() {
+    selectedCaseIndexNotifier.value = null;
+  }
+
+  bool isFilterActive() {
+    return filterCriteria != null;
+  }
 
   Future<void> toggleShowSharedCases() async {
     _showSharedCases = !_showSharedCases;
+    notifiedListenersAfterGettingEmptyCurrentCases = false;
     await getCurrentCases();
     notifyListeners();
   }
@@ -35,9 +63,16 @@ class CaseProvider with ChangeNotifier {
     // * Return value currently not used.
     final Response response;
     if (_showSharedCases) {
-      response = await _httpService.getSharedCases(authToken);
+      response = await _httpService.getSharedCases(
+        authToken,
+        filterCriteria: filterCriteria,
+      );
     } else {
-      response = await _httpService.getCases(authToken, workshopId);
+      response = await _httpService.getCases(
+        authToken,
+        workshopId,
+        filterCriteria: filterCriteria,
+      );
     }
     final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
@@ -47,8 +82,18 @@ class CaseProvider with ChangeNotifier {
       response,
       _logger,
     );
-    if (!verifyStatusCode) return [];
-    return _jsonBodyToCaseModelList(response.body);
+    late List<CaseModel> result;
+    if (!verifyStatusCode) {
+      result = [];
+    } else {
+      result = _jsonBodyToCaseModelList(response.body);
+    }
+
+    if (result.isEmpty) {
+      notifiedListenersAfterGettingEmptyCurrentCases = true;
+      notifyListeners();
+    }
+    return result;
   }
 
   Future<List<CaseModel>> getCasesByVehicleVin(String vehicleVin) async {
@@ -148,13 +193,6 @@ class CaseProvider with ChangeNotifier {
     _logger.warning("Unimplemented: sortCases()");
   }
 
-  Future<void> filterCases() async {
-    // Klasse FilterCriteria mit Feld für jedes Filterkriterium.
-    // Aktuelle Filter werden durch Zustand einer FilterCriteria Instanz
-    // definiert.
-    _logger.warning("Unimplemented: filterCases()");
-  }
-
   Future<bool> uploadObdData(String caseId, NewOBDDataDto obdDataDto) async {
     final String authToken = _getAuthToken();
     final Map<String, dynamic> obdDataJson = obdDataDto.toJson();
@@ -172,6 +210,7 @@ class CaseProvider with ChangeNotifier {
       _logger,
     );
     if (!verifyStatusCode) return false;
+    notifyListeners();
     return true;
   }
 
@@ -188,13 +227,16 @@ class CaseProvider with ChangeNotifier {
       vcdsData,
       filename,
     );
-    return HelperService.verifyStatusCode(
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
       201,
       "Could not upload vcds data. ",
       response,
       _logger,
     );
+    if (!verifyStatusCode) return false;
+    notifyListeners();
+    return true;
   }
 
   Future<bool> uploadTimeseriesData(
@@ -235,9 +277,11 @@ class CaseProvider with ChangeNotifier {
     String? componentA,
     String? componentB,
     String? componentC,
+    String? componentD,
     PicoscopeLabel? labelA,
     PicoscopeLabel? labelB,
     PicoscopeLabel? labelC,
+    PicoscopeLabel? labelD,
   ) async {
     final String authToken = _getAuthToken();
     final Response response = await _httpService.uploadPicoscopeData(
@@ -249,9 +293,11 @@ class CaseProvider with ChangeNotifier {
       componentA: componentA,
       componentB: componentB,
       componentC: componentC,
+      componentD: componentD,
       labelA: labelA,
       labelB: labelB,
       labelC: labelC,
+      labelD: labelD,
     );
     final bool verifyStatusCode = HelperService.verifyStatusCode(
       response.statusCode,
@@ -313,6 +359,78 @@ class CaseProvider with ChangeNotifier {
       response.statusCode,
       201,
       "Could not upload symptom data. ",
+      response,
+      _logger,
+    );
+    if (!verifyStatusCode) return false;
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> deleteObdData(
+    int? dataId,
+    String workshopId,
+    String caseId,
+  ) async {
+    final String authToken = _getAuthToken();
+    final Response response = await _httpService.deleteObdData(
+      authToken,
+      dataId,
+      workshopId,
+      caseId,
+    );
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
+      response.statusCode,
+      200,
+      "Could not delete OBD data",
+      response,
+      _logger,
+    );
+    if (!verifyStatusCode) return false;
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> deleteTimeseriesData(
+    int? dataId,
+    String workshopId,
+    String caseId,
+  ) async {
+    final String authToken = _getAuthToken();
+    final Response response = await _httpService.deleteTimeseriesData(
+      authToken,
+      dataId,
+      workshopId,
+      caseId,
+    );
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
+      response.statusCode,
+      200,
+      "Could not delete timeseries data",
+      response,
+      _logger,
+    );
+    if (!verifyStatusCode) return false;
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> deleteSymptomData(
+    int? dataId,
+    String workshopId,
+    String caseId,
+  ) async {
+    final String authToken = _getAuthToken();
+    final Response response = await _httpService.deleteSymptomData(
+      authToken,
+      dataId,
+      workshopId,
+      caseId,
+    );
+    final bool verifyStatusCode = HelperService.verifyStatusCode(
+      response.statusCode,
+      200,
+      "Could not delete symptom data",
       response,
       _logger,
     );

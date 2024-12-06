@@ -17,6 +17,7 @@ import "package:aw40_hub_frontend/dtos/vehicle_dto.dart";
 import "package:aw40_hub_frontend/services/helper_service.dart";
 import "package:aw40_hub_frontend/services/http_service.dart";
 import "package:aw40_hub_frontend/utils/enums.dart";
+import "package:aw40_hub_frontend/utils/filter_criteria.dart";
 import "package:http/http.dart" show Response;
 import "package:logging/logging.dart";
 
@@ -873,7 +874,11 @@ class MockHttpService implements HttpService {
   }
 
   @override
-  Future<Response> getCases(String token, String workshopId) {
+  Future<Response> getCases(
+    String token,
+    String workshopId, {
+    FilterCriteria? filterCriteria,
+  }) {
     _demoCaseDto.workshopId = workshopId;
     for (final c in _caseDtos) {
       c.workshopId = workshopId;
@@ -944,7 +949,10 @@ class MockHttpService implements HttpService {
   }
 
   @override
-  Future<Response> getSharedCases(String token) {
+  Future<Response> getSharedCases(
+    String token, {
+    FilterCriteria? filterCriteria,
+  }) {
     final List<CaseDto> caseDtos = _caseDtos + _sharedCaseDtos;
     return Future.delayed(
       Duration(milliseconds: delay),
@@ -1429,6 +1437,79 @@ class MockHttpService implements HttpService {
   @override
   Future<Response> addCustomer(String token, Map<String, dynamic> requestBody) {
     // TODO: implement addCustomer
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> deleteTimeseriesData(
+    String token,
+    int? dataId,
+    String workshopId,
+    String caseId,
+  ) {
+    // TODO: implement deleteTimeseriesData
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> deleteObdData(
+    String token,
+    int? dataId,
+    String workshopId,
+    String caseId,
+  ) {
+    // TODO: implement deleteObdData
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> deleteSymptomData(
+    String token,
+    int? dataId,
+    String workshopId,
+    String caseId,
+  ) {
+    // TODO: implement deleteSymptomData
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> getAssets(
+    String token,
+  ) {
+    // TODO: implement getAssets
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> getVehicleComponents(String token) {
+    // TODO: implement getVehicleComponents
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> createAsset(String token, Map<String, dynamic> requestBody) {
+    // TODO: implement createAsset
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> publishAsset(
+    String token,
+    String assetId,
+    Map<String, dynamic> requestBody,
+  ) {
+    // TODO: implement publishAsset
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> deleteAsset(
+    String token,
+    String assetId,
+    Map<String, dynamic>? requestBody,
+  ) {
+    // TODO: implement deleteAsset
     throw UnimplementedError();
   }
 }

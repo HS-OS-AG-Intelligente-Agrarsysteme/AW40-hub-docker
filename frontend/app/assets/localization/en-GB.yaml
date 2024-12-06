@@ -1,14 +1,19 @@
 general:
+  apply: "Apply"
   cancel: "Cancel"
   case: "Case"
   city: "City"
   close: "Close"
+  component: "Component"
+  confirm: "Confirm"
+  create: "Create"
   customer: "Customer"
-  customerId: "Customer id"
+  customerId: "Customer ID"
   dataType: "Data Type"
   date: "Date"
   datasets: "Datasets"
   delete: "Delete"
+  details: "Details"
   edit: "Edit"
   email: "Email"
   filter: "Filter"
@@ -23,16 +28,17 @@ general:
   logout: "Logout"
   milage: "Milage"
   no: "No"
-  noCustomerId: "No customer id"
+  noCustomerId: "No customer ID"
   noData: "No data available"
   noDate: "No Date"
   noDiagnoses: "There is currently no information about ongoing diagnoses."
   noVehicles: "There is currently no information about the vehicles."
-  noVehicleVin: "No vehicle vin"
-  noWorkshopId: "No workshop id"
+  noVehicleVin: "No vehicle VIN"
+  noWorkshopId: "No workshop ID"
   notFound: "Not found"
   notSpecified: "Not specified"
   number: "No."
+  obd: "OBD"
   obligatoryField: "Obligatory"
   occasion: "Occasion"
   phone: "Phone"
@@ -47,16 +53,18 @@ general:
   state: "State"
   status: "Status"
   street: "Street"
+  symptom: "Symptom"
   then: "Then"
   transition: "Transition"
   tsn: "TSN"
   unnamed: "Unnamed"
   vehicle: "Vehicle"
-  vehicleVin: "Vehicle vin"
+  vehicleVin: "Vehicle VIN"
   vin: "VIN"
   workshop: "Workshop"
-  workshopId: "Workshop id"
+  workshopId: "Workshop ID"
   yes: "Yes"
+  unknownDateTime: "Unknown Time"
 diagnoses:
   title: "Diagnosis"
   actions:
@@ -95,9 +103,10 @@ cases:
   title: "Cases"
   actions:
     addCase: "Add case"
-    updateCase: "Update case"
-    sortCases: "@:general.sort"
+    createAsset: "Create asset"
     filterCases: "@:general.filter"
+    sortCases: "@:general.sort"
+    updateCase: "Update case"
   occasions:
     notSpecified: "@:general.notSpecified"
     service: "@:general.service"
@@ -105,9 +114,13 @@ cases:
   status:
     open: "Open"
     closed: "Closed"
-  filterDialog:
-    title: "Filter cases"
-    toggleShared: "Show cases from all workshops"
+  createAssetDialog:
+    title: "Create asset"
+    name: "Name"
+    description: "Description"
+    author: "Author"
+    successMessage: "The asset was successfully created"
+    errorMessage: "The asset could not be created."
   addCaseDialog:
     customerTooltip: "Assign case to a customer"
     createNewCustomerTooltip: "Create new customer"
@@ -117,6 +130,15 @@ cases:
     confirmDialog:
       title: "Add customer"
       description: "Do you want to add customer {customer} to the case?"
+  filterDialog:
+    error: "Error code"
+    noFilterInput: "Please enter at least one filter"
+    resetFilterCriteria: "Reset filter"
+    title: "Filter cases"
+    toggleShared: "Show cases from all workshops"
+    tooltip: "Please select"
+    vin: "First six numbers of vehicle vin"
+    vinLengthInvalid: "Must be a maximum of six characters long"
   details:
     headline: "Details"
     dialog:
@@ -125,11 +147,14 @@ cases:
     showDiagnosis: "Show diagnosis"
     deleteCaseSuccessMessage: "The case was successfully deleted."
     deleteCaseErrorMessage: "The case could not be deleted."
+    deleteDataSuccessMessage: "The dataset was successfully deleted."
+    deleteDataUnknownDataTypeMessage: "The dataset cannot be deleted. Error: Unknown data record type"
+    deleteDataErrorMessage: "The dataset cannot be deleted."
     occasion:
       unknown: "Unknown"
       service_routine: "@:general.service"
       problem_defect: "@:general.repair"
-    startDiagnosis: "Start diagnosis"
+    startDiagnosis: "Start Diagnosis"
     status:
       open: "Open"
       closed: "Closed"
@@ -138,7 +163,7 @@ cases:
       symptoms: "Symptoms"
       timeseriesData: "Timeseries Data"
 uploadData:
-  label: "Upload data"
+  label: "Upload Data"
 customers:
   title: "Customers"
   headlines:
@@ -151,6 +176,33 @@ vehicles:
     updateVehicle: "Update vehicle"
   details:
     headline: "Details"
+assets:
+  title: "Assets"
+  headlines:
+    description: "Description"
+    filter: "Filter"
+    name: "Name"
+    timeOfGeneration: "Time of Generation"
+  confirmation:
+    title: Asset Upload
+    description: "Do you really would like to offer the asset?"
+  remove:
+    title: "Remove Asset"
+    description: "Do you really would like to remove the asset?"
+  details:
+    deleteAssetSuccessMessage: "The asset was successfully deleted."
+    deleteAssetErrorMessage: "The asset could not be deleted."
+    publishAssetSuccessMessage: "The asset was successfully offered."
+    publishAssetErrorMessage: "The asset could not be offered."
+  upload:
+    title: "Asset Upload"
+    price: "Price"
+    license: "License"
+    privateKey: "Private Key"
+    offer: "Offer"
+    retract: "Retract"
+    invalidPriceFormat: "Invalid price format"
+  noAssets: "No Assets"
 training:
   title: "Training"
 pageNotFound:
@@ -170,7 +222,7 @@ forms:
   obd:
     label: "Diagnostic Trouble Codes"
     hint: "Enter codes, separated by commas"
-    suffix: "e.g., P0001, U0001, U0002"
+    helper: "e.g., P0001, U0001, U0002 (for each 5 characters)"
   omniview:
     component:
       label: "Component"
@@ -186,6 +238,7 @@ forms:
       labelA: "Component A"
       labelB: "Component B"
       labelC: "Component C"
+      labelD: "Component D"
       label: "Label"
       hint: "Enter a Component"
   timeseries:

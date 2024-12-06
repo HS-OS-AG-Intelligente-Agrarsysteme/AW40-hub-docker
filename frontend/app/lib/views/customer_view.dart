@@ -6,7 +6,6 @@ import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:aw40_hub_frontend/views/customer_detail_view.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
-import "package:logging/logging.dart";
 import "package:provider/provider.dart";
 
 class CustomerView extends StatefulWidget {
@@ -20,7 +19,6 @@ class CustomerView extends StatefulWidget {
 
 class _CustomerViewState extends State<CustomerView> {
   final currentCustomerIndexNotifier = ValueNotifier<int?>(null);
-  Logger customViewLogger = Logger("CustomerViewLogger");
 
   @override
   void dispose() {

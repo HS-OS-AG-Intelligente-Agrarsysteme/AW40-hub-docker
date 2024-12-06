@@ -1,14 +1,19 @@
 general:
+  apply: "Anwenden"
   cancel: "Abbrechen"
   case: "Fall"
   city: "Stadt"
   close: "Schließen"
+  component: "Komponente"
+  confirm: "Bestätigen"
+  create: "Erstellen"
   customer: "Kunde"
   customerId: "Kunden ID"
   dataType: "Datentyp"
   date: "Datum"
   datasets: "Datensätze"
   delete: "Löschen"
+  details: "Details"
   edit: "Bearbeiten"
   email: "E-Mail"
   filter: "Filtern"
@@ -32,6 +37,7 @@ general:
   noWorkshopId: "Keine @:general.workshop ID"
   notFound: "nicht gefunden"
   notSpecified: "keine Angabe"
+  obd: "OBD"
   obligatoryField: "Pflichtfeld"
   occasion: "Anlass"
   phone: "Telefon"
@@ -46,6 +52,7 @@ general:
   state: "Zustand"
   status: "Status"
   street: "Straße"
+  symptom: "Symptom"
   then: "Dann"
   transition: "Übergang"
   tsn: "TSN"
@@ -56,6 +63,7 @@ general:
   workshop: "Werkstatt"
   workshopId: "Werkstatt ID"
   yes: "Ja"
+  unknownDateTime: "Unbekannte Zeit"
 diagnoses:
   title: "Diagnosen"
   actions:
@@ -70,7 +78,7 @@ diagnoses:
   details:
     headline: "Detailansicht"
     deleteDiagnosisSuccessMessage: "Die Diagnose wurde erfolgreich gelöscht."
-    deleteDiagnosisErrorMessage: "Der Diagnose konnte nicht gelöscht werden."
+    deleteDiagnosisErrorMessage: "Die Diagnose konnte nicht gelöscht werden."
     startDiagnosisSuccessMessage: "Die Diagnose wurde erfolgreich gestartet."
     startDiagnosisFailureMessage: "Die Diagnose konnte nicht erfolgreich gestartet werden."
     dialog:
@@ -94,9 +102,10 @@ cases:
   title: "Fälle"
   actions:
     addCase: "Neuen Fall anlegen"
-    updateCase: "Fall bearbeiten"
-    sortCases: "@:general.sort"
+    createAsset: "Asset erstellen"
     filterCases: "@:general.filter"
+    sortCases: "@:general.sort"
+    updateCase: "Fall bearbeiten"
   occasions:
     notSpecified: "@:general.notSpecified"
     service: "@:general.service"
@@ -104,9 +113,13 @@ cases:
   status:
     open: "Offen"
     closed: "Geschlossen"
-  filterDialog:
-    title: "Fälle filtern"
-    toggleShared: "Fälle aus allen Werkstätten anzeigen"
+  createAssetDialog:
+    title: "Asset erstellen"
+    name: "Name"
+    description: "Beschreibung"
+    author: "Autor"
+    successMessage: "Das Asset wurde erfolgreich erstellt."
+    errorMessage: "Das Asset konnte nicht erstellt werden."
   addCaseDialog:
     customerTooltip: "Fall einem Kunden zuordnen"
     createNewCustomerTooltip: "Neuen Kunden erstellen"
@@ -116,6 +129,15 @@ cases:
     confirmDialog:
       title: "Kunde hinzufügen"
       description: "Möchten Sie Kunde {customer} zum Fall hinzufügen?"
+  filterDialog:
+    error: "Fehler-Code"
+    noFilterInput: "Bitte mindestens einen Filter eingeben"
+    resetFilterCriteria: "Filter zurücksetzen"
+    title: "Fälle filtern"
+    toggleShared: "Fälle aus allen Werkstätten anzeigen"
+    tooltip: "Bitte auswählen"
+    vin: "Die ersten sechs Stellen der VIN"
+    vinLengthInvalid: "Muss maximal sechs Zeichen lang sein"
   details:
     headline: "Detailansicht"
     dialog:
@@ -124,6 +146,9 @@ cases:
     showDiagnosis: "Diagnose anzeigen"
     deleteCaseSuccessMessage: "Der Fall wurde erfolgreich gelöscht."
     deleteCaseErrorMessage: "Der Fall konnte nicht gelöscht werden."
+    deleteDataSuccessMessage: "Der Datensatz wurde erfolgreich gelöscht."
+    deleteDataUnknownDataTypeMessage: "Der Datensatz konnte nicht gelöscht werden. Fehler: Unbekannter Datensatz-Typ"
+    deleteDataErrorMessage: "Der Datensatz konnte nicht gelöscht werden."
     occasion:
       unknown: "Unbekannt"
       service_routine: "@:general.service"
@@ -150,6 +175,33 @@ vehicles:
     updateVehicle: "Fahrzeug bearbeiten"
   details:
     headline: "Detailansicht"
+assets:
+  title: "Assets"
+  headlines:
+    description: "Beschreibung"
+    filter: "Filter"
+    name: "Name"
+    timeOfGeneration: "Zeitpunkt der Generation"
+  confirmation:
+    title: Asset Upload
+    description: "Möchten Sie das Asset wirklich anbieten?"
+  remove:
+    title: "Asset entfernen"
+    description: "Möchten Sie das Asset wirklich entfernen?"
+  details:
+    deleteAssetSuccessMessage: "Das Asset wurde erfolgreich gelöscht."
+    deleteAssetErrorMessage: "Das Asset konnte nicht gelöscht werden."
+    publishAssetSuccessMessage: "Das Asset wurde erfolgreich angeboten."
+    publishAssetErrorMessage: "Das Asset konnte nicht angeboten werden."
+  upload:
+    title: "Asset-Upload"
+    price: "Preis"
+    license: "Lizenz"
+    privateKey: "Private Key"
+    offer: "Anbieten"
+    retract: "Entfernen"
+    invalidPriceFormat: "Ungültiges Preis-Format"
+  noAssets: "Keine Assets"
 training:
   title: "Schulung"
 pageNotFound:
@@ -168,8 +220,8 @@ forms:
     invalidNumber: "Ungültige Zahlen in Feldern"
   obd:
     label: "Diagnose-Fehlercodes"
-    hint: "Geben Sie Codes getrennt durch Kommas ein"
-    suffix: "z.B. P0001, U0001, U0002"
+    hint: "Eingabe getrennt durch Kommas"
+    helper: "z.B. P0001, U0001, U0002 (je 5 Zeichen)"
   omniview:
     component:
       label: "Komponente"
@@ -185,6 +237,7 @@ forms:
       labelA: "Komponente A"
       labelB: "Komponente B"
       labelC: "Komponente C"
+      labelD: "Komponente D"
       label: "Label"
       hint: "Komponente eingeben"
   timeseries:

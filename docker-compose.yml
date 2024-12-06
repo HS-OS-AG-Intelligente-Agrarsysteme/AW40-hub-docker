@@ -12,19 +12,36 @@ services:
       - full
       - rollout1
     command:
+      # Basic Configuration
+      - "--log.level=ERROR"
+      - "--api=true"
+      - "--providers.docker=true"
+      - "--providers.docker.network=hubnet"
+      - "--providers.docker.exposedByDefault=false"
+
+      # EntryPoints
+      - "--entrypoints.web.address=:80"
+      #- "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls=true"
+
       # Let's Encrypt
-      - '--certificatesresolvers.letsencrypt.acme.email=${ROOT_EMAIL:?error}'
-      - '--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web'
-      - '--certificatesresolvers.letsencrypt.acme.httpchallenge=true'
-      - '--certificatesresolvers.letsencrypt.acme.storage=/certs/acme.json'
+      - "--certificatesResolvers.letsencrypt.acme.email=${ROOT_EMAIL:?error}"
+      - "--certificatesResolvers.letsencrypt.acme.httpChallenge.entryPoint=web"
+      - "--certificatesResolvers.letsencrypt.acme.httpChallenge=true"
+      - "--certificatesResolvers.letsencrypt.acme.storage=/certs/acme.json"
+
       # Global Certificate Resolver
-      - '--entrypoints.websecure.http.tls.certresolver=${PROXY_DEFAULT_CERTIFICATE_RESOLVER:-}'
+      - "--entrypoints.websecure.http.tls.certresolver=${PROXY_DEFAULT_CERTIFICATE_RESOLVER:-}"
     labels:
       - traefik.enable=true
       - traefik.docker.network=hubnet
 
-      - traefik.http.routers.traefik.rule=Host(`${TRAEFIK_ADDRESS:?error}`)
+      - traefik.http.routers.traefik.rule=Host(`${TRAEFIK_ADDRESS:?error}`) && PathPrefix(`/api`, `/dashboard`)
       - traefik.http.routers.traefik.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
+      - traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:?error}
+      - traefik.http.routers.traefik.middlewares=traefik-auth@docker
       - traefik.http.routers.traefik.service=api@internal
     networks:
       hubnet:
@@ -36,9 +53,9 @@ services:
     ports:
       - 80:80
       - 443:443
+      - 9000:9000
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock:ro
-    - ./proxy/proxy-config.yml:/etc/traefik/traefik.yml:ro
     - proxy-certs:/certs
 
   mongo:
@@ -77,8 +94,10 @@ services:
       - traefik.enable=true
       - traefik.docker.network=hubnet
 
-      - traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_ADDRESS:?error}`)
+      - traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_ADDRESS:?error}`) && PathPrefix(`${KEYCLOAK_PATH:-/}`)
       - traefik.http.routers.keycloak.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
+      - traefik.http.middlewares.keycloak-remove-prefix.stripprefix.prefixes=${KEYCLOAK_PATH:-/}
+      - traefik.http.routers.keycloak.middlewares=keycloak-remove-prefix@docker
       - traefik.http.routers.keycloak.service=keycloak
       - traefik.http.services.keycloak.loadbalancer.server.port=8080
     networks:
@@ -128,7 +147,7 @@ services:
       context: ./api
     <<: *default_restart_policy
     # DEVELOPMENT: run with reload and mount api package code
-    command: uvicorn --reload api.main:app
+    command: uvicorn --reload api.main:app --root-path ${API_PATH:-""}
     profiles:
       - full
       - rollout1
@@ -148,8 +167,10 @@ services:
       - traefik.enable=true
       - traefik.docker.network=hubnet
 
-      - traefik.http.routers.api.rule=Host(`${API_ADDRESS:?error}`)
+      - traefik.http.routers.api.rule=Host(`${API_ADDRESS:?error}`) && PathPrefix(`${API_PATH:-/}`)
       - traefik.http.routers.api.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
+      - traefik.http.middlewares.api-remove-prefix.stripprefix.prefixes=${API_PATH:-/}
+      - traefik.http.routers.api.middlewares=api-remove-prefix@docker
       - traefik.http.routers.api.service=api
       - traefik.http.services.api.loadbalancer.server.port=8000
     networks:
@@ -160,14 +181,16 @@ services:
       - 127.0.0.1:8000:8000 # For pytest
     volumes:
       - ./api/api/:/home/api/api/
+      - asset-data:/home/api/asset-data
 
   frontend:
     build:
       context: ./frontend
       args:
-        - API_ADDRESS=${API_ADDRESS:?error}
-        - FRONTEND_ADDRESS=${FRONTEND_ADDRESS:?error}
-        - KEYCLOAK_ADDRESS=${KEYCLOAK_ADDRESS:?error}
+        - API_ADDRESS=${API_ADDRESS:?error}${API_PATH:-}
+        - FRONTEND_ADDRESS=${FRONTEND_ADDRESS:?error}${FRONTEND_PATH:-}
+        - FRONTEND_PATH=${FRONTEND_PATH:-}
+        - KEYCLOAK_ADDRESS=${KEYCLOAK_ADDRESS:?error}${KEYCLOAK_PATH:-}
         - KEYCLOAK_FRONTEND_CLIENT=${KEYCLOAK_FRONTEND_CLIENT:?error}
         - KEYCLOAK_REALM=${KEYCLOAK_REALM:?error}
         - FRONTEND_LOG_LEVEL=${FRONTEND_LOG_LEVEL:?error}
@@ -184,8 +207,10 @@ services:
       - traefik.enable=true
       - traefik.docker.network=hubnet
 
-      - traefik.http.routers.frontend.rule=Host(`${FRONTEND_ADDRESS:?error}`)
+      - traefik.http.routers.frontend.rule=Host(`${FRONTEND_ADDRESS:?error}`) && PathPrefix(`${FRONTEND_PATH:-/}`)
       - traefik.http.routers.frontend.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
+      - traefik.http.middlewares.frontend-remove-prefix.stripprefix.prefixes=${FRONTEND_PATH:-/}
+      - traefik.http.routers.frontend.middlewares=frontend-remove-prefix@docker
       - traefik.http.routers.frontend.service=frontend
       - traefik.http.services.frontend.loadbalancer.server.port=80
     networks:
@@ -204,8 +229,10 @@ services:
       - traefik.enable=true
       - traefik.docker.network=hubnet
 
-      - traefik.http.routers.docs.rule=Host(`${DOCS_ADDRESS:?error}`)
+      - traefik.http.routers.docs.rule=Host(`${DOCS_ADDRESS:?error}`) && PathPrefix(`${DOCS_PATH:-/}`)
       - traefik.http.routers.docs.entrypoints=${PROXY_DEFAULT_ENTRYPOINTS:?error}
+      - traefik.http.middlewares.docs-remove-prefix.stripprefix.prefixes=${DOCS_PATH:-/}
+      - traefik.http.routers.docs.middlewares=docs-remove-prefix@docker
       - traefik.http.routers.docs.service=docs
       - traefik.http.services.docs.loadbalancer.server.port=80
     networks:
@@ -253,7 +280,7 @@ services:
       - full
       - rollout1
     ports:
-      - 3030:3030
+      - 127.0.0.1:3030:3030
     hostname: "knowledge-graph"
     networks:
       - hubintranet
@@ -285,3 +312,4 @@ volumes:
   mongo-data:
   keycloak-db-data:
   proxy-certs:
+  asset-data:

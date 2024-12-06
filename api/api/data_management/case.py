@@ -126,19 +126,55 @@ class Case(Document):
             cls,
             customer_id: Optional[str] = None,
             vin: Optional[str] = None,
-            workshop_id: Optional[str] = None
+            workshop_id: Optional[str] = None,
+            obd_data_dtc: Optional[str] = None,
+            timeseries_data_component: Optional[str] = None
     ) -> List[Self]:
         """
-        Get list of all cases filtered by customer_id, vehicle_vin and
-        workshop_id.
+        Get list of all cases with optional filtering by customer_id,
+        vehicle_vin, workshop_id or obd_data dtc.
+
+        Parameters
+        ----------
+        customer_id
+            Customer Id to search for. Only cases associated with the specified
+            customer are returned
+        vin
+            (Partial) VIN to search for. The specified parameter value is
+            matched against the beginning of the stored vins.
+            This allows partial vin specification e.g. to search for cases with
+            vehicles by a specific manufacturer.
+        workshop_id
+            Workshop Id to search for. Only cases from the specified workshop
+            are returned.
+        obd_data_dtc
+            DTC to search for. Only cases with at least one occurrence of the
+            specified dtc in any of the OBD datasets are returned.
+        timeseries_data_component
+            Timeseries data component to search for. Only cases that contain at
+            least one timeseries dataset for the specified component are
+            returned.
+
+        Returns
+        -------
+        List of cases matching the specified search criteria.
         """
         filter = {}
         if customer_id is not None:
             filter["customer_id"] = PydanticObjectId(customer_id)
         if vin is not None:
-            filter["vehicle_vin"] = vin
+            # VIN is matched against beginning of stored vins
+            filter["vehicle_vin"] = {"$regex": f"^{vin}"}
         if workshop_id is not None:
             filter["workshop_id"] = workshop_id
+        if obd_data_dtc is not None:
+            # Only return cases that contain the specified dtc in any
+            # of the obd datasets
+            filter["obd_data.dtcs"] = obd_data_dtc
+        if timeseries_data_component is not None:
+            # Only return cases that contain a timeseries dataset with the
+            # specified component
+            filter["timeseries_data.component"] = timeseries_data_component
 
         cases = await cls.find(filter).to_list()
         return cases
