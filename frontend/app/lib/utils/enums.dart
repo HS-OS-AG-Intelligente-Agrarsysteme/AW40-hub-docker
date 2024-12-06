@@ -28,7 +28,13 @@ enum ConfigKey {
   useMockData,
 }
 
-enum LocalStorageKey { verifier, redirectUri, refreshToken }
+enum LocalStorageKey {
+  verifier,
+  redirectUri,
+  refreshToken,
+  accessToken,
+  accessTokenExpirationDateTime,
+}
 
 enum CaseOccasion {
   unknown,
