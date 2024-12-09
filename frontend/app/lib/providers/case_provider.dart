@@ -27,6 +27,8 @@ class CaseProvider with ChangeNotifier {
   bool _showSharedCases = true;
   bool get showSharedCases => _showSharedCases;
 
+  ValueNotifier<int?> selectedCaseIndexNotifier = ValueNotifier<int?>(null);
+
   FilterCriteria? _filterCriteria;
   FilterCriteria? get filterCriteria => _filterCriteria;
 
@@ -39,6 +41,10 @@ class CaseProvider with ChangeNotifier {
     _filterCriteria = null;
     notifiedListenersAfterGettingEmptyCurrentCases = false;
     notifyListeners();
+  }
+
+  void resetSelectedcaseIndexNotifier() {
+    selectedCaseIndexNotifier.value = null;
   }
 
   bool isFilterActive() {

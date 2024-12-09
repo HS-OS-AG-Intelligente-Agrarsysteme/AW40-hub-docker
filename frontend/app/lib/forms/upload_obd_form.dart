@@ -30,7 +30,7 @@ class _UploadObdFormState extends State<UploadObdForm> {
         decoration: InputDecoration(
           labelText: tr("forms.obd.label"),
           hintText: tr("forms.obd.hint"),
-          suffixText: tr("forms.obd.suffix"),
+          helperText: tr("forms.obd.helper"),
           border: const OutlineInputBorder(),
         ),
       ),

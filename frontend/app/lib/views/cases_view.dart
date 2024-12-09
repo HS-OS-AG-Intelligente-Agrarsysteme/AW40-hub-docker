@@ -6,6 +6,7 @@ import "package:aw40_hub_frontend/utils/enums.dart";
 import "package:aw40_hub_frontend/views/case_detail_view.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
+import "package:logging/logging.dart";
 import "package:provider/provider.dart";
 
 class CasesView extends StatefulWidget {
@@ -18,29 +19,38 @@ class CasesView extends StatefulWidget {
 }
 
 class _CasesViewState extends State<CasesView> {
-  ValueNotifier<int?> currentCaseIndexNotifier = ValueNotifier<int?>(null);
+  final Logger _logger = Logger("CasesView");
 
   @override
   void dispose() {
-    currentCaseIndexNotifier.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    _logger.info("build _CasesViewState");
     final caseProvider = Provider.of<CaseProvider>(context);
 
     if (caseProvider.notifiedListenersAfterGettingEmptyCurrentCases) {
+      _logger.info("notifiedListenersAfterGettingEmptyCurrentCases = true");
       caseProvider.notifiedListenersAfterGettingEmptyCurrentCases = false;
-      return buildCasesTable([]);
+      return buildCasesTable([], caseProvider);
     }
 
     return FutureBuilder(
       // ignore: discarded_futures
       future: caseProvider.getCurrentCases(),
       builder: (BuildContext context, AsyncSnapshot<List<CaseModel>> snapshot) {
+        _logger.info(
+          // ignore: lines_longer_than_80_chars
+          "FutureBuilder called - ConnectionState: ${snapshot.connectionState}, "
+          "Has Data: ${snapshot.hasData}, "
+          "Error: ${snapshot.error}, "
+          "Data: ${snapshot.data}",
+        );
         if (snapshot.connectionState != ConnectionState.done ||
             !snapshot.hasData) {
+          _logger.info("Returning: Center with CircularProgressIndicator");
           return const Center(child: CircularProgressIndicator());
         }
         final List<CaseModel>? caseModels = snapshot.data;
@@ -50,32 +60,34 @@ class _CasesViewState extends State<CasesView> {
             exceptionMessage: "Received no case data.",
           );
         }
-        return buildCasesTable(caseModels);
+        return buildCasesTable(caseModels, caseProvider);
       },
     );
   }
 
-  Row buildCasesTable(List<CaseModel> caseModels) {
+  Row buildCasesTable(List<CaseModel> caseModels, CaseProvider caseProvider) {
+    _logger.info("called buildCasesTable with data $caseModels");
     return Row(
       children: [
         Expanded(
           flex: 3,
           child: CasesTable(
-            caseIndexNotifier: currentCaseIndexNotifier,
+            selectedCaseIndexNotifier: caseProvider.selectedCaseIndexNotifier,
             caseModel: caseModels,
           ),
         ),
 
         // Show detail view if a case is selected.
         ValueListenableBuilder(
-          valueListenable: currentCaseIndexNotifier,
+          valueListenable: caseProvider.selectedCaseIndexNotifier,
           builder: (context, value, child) {
             if (value == null) return const SizedBox.shrink();
             return Expanded(
               flex: 2,
               child: CaseDetailView(
                 caseModel: caseModels[value],
-                onClose: () => currentCaseIndexNotifier.value = null,
+                onClose: () =>
+                    caseProvider.selectedCaseIndexNotifier.value = null,
               ),
             );
           },
@@ -88,12 +100,12 @@ class _CasesViewState extends State<CasesView> {
 class CasesTable extends StatelessWidget {
   const CasesTable({
     required this.caseModel,
-    required this.caseIndexNotifier,
+    required this.selectedCaseIndexNotifier,
     super.key,
   });
 
   final List<CaseModel> caseModel;
-  final ValueNotifier<int?> caseIndexNotifier;
+  final ValueNotifier<int?> selectedCaseIndexNotifier;
 
   @override
   Widget build(BuildContext context) {
@@ -101,10 +113,10 @@ class CasesTable extends StatelessWidget {
       child: PaginatedDataTable(
         source: CasesDataTableSource(
           themeData: Theme.of(context),
-          currentIndexNotifier: caseIndexNotifier,
+          selectedCaseIndexNotifier: selectedCaseIndexNotifier,
           caseModels: caseModel,
           onPressedRow: (int i) {
-            caseIndexNotifier.value = i;
+            selectedCaseIndexNotifier.value = i;
           },
         ),
         showCheckboxColumn: false,

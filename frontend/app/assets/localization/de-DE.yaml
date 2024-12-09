@@ -219,8 +219,8 @@ forms:
     invalidNumber: "Ungültige Zahlen in Feldern"
   obd:
     label: "Diagnose-Fehlercodes"
-    hint: "Geben Sie Codes getrennt durch Kommas ein"
-    suffix: "z.B. P0001, U0001, U0002"
+    hint: "Eingabe getrennt durch Kommas"
+    helper: "z.B. P0001, U0001, U0002 (je 5 Zeichen)"
   omniview:
     component:
       label: "Komponente"

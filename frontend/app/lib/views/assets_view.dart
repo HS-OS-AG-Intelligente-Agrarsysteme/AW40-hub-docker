@@ -20,11 +20,11 @@ class AssetsView extends StatefulWidget {
 
 class _AssetsView extends State<AssetsView> {
   final Logger _logger = Logger("AssetsViewLogger");
-  ValueNotifier<int?> currentCaseIndexNotifier = ValueNotifier<int?>(null);
+  ValueNotifier<int?> selectedAssetIndexNotifier = ValueNotifier<int?>(null);
 
   @override
   void dispose() {
-    currentCaseIndexNotifier.dispose();
+    selectedAssetIndexNotifier.dispose();
     super.dispose();
   }
 
@@ -53,7 +53,7 @@ class _AssetsView extends State<AssetsView> {
 
         return AssetsTable(
           assetModels: assetModels,
-          caseIndexNotifier: currentCaseIndexNotifier,
+          selectedAssetIndexNotifier: selectedAssetIndexNotifier,
         );
       },
     );
@@ -63,23 +63,23 @@ class _AssetsView extends State<AssetsView> {
 class AssetsTable extends StatefulWidget {
   const AssetsTable({
     required this.assetModels,
-    required this.caseIndexNotifier,
+    required this.selectedAssetIndexNotifier,
     super.key,
   });
 
   final List<AssetModel> assetModels;
-  final ValueNotifier<int?> caseIndexNotifier;
+  final ValueNotifier<int?> selectedAssetIndexNotifier;
 
   @override
   State<StatefulWidget> createState() => AssetsTableState();
 }
 
 class AssetsTableState extends State<AssetsTable> {
-  ValueNotifier<int?> currentAssetsIndexNotifier = ValueNotifier<int?>(null);
+  ValueNotifier<int?> selectedAssetIndexNotifier = ValueNotifier<int?>(null);
 
   @override
   void dispose() {
-    currentAssetsIndexNotifier.dispose();
+    selectedAssetIndexNotifier.dispose();
     super.dispose();
   }
 
@@ -102,10 +102,10 @@ class AssetsTableState extends State<AssetsTable> {
             child: PaginatedDataTable(
               source: AssetsDataTableSource(
                 themeData: Theme.of(context),
-                currentIndexNotifier: currentAssetsIndexNotifier,
+                selectedAssetIndexNotifier: selectedAssetIndexNotifier,
                 assetModels: widget.assetModels,
                 onPressedRow: (int i) =>
-                    setState(() => currentAssetsIndexNotifier.value = i),
+                    setState(() => selectedAssetIndexNotifier.value = i),
               ),
               showCheckboxColumn: false,
               rowsPerPage: 50,
@@ -122,14 +122,14 @@ class AssetsTableState extends State<AssetsTable> {
 
         // Show detail view if a assets is selected.
         ValueListenableBuilder(
-          valueListenable: currentAssetsIndexNotifier,
+          valueListenable: selectedAssetIndexNotifier,
           builder: (context, value, child) {
             if (value == null) return const SizedBox.shrink();
             return Expanded(
               flex: 2,
               child: AssetsDetailView(
                 assetModel: widget.assetModels[value],
-                onClose: () => currentAssetsIndexNotifier.value = null,
+                onClose: () => selectedAssetIndexNotifier.value = null,
               ),
             );
           },
