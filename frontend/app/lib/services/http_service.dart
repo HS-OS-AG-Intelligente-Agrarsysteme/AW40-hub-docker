@@ -150,7 +150,9 @@ class HttpService {
     String caseId,
   ) {
     return _client.delete(
-      Uri.parse("$backendUrl/$workshopId/cases/$caseId/timeseries/$dataId"),
+      Uri.parse(
+        "$backendUrl/$workshopId/cases/$caseId/timeseries_data/$dataId",
+      ),
       headers: getAuthHeaderWith(token),
     );
   }
