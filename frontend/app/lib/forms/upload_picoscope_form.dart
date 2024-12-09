@@ -59,7 +59,7 @@ class _UploadPicoscopeFormState extends State<UploadPicoscopeForm> {
                       labelText: tr("forms.picoscope.component.labelA"),
                       hintText: tr("forms.picoscope.component.hint"),
                       border: const OutlineInputBorder(),
-                      suffixText: tr("forms.optional"),
+                      suffixText: tr("forms.mandatory"),
                     ),
                   ),
                 ),
@@ -68,7 +68,7 @@ class _UploadPicoscopeFormState extends State<UploadPicoscopeForm> {
                   child: DropdownMenu<PicoscopeLabel>(
                     controller: _labelAController,
                     label: Text(tr("forms.picoscope.component.label")),
-                    hintText: tr("forms.optional"),
+                    hintText: tr("forms.mandatory"),
                     onSelected: (PicoscopeLabel? picoscopeLabel) {
                       setState(() {
                         selectedLabelA = picoscopeLabel;
@@ -244,6 +244,15 @@ class _UploadPicoscopeFormState extends State<UploadPicoscopeForm> {
         EnumToString.fromString(PicoscopeLabel.values, _labelCController.text);
     final PicoscopeLabel? labelD =
         EnumToString.fromString(PicoscopeLabel.values, _labelDController.text);
+
+    if (componentA == "" || labelA == null) {
+      messengerState.showSnackBar(
+        SnackBar(
+          content: Text(tr("forms.picoscope.component.required")),
+        ),
+      );
+      return;
+    }
 
     final bool result = await provider.uploadPicoscopeData(
       widget.caseId,
