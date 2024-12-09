@@ -211,6 +211,7 @@ noAuthorization:
 forms:
   submit: "Submit"
   optional: "optional"
+  mandatory: "mandatory"
   validation:
     enterText: "Please enter some text"
     enterNumber: "Please enter a number"
@@ -240,6 +241,7 @@ forms:
       labelD: "Component D"
       label: "Label"
       hint: "Enter a Component"
+      required: "Component A und Label A required"
   timeseries:
     label: "Label"
     component:
