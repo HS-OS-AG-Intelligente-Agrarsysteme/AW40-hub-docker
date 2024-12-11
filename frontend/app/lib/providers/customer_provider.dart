@@ -19,7 +19,7 @@ class CustomerProvider with ChangeNotifier {
   final HttpService _httpService;
 
   final Logger _logger = Logger("customer_provider");
-  late final String workshopId;
+  late String workshopId;
 
   late final String costumerId;
 

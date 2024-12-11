@@ -7,6 +7,7 @@ import "package:http/http.dart" as http;
 import "package:http/testing.dart";
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group("HttpService", () {
     setUp(() async {
       await ConfigService().initialize();
@@ -80,7 +81,8 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).getSharedCases("some-token");
+      await HttpService(client, interceptor: client)
+          .getSharedCases("some-token");
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
     test("verify getCases", () async {
@@ -106,7 +108,8 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).getCases("some-token", workshopId);
+      await HttpService(client, interceptor: client)
+          .getCases("some-token", workshopId);
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
     test("verify getCasesByVehicleVin", () async {
@@ -133,7 +136,7 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).getCasesByVehicleVin(
+      await HttpService(client, interceptor: client).getCasesByVehicleVin(
         "some-token",
         workshopId,
         vehicleVin,
@@ -169,7 +172,8 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).addCase("token", workshopId, requestBody);
+      await HttpService(client, interceptor: client)
+          .addCase("token", workshopId, requestBody);
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
     test("verify updateCase", () async {
@@ -201,7 +205,7 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).updateCase(
+      await HttpService(client, interceptor: client).updateCase(
         "token",
         workshopId,
         caseId,
@@ -233,7 +237,8 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).deleteCase("token", workshopId, caseId);
+      await HttpService(client, interceptor: client)
+          .deleteCase("token", workshopId, caseId);
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
     test("verify getDiagnoses", () async {
@@ -259,7 +264,8 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).getDiagnoses("token", workshopId);
+      await HttpService(client, interceptor: client)
+          .getDiagnoses("token", workshopId);
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
     test("verify getDiagnosis", () async {
@@ -287,7 +293,8 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).getDiagnosis("token", workshopId, caseId);
+      await HttpService(client, interceptor: client)
+          .getDiagnosis("token", workshopId, caseId);
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
     test("verify startDiagnosis", () async {
@@ -315,7 +322,8 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).startDiagnosis("token", workshopId, caseId);
+      await HttpService(client, interceptor: client)
+          .startDiagnosis("token", workshopId, caseId);
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
     test("verify deleteDiagnosis", () async {
@@ -343,7 +351,8 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).deleteDiagnosis("token", workshopId, caseId);
+      await HttpService(client, interceptor: client)
+          .deleteDiagnosis("token", workshopId, caseId);
       expect(sentRequest, isTrue, reason: "Request was not sent");
     });
     test("verify uploadObdData", () async {
@@ -376,7 +385,7 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).uploadObdData(
+      await HttpService(client, interceptor: client).uploadObdData(
         "token",
         workshopId,
         caseId,
@@ -430,7 +439,7 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).uploadPicoscopeData(
+      await HttpService(client, interceptor: client).uploadPicoscopeData(
         "token",
         workshopId,
         caseId,
@@ -484,7 +493,7 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).addTimeseriesData(
+      await HttpService(client, interceptor: client).addTimeseriesData(
         "token",
         workshopId,
         caseId,
@@ -529,7 +538,7 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).uploadSymptomData(
+      await HttpService(client, interceptor: client).uploadSymptomData(
         "token",
         workshopId,
         caseId,
@@ -576,7 +585,7 @@ void main() {
         );
         return http.Response('{"status": "success"}', 200);
       });
-      await HttpService(client).uploadOmniviewData(
+      await HttpService(client, interceptor: client).uploadOmniviewData(
         "token",
         workshopId,
         caseId,
@@ -612,7 +621,7 @@ void main() {
       );
       return http.Response('{"status": "success"}', 200);
     });
-    await HttpService(client).getSharedCustomers(
+    await HttpService(client, interceptor: client).getSharedCustomers(
       "some-token",
     );
     expect(sentRequest, isTrue, reason: "Request should have been sent");
@@ -639,7 +648,8 @@ void main() {
       );
       return http.Response('{"status": "success"}', 200);
     });
-    await HttpService(client).getSharedVehicles("some-token");
+    await HttpService(client, interceptor: client)
+        .getSharedVehicles("some-token");
     expect(sentRequest, isTrue, reason: "Request should have been sent");
   });
 }
