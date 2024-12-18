@@ -866,7 +866,7 @@ class MockHttpService implements HttpService {
     String token, [
     Map<String, String>? otherHeaders,
   ]) {
-    // TODO: Make getAuthHeaderWith() private in HttpService, amend tests,
+    // Make getAuthHeaderWith() private in HttpService, amend tests,
     //  remove this implementation
     throw UnsupportedError(
       "This method should never be called on MockHttpService",
@@ -896,7 +896,7 @@ class MockHttpService implements HttpService {
     String workshopId,
     String vehicleVin,
   ) {
-    // TODO implement getCasesByVehicleVin
+    // implement getCasesByVehicleVin
     throw UnimplementedError();
   }
 
@@ -967,7 +967,7 @@ class MockHttpService implements HttpService {
     String caseId,
   ) {
     // ignore: lines_longer_than_80_chars
-    // TODO maybe adjust regarding params in the future when getCustomer is used in the customer provider
+    // maybe adjust regarding params in the future when getCustomer is used in the customer provider
     return Future.delayed(
       Duration(milliseconds: delay),
       () => Response(
@@ -1376,7 +1376,7 @@ class MockHttpService implements HttpService {
 
   @override
   Future<Response> getSharedVehicles(String token) {
-    // TODO: implement getSharedVehicles
+    // implement getSharedVehicles
     throw UnimplementedError();
   }
 
@@ -1410,7 +1410,7 @@ class MockHttpService implements HttpService {
     String caseId,
     Map<String, dynamic> requestBody,
   ) {
-    // TODO: implement updateVehicles
+    //implement updateVehicles
     throw UnimplementedError();
   }
 
@@ -1420,7 +1420,7 @@ class MockHttpService implements HttpService {
     int? page,
     int? pageSize,
   ) {
-    // TODO: implement getCustomers
+    //implement getCustomers
     throw UnimplementedError();
   }
 
@@ -1430,13 +1430,13 @@ class MockHttpService implements HttpService {
     String customerId,
     Map<String, dynamic> requestBody,
   ) {
-    // TODO: implement updateCustomer
+    //implement updateCustomer
     throw UnimplementedError();
   }
 
   @override
   Future<Response> addCustomer(String token, Map<String, dynamic> requestBody) {
-    // TODO: implement addCustomer
+    //implement addCustomer
     throw UnimplementedError();
   }
 
@@ -1447,7 +1447,7 @@ class MockHttpService implements HttpService {
     String workshopId,
     String caseId,
   ) {
-    // TODO: implement deleteTimeseriesData
+    // implement deleteTimeseriesData
     throw UnimplementedError();
   }
 
@@ -1458,7 +1458,7 @@ class MockHttpService implements HttpService {
     String workshopId,
     String caseId,
   ) {
-    // TODO: implement deleteObdData
+    // implement deleteObdData
     throw UnimplementedError();
   }
 
@@ -1469,7 +1469,7 @@ class MockHttpService implements HttpService {
     String workshopId,
     String caseId,
   ) {
-    // TODO: implement deleteSymptomData
+    // implement deleteSymptomData
     throw UnimplementedError();
   }
 
@@ -1477,19 +1477,19 @@ class MockHttpService implements HttpService {
   Future<Response> getAssets(
     String token,
   ) {
-    // TODO: implement getAssets
+    // implement getAssets
     throw UnimplementedError();
   }
 
   @override
   Future<Response> getVehicleComponents(String token) {
-    // TODO: implement getVehicleComponents
+    // implement getVehicleComponents
     throw UnimplementedError();
   }
 
   @override
   Future<Response> createAsset(String token, Map<String, dynamic> requestBody) {
-    // TODO: implement createAsset
+    // implement createAsset
     throw UnimplementedError();
   }
 
@@ -1499,7 +1499,7 @@ class MockHttpService implements HttpService {
     String assetId,
     Map<String, dynamic> requestBody,
   ) {
-    // TODO: implement publishAsset
+    // implement publishAsset
     throw UnimplementedError();
   }
 
@@ -1509,7 +1509,7 @@ class MockHttpService implements HttpService {
     String assetId,
     Map<String, dynamic>? requestBody,
   ) {
-    // TODO: implement deleteAsset
+    //implement deleteAsset
     throw UnimplementedError();
   }
 }

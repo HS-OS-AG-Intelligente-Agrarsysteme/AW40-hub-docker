@@ -546,7 +546,7 @@ void main() {
           reason: "workshopId should be input parameter",
         );
       });
-      // TODO: Test validation once DTO is implemented.
+      // Test validation once DTO is implemented.
     });
     group("uploadPicoscopeData()", () {
       test("returns 201 CaseDto json", () async {
@@ -578,7 +578,7 @@ void main() {
           reason: "workshopId should be input parameter",
         );
       });
-      // TODO: Test validation once DTO is implemented.
+      // Test validation once DTO is implemented.
     });
     group("uploadSymptomData()", () {
       test("returns 201 CaseDto json", () async {
@@ -689,7 +689,7 @@ void main() {
           reason: "caseDto should have one obdData",
         );
       });
-      // TODO: Test validation once actual method is implemented.
+      // Test validation once actual method is implemented.
     });
     testDemoDiagnosisWorkflow();
   });
@@ -819,7 +819,7 @@ void testDemoDiagnosisWorkflow() {
       );
 
       // Add obd data.
-      // TODO: This should also work with a call to uploadVcdsData.
+      // This should also work with a call to uploadVcdsData.
       // (Which it does, it just isn't tested yet.)
       final NewOBDDataDto newOBDDataDto = NewOBDDataDto([], []);
       Response response = await mockHttpService.uploadObdData(
@@ -861,7 +861,7 @@ void testDemoDiagnosisWorkflow() {
       );
 
       // Add timeseries data.
-      // TODO: This should also work with a call to uploadOmniviewData.
+      //  This should also work with a call to uploadOmniviewData.
       // (Which it does, it just isn't tested yet.)
       response = await mockHttpService.uploadPicoscopeData(
         "token",
