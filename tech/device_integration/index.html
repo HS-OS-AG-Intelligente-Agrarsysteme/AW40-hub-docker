@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html data-bs-theme="light" lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
@@ -12,9 +12,13 @@ LMIS AG
 <link href="../../img/favicon.ico" rel="shortcut icon"/>
 <title>Integration heterogener Messgeräte - Autowerkstatt 4.0 - Hub</title>
 <link href="../../css/bootstrap.min.css" rel="stylesheet"/>
-<link href="../../css/font-awesome.min.css" rel="stylesheet"/>
+<link href="../../css/fontawesome.min.css" rel="stylesheet"/>
+<link href="../../css/brands.min.css" rel="stylesheet"/>
+<link href="../../css/solid.min.css" rel="stylesheet"/>
+<link href="../../css/v4-font-face.min.css" rel="stylesheet"/>
 <link href="../../css/base.css" rel="stylesheet"/>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" id="hljs-light" rel="stylesheet"/>
+<link disabled="" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" id="hljs-dark" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 <script>hljs.highlightAll();</script>
 <link href="../../download/aw40-docs.pdf" rel="alternate" title="PDF" type="application/pdf"/></head>
@@ -23,18 +27,18 @@ LMIS AG
 <div class="container">
 <a class="navbar-brand" href="../..">Autowerkstatt 4.0 - Hub</a>
 <!-- Expander button -->
-<button class="navbar-toggler" data-target="#navbar-collapse" data-toggle="collapse" type="button">
+<button aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar-collapse" data-bs-toggle="collapse" type="button">
 <span class="navbar-toggler-icon"></span>
 </button>
 <!-- Expanded navigation -->
 <div class="navbar-collapse collapse" id="navbar-collapse">
 <!-- Main navigation -->
 <ul class="nav navbar-nav">
-<li class="navitem">
+<li class="nav-item">
 <a class="nav-link" href="../../background/">Hintergrund</a>
 </li>
-<li class="dropdown active">
-<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Technische Umsetzung <b class="caret"></b></a>
+<li class="nav-item dropdown">
+<a aria-current="page" aria-expanded="false" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button">Technische Umsetzung</a>
 <ul class="dropdown-menu">
 <li>
 <a class="dropdown-item" href="../database/">Datenbank</a>
@@ -49,25 +53,22 @@ LMIS AG
 <a class="dropdown-item" href="../ai/">KI</a>
 </li>
 <li>
-<a class="dropdown-item active" href="./">Integration heterogener Messgeräte</a>
-</li>
-<li>
-<a class="dropdown-item" href="../federatedcatalog/">Federated Catalog</a>
+<a aria-current="page" class="dropdown-item active" href="./">Integration heterogener Messgeräte</a>
 </li>
 </ul>
 </li>
-<li class="navitem">
+<li class="nav-item">
 <a class="nav-link" href="../../download/aw40-docs.pdf">Download</a>
 </li>
 </ul>
-<ul class="nav navbar-nav ml-auto">
+<ul class="nav navbar-nav ms-md-auto">
 <li class="nav-item">
 <a class="nav-link" href="../ai/" rel="prev">
 <i class="fa fa-arrow-left"></i> Previous
                                 </a>
 </li>
 <li class="nav-item">
-<a class="nav-link" href="../federatedcatalog/" rel="next">
+<a class="nav-link disabled" rel="next">
                                     Next <i class="fa fa-arrow-right"></i>
 </a>
 </li>
@@ -77,21 +78,21 @@ LMIS AG
 </div>
 <div class="container">
 <div class="row">
-<div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+<div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
 <div class="navbar-header">
-<button class="navbar-toggler collapsed" data-target="#toc-collapse" data-toggle="collapse" title="Table of Contents" type="button">
+<button class="navbar-toggler collapsed" data-bs-target="#toc-collapse" data-bs-toggle="collapse" title="Table of Contents" type="button">
 <span class="fa fa-angle-down"></span>
 </button>
 </div>
-<div class="navbar-collapse collapse card bg-secondary" id="toc-collapse">
+<div class="navbar-collapse collapse card bg-body-tertiary" id="toc-collapse">
 <ul class="nav flex-column">
-<li class="nav-item" data-level="1"><a class="nav-link" href="#integration-heterogener-messgerate">Integration heterogener Messgeräte</a>
+<li class="nav-item" data-bs-level="1"><a class="nav-link" href="#integration-heterogener-messgerate">Integration heterogener Messgeräte</a>
 <ul class="nav flex-column">
-<li class="nav-item" data-level="2"><a class="nav-link" href="#ansatz-1-hub-seitige-messsystemintegration">Ansatz 1: Hub-seitige Messsystemintegration</a>
+<li class="nav-item" data-bs-level="2"><a class="nav-link" href="#ansatz-1-hub-seitige-messsystemintegration">Ansatz 1: Hub-seitige Messsystemintegration</a>
 <ul class="nav flex-column">
 </ul>
 </li>
-<li class="nav-item" data-level="2"><a class="nav-link" href="#ansatz-2-messsystem-seitige-hubintegration">Ansatz 2: Messsystem-seitige Hubintegration</a>
+<li class="nav-item" data-bs-level="2"><a class="nav-link" href="#ansatz-2-messsystem-seitige-hubintegration">Ansatz 2: Messsystem-seitige Hubintegration</a>
 <ul class="nav flex-column">
 </ul>
 </li>
@@ -144,8 +145,7 @@ unterstützten Fehlerdiagnose verwertet werden können.</p></div>
 <hr/>
 <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
 </footer>
-<script src="../../js/jquery-3.6.0.min.js"></script>
-<script src="../../js/bootstrap.min.js"></script>
+<script src="../../js/bootstrap.bundle.min.js"></script>
 <script>
             var base_url = "../..",
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
@@ -156,7 +156,7 @@ unterstützten Fehlerdiagnose verwertet werden können.</p></div>
 <div class="modal-content">
 <div class="modal-header">
 <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
-<button class="close" data-dismiss="modal" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
 </div>
 <div class="modal-body">
 <table class="table">
