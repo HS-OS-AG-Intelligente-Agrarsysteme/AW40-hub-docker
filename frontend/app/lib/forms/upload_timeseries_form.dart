@@ -173,5 +173,10 @@ class _UploadTimeseriesFormState extends State<UploadTimeseriesForm> {
         ? tr("diagnoses.details.uploadDataSuccessMessage")
         : tr("diagnoses.details.uploadDataErrorMessage");
     messengerState.showSnackBar(SnackBar(content: Text(snackBarText)));
+    _closeForm();
+  }
+
+  void _closeForm() {
+    Navigator.of(context).pop();
   }
 }

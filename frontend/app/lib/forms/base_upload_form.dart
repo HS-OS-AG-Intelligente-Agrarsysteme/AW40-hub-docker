@@ -20,7 +20,7 @@ class BaseUploadForm extends StatelessWidget {
         ElevatedButton(
           onPressed: () {
             onSubmit();
-            Navigator.of(context).pop();
+            //Navigator.of(context).pop();
           },
           child: Text(tr("forms.submit")),
         ),

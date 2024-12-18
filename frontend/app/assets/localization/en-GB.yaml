@@ -90,6 +90,7 @@ diagnoses:
     dragAndDrop: "Drag and drop the file here"
     dropFileError: "The file could not be captured."
     uploadDataSuccessMessage: "The data has been uploaded successfully."
+    uploadDragAndDropfailed: "Failed. A Datafile has to be uploaded."
     uploadDataErrorMessage: "The data could not be uploaded."
     noFaultPathFound: "No fault path found"
     noStateMachineLog: "No state machine log available"

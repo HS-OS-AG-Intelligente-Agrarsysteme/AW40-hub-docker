@@ -53,6 +53,7 @@ class _UploadPicoscopeFormState extends State<UploadPicoscopeForm> {
                 Expanded(
                   flex: 2,
                   child: TextFormField(
+                    validator: _validation,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     controller: _componentAController,
                     decoration: InputDecoration(
@@ -214,13 +215,20 @@ class _UploadPicoscopeFormState extends State<UploadPicoscopeForm> {
     );
   }
 
+  String? _validation(String? value) {
+    if (value == null || value.isEmpty) {
+      return tr("forms.validation.enterText");
+    }
+    return null;
+  }
+
   Future<void> _onSubmit() async {
     final messengerState = ScaffoldMessenger.of(context);
     final Uint8List? file = _file;
     if (file == null) {
       messengerState.showSnackBar(
         SnackBar(
-          content: Text(tr("diagnoses.details.uploadDataErrorMessage")),
+          content: Text(tr("diagnoses.details.uploadDragAndDropfailed")),
         ),
       );
       return;
@@ -272,5 +280,10 @@ class _UploadPicoscopeFormState extends State<UploadPicoscopeForm> {
         ? tr("diagnoses.details.uploadDataSuccessMessage")
         : tr("diagnoses.details.uploadDataErrorMessage");
     messengerState.showSnackBar(SnackBar(content: Text(snackBarText)));
+    _closeForm();
+  }
+
+  void _closeForm() {
+    Navigator.of(context).pop();
   }
 }

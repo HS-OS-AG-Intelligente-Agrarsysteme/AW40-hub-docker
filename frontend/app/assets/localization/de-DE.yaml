@@ -89,6 +89,7 @@ diagnoses:
     dragAndDrop: "Datei per Drag & Drop hier ablegen"
     dropFileError: "Die Datei konnte nicht erfasst werden"
     uploadDataSuccessMessage: "Die Daten wurden erfolgreich hochgeladen."
+    uploadDragAndDropfailed: "Fehlgeschlagen. Es muss noch eine Daten-File hinzugefügt werden."
     uploadDataErrorMessage: "Die Daten konnten nicht hochgeladen werden."
     noFaultPathFound: "Kein Fehlerpfad gefunden"
     noStateMachineLog: "Kein State-Machine-Protokoll verfügbar"

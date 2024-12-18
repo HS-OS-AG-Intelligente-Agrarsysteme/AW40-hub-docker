@@ -40,7 +40,7 @@ class _UploadVcdsFormState extends State<UploadVcdsForm> {
     if (file == null) {
       messengerState.showSnackBar(
         SnackBar(
-          content: Text(tr("diagnoses.details.uploadDataErrorMessage")),
+          content: Text(tr("diagnoses.details.uploadDragAndDropfailed")),
         ),
       );
       return;
@@ -59,5 +59,10 @@ class _UploadVcdsFormState extends State<UploadVcdsForm> {
         ? tr("diagnoses.details.uploadDataSuccessMessage")
         : tr("diagnoses.details.uploadDataErrorMessage");
     messengerState.showSnackBar(SnackBar(content: Text(snackBarText)));
+    _closeForm();
+  }
+
+  void _closeForm() {
+    Navigator.of(context).pop();
   }
 }

@@ -69,9 +69,8 @@ class _UploadSymptomFormState extends State<UploadSymptomForm> {
 
   String? _validation(String? value) {
     if (value == null || value.isEmpty) {
-      return tr("forms.submit");
+      return tr("forms.validation.enterText");
     }
-
     return null;
   }
 
@@ -96,5 +95,10 @@ class _UploadSymptomFormState extends State<UploadSymptomForm> {
         ? tr("diagnoses.details.uploadDataSuccessMessage")
         : tr("diagnoses.details.uploadDataErrorMessage");
     messengerState.showSnackBar(SnackBar(content: Text(snackBarText)));
+    _closeForm();
+  }
+
+  void _closeForm() {
+    Navigator.of(context).pop();
   }
 }
