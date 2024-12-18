@@ -10,27 +10,33 @@ Die API hat mehrere Teilbereiche (Router)
 
 <font size=1>
 
-| Bereich     | Pfad             | Beschreibung                                                                                 | Authentifizierung |
-|-------------|------------------|----------------------------------------------------------------------------------------------|-------------------|
-| Diagnostics | `/diagnostics`   | Zugriffspunkte für das Diagnosebackend.                                                      | API Key           |
-| Health      | `/health`        | Funktionskontrolle                                                                           | keine             |
-| MinIO       | `/minio`         | *WIP*                                                                                        | API Key           |
-| Shared      | `/shared`        | Lesezugriff auf geteilte Ressourcen innerhalb einer Betreiberfirma.                          | Keycloak          |
-| Workshops   | `/{workshop_id}` | Verwaltung eigener Daten und Diagnosen durch Endnutzer Anwendungen in einzelnen Werkstätten. | Keycloak          |
-| Knowledge   | `/knowledge`     | Vereinfachter Zugriff auf Informationen, die im [Wissensgraph](./ai.md) gespeichert sind.    | Keycloak          |
-
+| Bereich                    | Pfad             | Beschreibung                                                                                 | Authentifizierung |
+|----------------------------|------------------|----------------------------------------------------------------------------------------------|-------------------|
+| Diagnostics                | `/diagnostics`   | Zugriffspunkte für das Diagnosebackend.                                                      | API Key           |
+| Health                     | `/health`        | Funktionskontrolle                                                                           | keine             |
+| Shared                     | `/shared`        | Lesezugriff auf geteilte Ressourcen innerhalb einer Betreiberfirma.                          | Keycloak          |
+| Workshops                  | `/{workshop_id}` | Verwaltung eigener Daten und Diagnosen durch Endnutzer Anwendungen in einzelnen Werkstätten. | Keycloak          |
+| Knowledge                  | `/knowledge`     | Vereinfachter Zugriff auf Informationen, die im [Wissensgraph](./ai.md) gespeichert sind.    | Keycloak          |
+| Customers                  | `/customers`     | Verwaltung von Kundendaten.                                                                  | Keycloak          |
+| Dataspace Assets           | `/assets/manage` | Verwaltung von Assets die im Datenraum angeboten werden                                      | Keycloak          |
+| Public Dataspace Resources | `/assets/public` | Bereitstellung von Asset Datensätzen im Datenraum                                            | API Key           |
 </font>
 
 ## Details
 
-Die oben beschriebenen Router können grob in zwei Gruppen unterteilt werden.
+Die oben beschriebenen Router können in drei Gruppen unterteilt werden.
 
-Die erste Gruppe bilden die Bereiche Diagnostics, Health und MinIO. Alle in
+Die erste Gruppe bilden die Bereiche Diagnostics und Health. Alle in
 diesen Routern bereitgestellten Endpunkte sind für die M2M Kommunikation 
 zwischen verschiedenen Services "im Hintergrund" vorgesehen.
 
-Die zweite Gruppen bilden die Bereiche Shared, Workshops und Knowledge welche
-für die Kommunikation mit (menschlichen) Endnutzern vorgesehen sind.
+Die zweite Gruppen bilden die Bereiche Shared, Workshops, Knowledge, Customers
+und Dataspace Assets, welche für die Kommunikation mit (menschlichen) Endnutzern 
+innerhalb einer Betreiberfirma vorgesehen sind.
+
+Die dritte Gruppe beinhaltet den Bereich Public Dataspace Assets. Die Endpunkte
+in dieser Gruppe werden von Datenraumservices außerhalb der eigenen Betreiberfirma
+angesprochen, um bereitgestellte Daten herunterzuladen.
 
 ### Workshop Router
 
@@ -64,3 +70,21 @@ auf ausgewählte Fakten zu im Wissensgraph beinhalteten Informationen, wie z.B.
 die Namen der gespeicherten Fahrzeugbauteile.  
 Der Zugriff ist mit einem von Keycloak ausgestellten Token möglich, wobei sowohl
 die Rollen `workshop` als auch `shared` autorisiert sind.
+
+### Customers Router
+
+Über die unter `/customers` bereitgestellten Endpunkte können Kundendaten
+verwaltet werden.
+Der Zugriff ist mit einem von Keycloak ausgestellten Token möglich. Dem 
+Nutzeraccount muss dabei die Rolle `customers` zugewiesen sein.
+
+### Dataspace Assets und Public Dataspace Resources
+
+Über die unter `/assets/manage` bereitgestellten Endpunkte können ausgewählte
+Teile der eigenen Daten zu Assets "verpackt" werden. Diese Assets können dann
+publiziert, d.h. im Datenraum angeboten werden.
+Der Zugriff ist mit einem von Keycloak ausgestellten Token möglich. Dem 
+Nutzeraccount muss dabei die Rolle `assets` zugewiesen sein.
+Wenn ein Asset publiziert ist, dann kann es über einen (bei der Publikation
+automatisch generierten Downloadlink) im Bereich `/assets/public` heruntergeladen
+werde.
