@@ -18,7 +18,7 @@ class DiagnosisProvider with ChangeNotifier {
   final HttpService _httpService;
 
   final Logger _logger = Logger("diagnosis_provider");
-  late final String workshopId;
+  late String workshopId;
   String? _authToken;
 
   /// The caseId of the diagnosis whose detail view was last shown.

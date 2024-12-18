@@ -18,7 +18,7 @@ class VehicleProvider with ChangeNotifier {
   final HttpService _httpService;
 
   final Logger _logger = Logger("vehicle_provider");
-  late final String workshopId;
+  late String workshopId;
 
   late final String caseId;
 

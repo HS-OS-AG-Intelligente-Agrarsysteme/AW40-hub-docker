@@ -18,7 +18,7 @@ import "package:flutter/material.dart";
 import "package:http/http.dart" as http;
 import "package:logging/logging.dart";
 import "package:routemaster/routemaster.dart";
-import "package:universal_html/html.dart" hide Navigator;
+import "package:universal_html/html.dart" hide Navigator, Text;
 
 class AuthProvider with ChangeNotifier {
   AuthProvider(
@@ -29,7 +29,7 @@ class AuthProvider with ChangeNotifier {
     this._configService, [
     this._refreshToken,
   ]);
-  JwtModel? _jwt;
+  JwtModel? _accessTokenJwt;
   String? _refreshToken;
   String? _idToken;
   Completer<void>? _pendingAuthCheck;
@@ -42,21 +42,22 @@ class AuthProvider with ChangeNotifier {
   final ConfigService _configService;
   final Logger _logger = Logger("auth_provider");
 
+  // TODO is this necessary or is getAccessTokenSufficient?
   Future<String?> getAuthToken() async {
     await _checkAuth();
-    return _jwt?.jwt;
+    return _accessTokenJwt?.jwt;
   }
 
   /// For Cases where JWT is not accepted from Backend, e.g. timing problems
   /// to indirectly force a JWT refresh
-  void removeJwtToken() => _jwt = null;
+  void removeJwtToken() => _accessTokenJwt = null;
 
   /// Returns true if the user is logged in, false otherwise.
-  bool isLoggedIn() => _jwt != null;
+  bool isLoggedIn() => _accessTokenJwt != null;
 
   /// Returns `true` if logged in user has >=1 of the `AuthorizedGroup`s.
   bool get isAuthorized {
-    final jwt = _jwt;
+    final jwt = _accessTokenJwt;
     if (jwt == null) return false;
     List<String> groups = jwt.groups;
     if (groups.isEmpty) return false;
@@ -69,7 +70,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   List<AuthorizedGroup> get getUserGroups {
-    final jwt = _jwt;
+    final jwt = _accessTokenJwt;
     if (jwt == null) return [];
     return EnumToString.fromList(AuthorizedGroup.values, jwt.groups)
         .whereType<AuthorizedGroup>()
@@ -79,11 +80,11 @@ class AuthProvider with ChangeNotifier {
   LoggedInUserModel get loggedInUser {
     return LoggedInUserModel(
       getUserGroups,
-      _jwt?.name ?? tr("general.unnamed"),
-      _jwt?.preferredUsername ?? tr("general.unnamed"),
-      _jwt?.email ?? "",
+      _accessTokenJwt?.name ?? tr("general.unnamed"),
+      _accessTokenJwt?.preferredUsername ?? tr("general.unnamed"),
+      _accessTokenJwt?.email ?? "",
       // TODO: Workshop ID == username for now.
-      _jwt?.preferredUsername ?? "",
+      _accessTokenJwt?.preferredUsername ?? "",
     );
   }
 
@@ -132,12 +133,12 @@ class AuthProvider with ChangeNotifier {
       value: refreshTokenSnapshot,
     );
 
-    _jwt = JwtModel.fromJwtString(returnedJwt);
+    _accessTokenJwt = JwtModel.fromJwtString(returnedJwt);
 
-    _logger.config("Lang from jwt: ${_jwt?.locale}");
+    _logger.config("Lang from jwt: ${_accessTokenJwt?.locale}");
 
-    final Locale? locale = _jwt?.locale != null
-        ? kSupportedLocales[_jwt?.locale]
+    final Locale? locale = _accessTokenJwt?.locale != null
+        ? kSupportedLocales[_accessTokenJwt?.locale]
         : kFallbackLocale;
 
     if (locale != null) {
@@ -169,13 +170,13 @@ class AuthProvider with ChangeNotifier {
     try {
       _pendingAuthCheck = Completer<void>();
 
-      final JwtModel? jwtSnapshot = _jwt;
+      final JwtModel? jwtSnapshot = _accessTokenJwt;
       final String? refreshTokenSnapshot = _refreshToken;
 
       final bool hasRefreshTokenButNoValidJwt = refreshTokenSnapshot != null &&
           (jwtSnapshot == null || isExpired(jwtSnapshot));
       if (hasRefreshTokenButNoValidJwt) {
-        await _refreshJWT();
+        await refreshAccessToken();
       }
     } finally {
       _pendingAuthCheck?.complete();
@@ -275,13 +276,38 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> resetAuthTokensAndStorage() async {
     await _storageService.resetLocalStorage();
-    _jwt = null;
+    _accessTokenJwt = null;
     _refreshToken = null;
     notifyListeners();
   }
 
-  Future<void> _refreshJWT() async {
-    _logger.config("refreshJWT");
+  Future<String?> getAccessToken() async {
+    final expiryDateString = await _storageService.loadStringFromLocalStorage(
+      key: LocalStorageKey.accessTokenExpirationDateTime,
+    );
+    if (expiryDateString != null) {
+      final expiryDate = DateTime.parse(expiryDateString);
+
+      if (DateTime.now().isAfter(expiryDate)) {
+        // token is expired
+        return null;
+      }
+    }
+
+    return _storageService.loadStringFromLocalStorage(
+      key: LocalStorageKey.accessToken,
+    );
+  }
+
+  Future<void> refreshAccessToken() async {
+    _logger.config("refreshAccessToken");
+
+    _refreshToken = await _storageService.loadStringFromLocalStorage(
+      key: LocalStorageKey.refreshToken,
+    );
+    if (_refreshToken == null) {
+      _informUserAboutInvalidToken();
+    }
 
     final Map<String, dynamic> jsonMap = <String, dynamic>{
       "refresh_token": _refreshToken,
@@ -312,14 +338,26 @@ class AuthProvider with ChangeNotifier {
         final Map<TokenType, String> tokenMap =
             _tokenService.readRefreshAndJWTFromKeyCloakMap(keyCloakMap);
 
-        final String? newJwt = tokenMap[TokenType.jwt];
+        final String? newAccessToken = tokenMap[TokenType.jwt];
         final String? newRefreshToken = tokenMap[TokenType.refresh];
         final String? newIdToken = tokenMap[TokenType.id];
-        if (newJwt == null || newRefreshToken == null) return;
+        if (newAccessToken == null || newRefreshToken == null) return;
         _refreshToken = newRefreshToken;
         _idToken = newIdToken;
-        _jwt = JwtModel.fromJwtString(newJwt);
+        _accessTokenJwt = JwtModel.fromJwtString(newAccessToken);
 
+        unawaited(
+          _storageService.storeStringToLocalStorage(
+            key: LocalStorageKey.accessToken,
+            value: newAccessToken,
+          ),
+        );
+        unawaited(
+          _storageService.storeStringToLocalStorage(
+            key: LocalStorageKey.accessTokenExpirationDateTime,
+            value: _accessTokenJwt!.exp.toIso8601String(),
+          ),
+        );
         unawaited(
           _storageService.storeStringToLocalStorage(
             key: LocalStorageKey.refreshToken,
@@ -337,13 +375,24 @@ class AuthProvider with ChangeNotifier {
         _logger.config(res.reasonPhrase);
         _logger.config(res.body);
         await resetAuthTokensAndStorage();
+        _informUserAboutInvalidToken();
       }
     } on Exception catch (e) {
       _logger.warning(
         "$e: token could not be refreshed, clearing tokens and storage",
       );
       await resetAuthTokensAndStorage();
+      _informUserAboutInvalidToken();
     }
+  }
+
+  void _informUserAboutInvalidToken() {
+    final messengerState = ScaffoldMessenger.of(HelperService.globalContext);
+    messengerState.showSnackBar(
+      SnackBar(
+        content: Text(tr("general.invalidSession")),
+      ),
+    );
   }
 
   Future<void> logout() async {

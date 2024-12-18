@@ -21,6 +21,7 @@ general:
   housenumber: "Hausnr."
   id: "ID"
   invalidEmail: "E-mail ist ungültig."
+  invalidSession: "Es scheint, dass Ihre Sitzung nicht mehr gültig ist. Bitte melden Sie sich erneut an."
   yearBuild: "Baujahr"
   language: "Sprache"
   lastname: "Nachname"
